@@ -1,0 +1,24 @@
+﻿
+.ContinueButton { padding: 4px 8px; }
+.Multextbox { width: 258px; height: 84px; }
+.Counter_St { color: #00009b; font-size: 15px; font-weight: bold; }
+@media screen and (max-width: 979px) /* Tablet &Mobile*/ {
+
+ .Multextbox { width: 100%; }
+}
+
+.SCount { color: #003D5B; font-size: 18px; font-weight:bold; margin: 10px 0;}
+
+@page { margin: 0.5cm; }
+@media print {
+ .Site_Navigation, .footer, .UserPanel, .ContinueButton, #Print, .ui-tabs .ui-tabs-nav, .pgr, .PrintPage, .NoPrint { display: none; }
+ .maincontain { width: 100%; margin-left: 0; float: none; padding:0}
+
+
+ .mGrid th {border: 1px solid #333;}
+ .mGrid th a {color: #000; }
+
+ .mGrid td { border: 1px solid #333; font-size: 13px; padding: 5px 3px; color: #000; }
+ .mGrid td a { font-size: 13px; text-align: left; color: #000; }
+
+}

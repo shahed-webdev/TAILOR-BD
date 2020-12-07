@@ -1,0 +1,30 @@
+﻿
+.textbox { width: 192px; }
+.Datetime { width: 90%; }
+
+.ContinueButton { padding: 4px 8px; }
+
+.Lnk a { font-weight: normal; color: #0094ff; }
+.Cmd_Print {
+    padding: 6px 15px;
+    color:#000;
+}
+/****Responsive Design****/
+
+@media screen and (max-width: 979px) /* Tablet &Mobile*/ {
+
+ .dropdown { width: 94%; }
+ .Datetime, .textbox { width: 90%; }
+ /*----Tab Style -------*/
+ .ui-widget { margin-left: 2%; }
+ .ui-tabs .ui-tabs-nav li a { float: left; font-size: 16px; padding: 11px 13px; text-decoration: none; }
+}
+@page { margin: 0.5cm; }
+@media print {
+ .Site_Navigation, .footer, .Category, .UserPanel, .ContinueButton, .ui-tabs .ui-tabs-nav, 
+ .pgr, h3, .Logo, .Datetime, ul,.NoPrint,.RadioB,.Search_Date,.Search_Number{ display: none; }
+ .maincontain { width: 100%; left: 0; margin-left: 0; }
+ .headerBack { margin-bottom: 0; background-color: #ddd; border-bottom: 1px solid #333; height: 80px; text-align: center; }
+ .NameAndLogo { float: none; width: 100%; }
+ .Ins_Name { color: #333; font-size: 30px; text-align: center; margin: 18px 0 0; text-align: center; width: 100%; }
+}

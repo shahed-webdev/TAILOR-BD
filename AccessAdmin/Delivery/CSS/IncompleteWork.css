@@ -1,0 +1,36 @@
+﻿
+.HelpMsg{color:#f25d34;font-size:12px;font-style:italic}
+.ContinueButton{padding:4px 8px}
+.mGrid td .mGrid th{border:1px solid #fff;background-color:#fff;padding:0;color:#069263;font-size:11px}
+.mGrid th{font-size:13px;padding:6px 1px}
+.mGrid .textbox{font-size:12px;padding:2px 4px}
+.mGrid td table tr td{border:none;text-align:center}
+.mGrid td a {color: #333;}
+.ViewMesure{font-weight:bold;}
+.ViewMesure:hover {color:#f25d34}
+.P_Complete{background-color:#eee}
+.modalPopup{max-width:60%}
+.pgridstyle{border-bottom:solid 1px gray;padding:4px 0 20px}
+.pgridstyle2{border-bottom:none;padding:0}
+.Table_style{width:100%;margin-bottom:5px;font-size:14px}
+.Table_style td{border:1px solid #000;text-align:center;width:33%}
+.M_Size{font-size:18px}
+.O_Size{font-size:18px}
+.MesureMentSt tr td{vertical-align:top;padding:0 3px}
+hr{background:none;border-top:1px solid #000;margin:0;display:block}
+.MesureMentSt tr td table{border:1px solid #666}
+.MesureMentSt tr td table tr td{padding:1px 5px}
+#MeasurementWithName,#MeasurementWithoutName{border:none;padding:0}
+@media screen and (max-width: 979px) {
+.textbox{width:40%}
+}
+
+@page { margin: 0.5cm; }
+@media print {
+ .Site_Navigation, .footer, .Category, .UserPanel, .ContinueButton, .ui-tabs .ui-tabs-nav, 
+ .pgr, h3, .Logo, .Datetime, ul,.NoPrint,.RadioB,.Search_Date,.Search_Number{ display: none; }
+ .maincontain { width: 100%; left: 0; margin-left: 0; }
+ .headerBack { margin-bottom: 0; background-color: #ddd; border-bottom: 1px solid #333; height: 80px; text-align: center; }
+ .NameAndLogo { float: none; width: 100%; }
+ .Ins_Name { color: #333; font-size: 30px; text-align: center; margin: 18px 0 0; text-align: center; width: 100%; }
+}

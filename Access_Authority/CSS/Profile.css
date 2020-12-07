@@ -1,0 +1,166 @@
+﻿
+.Contain {
+   height:850px;
+}
+.Link {
+    float:left;
+     margin-left: 27px;
+}
+.Link ul{
+    list-style: outside none none;
+    margin: 0 0 0 7px;
+    padding: 0;
+    font-size: 14px;
+    line-height: 21px;
+  }
+.Link ul li{
+    border-bottom: 1px dotted;
+    padding: 3px 0;
+  }
+.Link h4{
+    margin: 9px 0 8px;
+    padding: 0;
+  }
+.Profile_Image {
+  float:left;
+  background:#fff;
+    }
+.P_Image {
+       border-radius: 2px;
+    height: 117px;
+    width: 109px;
+}
+.Name {
+    color: #003a6a;
+    font-family: Tahoma;
+    font-size: 14px;
+    font-weight: bold;
+    max-width: 180px;
+    padding: 5px 0;
+    text-align: center;
+}
+.Update_Info {
+    float:left;
+      background:#fff;
+}
+.PassWordChange {
+     background-color: #6ce075;
+    border: medium none;
+    color: #333;
+    cursor: pointer;
+    float: right;
+    font-size: 12px;
+    padding: 2px;
+}
+.ChangePassword {
+    position:absolute;
+    right:10px;
+    display:none;
+}
+.mGrid {
+   width:auto;
+       border: medium none;
+ }
+
+.mGrid td {
+    border: medium none;
+}
+
+.mGrid .alt {
+    background:none;
+}
+.Update_Info .textbox {
+    width:88%;
+}
+
+
+.Info_Border {
+    padding: 15px 4px 17px 10px;
+    width: 258px;
+}
+
+.Admin_Name {
+    font-size:20px;
+    font-weight:bold;
+    color: #747474;
+}
+.Admin_F_Name {
+    font-size:15px;
+    color: #747474;
+    margin-top: 5px;
+}
+.Heading {
+   color: #747474;
+    font-size: 17px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+.Sub_Heading {
+   color: #747474;
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+.Designation {
+    background: rgba(0, 0, 0, 0) url("../../AccessAdmin/CSS/Ico/Profile_Icon.png") no-repeat scroll 0 0;
+    color: #747474;
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 2px 0 0 28px;
+}
+.Mobile{
+    background: rgba(0, 0, 0, 0) url("../../AccessAdmin/CSS/Ico/Profile_Icon.png") no-repeat scroll 0 -84px;
+    color: #747474;
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 2px 0 0 28px;
+}
+.Email{
+    background: rgba(0, 0, 0, 0) url("../../AccessAdmin/CSS/Ico/Profile_Icon.png") no-repeat scroll 0 -126px;
+    color: #747474;
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 2px 0 0 28px;
+}
+.Address{
+    background: rgba(0, 0, 0, 0) url("../../AccessAdmin/CSS/Ico/Profile_Icon.png") no-repeat scroll 0 -168px;
+    color: #747474;
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 2px 0 0 28px;
+}
+
+.Data{
+   color: #747474;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 20px;
+     padding-left: 30px;
+}
+
+.Edit_Bnt {
+       background-color: #64cf70;
+    border: medium none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 30px;
+    padding: 4px 7px;
+    text-align: center;
+    width: 88px;
+}
+ a{
+   color: #5a5a5a;
+   text-decoration:none;
+}
+ a:hover{
+   color:#000;
+}
+ 
+.textbox {
+    color: #767676;
+}

@@ -1,0 +1,39 @@
+﻿
+.AcName { background-color: #ddd; font-size: 15px; font-weight: bold; padding: 5px;}
+.Balance { font-size: 15px; font-weight: bold; height: 10px; }
+
+.Total_Balance { border-top: 1px solid #000; font-size: 15px; font-weight: bold; height: 14px; }
+.Pre_Due { background-color: #ddd; font-size: 15px; font-weight: bold; padding: 5px; border: 1px solid; text-align:right;}
+.row { padding:4px 5px; color: #000; border-top:1px solid #000}
+.A_Title { width: 45%; float: left; }
+.A_value { width: 45%; float: right; text-align: right; }
+
+#Summery, #Details { border: none; }
+.Account-sec { margin: 0 10px; }
+
+
+fieldset { border: 1px solid #000; border-radius: 3px; display: table-cell; margin: 10px auto; padding: 0; }
+.F-set { padding: 8px;}
+legend { font-size: 20px; font-weight: bold; padding: 0 4px; }
+
+.clear { clear: both; }
+#Details h4 { margin-bottom: 3px; font-size: 16px; }
+.Balance_After {background-color: #ddd; font-size: 16px; font-weight: bold; text-align: right; margin-top: 16px; border: 1px solid; }
+
+.Amt { text-align: right; font-size: 15px; font-weight: bold; }
+.NetB { border-top: 1px solid #000; font-size: 15px; font-weight: bold; margin-top: 6px; padding-top: 5px; text-align: right; }
+
+@page { margin: 0.5cm; }
+
+@media print {
+ .Site_Navigation, .ui-tabs .ui-tabs-nav, .pgr, .Category, .UserPanel, .footer, .Logo_Img, .SearchButton, .print, .NoPrint { display: none; }
+ .maincontain { width: 100%; margin-left: 0; float: none; }
+
+ .headerBack { margin-bottom: 5px; border-bottom: 1px solid #333; height: 100px; text-align: center; }
+ .NameAndLogo { float: none; width: 100%; }
+ .Ins_Name { font-size: 30px; text-align: center; margin: 18px 0 0; width: 100%; }
+ .Ins_Address { color: #fff; }
+ .P_H { color:#000}
+
+ #Summery, #Details { border: none; border-radius: 0; padding: 0; }
+}

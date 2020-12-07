@@ -1,0 +1,13 @@
+﻿
+.Amnt { color: #265496; font-weight: bold; font-size: 14px; }
+.Subtotal_Amnt { color: #265496; font-weight: bold; font-size: 14px; }
+.textbox, .Datetime { width: 195px; }
+.Amount_Msg { color: #316418; font-size: 13px; font-weight: bold; }
+.SPl { cursor: pointer; }
+.mGrid { width: 60%; }
+
+.ui-autocomplete { background-color: #fff; cursor: default; max-height: 200px; overflow: auto; position: absolute; border: 1px solid #ddd; box-shadow: 2px 2px 5px #ebebeb; }
+.ui-menu-item { border-bottom: 1px solid #ddd; }
+.ui-menu-item:hover { border-bottom: 1px solid #ddd; }
+h3 { margin: 0; }
+.Cus_Info { display: block; font-size: 16px; margin: 10px 6px; }

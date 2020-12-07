@@ -1,0 +1,25 @@
+﻿
+.Datetime { width: 140px; }
+.print {padding: 15px 12px}
+.Amnt { color: #33cc33; font-size: large; font-weight: bold; }
+@media screen and (max-width:979px) {
+ .dropdown { width: 94%; }
+ .Datetime { width: 90%; }
+ .ui-tabs .ui-tabs-nav li { float: left; margin: 6px 1px 0px 1px; width: 100%; font-size: 16px; text-decoration: none; }
+}
+
+
+@page { margin: 0}
+@media print {
+.Site_Navigation, a,h3, .No_Print, .pgr, .Category, .UserPanel, .footer,.Logo_Img,.SearchButton,.print,.RadioB{ display: none; }
+ .maincontain { width: 100%; margin-left: 0; float: none;}
+ .headerBack { margin-bottom: 0; background-color: #ddd; border-bottom: 1px solid #333; height: 80px; text-align: center; }
+ .NameAndLogo { float: none; width: 100%; }
+ .Ins_Name { color: #333; font-size: 30px; text-align: center; margin: 18px 0 0; width: 100%; }
+
+#Expanse, #Due, #Paid { border: none; padding:0}
+
+ .mGrid th { padding:3px; font-weight:bold}
+ .mGrid td { padding: 3px 2px; }
+}
+

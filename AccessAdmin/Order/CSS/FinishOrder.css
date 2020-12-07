@@ -1,0 +1,42 @@
+﻿
+
+h3 { font-size: 15px; margin: 0 0 7px; padding: 0 0 5px 5px; border: none; }
+.Personal_Info { background-color: #fafafa; border: 1px solid #f2f2f2; float: left; padding: 8px 0 11px; margin-bottom: 16px; width: 60%; }
+.Profile_Image { float: left; font-size: 13px; font-weight: bold; margin: 0px 0 0 15px; text-align: center; }
+.P_Image { background-color: #fff; border: 1px solid #f2f2f2; border-radius: 3px; height: 122px; margin-top: 6px; padding: 10px; width: 105px; }
+.Updt_Image { height: 80px; width: 60px; }
+.Info { float: left; margin-left: 10px; width: 50%; }
+ .Info ul { margin: 0; padding: 0; }
+  .Info ul li { background: #fff none repeat scroll 0 0; border: 1px solid #f2f2f2; font-size: 14px; line-height: 29px; list-style: outside none none; margin: 6px 0 0; padding-left: 10px; color: #777; }
+.Summry { width: 60%; margin: 20px 0; }
+
+ .Summry ul { margin: 0; padding: 0; }
+  .Summry ul li { border-bottom: 1px solid #c3c3c3; font-size: 13px; line-height: 24px; list-style: outside none none; margin: 6px 0 0; font-weight: bold; }
+.Title_R { text-align: right; }
+.Amount_Msg { color: #316418; font-size: 13px; font-weight: bold; }
+
+.mGrid { width: 60%; }
+ .mGrid td { border: 1px solid #eaeaea; font-size: 12px; padding: 1px 3px; }
+
+  .mGrid td table td { border: none; }
+
+
+
+/*Responsive Design*/
+@media screen and (max-width: 979px) /* Tablet &Mobile*/ {
+ .Personal_Info { width: 100%; }
+
+ .Info { margin: 1% 0 0 1%; width: 68%; }
+
+ .Profile_Image { margin: 3% 0 0 1%; width: 29%; }
+
+ .P_Image { height: 76px; width: 77%; }
+
+
+ .textbox { width: 83%; }
+
+ .mGrid { width: 100%; }
+
+ #RD a { display: block; }
+ .T_Box_Sizing input { text-align: center; width: 65%; }
+}

@@ -1,0 +1,18 @@
+﻿
+/*Buying Report*/
+.Amount_Date {background-color:#ddd; color:#333; font-size: 20px; margin: 10px 0; padding: 5px;}
+.Title { border-bottom: 3px solid #888893; color: #153659; font-size: 20px; margin: 10px 0; }
+.HeadLine { background-color: #e7f7fd; color: #196689; float: left; font-size: 20px; margin: 6px; padding: 10px 35px; text-align: center;}
+.Amount { color: #08ccb4; }
+.S_Details { background-color: #e7f7fd; color: #014366; font-size:17px; margin: 12px 12px 0 0; padding: 14px 3px; text-align: center;}
+
+
+@page { margin: 0.5cm; }
+@media print {
+ .Site_Navigation, .footer, .Category, .UserPanel, .ContinueButton, .ui-tabs .ui-tabs-nav, .pgr, h3, .Logo, .Datetime, ul { display: none; }
+ .maincontain { width: 100%; left: 0; margin-left: 0; }
+ .headerBack { margin-bottom: 0; background-color: #ddd; border-bottom: 1px solid #333; height: 80px; text-align: center; }
+ .NameAndLogo { float: none; width: 100%; }
+ .Ins_Name { color: #333; font-size: 30px; text-align: center; margin: 18px 0 0; text-align: center; width: 100%; }
+ .S_Details, .HeadLine {background-color: #fff; border:1px solid #ddd}
+}

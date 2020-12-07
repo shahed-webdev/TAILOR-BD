@@ -1,0 +1,18 @@
+﻿.Contain{ background-color:#fff;  border:1px solid #ddd;  margin:auto;  width:960px}
+
+.ImgStyle{ height:130px;  width:120px;  border:3px solid #fff;  border-radius:5px}
+#GradingSystem{ float:right;  margin:0}
+.Print{ color:hsl(200,100%,29%);  text-decoration:none}
+.Print:hover{ color:hsl(200,100%,29%)}
+#ExamResults{ clear:both}
+#PrintVid{ margin-bottom:10px;  width:80px}
+ #PrintStudentInfo{ color:hsl(0,0%,0%);  float:left;  font-size:14px;  margin-bottom:10px;  width:310px}
+#Attendance a{ text-decoration:none}
+#Attendance a:hover{ color:rgb(5,69,247)}
+
+.Abs{ background-color:rgb(200,43,0);  color:#fff}
+.Late{ background-color:hsl(24,100%,59%);  color:hsl(0,0%,100%)}
+.Leave{ background-color:#6d6a6a;  color:#fff}
+
+.Site_Navigation{ display:none}
+.maincontain{ left:0;  width:auto;  position:relative;  margin:auto auto 30px;  padding:0 10px}

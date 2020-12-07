@@ -1,0 +1,95 @@
+﻿
+.mGrid { background-color: #fff; border: medium none; font-family: Arial,Helvetica; text-align: center; width: 100%; word-wrap: break-word; }
+.mGrid th { background-color:#00b4aa; border: 1px solid #ddd; border-bottom: 1px solid #7dabed; color: #fbfbfb; font-size: 12px; padding: 4px 3px; text-align: center; font-weight: normal; }
+.mGrid th a { color: #fff; text-decoration: none; }
+.mGrid th a:hover { color: #fff; text-decoration:underline; }
+.mGrid td { border: 1px solid #eaeaea; font-size: 12px; padding: 8px 0 8px 4px;}
+/*.mGrid > tbody > tr:hover { background: #fbf8e9; }*/
+.mGrid td a { color: #076db3; font-size: 12px; text-decoration: none; }
+
+ .mGrid .RowStyle { }
+ .mGrid .alt { background: url("grd_alt.png") repeat-x scroll center top #f7f7f7; }
+ .mGrid .alt { background: url("grd_alt.png") repeat-x scroll center top #fcfcfc; }
+ .mGrid .pgr { background-color: #00b4aa; }
+ .mGrid .pgr:hover { background-color:#00b4aa; }
+ .mGrid .pgr table { margin: 3px 0; }
+ .mGrid .pgr td { border-left: 1px solid #666; border-width: 0 0 0 1px; color: #fbfbfb; font-weight: bold; line-height: 12px; padding: 1px 7px; }
+ .mGrid .pgr a { color: #000; text-decoration: none; }
+ .mGrid .pgr a:hover { color: #fbfbfb; text-decoration: none; }
+ .mGrid .Selected { background-color: #9c0; }
+ .mGrid .GridFooter { background-color: #f4f4f4; border: 1px solid #ddd; font-weight: bold; padding: 7px 13px; text-align: center;}
+ .mGrid .textbox { width: 85%; }
+/*Dress Style*/
+.DGrid { background-color: #fff; border: medium none; font-family: Arial,Helvetica; width: 100%; word-wrap: break-word; }
+.DGrid td { border: 1px solid #fff; font-size: 14px; padding: 5px 2px; text-align: center; }
+.DGrid td a { color: #076db3; font-family: Tahoma; font-size: 9pt; text-decoration: none; }
+.DGrid th { border: none; border-bottom: 1px solid #ddd; color: #8e8e8e; font-size: 14px; padding: 6px; text-align: center; }
+.DGrid th a { color: #fff; text-decoration: none; }
+.DGrid th a:hover { color: #0094ff; }
+
+.sortasc a { background: url("Arrow_down.png") no-repeat scroll 95% 50% rgba(0,0,0,0); padding-right: 22px; }
+.sortdesc a { background: url("Arrow_up.png") no-repeat scroll 95% 50% rgba(0,0,0,0); padding-right: 22px; }
+
+
+/****Comand Icon****/
+.Edit,.Updete,.Cancel,.Delete,.Details,.Select,.Row_Selected,.Cmd_Print,.Delivery_Ic,.AddMoreDress,.CH_Mesure,.M_Receipt,.Mesurment,.Style { border:none; padding:6px 13px}
+
+.Edit { background:url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll 0 0}
+.Edit:hover { background:url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll 0 -36px}
+
+.Updete { background:url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -43px 0}
+.Updete:hover { background:url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -43px -36px}
+
+.Cancel { background:url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -85px 0}
+.Cancel:hover { background:url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -85px -36px}
+
+.Delete { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -128px 0}
+.Delete:hover { background: url(Cmd_Ico/Cmd_Ico.png) no-repeat scroll -128px -36px}
+
+.Details{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -167px 0}
+.Details:hover{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -167px -36px}
+
+.Select { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -209px 0}
+.Select:hover { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -209px -36px}
+
+.Row_Selected {background-color: #7cc2e1; color: #000}
+.Row_Selected .Select{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -209px -36px}
+
+.Cmd_Print{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -1px -74px}
+.Cmd_Print:hover { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -1px -112px}
+
+.Delivery_Ic{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -42px -74px}
+.Delivery_Ic:hover { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -42px -112px}
+
+.AddMoreDress{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -128px -74px}
+.AddMoreDress:hover { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -128px -112px}
+
+.CH_Mesure{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -208px -74px}
+.CH_Mesure:hover { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -208px -111px}
+
+.M_Receipt{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -85px -74px}
+.M_Receipt:hover { background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -85px -111px}
+
+.Mesurment{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -167px -74px}
+.Mesurment:hover{ background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -167px -112px}
+
+.Style {background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll 0px -149px}
+.Style:hover {background: url("Cmd_Ico/Cmd_Ico.png") no-repeat scroll -44px -149px}
+
+
+
+.Error { background-color: #d35e3e; color: #fff; }
+
+@media screen and (max-width:979px) /* Tablet &Mobile*/ {
+ .mGrid { width: 100%; }
+
+  .mGrid th { font-size: 11px; padding: 1px; font-weight: normal; }
+  .mGrid img { vertical-align: middle; page-break-inside: avoid; max-width: 100% !important; display: inline-block; height: 50px; }
+  .mGrid input { width: 90%; }
+
+  .mGrid .Updete { padding: 29px 17px; }
+  .mGrid .Cancel { padding: 15px 17px; }
+  .mGrid MHide, .search_textbox { display: none; }
+ .footable .search_textbox { display: none; }
+ .PGrid td { font-size: 12px; padding: 3px 7px; }
+}

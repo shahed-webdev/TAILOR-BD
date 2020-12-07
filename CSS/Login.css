@@ -1,0 +1,27 @@
+﻿.UserPanel{display:none}
+
+.Login_Mid{background:rgba(0,0,0,0) url("Image/Login_Border_Ico.png") no-repeat scroll 0 0; height:254px; margin:7% auto auto; padding:92px 41px 0 33px; width:306px}
+
+.Login_Area{margin-left:42px}
+
+.Login_Label{color:#666; font-family:sans-serif; font-size:13px; font-weight:bold}
+
+.LoginTextBox{border:1px solid #5785c7; height:24px; width:200px}
+
+.Login_Button{background-color:#fff; border:1px solid #5785c7; color:#666; font-family:sans-serif; font-size:13px; font-weight:bold; padding:3px 7px; cursor:pointer}
+
+/* phones */
+@media screen and (max-width:767px){ .Login_Mid{background:rgba(0,0,0,0) none repeat scroll 0 0; margin:auto; padding:17% 0 0; width:100%}
+
+ .Login_Area{margin-left:10%}
+
+ .Login_Label{font-size:16px}
+
+ .LoginTextBox{border:1px solid #5785c7; height:24px; width:246px; font-size:16px}
+}
+
+/* phones landscape*/
+@media only screen and (max-width:767px) and (orientation:landscape){ .Login_Mid{padding:17% 0 0 17%}
+}
+
+/***************end*************************/

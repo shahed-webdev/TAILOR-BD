@@ -1,0 +1,1203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7410AD33-57FA-46C3-A35F-197E1E83404A}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TailorBD</RootNamespace>
+    <AssemblyName>TailorBD</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AjaxControlToolkit">
+      <HintPath>C:\Users\Muhibullah\OneDrive\Projects\Sikkhaloy\Sikkhaloy\bin\AjaxControlToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="AjaxMin, Version=5.14.5506.26196, Culture=neutral, PublicKeyToken=21ef50ce11b5d80f, processorArchitecture=MSIL">
+      <HintPath>packages\AjaxMin.5.14.5506.26202\lib\net40\AjaxMin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ClientAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Abdus Sattar Code\SMS API\ClientAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Abdus Sattar Code\SMS API\Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="HttpSDK, Version=1.0.5699.31634, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Laptop BackUp\Loops IT\SMS Details\New API (9-Aug-2015)\HttpSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin">
+      <HintPath>packages\Microsoft.Owin.2.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\MicrosoftReportViewerWebForms.11.0.0.0\lib\Microsoft.ReportViewer.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\MicrosoftReportViewerWebForms.11.0.0.0\lib\Microsoft.ReportViewer.ProcessingObjectModel.DLL</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\MicrosoftReportViewerWebForms.11.0.0.0\lib\Microsoft.ReportViewer.WebForms.DLL</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\assembly\GAC_MSIL\Microsoft.ReportViewer.WinForms\11.0.0.0__89845dcd8080cc91\Microsoft.ReportViewer.WinForms.DLL</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AccessAdmin\Accounts\Accounts_Analysis.aspx" />
+    <Content Include="AccessAdmin\Accounts\Accounts_Report.aspx" />
+    <Content Include="AccessAdmin\Accounts\Add_Account.aspx" />
+    <Content Include="AccessAdmin\Accounts\Add_Expanse.aspx" />
+    <Content Include="AccessAdmin\Accounts\CSS\Expanse.css" />
+    <Content Include="AccessAdmin\Accounts\CSS\Ico\Adjsmnt.png" />
+    <Content Include="AccessAdmin\Accounts\CSS\Ico\In.png" />
+    <Content Include="AccessAdmin\Accounts\CSS\Ico\Out.png" />
+    <Content Include="AccessAdmin\Accounts\CSS\Ico\Sub_In.png" />
+    <Content Include="AccessAdmin\Accounts\CSS\Ico\Sub_Out.png" />
+    <Content Include="AccessAdmin\Accounts\CSS\Income.css" />
+    <Content Include="AccessAdmin\Accounts\CSS\Accounts_Summery.css" />
+    <Content Include="AccessAdmin\Accounts\CSS\Income_Expense_Report.css" />
+    <Content Include="AccessAdmin\Accounts\Deposit_Withdraw.aspx" />
+    <Content Include="AccessAdmin\Accounts\Income_And_Expense_Report.aspx" />
+    <Content Include="AccessAdmin\Accounts\Income.aspx" />
+    <Content Include="AccessAdmin\Accounts\Others_Income.aspx" />
+    <Content Include="AccessAdmin\CSS\CustomerDetails.css" />
+    <Content Include="AccessAdmin\CSS\DeliveryComplete.css" />
+    <Content Include="AccessAdmin\CSS\Ico\Profile_Icon.png" />
+    <Content Include="AccessAdmin\CSS\Profile.css" />
+    <Content Include="AccessAdmin\CSS\TailorInfo.css" />
+    <Content Include="AccessAdmin\Customer\Add_Customer_Mesurement.aspx" />
+    <Content Include="AccessAdmin\Customer\Css\CustomerList.css" />
+    <Content Include="AccessAdmin\Customer\Css\Print_Customer_Mesurement.css" />
+    <Content Include="AccessAdmin\Customer\CustomerDetails.aspx" />
+    <Content Include="AccessAdmin\Customer\CustomerList.aspx" />
+    <Content Include="AccessAdmin\Customer\Customer_Mesurement_Print.aspx" />
+    <Content Include="AccessAdmin\Delivery\CSS\IncompleteWork.css" />
+    <Content Include="AccessAdmin\Delivery\Delivered_Works.aspx" />
+    <Content Include="AccessAdmin\Delivery\Delivery.aspx" />
+    <Content Include="AccessAdmin\Delivery\DeliveryComplete.aspx" />
+    <Content Include="AccessAdmin\Delivery\Incompleteworks.aspx" />
+    <Content Include="AccessAdmin\Dress\AdMoreMeasurement.aspx" />
+    <Content Include="AccessAdmin\Dress\CSS\Dress.css" />
+    <Content Include="AccessAdmin\Dress\Measurement_Type_Add.aspx" />
+    <Content Include="AccessAdmin\Dress\Mesurement_Delete\Add_Dress.aspx" />
+    <Content Include="AccessAdmin\Dress\Mesurement_Delete\Delete_Measurement_Type.aspx" />
+    <Content Include="AccessAdmin\Dress\Mesurement_Delete\Measurement_Serialized.aspx" />
+    <Content Include="AccessAdmin\Dress\Mesurement_Printing_Setting.aspx" />
+    <Content Include="AccessAdmin\Employee\Add_Employee.aspx" />
+    <Content Include="AccessAdmin\Employee\Details.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Add_Fabrics.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Add_Fabrics_Brand.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Add_Fabrics_Category.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Add_Mesurement_Unit.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Buying\Buying_Report.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Buying\CSS\Report_Print.css" />
+    <Content Include="AccessAdmin\Fabrics\CSS\Ico\Ajax_Loading.gif" />
+    <Content Include="AccessAdmin\Fabrics\Damage\Css\Report_Print.css" />
+    <Content Include="AccessAdmin\Fabrics\Damage\Damage_Fabrics.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Damage\Damage_Report.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Fabrics_Stocks.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Fabric_Details.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Sell\CSS\Fabrics_Selling.css" />
+    <Content Include="AccessAdmin\Fabrics\Sell\CSS\Report_Print.css" />
+    <Content Include="AccessAdmin\Fabrics\Sell\Fabrics_Selling.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Sell\Print_Invoice.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Sell\Selling_Report.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Sell\Selling_Return.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Sell\Selling_Records.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Supplier\Add_Supplier.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Buying\Buying_Records.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Buying\Fabric_Buying.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Buying\Print_Invoice.aspx" />
+    <Content Include="AccessAdmin\Fabrics\Buying\Return.aspx" />
+    <Content Include="AccessAdmin\Fabrics\CSS\Receipt_Print.css" />
+    <Content Include="AccessAdmin\Fabrics\Supplier\Supplier_Details.aspx" />
+    <Content Include="AccessAdmin\Invoice\Print.css" />
+    <Content Include="AccessAdmin\Invoice\Print_Invoice.aspx" />
+    <Content Include="AccessAdmin\Order\Add_More_Dress_In_Order.aspx" />
+    <Content Include="AccessAdmin\Order\Change_Delivery_Date.aspx" />
+    <Content Include="AccessAdmin\Order\CSS\A4_Print.css" />
+    <Content Include="AccessAdmin\Order\CSS\Delete_Order.css" />
+    <Content Include="AccessAdmin\Order\CSS\FinishOrder.css" />
+    <Content Include="AccessAdmin\Order\CSS\Order_List.css" />
+    <Content Include="AccessAdmin\Order\CSS\Print_M.Receipt.css" />
+    <Content Include="AccessAdmin\Order\CSS\Print_Mesurement.css" />
+    <Content Include="AccessAdmin\Order\Delete_Order.aspx" />
+    <Content Include="AccessAdmin\Order\FinishOrder.aspx" />
+    <Content Include="AccessAdmin\Order\CSS\DressAndMeasurements.css" />
+    <Content Include="AccessAdmin\Order\Dressandmeasurements.aspx" />
+    <Content Include="AccessAdmin\Order\MoneyReceipt.aspx" />
+    <Content Include="AccessAdmin\Order\Order.aspx" />
+    <Content Include="AccessAdmin\Dress\Dress_Add.aspx" />
+    <Content Include="AccessAdmin\Dress\Dress_Style_Category_Add.aspx" />
+    <Content Include="AccessAdmin\Dress\Style_ Design_Add.aspx" />
+    <Content Include="AccessAdmin\Order\OrderDetailsForMaker.aspx" />
+    <Content Include="AccessAdmin\Order\OrdrList.aspx" />
+    <Content Include="AccessAdmin\Order\OrderDetailsForCustomer.aspx" />
+    <Content Include="AccessAdmin\Order\Print_A4_Mesurement.aspx" />
+    <Content Include="AccessAdmin\Order\Print_Mesurement.aspx" />
+    <Content Include="AccessAdmin\Profile.aspx" />
+    <Content Include="AccessAdmin\Reports\CSS\Ico\Complete.png" />
+    <Content Include="AccessAdmin\Reports\CSS\Ico\InComplete.png" />
+    <Content Include="AccessAdmin\Reports\CSS\Report_Print.css" />
+    <Content Include="AccessAdmin\Reports\Order_And_Delivery_Report_By_Date.aspx" />
+    <Content Include="AccessAdmin\Reports\Order_Report.aspx" />
+    <Content Include="AccessAdmin\SMS\Css\Ico\btn-close.png" />
+    <Content Include="AccessAdmin\SMS\Css\Print.css" />
+    <Content Include="AccessAdmin\SMS\Css\SMS.css" />
+    <Content Include="AccessAdmin\SMS\Others_SMS.aspx" />
+    <Content Include="AccessAdmin\SMS\Send_SMS.aspx" />
+    <Content Include="AccessAdmin\SMS\Sent_Records.aspx" />
+    <Content Include="AccessAdmin\Sub_Admin\Access_Manage.aspx" />
+    <Content Include="AccessAdmin\Sub_Admin\SignUp_Sub_Admin.aspx" />
+    <Content Include="AccessAdmin\TailorInfo.aspx" />
+    <Content Include="AccessSub_Admin\Css\Profile.css" />
+    <Content Include="AccessSub_Admin\Sub_Admin_Profile.aspx" />
+    <Content Include="Access_Authority\AccessSub_Authority\Create_Sub_Authority.aspx" />
+    <Content Include="Access_Authority\AccessSub_Authority\Css\Profile.css" />
+    <Content Include="Access_Authority\AccessSub_Authority\Sub_Authority_Profile.aspx" />
+    <Content Include="Access_Authority\Access_Manage\Admin_Access_Manage.aspx" />
+    <Content Include="Access_Authority\Access_Manage\Role_Access_Manage.aspx" />
+    <Content Include="Access_Authority\AddMarketingReport.aspx" />
+    <Content Include="Access_Authority\Approve_Unlock_User.aspx" />
+    <Content Include="Access_Authority\CSS\Institution_Pay_Invoice.css" />
+    <Content Include="Access_Authority\CSS\Print.css" />
+    <Content Include="Access_Authority\Create_Delete_Role.aspx" />
+    <Content Include="Access_Authority\CSS\Profile.css" />
+    <Content Include="Access_Authority\CSS\Create_Delete_Role.css" />
+    <Content Include="Access_Authority\CSS\Manage-Role.css" />
+    <Content Include="Access_Authority\CSS\Manage-User.css" />
+    <Content Include="Access_Authority\Invoice\AdMoreInvoice.aspx" />
+    <Content Include="Access_Authority\Invoice\Create_Invoice.aspx" />
+    <Content Include="Access_Authority\Invoice\Pay_Invoice.aspx" />
+    <Content Include="Access_Authority\Invoice\Print_Invoice.aspx" />
+    <Content Include="Access_Authority\Link\Category.aspx" />
+    <Content Include="Access_Authority\Link\Sub_Category.aspx" />
+    <Content Include="Access_Authority\Link\Sub_Category_Links.aspx" />
+    <Content Include="Access_Authority\Manage_Roles.aspx" />
+    <Content Include="Access_Authority\Manage_Users.aspx" />
+    <Content Include="Access_Authority\M_Report_Details.aspx" />
+    <Content Include="Access_Authority\Package.aspx" />
+    <Content Include="Access_Authority\Institution_List.aspx" />
+    <Content Include="Access_Authority\Profile.aspx" />
+    <Content Include="Access_Authority\See_Marketing_Report.aspx" />
+    <Content Include="Access_Authority\SignUp_Institution.aspx" />
+    <Content Include="CssGridview\Cmd_Ico\Arrow_down.png" />
+    <Content Include="CssGridview\Cmd_Ico\Arrow_up.png" />
+    <Content Include="CssGridview\Cmd_Ico\Cmd_Ico.png" />
+    <Content Include="CssGridview\Cmd_Ico\Design.png" />
+    <Content Include="CssGridview\Cmd_Ico\DesignH.png" />
+    <Content Include="CssGridview\Cmd_Ico\minus.png" />
+    <Content Include="CssGridview\Cmd_Ico\plus.png" />
+    <Content Include="CssGridview\Cmd_Ico\Printing.png" />
+    <Content Include="CssGridview\Cmd_Ico\select_arrow.png" />
+    <Content Include="CssGridview\Cmd_Ico\View.png" />
+    <Content Include="CssGridview\Gridview.css" />
+    <Content Include="CSS\Basic.css" />
+    <Content Include="CSS\Default.css" />
+    <Content Include="CSS\DesignMaster.css" />
+    <Content Include="CSS\Image\Add_Expense.png" />
+    <Content Include="CSS\Image\btn-close.png" />
+    <Content Include="CSS\Image\CheckBox.png" />
+    <Content Include="CSS\Image\Collaps_Ico.png" />
+    <Content Include="CSS\Image\ddarow.png" />
+    <Content Include="CSS\Image\banner.jpg" />
+    <Content Include="CSS\Image\Default\Dress.png" />
+    <Content Include="CSS\Image\Default\Logo.png" />
+    <Content Include="CSS\Image\Default\Mesurment.png" />
+    <Content Include="CSS\Image\Default\Profile.png" />
+    <Content Include="CSS\Image\Default\Style.png" />
+    <Content Include="CSS\Image\Expand_Ico.png" />
+    <Content Include="CSS\Image\gif-load.gif" />
+    <Content Include="CSS\Image\hr.png" />
+    <Content Include="CSS\Image\Login_Border_Ico.png" />
+    <Content Include="CSS\Image\Save_Ico.png" />
+    <Content Include="CSS\Image\Setting_Ico.png" />
+    <Content Include="CSS\Image\Ssettings.png" />
+    <Content Include="CSS\Image\Success.png" />
+    <Content Include="CSS\Image\Title_Binder.png" />
+    <Content Include="CSS\Image\Logo.png" />
+    <Content Include="CSS\Image\RadioButton.png" />
+    <Content Include="CSS\Image\Save.png" />
+    <Content Include="CSS\Image\Search.png" />
+    <Content Include="CSS\Image\social.png" />
+    <Content Include="CSS\Image\TextBox.gif" />
+    <Content Include="CSS\Image\Warning.png" />
+    <Content Include="CSS\Login.css" />
+    <Content Include="Default.aspx" />
+    <Content Include="JS\Autocomplete\jquery.autocomplete.js" />
+    <Content Include="JS\DatePicker\jquery.datepick.css" />
+    <Content Include="JS\DatePicker\jquery.datepick.js" />
+    <Content Include="JS\graphics\close.png" />
+    <Content Include="JS\graphics\closeX.png" />
+    <Content Include="JS\graphics\controlbar-black-border.gif" />
+    <Content Include="JS\graphics\controlbar-text-buttons.png" />
+    <Content Include="JS\graphics\controlbar-white-small.gif" />
+    <Content Include="JS\graphics\controlbar-white.gif" />
+    <Content Include="JS\graphics\controlbar2.gif" />
+    <Content Include="JS\graphics\controlbar3.gif" />
+    <Content Include="JS\graphics\controlbar4-hover.gif" />
+    <Content Include="JS\graphics\controlbar4.gif" />
+    <Content Include="JS\graphics\fullexpand.gif" />
+    <Content Include="JS\graphics\geckodimmer.png" />
+    <Content Include="JS\graphics\icon.gif" />
+    <Content Include="JS\graphics\loader.gif" />
+    <Content Include="JS\graphics\loader.white.gif" />
+    <Content Include="JS\graphics\outlines\beveled.png" />
+    <Content Include="JS\graphics\outlines\drop-shadow.png" />
+    <Content Include="JS\graphics\outlines\glossy-dark.png" />
+    <Content Include="JS\graphics\outlines\outer-glow.png" />
+    <Content Include="JS\graphics\outlines\rounded-black.png" />
+    <Content Include="JS\graphics\outlines\rounded-white.png" />
+    <Content Include="JS\graphics\resize.gif" />
+    <Content Include="JS\graphics\scrollarrows.png" />
+    <Content Include="JS\graphics\zoomin.cur" />
+    <Content Include="JS\graphics\zoomout.cur" />
+    <Content Include="JS\ImageUploder\img_upload.gif" />
+    <Content Include="JS\ImageUploder\jquery.FileUploaderStyle.js" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_gloss-wave_100_84ba4d_500x100.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_gloss-wave_100_eaf0ed_500x100.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_gloss-wave_16_ffffff_500x100.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_highlight-hard_15_888888_1x100.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_highlight-hard_55_555555_1x100.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-bg_highlight-soft_35_adadad_1x100.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-icons_117925_256x240.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-icons_666666_256x240.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-icons_aaaaaa_256x240.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-icons_bbbbbb_256x240.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-icons_cccccc_256x240.png" />
+    <Content Include="JS\jq_Profile\css\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="JS\jq_Profile\css\Profile_jquery-ui-1.8.23.custom.css" />
+    <Content Include="JS\jq_Profile\jquery-ui-1.8.23.custom.min.js" />
+    <Content Include="JS\requiered\quicksearch.js" />
+    <Content Include="JS\SMSCount\sms_counter.min.js" />
+    <Content Include="JS\Tabs\Tab.css" />
+    <Content Include="JS\TextSlide\Slide.js" />
+    <Content Include="JS\TimePicker\jquery.ptTimeSelect.css" />
+    <Content Include="JS\TimePicker\jquery.ptTimeSelect.js" />
+    <Content Include="Login.aspx" />
+    <Content Include="Profile_Redirect.aspx" />
+    <Content Include="UserGuide\Add_Measurements.aspx" />
+    <Content Include="UserGuide\Add_Style.aspx" />
+    <Content Include="UserGuide\Dress_Add.aspx" />
+    <Content Include="UserGuide\How_To_Order.aspx" />
+    <Content Include="UserGuide\Images\d-1.PNG" />
+    <Content Include="UserGuide\Images\d-2.PNG" />
+    <Content Include="UserGuide\Images\d-3.PNG" />
+    <Content Include="UserGuide\Images\d-4.PNG" />
+    <Content Include="UserGuide\Images\d-5.png" />
+    <Content Include="UserGuide\Images\m-1.png" />
+    <Content Include="UserGuide\Images\m-2.png" />
+    <Content Include="UserGuide\Images\m-3.png" />
+    <Content Include="UserGuide\Images\Order%286%29.png" />
+    <Content Include="UserGuide\Images\Order%287%29.png" />
+    <Content Include="UserGuide\Images\Order%288%29.png" />
+    <Content Include="UserGuide\Images\Order%281%29.png" />
+    <Content Include="UserGuide\Images\Order%282%29.png" />
+    <Content Include="UserGuide\Images\Order%283%29.png" />
+    <Content Include="UserGuide\Images\Order%284%29.png" />
+    <Content Include="UserGuide\Images\Order%285%29.png" />
+    <Content Include="UserGuide\Images\Order%289%29.png" />
+    <Content Include="UserGuide\Images\s-1.png" />
+    <Content Include="UserGuide\Images\s-2.png" />
+    <Content Include="UserGuide\Images\s-3.png" />
+    <Content Include="UserGuide\Images\s-4.png" />
+    <Content Include="UserGuide\Images\s-5.png" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccessAdmin\Accounts\Accounts_Analysis.aspx.cs">
+      <DependentUpon>Accounts_Analysis.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Accounts_Analysis.aspx.designer.cs">
+      <DependentUpon>Accounts_Analysis.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Accounts_Report.aspx.cs">
+      <DependentUpon>Accounts_Report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Accounts_Report.aspx.designer.cs">
+      <DependentUpon>Accounts_Report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Add_Account.aspx.cs">
+      <DependentUpon>Add_Account.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Add_Account.aspx.designer.cs">
+      <DependentUpon>Add_Account.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Add_Expanse.aspx.cs">
+      <DependentUpon>Add_Expanse.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Add_Expanse.aspx.designer.cs">
+      <DependentUpon>Add_Expanse.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Deposit_Withdraw.aspx.cs">
+      <DependentUpon>Deposit_Withdraw.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Deposit_Withdraw.aspx.designer.cs">
+      <DependentUpon>Deposit_Withdraw.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Income_And_Expense_Report.aspx.cs">
+      <DependentUpon>Income_And_Expense_Report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Income_And_Expense_Report.aspx.designer.cs">
+      <DependentUpon>Income_And_Expense_Report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Income.aspx.cs">
+      <DependentUpon>Income.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Income.aspx.designer.cs">
+      <DependentUpon>Income.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Others_Income.aspx.cs">
+      <DependentUpon>Others_Income.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Accounts\Others_Income.aspx.designer.cs">
+      <DependentUpon>Others_Income.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\Add_Customer_Mesurement.aspx.cs">
+      <DependentUpon>Add_Customer_Mesurement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\Add_Customer_Mesurement.aspx.designer.cs">
+      <DependentUpon>Add_Customer_Mesurement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\CustomerDetails.aspx.cs">
+      <DependentUpon>CustomerDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\CustomerDetails.aspx.designer.cs">
+      <DependentUpon>CustomerDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\CustomerList.aspx.cs">
+      <DependentUpon>CustomerList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\CustomerList.aspx.designer.cs">
+      <DependentUpon>CustomerList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\Customer_Mesurement_Print.aspx.cs">
+      <DependentUpon>Customer_Mesurement_Print.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Customer\Customer_Mesurement_Print.aspx.designer.cs">
+      <DependentUpon>Customer_Mesurement_Print.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\Delivered_Works.aspx.cs">
+      <DependentUpon>Delivered_Works.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\Delivered_Works.aspx.designer.cs">
+      <DependentUpon>Delivered_Works.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\Delivery.aspx.cs">
+      <DependentUpon>Delivery.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\Delivery.aspx.designer.cs">
+      <DependentUpon>Delivery.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\DeliveryComplete.aspx.cs">
+      <DependentUpon>DeliveryComplete.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\DeliveryComplete.aspx.designer.cs">
+      <DependentUpon>DeliveryComplete.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\Incompleteworks.aspx.cs">
+      <DependentUpon>Incompleteworks.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Delivery\Incompleteworks.aspx.designer.cs">
+      <DependentUpon>Incompleteworks.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\AdMoreMeasurement.aspx.cs">
+      <DependentUpon>AdMoreMeasurement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\AdMoreMeasurement.aspx.designer.cs">
+      <DependentUpon>AdMoreMeasurement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Measurement_Type_Add.aspx.cs">
+      <DependentUpon>Measurement_Type_Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Measurement_Type_Add.aspx.designer.cs">
+      <DependentUpon>Measurement_Type_Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Delete\Add_Dress.aspx.cs">
+      <DependentUpon>Add_Dress.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Delete\Add_Dress.aspx.designer.cs">
+      <DependentUpon>Add_Dress.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Delete\Delete_Measurement_Type.aspx.cs">
+      <DependentUpon>Delete_Measurement_Type.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Delete\Delete_Measurement_Type.aspx.designer.cs">
+      <DependentUpon>Delete_Measurement_Type.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Delete\Measurement_Serialized.aspx.cs">
+      <DependentUpon>Measurement_Serialized.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Delete\Measurement_Serialized.aspx.designer.cs">
+      <DependentUpon>Measurement_Serialized.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Printing_Setting.aspx.cs">
+      <DependentUpon>Mesurement_Printing_Setting.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Mesurement_Printing_Setting.aspx.designer.cs">
+      <DependentUpon>Mesurement_Printing_Setting.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Employee\Add_Employee.aspx.cs">
+      <DependentUpon>Add_Employee.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Employee\Add_Employee.aspx.designer.cs">
+      <DependentUpon>Add_Employee.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Employee\Details.aspx.cs">
+      <DependentUpon>Details.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Employee\Details.aspx.designer.cs">
+      <DependentUpon>Details.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Fabrics.aspx.cs">
+      <DependentUpon>Add_Fabrics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Fabrics.aspx.designer.cs">
+      <DependentUpon>Add_Fabrics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Fabrics_Brand.aspx.cs">
+      <DependentUpon>Add_Fabrics_Brand.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Fabrics_Brand.aspx.designer.cs">
+      <DependentUpon>Add_Fabrics_Brand.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Fabrics_Category.aspx.cs">
+      <DependentUpon>Add_Fabrics_Category.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Fabrics_Category.aspx.designer.cs">
+      <DependentUpon>Add_Fabrics_Category.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Mesurement_Unit.aspx.cs">
+      <DependentUpon>Add_Mesurement_Unit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Add_Mesurement_Unit.aspx.designer.cs">
+      <DependentUpon>Add_Mesurement_Unit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Buying_Report.aspx.cs">
+      <DependentUpon>Buying_Report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Buying_Report.aspx.designer.cs">
+      <DependentUpon>Buying_Report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Damage\Damage_Fabrics.aspx.cs">
+      <DependentUpon>Damage_Fabrics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Damage\Damage_Fabrics.aspx.designer.cs">
+      <DependentUpon>Damage_Fabrics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Damage\Damage_Report.aspx.cs">
+      <DependentUpon>Damage_Report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Damage\Damage_Report.aspx.designer.cs">
+      <DependentUpon>Damage_Report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Fabrics_Stocks.aspx.cs">
+      <DependentUpon>Fabrics_Stocks.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Fabrics_Stocks.aspx.designer.cs">
+      <DependentUpon>Fabrics_Stocks.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Fabric_Details.aspx.cs">
+      <DependentUpon>Fabric_Details.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Fabric_Details.aspx.designer.cs">
+      <DependentUpon>Fabric_Details.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Fabrics_Selling.aspx.cs">
+      <DependentUpon>Fabrics_Selling.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Fabrics_Selling.aspx.designer.cs">
+      <DependentUpon>Fabrics_Selling.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Print_Invoice.aspx.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Print_Invoice.aspx.designer.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Selling_Report.aspx.cs">
+      <DependentUpon>Selling_Report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Selling_Report.aspx.designer.cs">
+      <DependentUpon>Selling_Report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Selling_Return.aspx.cs">
+      <DependentUpon>Selling_Return.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Selling_Return.aspx.designer.cs">
+      <DependentUpon>Selling_Return.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Selling_Records.aspx.cs">
+      <DependentUpon>Selling_Records.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Sell\Selling_Records.aspx.designer.cs">
+      <DependentUpon>Selling_Records.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Supplier\Add_Supplier.aspx.cs">
+      <DependentUpon>Add_Supplier.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Supplier\Add_Supplier.aspx.designer.cs">
+      <DependentUpon>Add_Supplier.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Buying_Records.aspx.cs">
+      <DependentUpon>Buying_Records.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Buying_Records.aspx.designer.cs">
+      <DependentUpon>Buying_Records.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Fabric_Buying.aspx.cs">
+      <DependentUpon>Fabric_Buying.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Fabric_Buying.aspx.designer.cs">
+      <DependentUpon>Fabric_Buying.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Print_Invoice.aspx.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Print_Invoice.aspx.designer.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Return.aspx.cs">
+      <DependentUpon>Return.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Buying\Return.aspx.designer.cs">
+      <DependentUpon>Return.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Supplier\Supplier_Details.aspx.cs">
+      <DependentUpon>Supplier_Details.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Fabrics\Supplier\Supplier_Details.aspx.designer.cs">
+      <DependentUpon>Supplier_Details.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Invoice\Print_Invoice.aspx.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Invoice\Print_Invoice.aspx.designer.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Add_More_Dress_In_Order.aspx.cs">
+      <DependentUpon>Add_More_Dress_In_Order.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Add_More_Dress_In_Order.aspx.designer.cs">
+      <DependentUpon>Add_More_Dress_In_Order.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Change_Delivery_Date.aspx.cs">
+      <DependentUpon>Change_Delivery_Date.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Change_Delivery_Date.aspx.designer.cs">
+      <DependentUpon>Change_Delivery_Date.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Delete_Order.aspx.cs">
+      <DependentUpon>Delete_Order.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Delete_Order.aspx.designer.cs">
+      <DependentUpon>Delete_Order.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\FinishOrder.aspx.cs">
+      <DependentUpon>FinishOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\FinishOrder.aspx.designer.cs">
+      <DependentUpon>FinishOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Dressandmeasurements.aspx.cs">
+      <DependentUpon>Dressandmeasurements.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Dressandmeasurements.aspx.designer.cs">
+      <DependentUpon>Dressandmeasurements.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\MoneyReceipt.aspx.cs">
+      <DependentUpon>MoneyReceipt.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\MoneyReceipt.aspx.designer.cs">
+      <DependentUpon>MoneyReceipt.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Order.aspx.cs">
+      <DependentUpon>Order.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Order.aspx.designer.cs">
+      <DependentUpon>Order.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Dress_Add.aspx.cs">
+      <DependentUpon>Dress_Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Dress_Add.aspx.designer.cs">
+      <DependentUpon>Dress_Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Dress_Style_Category_Add.aspx.cs">
+      <DependentUpon>Dress_Style_Category_Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Dress_Style_Category_Add.aspx.designer.cs">
+      <DependentUpon>Dress_Style_Category_Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Style_ Design_Add.aspx.cs">
+      <DependentUpon>Style_ Design_Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Dress\Style_ Design_Add.aspx.designer.cs">
+      <DependentUpon>Style_ Design_Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\OrderDetailsForCustomer.aspx.cs">
+      <DependentUpon>OrderDetailsForCustomer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\OrderDetailsForCustomer.aspx.designer.cs">
+      <DependentUpon>OrderDetailsForCustomer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\OrderDetailsForMaker.aspx.cs">
+      <DependentUpon>OrderDetailsForMaker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\OrderDetailsForMaker.aspx.designer.cs">
+      <DependentUpon>OrderDetailsForMaker.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\OrdrList.aspx.cs">
+      <DependentUpon>OrdrList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\OrdrList.aspx.designer.cs">
+      <DependentUpon>OrdrList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Print_A4_Mesurement.aspx.cs">
+      <DependentUpon>Print_A4_Mesurement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Print_A4_Mesurement.aspx.designer.cs">
+      <DependentUpon>Print_A4_Mesurement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Print_Mesurement.aspx.cs">
+      <DependentUpon>Print_Mesurement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Order\Print_Mesurement.aspx.designer.cs">
+      <DependentUpon>Print_Mesurement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Profile.aspx.cs">
+      <DependentUpon>Profile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Profile.aspx.designer.cs">
+      <DependentUpon>Profile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Reports\Order_And_Delivery_Report_By_Date.aspx.cs">
+      <DependentUpon>Order_And_Delivery_Report_By_Date.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Reports\Order_And_Delivery_Report_By_Date.aspx.designer.cs">
+      <DependentUpon>Order_And_Delivery_Report_By_Date.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Reports\Order_DataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Order_DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Reports\Order_Report.aspx.cs">
+      <DependentUpon>Order_Report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Reports\Order_Report.aspx.designer.cs">
+      <DependentUpon>Order_Report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\SMS\Others_SMS.aspx.cs">
+      <DependentUpon>Others_SMS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\SMS\Others_SMS.aspx.designer.cs">
+      <DependentUpon>Others_SMS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\SMS\Send_SMS.aspx.cs">
+      <DependentUpon>Send_SMS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\SMS\Send_SMS.aspx.designer.cs">
+      <DependentUpon>Send_SMS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\SMS\Sent_Records.aspx.cs">
+      <DependentUpon>Sent_Records.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\SMS\Sent_Records.aspx.designer.cs">
+      <DependentUpon>Sent_Records.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Sub_Admin\Access_Manage.aspx.cs">
+      <DependentUpon>Access_Manage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Sub_Admin\Access_Manage.aspx.designer.cs">
+      <DependentUpon>Access_Manage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\Sub_Admin\SignUp_Sub_Admin.aspx.cs">
+      <DependentUpon>SignUp_Sub_Admin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\Sub_Admin\SignUp_Sub_Admin.aspx.designer.cs">
+      <DependentUpon>SignUp_Sub_Admin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\TailorInfo.aspx.cs">
+      <DependentUpon>TailorInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\TailorInfo.aspx.designer.cs">
+      <DependentUpon>TailorInfo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessSub_Admin\Sub_Admin_Profile.aspx.cs">
+      <DependentUpon>Sub_Admin_Profile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessSub_Admin\Sub_Admin_Profile.aspx.designer.cs">
+      <DependentUpon>Sub_Admin_Profile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\AccessSub_Authority\Create_Sub_Authority.aspx.cs">
+      <DependentUpon>Create_Sub_Authority.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\AccessSub_Authority\Create_Sub_Authority.aspx.designer.cs">
+      <DependentUpon>Create_Sub_Authority.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\AccessSub_Authority\Sub_Authority_Profile.aspx.cs">
+      <DependentUpon>Sub_Authority_Profile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\AccessSub_Authority\Sub_Authority_Profile.aspx.designer.cs">
+      <DependentUpon>Sub_Authority_Profile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Access_Manage\Admin_Access_Manage.aspx.cs">
+      <DependentUpon>Admin_Access_Manage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Access_Manage\Admin_Access_Manage.aspx.designer.cs">
+      <DependentUpon>Admin_Access_Manage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Access_Manage\Role_Access_Manage.aspx.cs">
+      <DependentUpon>Role_Access_Manage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Access_Manage\Role_Access_Manage.aspx.designer.cs">
+      <DependentUpon>Role_Access_Manage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\AddMarketingReport.aspx.cs">
+      <DependentUpon>AddMarketingReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\AddMarketingReport.aspx.designer.cs">
+      <DependentUpon>AddMarketingReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Approve_Unlock_User.aspx.cs">
+      <DependentUpon>Approve_Unlock_User.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Approve_Unlock_User.aspx.designer.cs">
+      <DependentUpon>Approve_Unlock_User.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Create_Delete_Role.aspx.cs">
+      <DependentUpon>Create_Delete_Role.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Create_Delete_Role.aspx.designer.cs">
+      <DependentUpon>Create_Delete_Role.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\AdMoreInvoice.aspx.cs">
+      <DependentUpon>AdMoreInvoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\AdMoreInvoice.aspx.designer.cs">
+      <DependentUpon>AdMoreInvoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\Create_Invoice.aspx.cs">
+      <DependentUpon>Create_Invoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\Create_Invoice.aspx.designer.cs">
+      <DependentUpon>Create_Invoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\Pay_Invoice.aspx.cs">
+      <DependentUpon>Pay_Invoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\Pay_Invoice.aspx.designer.cs">
+      <DependentUpon>Pay_Invoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\Invoice_DataSet1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Invoice_DataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\Print_Invoice.aspx.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Invoice\Print_Invoice.aspx.designer.cs">
+      <DependentUpon>Print_Invoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Link\Category.aspx.cs">
+      <DependentUpon>Category.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Link\Category.aspx.designer.cs">
+      <DependentUpon>Category.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Link\Sub_Category.aspx.cs">
+      <DependentUpon>Sub_Category.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Link\Sub_Category.aspx.designer.cs">
+      <DependentUpon>Sub_Category.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Link\Sub_Category_Links.aspx.cs">
+      <DependentUpon>Sub_Category_Links.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Link\Sub_Category_Links.aspx.designer.cs">
+      <DependentUpon>Sub_Category_Links.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Manage_Roles.aspx.cs">
+      <DependentUpon>Manage_Roles.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Manage_Roles.aspx.designer.cs">
+      <DependentUpon>Manage_Roles.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Manage_Users.aspx.cs">
+      <DependentUpon>Manage_Users.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Manage_Users.aspx.designer.cs">
+      <DependentUpon>Manage_Users.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\M_Report_Details.aspx.cs">
+      <DependentUpon>M_Report_Details.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\M_Report_Details.aspx.designer.cs">
+      <DependentUpon>M_Report_Details.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Package.aspx.cs">
+      <DependentUpon>Package.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Package.aspx.designer.cs">
+      <DependentUpon>Package.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Institution_List.aspx.cs">
+      <DependentUpon>Institution_List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Institution_List.aspx.designer.cs">
+      <DependentUpon>Institution_List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\Profile.aspx.cs">
+      <DependentUpon>Profile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\Profile.aspx.designer.cs">
+      <DependentUpon>Profile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\See_Marketing_Report.aspx.cs">
+      <DependentUpon>See_Marketing_Report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\See_Marketing_Report.aspx.designer.cs">
+      <DependentUpon>See_Marketing_Report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Access_Authority\SignUp_Institution.aspx.cs">
+      <DependentUpon>SignUp_Institution.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Access_Authority\SignUp_Institution.aspx.designer.cs">
+      <DependentUpon>SignUp_Institution.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Basic.Master.cs">
+      <DependentUpon>Basic.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Basic.Master.designer.cs">
+      <DependentUpon>Basic.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Design.Master.cs">
+      <DependentUpon>Design.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Design.Master.designer.cs">
+      <DependentUpon>Design.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\AuthorityHandler.ashx.cs">
+      <DependentUpon>AuthorityHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Customer.ashx.cs">
+      <DependentUpon>Customer.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\DressHandler.ashx.cs">
+      <DependentUpon>DressHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Fabrics.ashx.cs">
+      <DependentUpon>Fabrics.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Find_Customer_Name.ashx.cs">
+      <DependentUpon>Find_Customer_Name.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Find_Mobile_No.ashx.cs">
+      <DependentUpon>Find_Mobile_No.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\MeasurementType.ashx.cs">
+      <DependentUpon>MeasurementType.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Style_Name.ashx.cs">
+      <DependentUpon>Style_Name.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\TailorInfo.ashx.cs">
+      <DependentUpon>TailorInfo.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Profile_Redirect.aspx.cs">
+      <DependentUpon>Profile_Redirect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Profile_Redirect.aspx.designer.cs">
+      <DependentUpon>Profile_Redirect.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SMS_Class.cs" />
+    <Compile Include="UserGuide\Add_Measurements.aspx.cs">
+      <DependentUpon>Add_Measurements.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserGuide\Add_Measurements.aspx.designer.cs">
+      <DependentUpon>Add_Measurements.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UserGuide\Add_Style.aspx.cs">
+      <DependentUpon>Add_Style.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserGuide\Add_Style.aspx.designer.cs">
+      <DependentUpon>Add_Style.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UserGuide\Dress_Add.aspx.cs">
+      <DependentUpon>Dress_Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserGuide\Dress_Add.aspx.designer.cs">
+      <DependentUpon>Dress_Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UserGuide\How_To_Order.aspx.cs">
+      <DependentUpon>How_To_Order.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserGuide\How_To_Order.aspx.designer.cs">
+      <DependentUpon>How_To_Order.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Basic.Master" />
+    <Content Include="Design.Master" />
+    <Content Include="Handler\AuthorityHandler.ashx" />
+    <Content Include="Handler\MeasurementType.ashx" />
+    <Content Include="Handler\DressHandler.ashx" />
+    <Content Include="Handler\Style_Name.ashx" />
+    <Content Include="Handler\TailorInfo.ashx" />
+    <Content Include="Handler\Customer.ashx" />
+    <Content Include="Access_Authority\Invoice\Invoice_DataSet.xsc">
+      <DependentUpon>Invoice_DataSet.xsd</DependentUpon>
+    </Content>
+    <Content Include="AccessAdmin\Reports\Order_DataSet.xsc">
+      <DependentUpon>Order_DataSet.xsd</DependentUpon>
+    </Content>
+    <None Include="AccessAdmin\Reports\Order_DataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>Order_DataSet.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="AccessAdmin\Reports\Order_DataSet.xss">
+      <DependentUpon>Order_DataSet.xsd</DependentUpon>
+    </Content>
+    <None Include="Access_Authority\Invoice\Invoice_DataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>Invoice_DataSet1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Access_Authority\Invoice\Invoice_DataSet.xss">
+      <DependentUpon>Invoice_DataSet.xsd</DependentUpon>
+    </Content>
+    <Content Include="Handler\Fabrics.ashx" />
+    <Content Include="Handler\Find_Mobile_No.ashx" />
+    <Content Include="Handler\Find_Customer_Name.ashx" />
+    <Content Include="packages.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AccessAdmin\Reports\OrderReport.rdlc" />
+    <EmbeddedResource Include="Access_Authority\Invoice\Report_Invoice.rdlc" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AccessAdmin\Sub_Admin\Css\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>8456</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:8458/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

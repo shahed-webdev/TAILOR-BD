@@ -1,0 +1,23 @@
+﻿
+.textbox,.Datetime {
+    width:240px;
+}
+
+.Img {
+    height: 100px;
+    vertical-align: middle;
+    page-break-inside: avoid;
+    max-width: 100% !important;
+    display: inline-block;
+    }
+@media screen and (max-width: 979px) /* Tablet &Mobile*/ {
+
+.dropdown {
+    width: 94%;
+}
+.Datetime,.textbox {
+    width: 90%;
+}
+
+}
+

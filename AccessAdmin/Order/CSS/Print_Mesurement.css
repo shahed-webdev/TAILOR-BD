@@ -1,0 +1,56 @@
+﻿
+
+@media screen {
+.No_Print {margin-bottom: 30px;}
+.Block { display: block; }
+.pgridstyle {padding: 0 0 35px}
+.InsName{ color: #000; font-size:17px; font-weight: bold; text-align: center; font-family: Tahoma}
+
+.Table_style { width: 100%; margin-bottom:60px; font-size: 15px; }
+.Table_style td { border: 1px solid #000; padding: 6px 0 10px; text-align: center; width: 33%}
+ 
+.M_Size { font-size: 14px; }
+.O_Size { font-size: 18px; }
+.CuName { color: #000; font-size:18px; font-weight: bold; margin-bottom:15px; text-align: center; width: 100%; }
+
+.MesureMentSt tr td { vertical-align: top; padding: 0 3px}
+.MesureMentSt tr td table { border: 1px solid #666}
+.MesureMentSt tr td table tr td { padding: 1px 5px; text-align: center}
+ 
+ hr { background: none; border-top: 1px solid #000000; margin: 0; display: block }
+.pgr { background-color: #f4f4f4; }
+.pgr table { margin: 3px 0; }
+.pgr td { border-left: 1px solid #666; border-width: 0 0 0 1px; color: #1da092; font-weight: bold; line-height: 12px; padding: 0 6px; }
+.pgr a { color: #7b7b7b; text-decoration: none; }
+.pgr a:hover { color: #ff6a00; text-decoration: underline; }
+
+.dropdown { padding-bottom: 0; width: 203px; height: initial; }
+.Drs_TB{ text-align:center; border:1px solid #666; font-size:13px; font-weight:bold; width:95%}
+
+.SaveFont { background: url("../../../CSS/Image/Save.png") no-repeat scroll 0 0 / 90% auto; border: medium none; padding: 4px 11px; cursor: pointer; }
+.SaveFont:hover { opacity: 0.7; }
+}
+
+
+/***Media print*****/
+@page {margin:0 210px}
+@media print {
+html, body {height:80%;} /*prevent blank page print*/
+.Site_Navigation, a, .No_Print, .pgr, .Category, .UserPanel,.headerBack, .footer, .print, .Class, #btnPrint,h3,.dropdown,.ContinueButton{ display: none}
+.maincontain { width: 100%; left: 0; padding:0; margin:0; float:none}
+.InsName{ color: #000; font-size:17px; font-weight: bold; text-align: center; font-family: Tahoma}
+
+.Table_style { width: 100%; margin-bottom:60px; font-size: 15px; }
+.Table_style td{ border: 1px solid #000;  padding: 6px 0 10px; text-align: center; width: 33%; }
+
+.M_Size { font-size: 14px; }
+.O_Size { font-size: 18px; }
+.CuName { color: #000; font-size:18px; font-weight: bold; margin-bottom: 6px; text-align: center; width: 100%; }
+
+.MesureMentSt tr td { vertical-align: top; padding: 2px 3px; }
+.MesureMentSt tr td table { border: 1px solid #666; }
+.MesureMentSt tr td table tr td { padding: 1px; text-align: center;}
+
+ hr { background: none; border-top: 1px solid #000000; margin: 0; display: block; }
+.Drs_TB{ text-align:center; border:none; font-size:13px; font-weight:bold; width:95%}
+}

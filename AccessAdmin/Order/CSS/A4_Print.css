@@ -1,0 +1,39 @@
+﻿.NameLogo { width: 100%; height: 120px; }
+.Sample { border: 1px solid #777; float: left; height: 60px; padding-top: 40px; text-align: center; width: 25%; }
+.LogoName { float: left; font-size: 15px; font-weight: bold; text-align: center; width: 49.81%; }
+.OnoDDate { float: right; font-size: 15px; font-weight: bold; text-align: center; width: 25%; }
+.ODBack { background-color: #595959; color: #fff; margin-bottom: 5px; padding: 4px 5px; }
+.Mwraper { width: 100%; margin-top: 10px; clear: both; }
+.M { float: left; width: 20%; clear: both; }
+.LMesure { font-size: 14px; color: #686868; font-weight: bold; border-bottom: 1px solid #8a8a8a; }
+.RMesure { font-size: 14px; text-align: right; color: #686868; font-weight: bold; border-bottom: 1px solid #8a8a8a; }
+.S { float: left; width: 80%; }
+
+.pgr { background-color: #f4f4f4; }
+.pgr table { margin: 3px 0; }
+.pgr td { border-left: 1px solid #666; border-width: 0 0 0 1px; color: #1da092; font-weight: bold; line-height: 12px; padding: 0 6px; }
+.pgr a { color: #7b7b7b; text-decoration: none; }
+.pgr a:hover { color: #ff6a00; text-decoration: underline; }
+
+#body_MwithPicGridView_StyleDataList_0_OrderStyleDataList_5 { margin: auto; }
+.SCategory { color: #686868; font-weight: bold; }
+.StyleSprt { border: 1px solid #d0d0d0; float: left; margin: 5px; padding: 5px; }
+.Style_Sprt { border: 1px dotted #afafaf; margin: 0 1px; padding: 5px; text-align: center; color: #5b5b5b; }
+.StyleImg { height: 70px; max-width: 100% !important; padding: 1px; vertical-align: middle; }
+.DressImg { border: 1px solid #c7c7c7; margin-top: 15px; padding: 18px 0; text-align: center; }
+.DressImg img { width: 180px; height: 200px; }
+.Style_Details { clear: both; font-size: 15px; font-style: italic; padding: 12px; }
+.Info ul { margin: 0; padding: 0; }
+.Info ul li { background: #fff none repeat scroll 0 0; border: 1px solid #f2f2f2; font-size: 14px; line-height: 26px; list-style: outside none none; margin: 7px 0 0; padding-left: 10px; color: #777; }
+.C_Info { background-color: #595959; border: 1px solid #777; color: #fff; font-size: 17px; font-weight: bold; margin-top: 5px; padding: 6px}
+
+
+
+@page { margin: 0.2in}
+@media print {
+.Site_Navigation,.headerBack, a,h3, .print, .pgr, .Category, .UserPanel, .footer{ display: none; }
+.maincontain { width: 100%; left: 0; padding:0; margin:0; float:none}
+ .StyleImg { height: 70px; }
+ .M { float: left; width: 30%; }
+ .S { float: left; width: 70%; }
+}

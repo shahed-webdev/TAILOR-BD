@@ -1,0 +1,11 @@
+﻿
+.modalPopup { width: 350px; }
+.modalPopup .Pop_Contain { text-align: center; padding: 7px; }
+.Warning { background: url("../../CSS/Image/Warning.png") no-repeat scroll 3px 0; display: block; color: #D00000; font-size: 14px; padding: 0 0 10px 30px; }
+.Success { background: url("../../CSS/Image/Success.png") no-repeat scroll 25px 10px; color: #02a952; display: block; font-size: 16px; padding: 10px; }
+.Pending { background-color: #D4D0BF; color: #333; padding: 1px 6px; }
+.PartlyDelivered { background-color: #8594AE; color: #fff; padding: 1px 6px; }
+.Delivered { background-color: #404C66; color: #fff; padding: 1px 6px; }
+.mGrid > tbody > tr:hover { color: #000; }
+.mGrid th a { text-decoration: underline; font-size: 13px}
+.mGrid th a:hover { text-decoration:none; color:#fff }

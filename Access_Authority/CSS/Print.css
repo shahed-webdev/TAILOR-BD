@@ -1,0 +1,13 @@
+﻿
+
+
+@page { margin: 0.5cm; }
+
+@media print {
+
+ body { background: none; }
+ .headerBack ,.search_textbox, .Hide,a{ display: none; }
+ .mGrid { width: 100%; }
+ .mGrid td { font-size: 14px; padding: 5px; color: #000; }
+
+}

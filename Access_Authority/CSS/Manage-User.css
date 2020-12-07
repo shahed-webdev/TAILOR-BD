@@ -1,0 +1,13 @@
+﻿
+#Contain{
+    height:auto;
+}
+#Contain a{
+ text-decoration:none;
+ color:rgb(0, 38, 255);
+ font-family:Tahoma;
+ font-size:12px;
+}
+#Contain a:hover {
+    color:rgb(255, 106, 0);
+}

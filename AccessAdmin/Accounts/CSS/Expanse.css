@@ -1,0 +1,12 @@
+﻿.textbox, .Datetime{ width:194px}
+@media screen and (max-width:979px){
+.dropdown{ width:94%}
+.Datetime, .textbox{ width:90%}
+}
+
+@page { margin: 0.3in}
+@media print {
+.Site_Navigation, a,h3, .No_Print, .pgr, .Category, .UserPanel, .footer,.Logo_Img,.SearchButton{ display: none; }
+.maincontain { width: 100%; left: 0; padding:0; margin:0; float:none}
+#Expanse, #Due, #Paid { border: none; padding:0}
+}

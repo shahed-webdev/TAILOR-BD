@@ -1,0 +1,71 @@
+﻿
+
+h3 {
+    font-size: 15px;
+    margin: 0 0 7px;
+    padding: 0 0 5px 5px;
+    border:none;
+}
+.Personal_Info {
+     background-color: #fafafa;
+    border: 1px solid #f2f2f2;
+    float: left;
+    padding: 10px 0 18px;
+    width: 100%;
+}
+.Profile_Image {
+   float: left;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 11px 0 0 22px;
+    text-align: center;
+ }
+.P_Image {
+    background-color: #fff;
+    border: 1px solid #f2f2f2;
+    border-radius: 3px;
+    height:143px;
+    padding: 10px;
+    width: 130px;
+}
+.Updt_Image {
+    height:80px;
+    width:60px;
+}
+.Info{
+     float: left;
+    margin-left:1%;
+    width:50%;
+ }
+.Info ul{
+    margin:0;
+    padding:0;
+}
+.Info ul li{
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #f2f2f2;
+    font-size: 15px;
+    line-height: 33px;
+    list-style: outside none none;
+    margin: 9px 0 0;
+    padding-left: 15px;
+}
+
+.BasicInfo {
+  margin-top:50px;
+}
+.RowColor {
+    background-color:red;
+}
+
+ a{
+   color:#0063cf;
+   text-decoration:none;
+}
+ a:hover{
+   color:#000;
+}
+ 
+.textbox {
+    color: #767676;
+}

@@ -1,0 +1,85 @@
+﻿
+.RadioB { padding: 0; }
+.Dress { background-color: #ff9400; color: #fff; border-top: 1px solid #fff; font-weight: bold; }
+.Personal_Info { background-color: #fafafa; border: 1px solid #f2f2f2; float: left; padding: 7px 0 11px; width: 60%; margin-bottom: 16px; }
+
+.Profile_Image { float: left; margin: 11px 0 0 15px; text-align: center; }
+
+.P_Image { background-color: #fff; border: 1px solid #f2f2f2; border-radius: 3px; height: 75px; padding: 10px; width: 72px; }
+
+.Info { float: left; margin: 4px 0 0 1%; width: 50%; }
+
+ .Info ul { margin: 0; padding: 0; }
+
+  .Info ul li { background: #fff none repeat scroll 0 0; border: 1px solid #f2f2f2; font-size: 14px; line-height: 26px; list-style: outside none none; margin: 7px 0 0; padding-left: 10px; color: #777; }
+
+.SelectDress { margin: 0 0 14px 2px; }
+
+.Mesure_Style { float: left; margin-left: 3px; max-width: 80%; }
+
+.DGrid { width: auto; }
+
+ .DGrid th { color: #333; padding-bottom: 5px; text-align: left; font-size: 16px; }
+
+#MesasurmentType table td { vertical-align: top; }
+
+.Mesure { background-color: #fafafa; border: 1px solid #ddd; clear: both; float: left; margin-bottom: 30px; padding: 11px 13px; width: 96%; }
+
+.DetailsHead { color: #333; float: left; font-size: 14px; padding: 5px; text-align: center; /*width:90px;*/ overflow: auto; }
+
+ .DetailsHead .textbox { text-align: center; width: 90%; }
+
+h3 { border-bottom: none; font-size: 15px; margin: 0; padding: 0; }
+
+.DGrid td { text-align: left; }
+
+.mGrid td table td { border: none; }
+
+.Style_Input { background-color: #fff; border: 1px solid #ddd; float: left; font-size: 14px; height: 145px; margin: 5px; max-width: 320px; min-width: 130px; padding: 11px 5px; text-align: center; overflow: auto; }
+
+.Color { border: 1px solid #333; float: left; font-size: 14px; margin: 5px; padding: 11px 5px; text-align: center; max-width: 320px; min-width: 130px; height: 145px; background-color: #fff; overflow: auto; }
+
+.StyleImg { height: 90px; padding: 2px; max-width: 100% !important; padding: 2px; vertical-align: middle; }
+
+.DDL { border: 1px solid #b7b7b7; border-radius: 2px; color: #333; cursor: pointer; padding: 2px 0; text-indent: 0.01px; font-family: tahoma; }
+
+
+.StyleTextBox { margin: 5px 0 0 10px; width: 50px; border: 1px solid #adadad; font-size: 13px; padding: 3px; }
+/*-------------checkbox---------------*/
+input[type=checkbox] + label { padding-left: 29px; height: 24px; display: inline; padding: 1px 0 4px 21px; line-height: 0; font-size: 12px; background-position: 0 0; }
+
+input[type=checkbox]:checked + label { background-position: 0 -21px; }
+.Add { background: url("../../../CSS/Image/Add_Expense.png") no-repeat scroll 0 0 / 26px auto; color: #0c9ee1; cursor: pointer; font-size: 15px; font-weight: bold; padding: 2px 0 2px 28px}
+#Msg { color: #ff0000; font-weight: bold}
+.Cancel_Pop{float: right; cursor:pointer; padding: 5px 12px; border:none; background:url("../../../CssGridview/Cmd_Ico/Cmd_Ico.png") no-repeat scroll -85px 1px}
+.Cancel_Pop:hover { background:url("../../../CssGridview/Cmd_Ico/Cmd_Ico.png") no-repeat scroll -85px -35px}
+
+/*Responsive Design*/
+@media screen and (max-width: 979px) /* Tablet &Mobile*/ {
+ .Personal_Info { width: 100%; }
+
+ .DetailsHead { color: #333; float: left; font-size: 14px; font-weight: bold; padding: 2% 0 4% 3%; text-align: center; width: 100%; }
+
+ .Info { margin: 1% 0 0 1%; width: 68%; }
+
+ .Profile_Image { margin: 3% 0 0 1%; width: 29%; }
+
+ .P_Image { height: 76px; width: 77%; }
+
+ .DDL { border: 2px solid #7d6754; border-radius: 5px; padding: 3px; text-indent: 0.01px; }
+
+
+ .Mesure_Style { max-width: 100%; margin: 0; }
+
+ .Mesure { margin-bottom: 5%; padding: 0; width: 100%; }
+
+ .Style_Input { max-width: 43%; min-width: 41%; overflow: auto; }
+
+ .Color { max-width: 43%; min-width: 41%; overflow: auto; }
+
+ .StyleImg { height: 85px; max-width: 100% !important; padding: 1px; vertical-align: middle; }
+
+ .textbox { width: 83%; }
+
+ .mGrid { width: 100%; }
+}

@@ -1,0 +1,105 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Design.master.cs" Inherits="TailorBD.Design" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <meta name="robots" content="default, index, follow" />
+
+   <title>Tailor BD</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <!--start javascript -->
+   <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+   <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+   <!--start CSS -->
+   <link href="CSS/DesignMaster.css" rel="stylesheet" />
+   <link href="CssGridview/Gridview.css" rel="stylesheet" />
+   <!--end CSS-->
+
+
+   <!--------------if disable javascript in  browser---------------->
+   <noscript>
+     <meta http-equiv="refresh" content="0; url=ErrorMessage.html"/>
+ </noscript>
+
+   <asp:ContentPlaceHolder ID="head" runat="server" />
+</head>
+
+<body onload="checkCookies()">
+   <form id="Form1" runat="server">
+      <div class="headerBack">
+         <div class="ManuWraper">
+           <a href="default.aspx" class="Logo"></a>
+            <div class="UserPanel">
+               <!--header_top for login-->
+               <asp:LoginView ID="CustomerLoginView" runat="server">
+                  <AnonymousTemplate>
+                     <table>
+                        <tr>
+                           <td><a href="../../Login.aspx">Login</a></td>
+                        </tr>
+                     </table>
+                  </AnonymousTemplate>
+                  <LoggedInTemplate>
+                     <div class="Username">
+                        <span class="DfrColor">Welcome </span>|
+                         <asp:LoginName ID="CustomerLoginName" runat="server" />
+                        <br />
+                        <a href="../../Profile_Redirect.aspx"><span class="DfrColor">Profile</span></a> | 
+                        <span class="LogOut">
+                           <asp:LoginStatus ID="LoginStatus1" runat="server" LogoutPageUrl="~/Default.aspx" LogoutAction="Redirect" OnLoggingOut="LoginStatus1_LoggingOut" />
+                        </span>
+                     </div>
+                  </LoggedInTemplate>
+               </asp:LoginView>
+            </div>
+         </div>
+      </div>
+      <!--End headerBack-->
+
+      <div class="Main_Design">
+         <asp:ContentPlaceHolder ID="body" runat="server" />
+      </div>
+
+      <footer>
+         <div class="footer-mid">
+            <div class="footer-address">
+               <h3><b>LoopsIT</b></h3>
+               <p>
+                  <b>+88 01739144141</b><br />
+                  <br />
+                  328, East Nakhal Para,Tejgaon, Dhaka-1215
+              <br />
+                  Email: info@loopsit.com
+               </p>
+            </div>
+
+            <div class="footer-social">
+               <ul>
+                  <li><a class="FB" href="https://www.facebook.com/Tailorbd"></a></li>
+              <%--<li><a class="TW" href="https://twitter.com/"></a></li>
+                  <li><a class="IN" href="https://www.youtube.com/"></a></li>
+                  <li><a class="GP" href="https://www.google.com"></a></li>--%>
+               </ul>
+            </div>
+
+         </div>
+         <div class="Copy_Right">
+            <span>Copyright © 2015-<span id="CYear"></span> Tailorbd.com All rights reserved</span>
+         </div>
+      </footer>
+   <script type="text/javascript">
+       $(function () {
+           $("#CYear").text((new Date).getFullYear());
+       });
+
+      function checkCookies() {
+         if (navigator.cookieEnabled != true) {
+            alert("System is not work coz (Cookies are not enabled your browser.)")
+         }
+      }
+   </script>
+   </form>
+</body>
+</html>

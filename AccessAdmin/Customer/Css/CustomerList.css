@@ -1,0 +1,19 @@
+﻿.CountCustomer { color: #090; font-size: 15px; font-weight: bold; }
+.ContinueButton { padding: 4px 8px; }
+.TotalDue { font-size: 15px; display: block; margin: 6px 0; }
+
+@media screen and (max-width:979px) {
+ .CountCustomer { color: #017e01; font-size: 13px; font-weight: normal; }
+}
+
+@page { size: A4; margin: 0; }
+
+@media print {
+ a, .No_Print, .print, .Class, #btnPrint, .Logo_Img, .RadioB { display: none; }
+.headerBack {border: none; height: 40px;margin-bottom:0; background-color:#fff }
+ .Ins_Name { margin: 0; color: #000; float: none; text-align: center; width: 100%; }
+ .NameAndLogo { width: 100%; }
+ .maincontain { width: 100%; left: 0; padding:0; margin:0; float:none; }
+ .dropdown { border: none; font-size:18px; font-weight: bold; }
+ #Expanse, #Due, #Paid { border: none; padding:0}
+}

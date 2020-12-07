@@ -1,0 +1,20 @@
+﻿
+.RNo { font-size:12px; font-weight: bold; width: 100%; text-align:center}
+ .RNo table { width: 100%; }
+.Total { font-size:12px; font-weight: bold; width: 100%; text-align: right; }
+.NoPrint { cursor: pointer; }
+.print {padding: 12px;}
+.InsName{ margin-bottom: 20px; color: #000; font-size:17px; font-weight: bold; text-align: center; font-family: Tahoma}
+/**Money Receipt*/
+.PrintGrid { width:100%; border:none}
+.PrintGrid th { padding: 2px 4px; color: #fff; border-top: 1px solid #fff; }
+.PrintGrid td{border:1px solid #ddd}
+.PrintGrid .Footre td {border:none; border-top:1px solid #ddd}
+.PrintGrid .Footre td table td{border:none}
+
+@page { margin: 0 192px; }
+
+@media print {
+ .Site_Navigation, .UserPanel, .ContinueButton, .NoPrint ,.footer,.print,.Logo,.Setting, .headerBack { display: none; }
+ .maincontain { width: 100%; left: 0; margin: 0; padding: 0; }
+}
