@@ -20,6 +20,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -336,6 +337,18 @@
     <Content Include="JS\TextSlide\Slide.js" />
     <Content Include="JS\TimePicker\jquery.ptTimeSelect.css" />
     <Content Include="JS\TimePicker\jquery.ptTimeSelect.js" />
+    <Content Include="libs\AjaxControlToolkit.dll" />
+    <Content Include="libs\AjaxMin.dll" />
+    <Content Include="libs\ClientAPI.dll" />
+    <Content Include="libs\Contracts.dll" />
+    <Content Include="libs\HttpSDK.dll" />
+    <Content Include="libs\Microsoft.Owin.dll" />
+    <Content Include="libs\Microsoft.ReportViewer.Common.dll" />
+    <Content Include="libs\Microsoft.ReportViewer.ProcessingObjectModel.DLL" />
+    <Content Include="libs\Microsoft.ReportViewer.WebForms.DLL" />
+    <Content Include="libs\Microsoft.ReportViewer.WinForms.dll" />
+    <Content Include="libs\Newtonsoft.Json.dll" />
+    <Content Include="libs\Owin.dll" />
     <Content Include="Login.aspx" />
     <Content Include="Profile_Redirect.aspx" />
     <Content Include="UserGuide\Add_Measurements.aspx" />
