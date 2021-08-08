@@ -36,12 +36,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
-                              Order:<%# Eval("OrderDate","{0:d MMM yy}") %>
-                                        <%#Eval("OrderTime","({0:h:mm tt})") %>
-                                        -
-                              Delivery:<%# string.IsNullOrEmpty(Eval("Update_DeliveryDate").ToString())? Eval("DeliveryDate","{0:d MMM yy}") : Eval("Update_DeliveryDate","{0:d MMM yy (h:mm tt)}") %>
-                                    </td>
+                                    <td>Order:<%# Eval("OrderDate","{0:d MMM yy}") %><%#Eval("OrderTime","({0:h:mm tt})") %>-
+                              Delivery:<%# string.IsNullOrEmpty(Eval("Update_DeliveryDate").ToString())? Eval("DeliveryDate","{0:d MMM yy}") : Eval("Update_DeliveryDate","{0:d MMM yy (h:mm tt)}") %></td>
                                 </tr>
                             </table>
                         </div>
@@ -140,10 +136,10 @@
                         Served By:
                <asp:Label ID="NameLabel" runat="server" Text='<%# Bind("Name") %>' />(<asp:Label ID="Label15" runat="server" Text='<%# Bind("Phone") %>' />)
                     </div>
-                    <p>Provided by: tailorbd.com</p>
+                    <p><%#Eval("PoweredByInfo") %></p>
                 </ItemTemplate>
             </asp:FormView>
-            <asp:SqlDataSource ID="ServedBySQl" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Registration.Name, Registration.Phone, Institution.M_Receipt_ServedBy FROM Registration INNER JOIN Institution ON Registration.InstitutionID = Institution.InstitutionID WHERE (Registration.RegistrationID = @RegistrationID)">
+            <asp:SqlDataSource ID="ServedBySQl" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Registration.Name, Registration.Phone, Institution.M_Receipt_ServedBy, Institution.PoweredByInfo FROM Registration INNER JOIN Institution ON Registration.InstitutionID = Institution.InstitutionID WHERE (Registration.RegistrationID = @RegistrationID)">
                 <SelectParameters>
                     <asp:CookieParameter CookieName="RegistrationID" Name="RegistrationID" Type="Int32" />
                 </SelectParameters>
@@ -498,6 +494,12 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td>Powered By Info</td>
+                                    <td>
+                                        <asp:TextBox ID="PoweredByInfoTextBox" Width="100%" CssClass="textbox" runat="server" Text='<%# Bind("PoweredByInfo") %>' />
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                 </tr>
@@ -510,7 +512,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                             </table>
                         </EditItemTemplate>
                     </asp:FormView>
-                    <asp:SqlDataSource ID="Print_MoneyReceiptSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT InstitutionID, M_Receipt_ShopName, M_Receipt_ServedBy, M_Receipt_TopSpace, M_Receipt_FontSize FROM Institution WHERE (InstitutionID = @InstitutionID)" UpdateCommand="UPDATE Institution SET M_Receipt_ShopName = @M_Receipt_ShopName, M_Receipt_ServedBy = @M_Receipt_ServedBy, M_Receipt_TopSpace = @M_Receipt_TopSpace, M_Receipt_FontSize = @M_Receipt_FontSize WHERE (InstitutionID = @InstitutionID)">
+                    <asp:SqlDataSource ID="Print_MoneyReceiptSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT InstitutionID, M_Receipt_ShopName, M_Receipt_ServedBy, M_Receipt_TopSpace, M_Receipt_FontSize,PoweredByInfo FROM Institution WHERE (InstitutionID = @InstitutionID)" UpdateCommand="UPDATE Institution SET M_Receipt_ShopName = @M_Receipt_ShopName, M_Receipt_ServedBy = @M_Receipt_ServedBy, M_Receipt_TopSpace = @M_Receipt_TopSpace, M_Receipt_FontSize = @M_Receipt_FontSize,PoweredByInfo=@PoweredByInfo WHERE (InstitutionID = @InstitutionID)">
                         <SelectParameters>
                             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" Type="Int32" />
                         </SelectParameters>
@@ -519,6 +521,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                             <asp:Parameter Name="M_Receipt_ServedBy" />
                             <asp:Parameter Name="M_Receipt_TopSpace" />
                             <asp:Parameter Name="M_Receipt_FontSize" />
+                            <asp:Parameter Name="PoweredByInfo" />
                             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
                         </UpdateParameters>
                     </asp:SqlDataSource>
