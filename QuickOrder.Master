@@ -1,0 +1,128 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="QuickOrder.master.cs" Inherits="TailorBD.QuickOrder" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <title>Tailor BD</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="robots" content="default, index, follow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" />
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet" />
+
+    <!-- custom -->
+    <link href="AccessAdmin/quick-order/style/main-maser.css" rel="stylesheet" />
+    <asp:ContentPlaceHolder ID="head" runat="server" />
+</head>
+<body>
+    <div class="container-fluid">
+        <form runat="server">
+            <%--header--%>
+            <div class="row">
+                <header class="flex-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <%--institution info--%>
+                        <asp:FormView ID="LogoFormView" RenderOuterTable="false" runat="server" DataKeyNames="InstitutionID" DataSourceID="LogoSQL">
+                            <ItemTemplate>
+                                <div class="brand d-flex align-items-center">
+                                    <img src="../../Handler/TailorInfo.ashx?Img=<%#Eval("InstitutionID") %>" alt="" />
+                                    <div class="ml-3">
+                                        <h1><%# Eval("InstitutionName") %></h1>
+                                        <p class="d-none d-print-block"><%# Eval("Address") %></p>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:FormView>
+                        <asp:SqlDataSource ID="LogoSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
+                            SelectCommand="SELECT InstitutionName, InstitutionID, Address FROM Institution WHERE (InstitutionID = @InstitutionID)">
+                            <SelectParameters>
+                                <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
+                            </SelectParameters>
+                        </asp:SqlDataSource>
+
+                        <%--login info--%>
+                        <asp:LoginView ID="CustomerLoginView" runat="server">
+                            <AnonymousTemplate>
+                                <a href="~/Login.aspx">Login</a>
+                            </AnonymousTemplate>
+                            <LoggedInTemplate>
+                                <div class="login-info">
+                                    Welcome |
+                                <asp:LoginName ID="CustomerLoginName" runat="server" />
+                                    <div>
+                                        <a href="../../../Profile_Redirect.aspx">Profile</a> | 
+                                    <asp:LoginStatus runat="server" LogoutPageUrl="~/Default.aspx" LogoutAction="Redirect" OnLoggingOut="LoginStatus_LoggingOut" />
+                                    </div>
+                                </div>
+                            </LoggedInTemplate>
+                        </asp:LoginView>
+                    </div>
+                </header>
+            </div>
+
+            <%--main--%>
+            <main class="row">
+                <%--side navbar--%>
+                <div class="side-navbar col-sm-3 col-xl-2">
+                    <asp:TreeView ID="LinkTreeView"
+                        ExpandImageUrl="~/CSS/Image/Expand_Ico.png"
+                        CollapseImageUrl="~/CSS/Image/Collaps_Ico.png"
+                        NodeStyle-CssClass="tree-node"
+                        RootNodeStyle-CssClass="root-node"
+                        LeafNodeStyle-CssClass="leaf-node"
+                        SelectedNodeStyle-CssClass="selected-node"
+                        NodeWrap="true"
+                        runat="server">
+                    </asp:TreeView>
+                </div>
+
+                <%--control body--%>
+                <div class="col">
+                    <asp:ContentPlaceHolder ID="Body" runat="server" />
+                </div>
+            </main>
+        </form>
+
+        <%--no control body--%>
+        <div class="col">
+            <asp:ContentPlaceHolder ID="BasicForm" runat="server" />
+        </div>
+    </div>
+
+    <%--footer--%>
+    <footer>
+        <span>Copyright © 2015-<span id="current-year"></span> Tailorbd.com All rights reserved</span>
+    </footer>
+
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#current-year").text((new Date).getFullYear());
+        });
+
+        function checkCookies() {
+            if (!navigator.cookieEnabled) {
+                alert("System is not work coz (Cookies are not enabled your browser.)")
+            }
+        }
+    </script>
+</body>
+</html>

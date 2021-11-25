@@ -80,7 +80,6 @@
       </div>
 
       <div class="Main_Wraper">
-
          <div class="Site_Navigation">
             <asp:TreeView ID="LinkTreeView"
                ExpandImageUrl="~/CSS/Image/Expand_Ico.png"
@@ -104,8 +103,6 @@
       <div class="footer">
          <span>Copyright © 2015-<span id="CYear"></span> Tailorbd.com All rights reserved</span>
       </div>
-
-
 
       <script>
           $(function () {

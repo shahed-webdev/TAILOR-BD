@@ -7,83 +7,101 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TailorBD
+namespace TailorBD.AccessAdmin.quick_order
 {
 
 
-    public partial class Basic
+    public partial class Order
     {
 
         /// <summary>
-        /// Head1 control.
+        /// DressDropDownList control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlHead Head1;
+        protected global::System.Web.UI.WebControls.DropDownList DressDropDownList;
 
         /// <summary>
-        /// head control.
+        /// DressSQL control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder head;
+        protected global::System.Web.UI.WebControls.SqlDataSource DressSQL;
 
         /// <summary>
-        /// Form1 control.
+        /// Measurement control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm Form1;
+        protected global::System.Web.UI.WebControls.Repeater Measurement;
 
         /// <summary>
-        /// LogoFormView control.
+        /// MoreSQL control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.FormView LogoFormView;
+        protected global::System.Web.UI.WebControls.SqlDataSource MoreSQL;
 
         /// <summary>
-        /// LogoSQL control.
+        /// CategoryRepeater control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.SqlDataSource LogoSQL;
+        protected global::System.Web.UI.WebControls.Repeater CategoryRepeater;
 
         /// <summary>
-        /// CustomerLoginView control.
+        /// Dress_Style_Name_SQL control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LoginView CustomerLoginView;
+        protected global::System.Web.UI.WebControls.SqlDataSource Dress_Style_Name_SQL;
 
         /// <summary>
-        /// LinkTreeView control.
+        /// Customer_DressSQL control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TreeView LinkTreeView;
+        protected global::System.Web.UI.WebControls.SqlDataSource Customer_DressSQL;
 
         /// <summary>
-        /// body control.
+        /// DetailsTextBox control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder body;
+        protected global::System.Web.UI.WebControls.TextBox DetailsTextBox;
+
+        /// <summary>
+        /// DressPriceDDList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList DressPriceDDList;
+
+        /// <summary>
+        /// DressPriceSQL control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.SqlDataSource DressPriceSQL;
     }
 }

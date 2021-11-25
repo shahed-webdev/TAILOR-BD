@@ -1,0 +1,25 @@
+﻿
+:root { --brand-color: #00b4aa; }
+header { padding: 1rem; margin-bottom: 20px; background-color: var(--brand-color) }
+
+.brand { color:#fff }
+.brand img { height: 60px; border-radius:5px}
+.brand h1 { font-size: 30px; font-weight:bold; margin-bottom: 0 }
+
+
+.login-info { color: #fff }
+.login-info a{ color: #fff }
+
+main { min-height: 720px; }
+
+/*---side navbar----------*/
+.side-navbar { border: none; }
+.side-navbar a:hover { color: #333; text-decoration: none; }
+.tree-node { color: #333; padding:14px 3px; border-bottom: 1px solid #ddd; width: 100%; }
+.root-node { border-bottom: 1px solid #e3e3e3; color: #00b7ad; font-size: 17px; font-weight: bold; width: 100%; }
+
+.leaf-node { font: 15px Arial,Sans-Serif; padding: 4px 4px 4px 0; }
+.leaf-node:hover { text-decoration: underline; }
+.selected-node { color: #cc0062; }
+
+footer { background-color: #00b4aa; color: #fff; text-align: center; padding: 20px 0; }
