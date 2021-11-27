@@ -21,6 +21,19 @@
 
     <!-- custom -->
     <link href="AccessAdmin/quick-order/style/main-maser.css" rel="stylesheet" />
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+   <!-- autocomplete -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+
+
     <asp:ContentPlaceHolder ID="head" runat="server" />
 </head>
 <body>
@@ -86,16 +99,12 @@
                 </div>
 
                 <%--control body--%>
-                <div class="col">
-                    <asp:ContentPlaceHolder ID="Body" runat="server" />
-                </div>
-            </main>
+                <asp:ContentPlaceHolder ID="Body" runat="server" />
         </form>
 
         <%--no control body--%>
-        <div class="col">
-            <asp:ContentPlaceHolder ID="BasicForm" runat="server" />
-        </div>
+        <asp:ContentPlaceHolder ID="BasicForm" runat="server" />
+        </main>
     </div>
 
     <%--footer--%>
@@ -104,14 +113,6 @@
     </footer>
 
 
-    <!-- JQuery -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
 
     <script>
         $(function () {

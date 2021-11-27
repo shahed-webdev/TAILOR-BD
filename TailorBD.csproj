@@ -197,6 +197,7 @@
     <Content Include="AccessAdmin\Order\Print_A4_Mesurement.aspx" />
     <Content Include="AccessAdmin\Order\Print_Mesurement.aspx" />
     <Content Include="AccessAdmin\Profile.aspx" />
+    <Content Include="AccessAdmin\quick-order\js\quick-order.js" />
     <Content Include="AccessAdmin\quick-order\Order.aspx" />
     <Content Include="AccessAdmin\quick-order\style\main-maser.css" />
     <Content Include="AccessAdmin\Reports\CSS\Ico\Complete.png" />
@@ -818,6 +819,7 @@
     <Compile Include="AccessAdmin\quick-order\Order.aspx.designer.cs">
       <DependentUpon>Order.aspx</DependentUpon>
     </Compile>
+    <Compile Include="AccessAdmin\quick-order\ViewModels\CustomerViewModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\DressDllViewModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\DressMeasurementStyleViewModel.cs" />
     <Compile Include="AccessAdmin\Reports\Order_And_Delivery_Report_By_Date.aspx.cs">
