@@ -3,45 +3,44 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
-    <h1>Take Order</h1>
-
-    <div class="form-inline mb-3">
-        <div class="form-group">
-            <asp:DropDownList ID="DressDropDownList" runat="server" AutoPostBack="True" CssClass="form-control" DataSourceID="DressSQL" DataTextField="Dress_Name" DataValueField="DressID" AppendDataBoundItems="True" OnSelectedIndexChanged="DressDropDownList_SelectedIndexChanged" OnDataBound="DressDropDownList_DataBound">
-                <asp:ListItem Value="0">পোশাক নির্বাচন করুন</asp:ListItem>
-            </asp:DropDownList>
-            <asp:SqlDataSource ID="DressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DressID, Dress_Name, Cloth_For_ID, RegistrationID, InstitutionID, Description, Date, Image, DressSerial FROM Dress WHERE  (InstitutionID = @InstitutionID) ORDER BY ISNULL(DressSerial, 99999)">
-                <SelectParameters>
-                    <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
-                </SelectParameters>
-            </asp:SqlDataSource>
+    
+        <div class="form-inline mb-3">
+            <div class="form-group">
+                <asp:DropDownList ID="DressDropDownList" runat="server" AutoPostBack="True" CssClass="form-control" DataSourceID="DressSQL" DataTextField="Dress_Name" DataValueField="DressID" AppendDataBoundItems="True" OnSelectedIndexChanged="DressDropDownList_SelectedIndexChanged">
+                    <asp:ListItem Value="0">পোশাক নির্বাচন করুন</asp:ListItem>
+                </asp:DropDownList>
+                <asp:SqlDataSource ID="DressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DressID, Dress_Name, Cloth_For_ID, RegistrationID, InstitutionID, Description, Date, Image, DressSerial FROM Dress WHERE  (InstitutionID = @InstitutionID) ORDER BY ISNULL(DressSerial, 99999)">
+                    <SelectParameters>
+                        <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
+                    </SelectParameters>
+                </asp:SqlDataSource>
+            </div>
         </div>
-    </div>
 
-    <div id="Section" style="display: none;">
-        <div class="row">
-            <asp:Repeater ID="Measurement" runat="server" DataSourceID="MoreSQL">
-                <ItemTemplate>
-                    <div class="col-sm-4 col-md-3 col-lg-2 mb-4">
-                        <div class="p-2 pb-3 bg-light Mesurement-bg">
-                            <asp:HiddenField ID="Measurement_GroupIDHiddenField" runat="server" Value='<%# Eval("Measurement_GroupID") %>' />
-                            <asp:Repeater ID="MesasurmentTypeDataList" runat="server" DataSourceID="MeasurementTypeSQL">
-                                <ItemTemplate>
-                                    <span><%#Eval("MeasurementType") %></span>
-                                    <input type="text" id='<%#Eval("MeasurementTypeID") %>' class="Measurement form-control" value='<%# Eval("Measurement") %>'>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                            <asp:SqlDataSource ID="MeasurementTypeSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Measurement_Type.MeasurementTypeID, Measurement_Type.MeasurementType, Customer_M.Measurement, Measurement_Type.Measurement_Group_SerialNo FROM Measurement_Type LEFT OUTER JOIN (SELECT Measurement, MeasurementTypeID FROM Customer_Measurement WHERE (CustomerID = @CustomerID)) AS Customer_M ON Measurement_Type.MeasurementTypeID = Customer_M.MeasurementTypeID WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)">
-                                <SelectParameters>
-                                    <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" />
-                                    <asp:ControlParameter ControlID="Measurement_GroupIDHiddenField" Name="Measurement_GroupID" PropertyName="Value" />
-                                </SelectParameters>
-                            </asp:SqlDataSource>
+        <div id="Section">
+            <div class="row">
+                <asp:Repeater ID="Measurement" runat="server" DataSourceID="MoreSQL">
+                    <ItemTemplate>
+                        <div class="col-sm-4 col-md-3 col-lg-2 mb-4">
+                            <div class="p-2 pb-3 bg-light Mesurement-bg">
+                                <asp:HiddenField ID="Measurement_GroupIDHiddenField" runat="server" Value='<%# Eval("Measurement_GroupID") %>' />
+                                <asp:Repeater ID="MesasurmentTypeDataList" runat="server" DataSourceID="MeasurementTypeSQL">
+                                    <ItemTemplate>
+                                        <span><%#Eval("MeasurementType") %></span>
+                                        <input type="text" id='<%#Eval("MeasurementTypeID") %>' class="Measurement form-control" value='<%# Eval("Measurement") %>'>
+                                    </ItemTemplate>
+                                </asp:Repeater>
+                                <asp:SqlDataSource ID="MeasurementTypeSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Measurement_Type.MeasurementTypeID, Measurement_Type.MeasurementType, Customer_M.Measurement, Measurement_Type.Measurement_Group_SerialNo FROM Measurement_Type LEFT OUTER JOIN (SELECT Measurement, MeasurementTypeID FROM Customer_Measurement WHERE (CustomerID = @CustomerID)) AS Customer_M ON Measurement_Type.MeasurementTypeID = Customer_M.MeasurementTypeID WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)">
+                                    <SelectParameters>
+                                        <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" DefaultValue="0" />
+                                        <asp:ControlParameter ControlID="Measurement_GroupIDHiddenField" Name="Measurement_GroupID" PropertyName="Value" />
+                                    </SelectParameters>
+                                </asp:SqlDataSource>
+                            </div>
                         </div>
-                    </div>
-                </ItemTemplate>
-            </asp:Repeater>
-            <asp:SqlDataSource ID="MoreSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending
+                    </ItemTemplate>
+                </asp:Repeater>
+                <asp:SqlDataSource ID="MoreSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending
 FROM Measurement_Type WHERE (InstitutionID = @InstitutionID) AND (DressID = @DressID) ORDER BY Ascending">
                 <SelectParameters>
                     <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
@@ -68,35 +67,35 @@ FROM Measurement_Type WHERE (InstitutionID = @InstitutionID) AND (DressID = @Dre
                                             <input type="checkbox" class="Ck_Design" id="<%# Eval("Dress_StyleID") %>" <%# Convert.ToBoolean(Eval("IsCheck")) ? "checked" : "" %> />
                                             <label for="<%# Eval("Dress_StyleID") %>"><%# Eval("Dress_Style_Name") %></label>
 
-                                            <input type="text" class="Ck_Design form-control" value='<%#Eval("DressStyleMesurement") %>' />
+                                                <input type="text" class="Ck_Design form-control" value='<%#Eval("DressStyleMesurement") %>' />
+                                            </div>
                                         </div>
-                                    </div>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                            <asp:SqlDataSource ID="StyleSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Dress_Style.Dress_StyleID, Dress_Style.Dress_Style_Name, Customer_DS.DressStyleMesurement, CAST(CASE WHEN Customer_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck FROM Dress_Style LEFT OUTER JOIN (SELECT DressStyleMesurement, Dress_StyleID FROM Customer_Dress_Style WHERE (CustomerID = @CustomerID)) AS Customer_DS ON Dress_Style.Dress_StyleID = Customer_DS.Dress_StyleID WHERE (Dress_Style.Dress_Style_CategoryID = @Dress_Style_CategoryID) ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
-                                <SelectParameters>
-                                    <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" />
-                                    <asp:ControlParameter ControlID="IdLabel" Name="Dress_Style_CategoryID" PropertyName="Text" />
-                                </SelectParameters>
-                            </asp:SqlDataSource>
+                                    </ItemTemplate>
+                                </asp:Repeater>
+                                <asp:SqlDataSource ID="StyleSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Dress_Style.Dress_StyleID, Dress_Style.Dress_Style_Name, Customer_DS.DressStyleMesurement, CAST(CASE WHEN Customer_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck FROM Dress_Style LEFT OUTER JOIN (SELECT DressStyleMesurement, Dress_StyleID FROM Customer_Dress_Style WHERE (CustomerID = @CustomerID)) AS Customer_DS ON Dress_Style.Dress_StyleID = Customer_DS.Dress_StyleID WHERE (Dress_Style.Dress_Style_CategoryID = @Dress_Style_CategoryID) ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
+                                    <SelectParameters>
+                                        <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" DefaultValue="0" />
+                                        <asp:ControlParameter ControlID="IdLabel" Name="Dress_Style_CategoryID" PropertyName="Text" />
+                                    </SelectParameters>
+                                </asp:SqlDataSource>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </ItemTemplate>
-        </asp:Repeater>
-        <asp:SqlDataSource ID="Dress_Style_Name_SQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DISTINCT Dress_Style_Category.Dress_Style_Category_Name, Dress_Style.Dress_Style_CategoryID, ISNULL(Dress_Style_Category.CategorySerial, 99999) AS SN FROM Dress_Style INNER JOIN Dress_Style_Category ON Dress_Style.Dress_Style_CategoryID = Dress_Style_Category.Dress_Style_CategoryID WHERE (Dress_Style.DressID = @DressID) ORDER BY SN">
-            <SelectParameters>
-                <asp:ControlParameter ControlID="DressDropDownList" Name="DressID" PropertyName="SelectedValue" />
-            </SelectParameters>
-        </asp:SqlDataSource>
-        <asp:SqlDataSource ID="Customer_DressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-            SelectCommand="SELECT CDDetails FROM Customer_Dress WHERE (CustomerID = @CustomerID) AND (DressID = @DressID) AND (InstitutionID = @InstitutionID)">
-            <SelectParameters>
-                <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" />
-                <asp:ControlParameter ControlID="DressDropDownList" Name="DressID" PropertyName="SelectedValue" />
-                <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
-            </SelectParameters>
-        </asp:SqlDataSource>
+                </ItemTemplate>
+            </asp:Repeater>
+            <asp:SqlDataSource ID="Dress_Style_Name_SQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DISTINCT Dress_Style_Category.Dress_Style_Category_Name, Dress_Style.Dress_Style_CategoryID, ISNULL(Dress_Style_Category.CategorySerial, 99999) AS SN FROM Dress_Style INNER JOIN Dress_Style_Category ON Dress_Style.Dress_Style_CategoryID = Dress_Style_Category.Dress_Style_CategoryID WHERE (Dress_Style.DressID = @DressID) ORDER BY SN">
+                <SelectParameters>
+                    <asp:ControlParameter ControlID="DressDropDownList" Name="DressID" PropertyName="SelectedValue" />
+                </SelectParameters>
+            </asp:SqlDataSource>
+            <asp:SqlDataSource ID="Customer_DressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
+                SelectCommand="SELECT CDDetails FROM Customer_Dress WHERE (CustomerID = @CustomerID) AND (DressID = @DressID) AND (InstitutionID = @InstitutionID)">
+                <SelectParameters>
+                    <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" DefaultValue="0" />
+                    <asp:ControlParameter ControlID="DressDropDownList" Name="DressID" PropertyName="SelectedValue" />
+                    <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
+                </SelectParameters>
+            </asp:SqlDataSource>
 
         <div class="form-group">
             <label>বিস্তারিত বিবরণ</label>

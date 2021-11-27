@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using TailorBD.AccessAdmin.quick_order.ViewModels;
 
 namespace TailorBD.AccessAdmin.quick_order
 {
@@ -18,30 +19,7 @@ namespace TailorBD.AccessAdmin.quick_order
         {
            
         }
-        protected void PrevDress()
-        {
-            foreach (ListItem myItem in DressDropDownList.Items)
-            {
-                SqlCommand CheckDress_cmd = new SqlCommand("SELECT Measurement_Type.DressID FROM Customer_Measurement INNER JOIN Measurement_Type ON Customer_Measurement.MeasurementTypeID = Measurement_Type.MeasurementTypeID WHERE (Measurement_Type.DressID = @DressID) AND (Customer_Measurement.CustomerID = @CustomerID)", con);
-                CheckDress_cmd.Parameters.AddWithValue("@DressID", 1);
-                CheckDress_cmd.Parameters.AddWithValue("@CustomerID", 1);
-               
-                con.Open();
-                object Dress = CheckDress_cmd.ExecuteScalar();
-                con.Close();
-
-                if (Dress != null)
-                {
-                    myItem.Attributes.Add("class", "Dress");
-                }
-            }
-        }
-
         //Dress
-        protected void DressDropDownList_DataBound(object sender, EventArgs e)
-        {
-            PrevDress();
-        }
         protected void DressDropDownList_SelectedIndexChanged(object sender, EventArgs e)
         {
          
@@ -54,8 +32,6 @@ namespace TailorBD.AccessAdmin.quick_order
             {
                 DetailsTextBox.Text = "";
             }
-
-            PrevDress();
         }
 
 
@@ -163,6 +139,41 @@ namespace TailorBD.AccessAdmin.quick_order
                 }
             }
             return Details.ToArray();
+        }
+
+        [WebMethod]
+        public static List<DressDllViewModel> dressDlls(int customerId = 0, int clothForId = 0)
+        {
+            List<DressDllViewModel> dressList = new List<DressDllViewModel>();
+            using (SqlConnection conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = "SELECT Dress.DressID,Dress.Dress_Name,CAST(IIF ( CT.DressID = 1, 1, 0 ) AS BIT) as IsMeasurementAvailable FROM Dress LEFT OUTER JOIN (SELECT DressID FROM Customer_Dress WHERE (InstitutionID = @InstitutionID) AND (CustomerID = @CustomerID)) AS CT ON Dress.DressID = CT.DressID WHERE (Dress.InstitutionID = @InstitutionID) AND (Dress.Cloth_For_ID = @Cloth_For_ID OR @Cloth_For_ID = 0) ORDER BY Dress.DressSerial";
+                    cmd.Parameters.AddWithValue("@CustomerID", customerId);
+                    cmd.Parameters.AddWithValue("@Cloth_For_ID", clothForId);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var dress = new DressDllViewModel
+                            {
+                                DressId =Convert.ToInt32(sdr["Details"]),
+                                DressName = sdr["Details"].ToString(), 
+                                IsMeasurementAvailable = Convert.ToBoolean(sdr["Details"])
+                            };
+                            dressList.Add(dress);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return dressList;
         }
     }
 }
