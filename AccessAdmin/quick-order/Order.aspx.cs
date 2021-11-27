@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Services;
 using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -20,19 +21,19 @@ namespace TailorBD.AccessAdmin.quick_order
            
         }
         //Dress
-        protected void DressDropDownList_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        //protected void DressDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+        //{
          
-            var DetailsDV = (DataView)Customer_DressSQL.Select(DataSourceSelectArguments.Empty);
-            if (DetailsDV.Count > 0)
-            {
-                DetailsTextBox.Text = DetailsDV[0]["CDDetails"].ToString();
-            }
-            else
-            {
-                DetailsTextBox.Text = "";
-            }
-        }
+        //    var DetailsDV = (DataView)Customer_DressSQL.Select(DataSourceSelectArguments.Empty);
+        //    if (DetailsDV.Count > 0)
+        //    {
+        //        DetailsTextBox.Text = DetailsDV[0]["CDDetails"].ToString();
+        //    }
+        //    else
+        //    {
+        //        DetailsTextBox.Text = "";
+        //    }
+        //}
 
 
         [WebMethod]
@@ -77,10 +78,10 @@ namespace TailorBD.AccessAdmin.quick_order
             return OrderList;
         }
 
-        protected void DressPriceDDList_DataBound(object sender, EventArgs e)
-        {
-            DressPriceDDList.Items.Insert(0, new ListItem("নির্ধারিত মূল্য নির্বাচন করুন", "0"));
-        }
+        //protected void DressPriceDDList_DataBound(object sender, EventArgs e)
+        //{
+        //    DressPriceDDList.Items.Insert(0, new ListItem("নির্ধারিত মূল্য নির্বাচন করুন", "0"));
+        //}
 
         //Autocomplete
         [WebMethod]
@@ -102,8 +103,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     {
                         while (sdr.Read())
                         {
-                            Details.Add(string.Format("{0}",
-                              sdr["Details"]));
+                            Details.Add(string.Format("{0}",sdr["Details"]));
                         }
                     }
                     conn.Close();
@@ -141,8 +141,48 @@ namespace TailorBD.AccessAdmin.quick_order
             return Details.ToArray();
         }
 
+
+        //find customer
         [WebMethod]
-        public static List<DressDllViewModel> dressDlls(int customerId = 0, int clothForId = 0)
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<CustomerViewModel> FindCustomer(string prefix)
+        {
+            List<CustomerViewModel> customers = new List<CustomerViewModel>();
+            using (SqlConnection conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = "select Top(3) CustomerID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND (Phone like @prefex + '%') or (CustomerName like @prefex + '%')";
+                    cmd.Parameters.AddWithValue("@prefex", prefix);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var dress = new CustomerViewModel
+                            {
+                                CustomerID = sdr["CustomerID"].ToString(),
+                                CustomerName = sdr["CustomerName"].ToString(),
+                                Phone = sdr["Phone"].ToString(),
+                                Address = sdr["Address"].ToString(),
+                            };
+                            customers.Add(dress);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return customers;
+        }
+
+        //dress dropdown
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<DressDllViewModel> DressDlls(int customerId = 0, int clothForId = 0)
         {
             List<DressDllViewModel> dressList = new List<DressDllViewModel>();
             using (SqlConnection conn = new SqlConnection())
@@ -163,9 +203,9 @@ namespace TailorBD.AccessAdmin.quick_order
                         {
                             var dress = new DressDllViewModel
                             {
-                                DressId =Convert.ToInt32(sdr["Details"]),
-                                DressName = sdr["Details"].ToString(), 
-                                IsMeasurementAvailable = Convert.ToBoolean(sdr["Details"])
+                                DressId =Convert.ToInt32(sdr["DressID"]),
+                                DressName = sdr["Dress_Name"].ToString(), 
+                                IsMeasurementAvailable = Convert.ToBoolean(sdr["IsMeasurementAvailable"])
                             };
                             dressList.Add(dress);
                         }
