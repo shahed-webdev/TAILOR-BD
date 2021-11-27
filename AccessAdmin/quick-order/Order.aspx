@@ -6,7 +6,7 @@
     
         <div class="form-inline mb-3">
             <div class="form-group">
-                <asp:DropDownList ID="DressDropDownList" runat="server" AutoPostBack="True" CssClass="form-control" DataSourceID="DressSQL" DataTextField="Dress_Name" DataValueField="DressID" AppendDataBoundItems="True" OnSelectedIndexChanged="DressDropDownList_SelectedIndexChanged" OnDataBound="DressDropDownList_DataBound">
+                <asp:DropDownList ID="DressDropDownList" runat="server" AutoPostBack="True" CssClass="form-control" DataSourceID="DressSQL" DataTextField="Dress_Name" DataValueField="DressID" AppendDataBoundItems="True" OnSelectedIndexChanged="DressDropDownList_SelectedIndexChanged">
                     <asp:ListItem Value="0">পোশাক নির্বাচন করুন</asp:ListItem>
                 </asp:DropDownList>
                 <asp:SqlDataSource ID="DressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DressID, Dress_Name, Cloth_For_ID, RegistrationID, InstitutionID, Description, Date, Image, DressSerial FROM Dress WHERE  (InstitutionID = @InstitutionID) ORDER BY ISNULL(DressSerial, 99999)">
@@ -17,7 +17,7 @@
             </div>
         </div>
 
-        <div id="Section" style="display: none;">
+        <div id="Section">
             <div class="row">
                 <asp:Repeater ID="Measurement" runat="server" DataSourceID="MoreSQL">
                     <ItemTemplate>
@@ -32,7 +32,7 @@
                                 </asp:Repeater>
                                 <asp:SqlDataSource ID="MeasurementTypeSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Measurement_Type.MeasurementTypeID, Measurement_Type.MeasurementType, Customer_M.Measurement, Measurement_Type.Measurement_Group_SerialNo FROM Measurement_Type LEFT OUTER JOIN (SELECT Measurement, MeasurementTypeID FROM Customer_Measurement WHERE (CustomerID = @CustomerID)) AS Customer_M ON Measurement_Type.MeasurementTypeID = Customer_M.MeasurementTypeID WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)">
                                     <SelectParameters>
-                                        <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" />
+                                        <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" DefaultValue="0" />
                                         <asp:ControlParameter ControlID="Measurement_GroupIDHiddenField" Name="Measurement_GroupID" PropertyName="Value" />
                                     </SelectParameters>
                                 </asp:SqlDataSource>
@@ -74,7 +74,7 @@ FROM Measurement_Type WHERE (InstitutionID = @InstitutionID) AND (DressID = @Dre
                                 </asp:Repeater>
                                 <asp:SqlDataSource ID="StyleSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Dress_Style.Dress_StyleID, Dress_Style.Dress_Style_Name, Customer_DS.DressStyleMesurement, CAST(CASE WHEN Customer_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck FROM Dress_Style LEFT OUTER JOIN (SELECT DressStyleMesurement, Dress_StyleID FROM Customer_Dress_Style WHERE (CustomerID = @CustomerID)) AS Customer_DS ON Dress_Style.Dress_StyleID = Customer_DS.Dress_StyleID WHERE (Dress_Style.Dress_Style_CategoryID = @Dress_Style_CategoryID) ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
                                     <SelectParameters>
-                                        <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" />
+                                        <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" DefaultValue="0" />
                                         <asp:ControlParameter ControlID="IdLabel" Name="Dress_Style_CategoryID" PropertyName="Text" />
                                     </SelectParameters>
                                 </asp:SqlDataSource>
@@ -91,7 +91,7 @@ FROM Measurement_Type WHERE (InstitutionID = @InstitutionID) AND (DressID = @Dre
             <asp:SqlDataSource ID="Customer_DressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
                 SelectCommand="SELECT CDDetails FROM Customer_Dress WHERE (CustomerID = @CustomerID) AND (DressID = @DressID) AND (InstitutionID = @InstitutionID)">
                 <SelectParameters>
-                    <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" />
+                    <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" DefaultValue="0" />
                     <asp:ControlParameter ControlID="DressDropDownList" Name="DressID" PropertyName="SelectedValue" />
                     <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
                 </SelectParameters>

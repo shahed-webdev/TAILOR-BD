@@ -818,6 +818,7 @@
     <Compile Include="AccessAdmin\quick-order\Order.aspx.designer.cs">
       <DependentUpon>Order.aspx</DependentUpon>
     </Compile>
+    <Compile Include="AccessAdmin\quick-order\ViewModels\DressDllViewModel.cs" />
     <Compile Include="AccessAdmin\Reports\Order_And_Delivery_Report_By_Date.aspx.cs">
       <DependentUpon>Order_And_Delivery_Report_By_Date.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
