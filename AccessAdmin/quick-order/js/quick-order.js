@@ -1,26 +1,48 @@
-﻿const order = (function () {
+﻿
+//get form data as object
+const serializeForm = function (form) {
+    const obj = {};
+    const formData = new FormData(form);
+    for (let key of formData.keys()) {
+        obj[key] = formData.get(key);
+    }
+    return obj;
+};
+
+
+const order = (function () {
     //find customer
-    $("#find-customer").typeahead({
-        minLength: 1,
-        displayText: function (item) {
-            return `${item.CustomerName}, ${item.Phone}`;
-        },
-        afterSelect: function (item) {
-            this.$element[0].value = item.CustomerName
-        },
-        source: function (request, result) {
-            $.ajax({
-                url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
-                contentType: "application/json; charset=utf-8",
-                success: response => result(response.d),
-                error: err => console.log(err)
-            });
-        },
-        updater: function (item) {
-            return item;
-        }
+    $(document).on("paste, input", ".find-customer", function () {
+        $(this).typeahead({
+            minLength: 2,
+            displayText: function (item) {
+                return `${item.CustomerName}, ${item.Phone}`;
+            },
+            afterSelect: function (item) {
+                this.$element[0].value = item.CustomerName
+            },
+            source: function (request, result) {
+                $.ajax({
+                    url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
+                    contentType: "application/json; charset=utf-8",
+                    success: response => result(response.d),
+                    error: err => console.log(err)
+                });
+            },
+            updater: function (item) {
+                return item;
+            }
+        })
     })
 
+    //add customer
+    const addCustomerForm = document.getElementById("addCustomerForm");
+    addCustomerForm.addEventListener("submit", function (evt) {
+        evt.preventDefault();
+
+        const model = serializeForm(this);
+        console.log(model)
+    })
 
     //dress name dropdown
     const dressDropdown = document.getElementById("dress-dropdown");
