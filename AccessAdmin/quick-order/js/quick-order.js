@@ -80,6 +80,19 @@ const order = (function () {
 
     //on change dress dropdown
     dressDropdown.addEventListener("change", function (evt) {
-        console.log(evt.target.value)
+        if (!evt.target.value) return;
+
+        const customerId = 0;
+        const dressId = +evt.target.value;
+
+        $.ajax({
+            type: 'GET',
+            url: `Order.aspx/GetDressMeasurementsStyles?dressId=${dressId}&customerId=${customerId}`,
+            contentType: "application/json; charset=utf-8",
+            success: response => {
+                console.log(response.d)
+            },
+            error: err => console.log(err)
+        });
     })
 })(document);
