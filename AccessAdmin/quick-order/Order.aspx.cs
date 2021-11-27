@@ -150,7 +150,7 @@ namespace TailorBD.AccessAdmin.quick_order
                                 measurementCmd.Parameters.AddWithValue("@CustomerID", customerId);
                                 measurementCmd.Connection = conn;
                                 
-                                using (SqlDataReader measurementDr = cmd.ExecuteReader())
+                                using (SqlDataReader measurementDr = measurementCmd.ExecuteReader())
                                 {
                                     while (measurementDr.Read())
                                     {
@@ -200,7 +200,7 @@ namespace TailorBD.AccessAdmin.quick_order
                                 styleCmd.Parameters.AddWithValue("CustomerID", customerId);
                                 styleCmd.Connection = conn;
                                
-                                using (SqlDataReader styleDr = cmd.ExecuteReader())
+                                using (SqlDataReader styleDr = styleCmd.ExecuteReader())
                                 {
                                     while (styleDr.Read())
                                     {

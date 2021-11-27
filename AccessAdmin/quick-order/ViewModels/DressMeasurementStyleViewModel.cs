@@ -19,6 +19,10 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
 
     public class MeasurementsGroupModel
     {
+        public MeasurementsGroupModel()
+        {
+            Measurements = new List<MeasurementsModel>();
+        }
         public int MeasurementGroupId { get; set; }
         public List<MeasurementsModel> Measurements { get; set; }
     }
@@ -31,6 +35,10 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
 
     public class StyleGroupModel
     {
+        public StyleGroupModel()
+        {
+            Styles = new List<StyleModel>();
+        }
         public int DressStyleCategoryId { get; set; }
         public string DressStyleCategoryName { get; set; }
         public List<StyleModel> Styles { get; set; }
