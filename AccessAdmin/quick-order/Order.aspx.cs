@@ -175,5 +175,127 @@ namespace TailorBD.AccessAdmin.quick_order
             }
             return dressList;
         }
+
+        [WebMethod]
+        public static DressMeasurementStyleViewModel GetDressMeasurementsStyles(int dressId,int customerId = 0, int clothForId = 0)
+        {
+            DressMeasurementStyleViewModel dress = new DressMeasurementStyleViewModel();
+            //dress details
+            using (SqlConnection conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = "SELECT CDDetails FROM Customer_Dress WHERE (CustomerID = @CustomerID) AND (DressID = @DressID) AND (InstitutionID = @InstitutionID)";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@DressID", dressId);
+                    cmd.Parameters.AddWithValue("@CustomerID", customerId);
+
+                    cmd.Connection = conn;
+                    conn.Open();
+                    dress.OrderDetails = cmd.ExecuteScalar().ToString();
+                    conn.Close();
+                }
+            }
+          
+            //dress measurement
+            using (SqlConnection conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = "SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending FROM Measurement_Type WHERE(InstitutionID = @InstitutionID) AND(DressID = @DressID) ORDER BY Ascending";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@DressID", dressId);
+                    
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var measurementsGroup = new MeasurementsGroupModel
+                            {
+                                 MeasurementGroupId= Convert.ToInt32(sdr["Measurement_GroupID"])
+                            };
+
+                            using (SqlCommand measurementCmd = new SqlCommand())
+                            {
+                                measurementCmd.CommandText = "SELECT Measurement_Type.MeasurementTypeID, Measurement_Type.MeasurementType, Customer_M.Measurement, Measurement_Type.Measurement_Group_SerialNo FROM Measurement_Type LEFT OUTER JOIN (SELECT Measurement, MeasurementTypeID FROM Customer_Measurement WHERE (CustomerID = @CustomerID)) AS Customer_M ON Measurement_Type.MeasurementTypeID = Customer_M.MeasurementTypeID WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)";
+                                measurementCmd.Parameters.AddWithValue("@Measurement_GroupID", measurementsGroup.MeasurementGroupId);
+                                measurementCmd.Parameters.AddWithValue("@CustomerID", customerId);
+                                measurementCmd.Connection = conn;
+                                using (SqlDataReader measurementDr = cmd.ExecuteReader())
+                                {
+                                    while (measurementDr.Read())
+                                    {
+                                        var measurement = new MeasurementsModel
+                                        {
+                                             MeasurementTypeID= Convert.ToInt32(measurementDr["Type"]),
+                                             MeasurementType = measurementDr["Value"].ToString(),
+                                             Measurement = measurementDr[""].ToString()
+                                        };
+                                        measurementsGroup.Measurements.Add(measurement);
+                                    }
+                                }
+
+                            }
+                            dress.MeasurementGroups.Add(measurementsGroup);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            //dress Style
+            using (SqlConnection conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = "SELECT DISTINCT Dress_Style_Category.Dress_Style_Category_Name, Dress_Style.Dress_Style_CategoryID, ISNULL(Dress_Style_Category.CategorySerial, 99999) AS SN FROM Dress_Style INNER JOIN Dress_Style_Category ON Dress_Style.Dress_Style_CategoryID = Dress_Style_Category.Dress_Style_CategoryID WHERE (Dress_Style.DressID = @DressID) ORDER BY SN";
+                    cmd.Parameters.AddWithValue("@DressID", dressId);
+                   
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var styleGroup = new StyleGroupModel
+                            { 
+                                DressStyleCategoryId = Convert.ToInt32(sdr["Dress_Style_CategoryID"]), 
+                                DressStyleCategoryName = sdr["Dress_Style_Category_Name"].ToString()
+                            };
+
+                            using (SqlCommand styleCmd = new SqlCommand())
+                            {
+                                styleCmd.CommandText = "SELECT Dress_Style.Dress_StyleID, Dress_Style.Dress_Style_Name, Customer_DS.DressStyleMesurement, CAST(CASE WHEN Customer_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck FROM Dress_Style LEFT OUTER JOIN (SELECT DressStyleMesurement, Dress_StyleID FROM Customer_Dress_Style WHERE (CustomerID = @CustomerID)) AS Customer_DS ON Dress_Style.Dress_StyleID = Customer_DS.Dress_StyleID WHERE (Dress_Style.Dress_Style_CategoryID = @Dress_Style_CategoryID) ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)";
+                                styleCmd.Parameters.AddWithValue("@Dress_Style_CategoryID", styleGroup.DressStyleCategoryId);
+                                styleCmd.Parameters.AddWithValue("CustomerID", customerId);
+                                styleCmd.Connection = conn;
+                                using (SqlDataReader styleDr = cmd.ExecuteReader())
+                                {
+                                    while (styleDr.Read())
+                                    {
+                                        var style = new StyleModel
+                                        {
+                                            DressStyleId = Convert.ToInt32(styleDr["Dress_StyleID"]),
+                                            DressStyleName = styleDr["Dress_Style_Name"].ToString(),
+                                            DressStyleMesurement = styleDr["DressStyleMesurement"].ToString(),
+                                            IsCheck = Convert.ToBoolean( styleDr["IsCheck"])
+                                        };
+                                        styleGroup.Styles.Add(style);
+                                    }
+                                }
+
+                            }
+                         dress.StyleGroups.Add(styleGroup);                          
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return dress;
+        }
     }
 }
