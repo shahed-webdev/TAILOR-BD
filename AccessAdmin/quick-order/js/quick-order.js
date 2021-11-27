@@ -91,8 +91,45 @@ const order = (function () {
             contentType: "application/json; charset=utf-8",
             success: response => {
                 console.log(response.d)
+                renderMesurement(response.d.MeasurementGroups)
             },
             error: err => console.log(err)
         });
     })
+
+    //render mesurement
+    const mesurements = document.getElementById("mesurements");
+    function renderMesurement(mesurementsGroup = []) {
+        const fragment = document.createDocumentFragment();
+
+        mesurementsGroup.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "col-sm-4 col-lg-3 mb-4";
+            div.innerHTML = `<div class="card p-3 h-100">${renderNameAndInput(item.Measurements)}</div>`;
+
+            fragment.appendChild(div)
+        });
+
+        mesurements.innerHTML = "";
+        mesurements.append(fragment)
+    }
+
+    //render mesurement name and input
+    function renderNameAndInput(measurementsData=[]) {
+        let html = '';
+        measurementsData.forEach(item => {
+            const active = item.Measurement ? "active" : "";
+
+            html += `<div class="mb-2">    
+                <div class="md-form md-outline my-1">
+                   <label class="${active}" for="${item.MeasurementTypeID}">${item.MeasurementType}</label>
+                  <input id="${item.MeasurementTypeID}" type="text" class="form-control" value="${item.Measurement}" autocomplete="off">
+                </div>
+              </div>`
+        })
+
+        return html;
+    }
+
+
 })(document);
