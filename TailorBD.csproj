@@ -821,6 +821,7 @@
     </Compile>
     <Compile Include="AccessAdmin\quick-order\ViewModels\CustomerViewModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\DressDllViewModel.cs" />
+    <Compile Include="AccessAdmin\quick-order\ViewModels\DressMeasurementStyleViewModel.cs" />
     <Compile Include="AccessAdmin\Reports\Order_And_Delivery_Report_By_Date.aspx.cs">
       <DependentUpon>Order_And_Delivery_Report_By_Date.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
