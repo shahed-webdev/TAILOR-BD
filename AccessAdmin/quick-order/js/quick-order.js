@@ -82,7 +82,7 @@ const order = (function () {
     dressDropdown.addEventListener("change", function (evt) {
         if (!evt.target.value) return;
 
-        const customerId = 0;
+        const customerId = 5042;
         const dressId = +evt.target.value;
 
         $.ajax({
@@ -90,8 +90,8 @@ const order = (function () {
             url: `Order.aspx/GetDressMeasurementsStyles?dressId=${dressId}&customerId=${customerId}`,
             contentType: "application/json; charset=utf-8",
             success: response => {
-                console.log(response.d)
-                renderMesurement(response.d.MeasurementGroups)
+                renderMesurement(response.d.MeasurementGroups);
+                renderStyleCategory(response.d.StyleGroups);
             },
             error: err => console.log(err)
         });
@@ -105,13 +105,13 @@ const order = (function () {
         mesurementsGroup.forEach(item => {
             const div = document.createElement("div");
             div.className = "col-sm-4 col-lg-3 mb-4";
-            div.innerHTML = `<div class="card p-3 h-100">${renderNameAndInput(item.Measurements)}</div>`;
+            div.innerHTML = `<div class="card px-3 pt-2 h-100">${renderNameAndInput(item.Measurements)}</div>`;
 
-            fragment.appendChild(div)
+            fragment.appendChild(div);
         });
 
         mesurements.innerHTML = "";
-        mesurements.append(fragment)
+        mesurements.append(fragment);
     }
 
     //render mesurement name and input
@@ -132,4 +132,51 @@ const order = (function () {
     }
 
 
+    //render styles
+    const dressStyles = document.getElementById("dress-styles");
+    function renderStyleCategory(styleGroups = []) {
+        const fragment = document.createDocumentFragment();
+
+        styleGroups.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "col-sm-6 col-lg-4 mb-4";
+            div.innerHTML = `
+              <div class="card">
+                <div class="card-header bg-white" role="tab">
+                    <a href="#tab${item.DressStyleCategoryId}" class="collapsed black-text" data-toggle="collapse" data-parent="#dress-styles" aria-expanded="false">
+                        <p class="mb-0">${item.DressStyleCategoryName}</p>
+                    </a>
+                </div>
+
+                <div id="tab${item.DressStyleCategoryId}" class="collapse" role="tabpanel" data-parent="#dress-styles">
+                    <div class="card-body">
+                        ${renderStyle(item.Styles)}
+                    </div>
+                </div>
+             </div>`;
+
+            fragment.appendChild(div);
+        });
+
+        dressStyles.innerHTML = "";
+        dressStyles.append(fragment);
+    }
+
+    //render mesurement name and input
+    function renderStyle(styles = []) {
+        let html = '';
+        styles.forEach(item => {
+            const checked = item.IsCheck ? "checked" : "";
+
+            html += `<div class="mb-3">    
+                <div class="custom-control custom-checkbox mb-1">
+                  <input type="checkbox" class="custom-control-input" id="${item.DressStyleId}" ${checked}>
+                  <label class="custom-control-label" for="${item.DressStyleId}">${item.DressStyleName}</label>
+                </div>
+                <input id="${item.DressStyleId}" type="text" class="form-control" value="${item.DressStyleMesurement}" autocomplete="off">
+              </div>`
+        })
+
+        return html;
+    }
 })(document);

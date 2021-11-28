@@ -3,10 +3,10 @@
 <asp:Content ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
-    <div class="col">
-        <h3 class="mb-3 font-weight-bold">Quick Order</h3>
+    <div class="col mb-5">
+        <h3 class="mb-1 font-weight-bold">Quick Order</h3>
 
-        <div class="row align-items-center">
+        <div class="row align-items-end">
             <div class="col col-sm-6">
                 <select id="dress-dropdown" class="form-control" required>
                     <option value="">[ SELECT DRESS ]</option>
@@ -14,60 +14,26 @@
             </div>
 
             <div class="col-sm-6 text-right">
-                <button data-toggle="modal" data-target="#addCustomerModal" class="btn btn-sm btn-teal">
+                <button type="button" data-toggle="modal" data-target="#addCustomerModal" class="btn btn-sm btn-teal">
                     <i class="fas fa-user-plus"></i>
                     Customer
                 </button>
-
-                <span class="badge badge-pill badge-default">md rahim</span>
-                <span class="badge badge-pill badge-default">0171124521</span>
+                <div>
+                    <span class="badge badge-pill badge-default">md rahim</span>
+                    <span class="badge badge-pill badge-default">0171124521</span>
+                </div>
             </div>
         </div>
 
+        <!--mesurement-->
         <div class="row mt-3" id="mesurements"></div>
 
         <!--Accordion wrapper-->
-        <div class="accordion md-accordion" id="accordionEx" role="tablist" aria-multiselectable="true">
-            <div class="card mb-3">
-                <!-- Card header -->
-                <div class="card-header" role="tab" id="headingTwo2">
-                    <a class="collapsed" data-toggle="collapse" data-parent="#accordionEx" href="#collapseTwo2"
-                        aria-expanded="false" aria-controls="collapseTwo2">
-                        <h5 class="mb-0">style</h5>
-                    </a>
-                </div>
-
-                <!-- Card body -->
-                <div id="collapseTwo2" class="collapse" role="tabpanel" aria-labelledby="headingTwo2" data-parent="#accordionEx">
-                    <div class="card-body">body
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="card">
-
-                <!-- Card header -->
-                <div class="card-header" role="tab" id="headingThree3">
-                    <a class="collapsed" data-toggle="collapse" data-parent="#accordionEx" href="#collapseThree3"
-                        aria-expanded="false" aria-controls="collapseThree3">
-                        <h5 class="mb-0">style</h5>
-                    </a>
-                </div>
-
-                <!-- Card body -->
-                <div id="collapseThree3" class="collapse" role="tabpanel" aria-labelledby="headingThree3" data-parent="#accordionEx">
-                    <div class="card-body">body
-                    </div>
-                </div>
-
-            </div>
-        </div>
+        <div class="row accordion" id="dress-styles" role="tablist" aria-multiselectable="true"></div>
     </div>
 
 
-
-    <%--customer add modal--%>
+    <!--customer add modal-->
     <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
