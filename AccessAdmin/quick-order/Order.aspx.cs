@@ -21,7 +21,7 @@ namespace TailorBD.AccessAdmin.quick_order
         }
 
 
-        //find customer
+        //find customer autocomplete
         [WebMethod]
         [ScriptMethod(UseHttpGet = true)]
         public static List<CustomerViewModel> FindCustomer(string prefix)
@@ -32,7 +32,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (SqlCommand cmd = new SqlCommand())
                 {
-                    cmd.CommandText = "select Top(3) CustomerID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND (Phone like @prefex + '%') or (CustomerName like @prefex + '%')";
+                    cmd.CommandText = "select Top(3) CustomerID,Cloth_For_ID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND (Phone like @prefex + '%') or (CustomerName like @prefex + '%')";
                     cmd.Parameters.AddWithValue("@prefex", prefix);
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
 
@@ -45,6 +45,7 @@ namespace TailorBD.AccessAdmin.quick_order
                             var dress = new CustomerViewModel
                             {
                                 CustomerID = sdr["CustomerID"].ToString(),
+                                Cloth_For_ID = sdr["Cloth_For_ID"].ToString(),
                                 CustomerName = sdr["CustomerName"].ToString(),
                                 Phone = sdr["Phone"].ToString(),
                                 Address = sdr["Address"].ToString(),
@@ -57,6 +58,15 @@ namespace TailorBD.AccessAdmin.quick_order
             }
             return customers;
         }
+
+        //add new customer
+        [WebMethod]
+        public static CustomerViewModel AddNewCustomer(CustomerViewModel model)
+        {
+            
+            return model;
+        }
+
 
         //dress dropdown
         [WebMethod]

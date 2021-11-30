@@ -14,23 +14,17 @@ const helpers = {
 //get dress from api
 function initData() {
     return {
-        isPageLoading: false,
-
         apiData: {
             customerId: 0,
+            dressId:0,
             clothForId: 0
         },
 
-        //order list data
-        selectedIndex: null,
-        order: [], //[{ dress: {}, mesurements:[], styles:[] }],
-
-        //get dress dropsown
+        // dress dropsown
         dressNames: {
             isLoading: true,
             data: []
         },
-
         async getDress() {
             const { customerId, clothForId } = this.apiData;
             const response = await fetch(`${helpers.baseUrl}/DressDlls?customerId=${customerId}&clothForId=${clothForId}`, helpers.header);
@@ -40,147 +34,61 @@ function initData() {
             this.dressNames.data = result.d;
         },
 
-        //add to cart dress
-        async addToListDress(dressId) {
-            //check dress was already added
-            if (this.order.length) {
-                const isAdded = this.order.some(item => item.dress.dressId === dressId);
-
-                if (isAdded) {
-                    $.notify("dress already added", { position: "to center" }, "error",);
-                    return;
-                }
-            }
-
-            //get dress info from dress list
-            const dress = this.dressNames.data.filter(item => item.DressId === dressId)[0];
-
-            const response = await this.getMesurementsStyles(dress.DressId);
-            console.log(response)
-
-            this.order.push({
-                dress: {
-                    dressId: dress.DressId,
-                    dressName: dress.DressName
-                },
-                quantity: 1,
-                mesurements: response.MeasurementGroups,
-                styles: response.StyleGroups
-            })
+        onChangeDressDropdown(evt) {
+            this.apiData.dressId = +evt.target.value || 0;
+            this.getMesurementsStyles();
         },
 
-        //remove Dress from cart
-        removeDress(dressId) {
-            const confirmDelete = confirm("Are you confirm to remove dress from list?");
-            if (confirmDelete) {
-                this.order = this.order.filter(item => item.dress.dressId !== dressId);
-                this.selectedIndex = null;
-            }
+        // mesurements
+        mesurementsStyles: {
+            isLoading: false,
+            data: []
         },
+        async getMesurementsStyles() {
+            this.mesurementsStyles.isLoading = true;
+            const { customerId, dressId } = this.apiData;
 
-        //mesurement and style modal
-        onOpenMesurementStyleModal(isMesurement, index) {
-            const mesure = isMesurement ? 'show' : 'hide';
-            const style = !isMesurement ? 'show' : 'hide';
+            const response = await fetch(`${helpers.baseUrl}/GetDressMeasurementsStyles?dressId=${dressId}&customerId=${customerId}`, helpers.header);
+            const result = await response.json();
 
-            this.selectedIndex = index;
-
-            $("#addMesurement").modal(mesure);
-            $("#addStyle").modal(style);
-        },
-
-        //get mesurements and styles
-        async getMesurementsStyles(dressId) {
-            const { customerId } = this.apiData;
-            this.isPageLoading = true;
-
-            try {
-                const response = await fetch(`${helpers.baseUrl}/GetDressMeasurementsStyles?dressId=${dressId}&customerId=${customerId}`, helpers.header);
-                const result = await response.json();
-                this.isPageLoading = false;
-
-                return result.d;
-
-            } catch (error) {
-                console.log(error)
-                return null;
-            }
+            this.mesurementsStyles.isLoading = false;
+            this.mesurementsStyles.data = result.d;
         },
 
         //customer
         customer: {
             isLoading: false,
-            isNewCustomer: true,
+            mesurementFound:false,
             data: {}
         },
 
-        //find
         findCustomer(evt) {
-            //reset if change text
-            this.apiData.customerId = 0;
-            this.customer.isNewCustomer = true;
-
-
             $(`#${evt.target.id}`).typeahead({
                 minLength: 1,
                 displayText: item => {
                     return `${item.CustomerName}, ${item.Phone}`;
                 },
-                afterSelect: function (item) {
+                afterSelect: function(item) {
                     this.$element[0].value = item.CustomerName;
                 },
                 source: (request, result) => {
-                    this.customer.isLoading = true;
-
                     $.ajax({
                         url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
                         contentType: "application/json; charset=utf-8",
-                        success: response => {
-                            result(response.d);
-                            this.customer.isLoading = false;
-                        },
-                        error: err => {
-                            console.log(err);
-                            this.customer.isLoading = false;
-                        }
+                        success: response => result(response.d),
+                        error: err => console.log(err)
                     });
                 },
                 updater: item => {
-                    //set customer info
                     this.customer.data = item;
+
+                    //set customer id and call for dress data
                     this.apiData.customerId = +item.CustomerID;
-                    this.customer.isNewCustomer = false;
+                    this.getMesurementsStyles();
 
                     return item;
                 }
             })
-        },
-
-        //add new
-        async addNewCustomer() {
-            const { Phone, CustomerName, Address, Cloth_For_ID = 1 } = this.customer.data;
-
-            const model = {
-                Phone,
-                CustomerName,
-                Address,
-                Cloth_For_ID
-            }
-
-            const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`, {
-                method: "POST",
-                headers: helpers.header.headers,
-                body: JSON.stringify({ model }),
-            });
-
-            const result = await response.json();
-
-            console.log(result)
-        },
-
-        //set mesurement
-        async setMesurements() {
-            const response = await this.getMesurementsStyles(dress.DressId);
         }
     }
 }

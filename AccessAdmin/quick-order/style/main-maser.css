@@ -23,3 +23,8 @@ main { min-height: 720px; }
 .selected-node { color: #cc0062; }
 
 footer { background-color: #00b4aa; color: #fff; text-align: center; padding: 20px 0; }
+
+/**DISABLE INPUT TYPE NUMBER WHEEL**/
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }

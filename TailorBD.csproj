@@ -197,7 +197,9 @@
     <Content Include="AccessAdmin\Order\Print_A4_Mesurement.aspx" />
     <Content Include="AccessAdmin\Order\Print_Mesurement.aspx" />
     <Content Include="AccessAdmin\Profile.aspx" />
+    <Content Include="AccessAdmin\quick-order\js\oldOrder.js" />
     <Content Include="AccessAdmin\quick-order\js\quick-order.js" />
+    <Content Include="AccessAdmin\quick-order\oldOrder.aspx" />
     <Content Include="AccessAdmin\quick-order\Order.aspx" />
     <Content Include="AccessAdmin\quick-order\style\main-maser.css" />
     <Content Include="AccessAdmin\Reports\CSS\Ico\Complete.png" />
@@ -266,6 +268,7 @@
     <Content Include="CSS\Image\ddarow.png" />
     <Content Include="CSS\Image\banner.jpg" />
     <Content Include="CSS\Image\Default\Dress.png" />
+    <Content Include="CSS\Image\loading.svg" />
     <Content Include="CSS\Image\Default\Logo.png" />
     <Content Include="CSS\Image\Default\Mesurment.png" />
     <Content Include="CSS\Image\Default\Profile.png" />
@@ -811,6 +814,13 @@
     </Compile>
     <Compile Include="AccessAdmin\Profile.aspx.designer.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\quick-order\oldOrder.aspx.cs">
+      <DependentUpon>oldOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\quick-order\oldOrder.aspx.designer.cs">
+      <DependentUpon>oldOrder.aspx</DependentUpon>
     </Compile>
     <Compile Include="AccessAdmin\quick-order\Order.aspx.cs">
       <DependentUpon>Order.aspx</DependentUpon>
