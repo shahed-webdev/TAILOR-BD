@@ -21,7 +21,7 @@
                   <select x-init="getDress()" x-model.number="dressId" :disabled="dressNames.isLoading" class="form-control w-auto" required>
                     <option value="">[ SELECT DRESS ]</option>
                     <template x-for="dress in dressNames.data" :key="dress.DressId">
-                       <option :class="dress.IsMeasurementAvailable && 'red-text'" :value="dress.DressId" x-text="dress.DressName"></option>
+                       <option :class="dress.IsMeasurementAvailable && 'text-success'" :value="dress.DressId" x-text="dress.DressName"></option>
                     </template>
                   </select>
 

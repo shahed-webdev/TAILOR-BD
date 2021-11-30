@@ -79,7 +79,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (SqlCommand cmd = new SqlCommand())
                 {
-                    cmd.CommandText = "SELECT Dress.DressID,Dress.Dress_Name,CAST(IIF ( CT.DressID = 1, 1, 0 ) AS BIT) as IsMeasurementAvailable FROM Dress LEFT OUTER JOIN (SELECT DressID FROM Customer_Dress WHERE (InstitutionID = @InstitutionID) AND (CustomerID = @CustomerID)) AS CT ON Dress.DressID = CT.DressID WHERE (Dress.InstitutionID = @InstitutionID) AND (Dress.Cloth_For_ID = @Cloth_For_ID OR @Cloth_For_ID = 0) ORDER BY Dress.DressSerial";
+                    cmd.CommandText = "SELECT Dress.DressID,Dress.Dress_Name,CAST(IIF (CT.DressID is null, 0, 1) AS BIT) as IsMeasurementAvailable FROM Dress LEFT OUTER JOIN (SELECT DressID FROM Customer_Dress WHERE (InstitutionID = @InstitutionID) AND (CustomerID = @CustomerID)) AS CT ON Dress.DressID = CT.DressID WHERE (Dress.InstitutionID = @InstitutionID) AND (Dress.Cloth_For_ID = @Cloth_For_ID OR @Cloth_For_ID = 0) ORDER BY Dress.DressSerial";
                     cmd.Parameters.AddWithValue("@CustomerID", customerId);
                     cmd.Parameters.AddWithValue("@Cloth_For_ID", clothForId);
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
@@ -104,6 +104,7 @@ namespace TailorBD.AccessAdmin.quick_order
             }
             return dressList;
         }
+
 
         //get dress measurements styles
         [WebMethod]

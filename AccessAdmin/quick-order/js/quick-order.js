@@ -118,6 +118,7 @@ function initData() {
         findCustomer(evt) {
             //reset if change text
             this.apiData.customerId = 0;
+            this.apiData.clothForId = 0;
             this.customer.isNewCustomer = true;
 
 
@@ -149,6 +150,7 @@ function initData() {
                     //set customer info
                     this.customer.data = item;
                     this.apiData.customerId = +item.CustomerID;
+                    this.apiData.clothForId = item.Cloth_For_ID;
                     this.customer.isNewCustomer = false;
 
                     return item;
@@ -179,8 +181,20 @@ function initData() {
         },
 
         //set mesurement
-        async setMesurements() {
-            const response = await this.getMesurementsStyles(dress.DressId);
+        setMesurements() {
+            this.getDress();
+
+            if (!this.order.length) {
+                $("#addCustomerModal").modal("hide");
+                return;
+            }
+
+            this.order.forEach(async item => {
+                const response = await this.getMesurementsStyles(item.dress.dressId);
+                console.log(response)
+            })
+
+            $("#addCustomerModal").modal("hide");
         }
     }
 }
