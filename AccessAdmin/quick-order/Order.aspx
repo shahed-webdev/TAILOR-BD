@@ -14,7 +14,8 @@
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
     <div class="col mb-5" x-data="initData()">
         <h3 class="mb-3 font-weight-bold">Quick Order</h3>
-
+        
+        <!--dress dropdown-->
         <div class="row align-items-center mb-4">
             <div class="col-sm-7 col-lg-9" x-data="{ dressId: 0 }">
                <form @submit.prevent="()=>addToListDress(dressId)">
@@ -50,14 +51,14 @@
 
         <!--dress list-->
         <div x-show="order.length" class="card card-body">
-          <table class="table">
+          <table class="table table-sm">
             <thead>
                 <tr>
                 <th style="width:30px" class="font-weight-bold">SN</th>
                 <th class="font-weight-bold">Dress</th>
                 <th style="width:100px" class="font-weight-bold text-center">Quantity</th>
-                <th class="font-weight-bold text-center">Measurement</th>
-               
+                <th class="font-weight-bold text-center">Details</th>
+               <th style="width:10px"></th>
              </tr>
             </thead>
             <tbody>
@@ -65,26 +66,63 @@
                 <tr>
                    <td x-text="index+1"></td>
                    <td>
-                       <div class="d-flex">
-                            <p class="mb-1 font-weight-bold" x-text="item.dress.dressName"></p>
-                           <a class="red-text ml-2" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
-                       </div>
+                       <p class="font-weight-bold mb-1" x-text="item.dress.dressName"></p>
                       
-                       <textarea x-model="item.orderDetails" rows="1" class="form-control" placeholder="dress details"></textarea>
+                       <button type="button" class="btn btn-cyan btn-font py-1" @click="()=> onOpenMeasurementStyleModal(true,index)">Measurement</button>
+                       <button type="button" class="btn btn-unique btn-font py-1 mx-2" @click="()=> onOpenMeasurementStyleModal(false,index)">Style</button>
+                       <button type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(index)">Payment</button>
                    </td>
                    <td class="text-center">
                        <input class="form-control text-center" type="number" min="1" x-model.number="item.quantity" @wheel="(e)=> e.preventDefault()">
                    </td>
                    <td class="text-center">
-                       <button type="button" class="btn btn-cyan btn-font py-1 mr-2" @click="()=> onOpenMeasurementStyleModal(true,index)">Measurement</button>
-                       <button type="button" class="btn btn-unique btn-font py-1" @click="()=> onOpenMeasurementStyleModal(false,index)">Style</button>
+                       <input x-model="item.orderDetails" class="form-control" placeholder="dress details">
                    </td>
+                    <td>
+                        <a class="red-text ml-2" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
+                    </td>
                 </tr>
           </template>
           </tbody>
         </table>
        </div>
-
+        
+       <!--display added payment list-->
+       <div class="mt-4">
+        <template x-for="(item, index) in order" :key="index">
+            <div>
+             <h4 x-show="item?.payments" x-text="item.dress.dressName"></h4>
+                <table x-show="item?.payments" class="table table-sm">
+                  <thead>
+                <tr>
+                    <th class="font-weight-bold">Payment For</th>
+                    <th style="width: 100px" class="text-center font-weight-bold">Unit</th>
+                    <th class="font-weight-bold text-right">Unit Price</th>
+                    <th class="font-weight-bold text-right">Line Total</th>
+                </tr>
+                </thead>
+                  <tbody>
+            <template x-for="(payment, i) in item.payments" :key="i">
+                <tr>
+                    <td x-text="payment.paymentFor"></td>
+                    <td>
+                        <input min="1" x-model="payment.paymentDressQuantity" type="number" class="form-control text-center">
+                    </td>
+                    <td class="text-right">
+                        ৳<span x-text="payment.amount"></span>
+                    </td>
+                    <td class="text-right">
+                        ৳<span x-text="payment.amount*payment.paymentDressQuantity"></span>
+                    </td>
+                </tr>
+            </template>
+            </tbody>
+               </table>
+            </div>
+        </template>
+       </div>   
+       
+    
 
         <!--measurement modal-->
         <div class="modal fade" id="addMeasurement" tabindex="-1" role="dialog">
@@ -161,9 +199,54 @@
             </div>
           </div>
         </div>
+        
+    
+        <!--payment modal-->
+        <div class="modal fade" id="addPaymentModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header text-center teal lighten-1 white-text">
+                    <h4 class="modal-title w-100">
+                        Add Payment: <strong x-text="selectedIndex !== null && order[selectedIndex].dress.dressName"></strong>
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+               
+                  <form @submit.prevent="()=>addPayment(selectedIndex)">
+                    <div class="modal-body mx-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <label>Payment For</label>
+                                <input type="text" x-model="dressPayment.paymentFor" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label>Amount</label>
+                                <input  x-model.number="dressPayment.amount" type="number" min="0" step="0.01" class="form-control" autocomplete="off" required>
+                            </div>
+                        </div>
+                       
+                       <div class="text-center mt-3">OR</div>
+         
+                        <div class="form-group">
+                            <label>Select Saved Payment</label>
+                            <select class="form-control">
+                                <option value="">[ Select Payment ]</option>
+                            </select>
+                        </div>
 
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-teal">Add <i class="fa fa-paper-plane ml-1"></i></button>
+                        </div>
+                    </div>
+                  </form>
+                 </div>
+              </div>
+        </div>         
+      
 
-        <!--customer add modal-->
+        <!--customer modal-->
         <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -188,7 +271,7 @@
                             <input type="text" id="address" x-model="customer.data.Address" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label for="customerName">Gender</label>
+                            <label>Gender</label>
                             <select x-model="customer.data.Cloth_For_ID" class="form-control" required>
                                 <option value="1">পুরুষ</option>
                                 <option value="2">মহিলা</option>
