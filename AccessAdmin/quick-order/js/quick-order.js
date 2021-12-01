@@ -47,7 +47,7 @@ function initData() {
                 const isAdded = this.order.some(item => item.dress.dressId === dressId);
 
                 if (isAdded) {
-                    $.notify("dress already added", { position: "to center" }, "error",);
+                    $.notify("dress already added", { position: "to center" }, "error");
                     return;
                 }
             }
@@ -158,7 +158,7 @@ function initData() {
                 }
             })
         },
-
+        
         //add new
         async addNewCustomer() {
             const { Phone, CustomerName, Address, Cloth_For_ID = 1 } = this.customer.data;
@@ -170,15 +170,26 @@ function initData() {
                 Cloth_For_ID
             }
 
-            const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`, {
-                method: "POST",
-                headers: helpers.header.headers,
-                body: JSON.stringify({ model }),
-            });
+            try {
+                const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`,
+                    {
+                        method: "POST",
+                        headers: helpers.header.headers,
+                        body: JSON.stringify({ model })
+                    });
 
-            const result = await response.json();
+                const result = await response.json();
+               
+                $.notify(result.d.Message, { position: "to center", className: result.d.IsSuccess ? "success": "error" });
 
-            console.log(result)
+                if (result.d.IsSuccess) {
+                    this.customer.data = result.d.Data;
+                    this.apiData.customerId = result.d.Data.CustomerID;
+                }
+            } catch (e) {
+                console.log("customer added error");
+                $.notify(e.message, { position: "to center", className:'error'});
+            }
         },
 
         //set measurement

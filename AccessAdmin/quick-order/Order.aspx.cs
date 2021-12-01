@@ -33,7 +33,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;select @orderNo";
-                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Connection = con;
 
                     con.Open();
@@ -49,19 +49,19 @@ namespace TailorBD.AccessAdmin.quick_order
         [ScriptMethod(UseHttpGet = true)]
         public static List<CustomerViewModel> FindCustomer(string prefix)
         {
-            List<CustomerViewModel> customers = new List<CustomerViewModel>();
-            using (SqlConnection conn = new SqlConnection())
+            var customers = new List<CustomerViewModel>();
+            using (var conn = new SqlConnection())
             {
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = "select Top(3) CustomerID,Cloth_For_ID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND (Phone like @prefex + '%') or (CustomerName like @prefex + '%')";
                     cmd.Parameters.AddWithValue("@prefex", prefix);
-                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
 
                     cmd.Connection = conn;
                     conn.Open();
-                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    using (var sdr = cmd.ExecuteReader())
                     {
                         while (sdr.Read())
                         {
@@ -86,35 +86,36 @@ namespace TailorBD.AccessAdmin.quick_order
         [WebMethod]
         public static ResponseModel<CustomerViewModel> AddNewCustomer(CustomerViewModel model)
         {
-            using (SqlConnection con = new SqlConnection())
+            using (var con = new SqlConnection())
             {
                 con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
 
                 //Check customer exist 
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = "select * from Customer where InstitutionID = @InstitutionID AND CustomerName = @CustomerName AND Phone = @Phone";
-                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Parameters.AddWithValue("@CustomerName", model.CustomerName.Trim());
                     cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
 
                     cmd.Connection = con;
+                    
                     con.Open();
-                    object Is_Customer = cmd.ExecuteScalar();
+                    var isCustomer = cmd.ExecuteScalar();
                     con.Close();
 
-                    if (Is_Customer != null)
+                    if (isCustomer != null)
                     {
                         return new ResponseModel<CustomerViewModel>(false, model.CustomerName + ". মোবাইল: " + model.Phone + " পূর্বে নিবন্ধিত, পুনরায় নিবন্ধন করা যাবে না");
                     }
                 }
 
                 //insert customer and get customerId
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = @"INSERT INTO Customer (RegistrationID, InstitutionID, Cloth_For_ID, CustomerName, Phone, Address, Date, CustomerNumber) VALUES (@RegistrationID,@InstitutionID,@Cloth_For_ID,@CustomerName,@Phone,@Address, GETDATE(),(SELECT [dbo].[CustomeSerialNumber](@InstitutionID))); select IDENT_CURRENT('Customer')";
-                    cmd.Parameters.AddWithValue("@RegistrationID", HttpContext.Current.Request.Cookies["RegistrationID"].Value);
-                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@RegistrationID", HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Parameters.AddWithValue("@Cloth_For_ID", model.Cloth_For_ID);
                     cmd.Parameters.AddWithValue("@CustomerName", model.CustomerName.Trim());
                     cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
@@ -126,10 +127,10 @@ namespace TailorBD.AccessAdmin.quick_order
                     con.Close();
 
                 }
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = @"UPDATE Institution SET TotalCustomer = [dbo].[CustomeSerialNumber](@InstitutionID) WHERE(InstitutionID = @InstitutionID)";
-                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Connection = con;
 
                     con.Open();
@@ -145,11 +146,11 @@ namespace TailorBD.AccessAdmin.quick_order
         [ScriptMethod(UseHttpGet = true)]
         public static List<DressDllViewModel> DressDlls(int customerId = 0, int clothForId = 0)
         {
-            List<DressDllViewModel> dressList = new List<DressDllViewModel>();
-            using (SqlConnection conn = new SqlConnection())
+            var dressList = new List<DressDllViewModel>();
+            using (var conn = new SqlConnection())
             {
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = "SELECT Dress.DressID,Dress.Dress_Name,CAST(IIF (CT.DressID is null, 0, 1) AS BIT) as IsMeasurementAvailable FROM Dress LEFT OUTER JOIN (SELECT DressID FROM Customer_Dress WHERE (InstitutionID = @InstitutionID) AND (CustomerID = @CustomerID)) AS CT ON Dress.DressID = CT.DressID WHERE (Dress.InstitutionID = @InstitutionID) AND (Dress.Cloth_For_ID = @Cloth_For_ID OR @Cloth_For_ID = 0) ORDER BY Dress.DressSerial";
                     cmd.Parameters.AddWithValue("@CustomerID", customerId);
@@ -158,7 +159,7 @@ namespace TailorBD.AccessAdmin.quick_order
 
                     cmd.Connection = conn;
                     conn.Open();
-                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    using (var sdr = cmd.ExecuteReader())
                     {
                         while (sdr.Read())
                         {
@@ -183,13 +184,13 @@ namespace TailorBD.AccessAdmin.quick_order
         [ScriptMethod(UseHttpGet = true)]
         public static DressMeasurementStyleViewModel GetDressMeasurementsStyles(int dressId, int customerId = 0)
         {
-            DressMeasurementStyleViewModel dress = new DressMeasurementStyleViewModel();
+            var dress = new DressMeasurementStyleViewModel();
             
             //dress details
-            using (SqlConnection conn = new SqlConnection())
+            using (var conn = new SqlConnection())
             {
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = "SELECT CDDetails FROM Customer_Dress WHERE (CustomerID = @CustomerID) AND (DressID = @DressID) AND (InstitutionID = @InstitutionID)";
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
@@ -206,10 +207,10 @@ namespace TailorBD.AccessAdmin.quick_order
             }
           
             //dress measurement
-            using (SqlConnection conn = new SqlConnection())
+            using (var conn = new SqlConnection())
             {
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = "SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending FROM Measurement_Type WHERE(InstitutionID = @InstitutionID) AND(DressID = @DressID) ORDER BY Ascending";
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
@@ -217,7 +218,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     
                     cmd.Connection = conn;
                     conn.Open();
-                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    using (var sdr = cmd.ExecuteReader())
                     {
                         while (sdr.Read())
                         {
@@ -226,14 +227,14 @@ namespace TailorBD.AccessAdmin.quick_order
                                  MeasurementGroupId= Convert.ToInt32(sdr["Measurement_GroupID"])
                             };
 
-                            using (SqlCommand measurementCmd = new SqlCommand())
+                            using (var measurementCmd = new SqlCommand())
                             {
                                 measurementCmd.CommandText = "SELECT Measurement_Type.MeasurementTypeID, Measurement_Type.MeasurementType, Customer_M.Measurement, Measurement_Type.Measurement_Group_SerialNo FROM Measurement_Type LEFT OUTER JOIN (SELECT Measurement, MeasurementTypeID FROM Customer_Measurement WHERE (CustomerID = @CustomerID)) AS Customer_M ON Measurement_Type.MeasurementTypeID = Customer_M.MeasurementTypeID WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)";
                                 measurementCmd.Parameters.AddWithValue("@Measurement_GroupID", measurementsGroup.MeasurementGroupId);
                                 measurementCmd.Parameters.AddWithValue("@CustomerID", customerId);
                                 measurementCmd.Connection = conn;
                                 
-                                using (SqlDataReader measurementDr = measurementCmd.ExecuteReader())
+                                using (var measurementDr = measurementCmd.ExecuteReader())
                                 {
                                     while (measurementDr.Read())
                                     {
@@ -256,17 +257,17 @@ namespace TailorBD.AccessAdmin.quick_order
             }
             
             //dress Style
-            using (SqlConnection conn = new SqlConnection())
+            using (var conn = new SqlConnection())
             {
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
-                using (SqlCommand cmd = new SqlCommand())
+                using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = "SELECT DISTINCT Dress_Style_Category.Dress_Style_Category_Name, Dress_Style.Dress_Style_CategoryID, ISNULL(Dress_Style_Category.CategorySerial, 99999) AS SN FROM Dress_Style INNER JOIN Dress_Style_Category ON Dress_Style.Dress_Style_CategoryID = Dress_Style_Category.Dress_Style_CategoryID WHERE (Dress_Style.DressID = @DressID) ORDER BY SN";
                     cmd.Parameters.AddWithValue("@DressID", dressId);
                    
                     cmd.Connection = conn;
                     conn.Open();
-                    using (SqlDataReader sdr = cmd.ExecuteReader())
+                    using (var sdr = cmd.ExecuteReader())
                     {
                         while (sdr.Read())
                         {
@@ -276,14 +277,14 @@ namespace TailorBD.AccessAdmin.quick_order
                                 DressStyleCategoryName = sdr["Dress_Style_Category_Name"].ToString()
                             };
 
-                            using (SqlCommand styleCmd = new SqlCommand())
+                            using (var styleCmd = new SqlCommand())
                             {
                                 styleCmd.CommandText = "SELECT Dress_Style.Dress_StyleID, Dress_Style.Dress_Style_Name, Customer_DS.DressStyleMesurement, CAST(CASE WHEN Customer_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck FROM Dress_Style LEFT OUTER JOIN (SELECT DressStyleMesurement, Dress_StyleID FROM Customer_Dress_Style WHERE (CustomerID = @CustomerID)) AS Customer_DS ON Dress_Style.Dress_StyleID = Customer_DS.Dress_StyleID WHERE (Dress_Style.Dress_Style_CategoryID = @Dress_Style_CategoryID) ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)";
                                 styleCmd.Parameters.AddWithValue("@Dress_Style_CategoryID", styleGroup.DressStyleCategoryId);
                                 styleCmd.Parameters.AddWithValue("CustomerID", customerId);
                                 styleCmd.Connection = conn;
                                
-                                using (SqlDataReader styleDr = styleCmd.ExecuteReader())
+                                using (var styleDr = styleCmd.ExecuteReader())
                                 {
                                     while (styleDr.Read())
                                     {
