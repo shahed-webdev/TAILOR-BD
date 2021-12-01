@@ -7,11 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TailorBD.AccessAdmin.Order {
-    
-    
-    public partial class Dressandmeasurements {
-        
+namespace TailorBD.AccessAdmin.Order
+{
+
+
+    public partial class Dressandmeasurements
+    {
+
         /// <summary>
         /// CustomerDataList control.
         /// </summary>
@@ -20,7 +22,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.FormView CustomerDataList;
-        
+
         /// <summary>
         /// CustomerSQL control.
         /// </summary>
@@ -29,7 +31,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource CustomerSQL;
-        
+
         /// <summary>
         /// DressDropDownList control.
         /// </summary>
@@ -38,7 +40,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList DressDropDownList;
-        
+
         /// <summary>
         /// DressSQL control.
         /// </summary>
@@ -47,7 +49,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource DressSQL;
-        
+
         /// <summary>
         /// Measurement control.
         /// </summary>
@@ -56,7 +58,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater Measurement;
-        
+
         /// <summary>
         /// MoreSQL control.
         /// </summary>
@@ -65,7 +67,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource MoreSQL;
-        
+
         /// <summary>
         /// CategoryRepeater control.
         /// </summary>
@@ -74,7 +76,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater CategoryRepeater;
-        
+
         /// <summary>
         /// Dress_Style_Name_SQL control.
         /// </summary>
@@ -83,7 +85,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource Dress_Style_Name_SQL;
-        
+
         /// <summary>
         /// Customer_DressSQL control.
         /// </summary>
@@ -92,7 +94,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource Customer_DressSQL;
-        
+
         /// <summary>
         /// DetailsTextBox control.
         /// </summary>
@@ -101,7 +103,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox DetailsTextBox;
-        
+
         /// <summary>
         /// DressPriceDDList control.
         /// </summary>
@@ -110,7 +112,7 @@ namespace TailorBD.AccessAdmin.Order {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList DressPriceDDList;
-        
+
         /// <summary>
         /// DressPriceSQL control.
         /// </summary>
