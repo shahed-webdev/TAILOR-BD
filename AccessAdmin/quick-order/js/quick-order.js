@@ -23,9 +23,9 @@ function initData() {
 
         //order list data
         selectedIndex: null,
-        order: [], //[{ dress: {}, mesurements:[], styles:[] }],
+        order: [], //[{OrderDetails:'', dress: {}, measurements:[], styles:[] }],
 
-        //get dress dropsown
+        //get dress dropdown
         dressNames: {
             isLoading: true,
             data: []
@@ -55,7 +55,7 @@ function initData() {
             //get dress info from dress list
             const dress = this.dressNames.data.filter(item => item.DressId === dressId)[0];
 
-            const response = await this.getMesurementsStyles(dress.DressId);
+            const response = await this.getMeasurementsStyles(dress.DressId);
             console.log(response)
 
             this.order.push({
@@ -63,8 +63,9 @@ function initData() {
                     dressId: dress.DressId,
                     dressName: dress.DressName
                 },
+                orderDetails: response.OrderDetails,
                 quantity: 1,
-                mesurements: response.MeasurementGroups,
+                measurements: response.MeasurementGroups,
                 styles: response.StyleGroups
             })
         },
@@ -78,19 +79,19 @@ function initData() {
             }
         },
 
-        //mesurement and style modal
-        onOpenMesurementStyleModal(isMesurement, index) {
-            const mesure = isMesurement ? 'show' : 'hide';
-            const style = !isMesurement ? 'show' : 'hide';
+        //measurement and style modal
+        onOpenMeasurementStyleModal(isMeasurement, index) {
+            const measure = isMeasurement ? 'show' : 'hide';
+            const style = !isMeasurement ? 'show' : 'hide';
 
             this.selectedIndex = index;
 
-            $("#addMesurement").modal(mesure);
+            $("#addMeasurement").modal(measure);
             $("#addStyle").modal(style);
         },
 
-        //get mesurements and styles
-        async getMesurementsStyles(dressId) {
+        //get measurement and styles
+        async getMeasurementsStyles(dressId) {
             const { customerId } = this.apiData;
             this.isPageLoading = true;
 
@@ -180,8 +181,8 @@ function initData() {
             console.log(result)
         },
 
-        //set mesurement
-        setMesurements() {
+        //set measurement
+        setMeasurements() {
             this.getDress();
 
             if (!this.order.length) {
@@ -190,7 +191,11 @@ function initData() {
             }
 
             this.order.forEach(async item => {
-                const response = await this.getMesurementsStyles(item.dress.dressId);
+                const response = await this.getMeasurementsStyles(item.dress.dressId);
+
+                item.orderDetails = response.OrderDetails;
+                item.measurements = response.MeasurementGroups;
+                item.styles = response.StyleGroups;
                 console.log(response)
             })
 
