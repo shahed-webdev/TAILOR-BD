@@ -129,8 +129,6 @@ function initData() {
             }
 
             orderPayment.payments.push({
-                dressName: orderPayment.dress.dressName,
-                dressQuantity: orderPayment.quantity,
                 paymentFor,
                 amount,
                 paymentDressQuantity: orderPayment.quantity
@@ -138,6 +136,8 @@ function initData() {
 
             //reset form
             this.dressPayment = { paymentFor: '', amount: '' };
+
+            console.log(this.order)
         },
 
         //customer

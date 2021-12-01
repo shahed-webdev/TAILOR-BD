@@ -51,7 +51,7 @@
 
         <!--dress list-->
         <div x-show="order.length" class="card card-body">
-          <table class="table">
+          <table class="table table-sm">
             <thead>
                 <tr>
                 <th style="width:30px" class="font-weight-bold">SN</th>
@@ -88,30 +88,40 @@
        </div>
         
        <!--display added payment list-->
-        <template x-if="order?.payments">
-            <div x-show="order.length" class="card card-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th class="font-weight-bold">Dress</th>
-                        <th class="font-weight-bold">Details</th>
-                        <%--<th class="font-weight-bold">Unit</th>
-                        <th class="font-weight-bold">Unit Price</th>
-                        <th class="font-weight-bold">Line Total</th>--%>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <template x-for="(item, index) in order.payments" :key="index">
-                        <tr>
-                            <td x-text="item.dressName"></td>
-                            <td x-text="item.dressQuantity"></td>
-                            
-                        </tr>
-                    </template>
-                    </tbody>
-                </table>
+       <div class="mt-4">
+        <template x-for="(item, index) in order" :key="index">
+            <div>
+             <h4 x-show="item?.payments" x-text="item.dress.dressName"></h4>
+                <table x-show="item?.payments" class="table table-sm">
+                  <thead>
+                <tr>
+                    <th class="font-weight-bold">Payment For</th>
+                    <th style="width: 100px" class="text-center font-weight-bold">Unit</th>
+                    <th class="font-weight-bold text-right">Unit Price</th>
+                    <th class="font-weight-bold text-right">Line Total</th>
+                </tr>
+                </thead>
+                  <tbody>
+            <template x-for="(payment, i) in item.payments" :key="i">
+                <tr>
+                    <td x-text="payment.paymentFor"></td>
+                    <td>
+                        <input min="1" x-model="payment.paymentDressQuantity" type="number" class="form-control text-center">
+                    </td>
+                    <td class="text-right">
+                        ৳<span x-text="payment.amount"></span>
+                    </td>
+                    <td class="text-right">
+                        ৳<span x-text="payment.amount*payment.paymentDressQuantity"></span>
+                    </td>
+                </tr>
+            </template>
+            </tbody>
+               </table>
             </div>
         </template>
+       </div>   
+       
     
 
         <!--measurement modal-->
@@ -209,7 +219,7 @@
                         <div class="row">
                             <div class="col-6">
                                 <label>Payment For</label>
-                                <input type="text" x-model="dressPayment.paymentFor" class="form-control" autocomplete="off" required>
+                                <input type="text" x-model="dressPayment.paymentFor" class="form-control" required>
                             </div>
                             <div class="col-6">
                                 <label>Amount</label>
@@ -217,7 +227,7 @@
                             </div>
                         </div>
                        
-                       <div class="text-center my-2">OR</div>
+                       <div class="text-center mt-3">OR</div>
          
                         <div class="form-group">
                             <label>Select Saved Payment</label>
