@@ -72,7 +72,7 @@ namespace TailorBD.AccessAdmin.Order
             con.Open();
             if (OrderID == "")
             {
-                SqlCommand OrderID_cmd = new SqlCommand("INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),(Select[dbo].[checkLastSerialNumber](@InstitutionID))) Select scope_identity()", con);
+                SqlCommand OrderID_cmd = new SqlCommand(@"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo); Select scope_identity()", con);
                 OrderID_cmd.Parameters.AddWithValue("@InstitutionID", InstitutionID);
                 OrderID_cmd.Parameters.AddWithValue("@RegistrationID", RegistrationID);
                 OrderID_cmd.Parameters.AddWithValue("@Cloth_For_ID", Cloth_For_ID);

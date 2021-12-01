@@ -20,6 +20,29 @@ namespace TailorBD.AccessAdmin.quick_order
            
         }
 
+        //Get Order Number First
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static int GetOrderNumber()
+        {
+            var orderNumber = 0;
+            using (var con = new SqlConnection())
+            {
+                con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;select @orderNo";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Connection = con;
+
+                    con.Open();
+                    orderNumber = (int)cmd.ExecuteScalar();
+                    con.Close();
+                }
+            }
+            return orderNumber;
+        }
 
         //find customer autocomplete
         [WebMethod]
@@ -61,12 +84,61 @@ namespace TailorBD.AccessAdmin.quick_order
 
         //add new customer
         [WebMethod]
-        public static CustomerViewModel AddNewCustomer(CustomerViewModel model)
+        public static ResponseModel<CustomerViewModel> AddNewCustomer(CustomerViewModel model)
         {
-            
-            return model;
-        }
+            using (SqlConnection con = new SqlConnection())
+            {
+                con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
 
+                //Check customer exist 
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = "select * from Customer where InstitutionID = @InstitutionID AND CustomerName = @CustomerName AND Phone = @Phone";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@CustomerName", model.CustomerName.Trim());
+                    cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
+
+                    cmd.Connection = con;
+                    con.Open();
+                    object Is_Customer = cmd.ExecuteScalar();
+                    con.Close();
+
+                    if (Is_Customer != null)
+                    {
+                        return new ResponseModel<CustomerViewModel>(false, model.CustomerName + ". মোবাইল: " + model.Phone + " পূর্বে নিবন্ধিত, পুনরায় নিবন্ধন করা যাবে না");
+                    }
+                }
+
+                //insert customer and get customerId
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Customer (RegistrationID, InstitutionID, Cloth_For_ID, CustomerName, Phone, Address, Date, CustomerNumber) VALUES (@RegistrationID,@InstitutionID,@Cloth_For_ID,@CustomerName,@Phone,@Address, GETDATE(),(SELECT [dbo].[CustomeSerialNumber](@InstitutionID))); select IDENT_CURRENT('Customer')";
+                    cmd.Parameters.AddWithValue("@RegistrationID", HttpContext.Current.Request.Cookies["RegistrationID"].Value);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Parameters.AddWithValue("@Cloth_For_ID", model.Cloth_For_ID);
+                    cmd.Parameters.AddWithValue("@CustomerName", model.CustomerName.Trim());
+                    cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
+                    cmd.Parameters.AddWithValue("@Address", model.Address.Trim());
+                    cmd.Connection = con;
+
+                    con.Open();
+                    model.CustomerID = cmd.ExecuteScalar().ToString();
+                    con.Close();
+
+                }
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"UPDATE Institution SET TotalCustomer = [dbo].[CustomeSerialNumber](@InstitutionID) WHERE(InstitutionID = @InstitutionID)";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+                    cmd.Connection = con;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                }
+            }
+            return new ResponseModel<CustomerViewModel>(true, "Customer added successfully", model);
+        }
 
         //dress dropdown
         [WebMethod]
@@ -226,8 +298,7 @@ namespace TailorBD.AccessAdmin.quick_order
                                     }
                                 }
                             }
-                           
-                         dress.StyleGroups.Add(styleGroup);                          
+                            dress.StyleGroups.Add(styleGroup);                          
                         }
                     }
                     conn.Close();

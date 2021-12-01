@@ -60,7 +60,7 @@
             <asp:BoundField DataField="Amount" HeaderText="Total" />
         </Columns>
     </asp:GridView>
-    <asp:SqlDataSource ID="OrderDetailsSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Dress.Dress_Name, OrderList.DressQuantity, Order_Payment.Unit, Order_Payment.UnitPrice, Order_Payment.Details, Order_Payment.Amount FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID INNER JOIN Order_Payment ON OrderList.OrderListID = Order_Payment.OrderListID WHERE (OrderList.OrderID = @OrderID) AND (OrderList.InstitutionID = @InstitutionID)">
+    <asp:SqlDataSource ID="OrderDetailsSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Dress.Dress_Name, OrderList.DressQuantity, Order_Payment.Unit, Order_Payment.UnitPrice, Order_Payment.Details, Order_Payment.Amount FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID LEFT OUTER JOIN Order_Payment ON OrderList.OrderListID = Order_Payment.OrderListID WHERE (Order_Payment.OrderID = @OrderID) AND (Order_Payment.InstitutionID = @InstitutionID)">
         <SelectParameters>
             <asp:QueryStringParameter Name="OrderID" QueryStringField="OrderID" Type="Int32" />
             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />

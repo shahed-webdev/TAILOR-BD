@@ -68,7 +68,7 @@
                         </div>
                     </ItemTemplate>
                 </asp:FormView>
-                <asp:SqlDataSource ID="CustomerSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT CustomerID, RegistrationID, InstitutionID, Cloth_For_ID, CustomerNumber, CustomerName, Phone, Address, Image, Date, [dbo].[checkLastSerialNumber](InstitutionID) AS Order_No FROM Customer WHERE (CustomerID = @CustomerID) AND (InstitutionID = @InstitutionID)">
+                <asp:SqlDataSource ID="CustomerSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Customer.CustomerID, Customer.RegistrationID, Customer.InstitutionID, Customer.Cloth_For_ID, Customer.CustomerNumber, Customer.CustomerName, Customer.Phone, Customer.Address, Customer.Image, Customer.Date, Institution.TotalOrder + 1 AS Order_No FROM Customer INNER JOIN Institution ON Customer.InstitutionID = Institution.InstitutionID WHERE (Customer.CustomerID = @CustomerID) AND (Customer.InstitutionID = @InstitutionID)">
                     <SelectParameters>
                         <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" Type="Int32" />
                         <asp:CookieParameter CookieName="InstitutionID" DefaultValue="" Name="InstitutionID" />
