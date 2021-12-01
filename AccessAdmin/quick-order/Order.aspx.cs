@@ -461,6 +461,40 @@ namespace TailorBD.AccessAdmin.quick_order
             return dressList;
         }
 
+        //Account dropdown
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<AccountDllModel> AccountDlls()
+        {
+            var accountList = new List<AccountDllModel>();
+            using (var conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SELECT  AccountID, AccountName, Default_Status FROM Account WHERE (InstitutionID = @InstitutionID) ORDER BY AccountName";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (var sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var dressPrice = new AccountDllModel
+                            {
+                                AccountId = Convert.ToInt32(sdr["AccountID"]),
+                                AccountName = sdr["AccountName"].ToString(),
+                                IsDefault = Convert.ToBoolean(sdr["Default_Status"])
+                            };
+                            accountList.Add(dressPrice);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return accountList;
+        }
 
     }
 }
