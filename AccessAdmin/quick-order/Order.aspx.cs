@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using TailorBD.AccessAdmin.quick_order.ViewModels;
 
 namespace TailorBD.AccessAdmin.quick_order
@@ -17,7 +14,7 @@ namespace TailorBD.AccessAdmin.quick_order
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-           
+
         }
 
         //Get Order Number First
@@ -165,8 +162,8 @@ namespace TailorBD.AccessAdmin.quick_order
                         {
                             var dress = new DressDllViewModel
                             {
-                                DressId =Convert.ToInt32(sdr["DressID"]),
-                                DressName = sdr["Dress_Name"].ToString(), 
+                                DressId = Convert.ToInt32(sdr["DressID"]),
+                                DressName = sdr["Dress_Name"].ToString(),
                                 IsMeasurementAvailable = Convert.ToBoolean(sdr["IsMeasurementAvailable"])
                             };
                             dressList.Add(dress);
@@ -205,7 +202,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     conn.Close();
                 }
             }
-          
+
             //dress measurement
             using (var conn = new SqlConnection())
             {
@@ -215,7 +212,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.CommandText = "SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending FROM Measurement_Type WHERE(InstitutionID = @InstitutionID) AND(DressID = @DressID) ORDER BY Ascending";
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
                     cmd.Parameters.AddWithValue("@DressID", dressId);
-                    
+
                     cmd.Connection = conn;
                     conn.Open();
                     using (var sdr = cmd.ExecuteReader())
@@ -224,7 +221,7 @@ namespace TailorBD.AccessAdmin.quick_order
                         {
                             var measurementsGroup = new MeasurementsGroupModel
                             {
-                                 MeasurementGroupId= Convert.ToInt32(sdr["Measurement_GroupID"])
+                                MeasurementGroupId = Convert.ToInt32(sdr["Measurement_GroupID"])
                             };
 
                             using (var measurementCmd = new SqlCommand())
@@ -240,9 +237,9 @@ namespace TailorBD.AccessAdmin.quick_order
                                     {
                                         var measurement = new MeasurementsModel
                                         {
-                                             MeasurementTypeID= Convert.ToInt32(measurementDr["MeasurementTypeID"]),
-                                             MeasurementType = measurementDr["MeasurementType"].ToString(),
-                                             Measurement = measurementDr["Measurement"].ToString()
+                                            MeasurementTypeID = Convert.ToInt32(measurementDr["MeasurementTypeID"]),
+                                            MeasurementType = measurementDr["MeasurementType"].ToString(),
+                                            Measurement = measurementDr["Measurement"].ToString()
                                         };
                                         measurementsGroup.Measurements.Add(measurement);
                                     }
@@ -255,7 +252,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     conn.Close();
                 }
             }
-            
+
             //dress Style
             using (var conn = new SqlConnection())
             {
@@ -264,7 +261,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 {
                     cmd.CommandText = "SELECT DISTINCT Dress_Style_Category.Dress_Style_Category_Name, Dress_Style.Dress_Style_CategoryID, ISNULL(Dress_Style_Category.CategorySerial, 99999) AS SN FROM Dress_Style INNER JOIN Dress_Style_Category ON Dress_Style.Dress_Style_CategoryID = Dress_Style_Category.Dress_Style_CategoryID WHERE (Dress_Style.DressID = @DressID) ORDER BY SN";
                     cmd.Parameters.AddWithValue("@DressID", dressId);
-                   
+
                     cmd.Connection = conn;
                     conn.Open();
                     using (var sdr = cmd.ExecuteReader())
@@ -272,8 +269,8 @@ namespace TailorBD.AccessAdmin.quick_order
                         while (sdr.Read())
                         {
                             var styleGroup = new StyleGroupModel
-                            { 
-                                DressStyleCategoryId = Convert.ToInt32(sdr["Dress_Style_CategoryID"]), 
+                            {
+                                DressStyleCategoryId = Convert.ToInt32(sdr["Dress_Style_CategoryID"]),
                                 DressStyleCategoryName = sdr["Dress_Style_Category_Name"].ToString()
                             };
 
@@ -293,13 +290,13 @@ namespace TailorBD.AccessAdmin.quick_order
                                             DressStyleId = Convert.ToInt32(styleDr["Dress_StyleID"]),
                                             DressStyleName = styleDr["Dress_Style_Name"].ToString(),
                                             DressStyleMesurement = styleDr["DressStyleMesurement"].ToString(),
-                                            IsCheck = Convert.ToBoolean( styleDr["IsCheck"])
+                                            IsCheck = Convert.ToBoolean(styleDr["IsCheck"])
                                         };
                                         styleGroup.Styles.Add(style);
                                     }
                                 }
                             }
-                            dress.StyleGroups.Add(styleGroup);                          
+                            dress.StyleGroups.Add(styleGroup);
                         }
                     }
                     conn.Close();
@@ -308,5 +305,135 @@ namespace TailorBD.AccessAdmin.quick_order
 
             return dress;
         }
+
+
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static int PostOrder(OrderPostModel model)
+        {
+            var institutionId = Convert.ToInt32(HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+            var registrationId = Convert.ToInt32(HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
+            var OrderId = 0;
+            // Insert order
+            using (var con = new SqlConnection())
+            {
+                con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    if (string.IsNullOrEmpty(model.OrderSn))
+                    {
+                        cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo); Select scope_identity()";
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo); Select scope_identity()";
+                        cmd.Parameters.AddWithValue("@orderNo", model.OrderSn);
+                    }
+
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
+                    cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
+                    cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                    con.Open();
+                    OrderId = (int)cmd.ExecuteScalar();
+                    con.Close();
+                }
+            }
+
+            //Insert order List
+            using (var con = new SqlConnection())
+            {
+                con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SP_Order_Place";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    con.Open();
+                    foreach (var list in model.OrderList)
+                    {
+                        cmd.Parameters.Clear();
+
+                        cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                        cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
+                        cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
+                        cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                        cmd.Parameters.AddWithValue("@OrderID", OrderId);
+                        cmd.Parameters.AddWithValue("@DressID", list.DressId);
+
+                        cmd.Parameters.AddWithValue("@List_Measurement", list.ListMeasurement);
+                        cmd.Parameters.AddWithValue("@List_Style", list.ListStyle);
+                        cmd.Parameters.AddWithValue("@List_payment", list.ListPayment);
+
+                        cmd.Parameters.AddWithValue("@DressQuantity", list.DressQuantity);
+                        cmd.Parameters.AddWithValue("@Details", list.Details);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    con.Close();
+                }
+            }
+
+            return OrderId;
+        }
+
+        //Get Discount limit %
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static int GetDiscountLimitPercentage()
+        {
+            var discountLimitPercentage = 0;
+            using (var con = new SqlConnection())
+            {
+                con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SELECT Discount_Limit FROM Institution WHERE (InstitutionID = @InstitutionID)";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                    cmd.Connection = con;
+
+                    con.Open();
+                    discountLimitPercentage = (int)cmd.ExecuteScalar();
+                    con.Close();
+                }
+            }
+            return discountLimitPercentage;
+        }
+
+        //dress price dropdown
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<DressPriceDllModel> DressPriceDlls(int dressId)
+        {
+            var dressList = new List<DressPriceDllModel>();
+            using (var conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SELECT Price_For, Price FROM Dress_Price WHERE (InstitutionID = @InstitutionID) AND (DressID = @DressID) ORDER BY Price_For";
+                    cmd.Parameters.AddWithValue("@DressID", dressId);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (var sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var dressPrice = new DressPriceDllModel
+                            {
+                                Price = Convert.ToDouble(sdr["Price"]),
+                                PriceFor = sdr["Price_For"].ToString()
+                            };
+                            dressList.Add(dressPrice);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return dressList;
+        }
+
+
     }
 }
