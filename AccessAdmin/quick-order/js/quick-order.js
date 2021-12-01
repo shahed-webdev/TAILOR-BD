@@ -23,9 +23,9 @@ function initData() {
 
         //order list data
         selectedIndex: null,
-        order: [], //[{ dress: {}, mesurements:[], styles:[] }],
+        order: [], //[{OrderDetails:'', dress: {}, measurements:[], styles:[] }],
 
-        //get dress dropsown
+        //get dress dropdown
         dressNames: {
             isLoading: true,
             data: []
@@ -47,7 +47,7 @@ function initData() {
                 const isAdded = this.order.some(item => item.dress.dressId === dressId);
 
                 if (isAdded) {
-                    $.notify("dress already added", { position: "to center" }, "error",);
+                    $.notify("dress already added", { position: "to center" }, "error");
                     return;
                 }
             }
@@ -55,7 +55,7 @@ function initData() {
             //get dress info from dress list
             const dress = this.dressNames.data.filter(item => item.DressId === dressId)[0];
 
-            const response = await this.getMesurementsStyles(dress.DressId);
+            const response = await this.getMeasurementsStyles(dress.DressId);
             console.log(response)
 
             this.order.push({
@@ -63,8 +63,9 @@ function initData() {
                     dressId: dress.DressId,
                     dressName: dress.DressName
                 },
+                orderDetails: response.OrderDetails,
                 quantity: 1,
-                mesurements: response.MeasurementGroups,
+                measurements: response.MeasurementGroups,
                 styles: response.StyleGroups
             })
         },
@@ -78,19 +79,19 @@ function initData() {
             }
         },
 
-        //mesurement and style modal
-        onOpenMesurementStyleModal(isMesurement, index) {
-            const mesure = isMesurement ? 'show' : 'hide';
-            const style = !isMesurement ? 'show' : 'hide';
+        //measurement and style modal
+        onOpenMeasurementStyleModal(isMeasurement, index) {
+            const measure = isMeasurement ? 'show' : 'hide';
+            const style = !isMeasurement ? 'show' : 'hide';
 
             this.selectedIndex = index;
 
-            $("#addMesurement").modal(mesure);
+            $("#addMeasurement").modal(measure);
             $("#addStyle").modal(style);
         },
 
-        //get mesurements and styles
-        async getMesurementsStyles(dressId) {
+        //get measurement and styles
+        async getMeasurementsStyles(dressId) {
             const { customerId } = this.apiData;
             this.isPageLoading = true;
 
@@ -157,7 +158,7 @@ function initData() {
                 }
             })
         },
-
+        
         //add new
         async addNewCustomer() {
             const { Phone, CustomerName, Address, Cloth_For_ID = 1 } = this.customer.data;
@@ -169,19 +170,30 @@ function initData() {
                 Cloth_For_ID
             }
 
-            const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`, {
-                method: "POST",
-                headers: helpers.header.headers,
-                body: JSON.stringify({ model }),
-            });
+            try {
+                const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`,
+                    {
+                        method: "POST",
+                        headers: helpers.header.headers,
+                        body: JSON.stringify({ model })
+                    });
 
-            const result = await response.json();
+                const result = await response.json();
+               
+                $.notify(result.d.Message, { position: "to center", className: result.d.IsSuccess ? "success": "error" });
 
-            console.log(result)
+                if (result.d.IsSuccess) {
+                    this.customer.data = result.d.Data;
+                    this.apiData.customerId = result.d.Data.CustomerID;
+                }
+            } catch (e) {
+                console.log("customer added error");
+                $.notify(e.message, { position: "to center", className:'error'});
+            }
         },
 
-        //set mesurement
-        setMesurements() {
+        //set measurement
+        setMeasurements() {
             this.getDress();
 
             if (!this.order.length) {
@@ -190,7 +202,11 @@ function initData() {
             }
 
             this.order.forEach(async item => {
-                const response = await this.getMesurementsStyles(item.dress.dressId);
+                const response = await this.getMeasurementsStyles(item.dress.dressId);
+
+                item.orderDetails = response.OrderDetails;
+                item.measurements = response.MeasurementGroups;
+                item.styles = response.StyleGroups;
                 console.log(response)
             })
 

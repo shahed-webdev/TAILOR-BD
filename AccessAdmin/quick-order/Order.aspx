@@ -5,8 +5,9 @@
         .loading-overlay { z-index: 999; position: fixed; bottom: 0; top: 0; left: 0; right: 0; background-color: rgba(0,0,0,.1); display: flex; justify-content: center; align-items: center; }
         .btn-font { padding: .4rem 1rem; font-size: .9rem; margin: 0 }
         .table td { vertical-align: middle; }
-         #addStyle .modal-dialog, #addMesurement .modal-dialog{max-width:80%}
-     </style>   
+        #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
+        #addCustomerModal .dropdown-menu { z-index: 99999999; }
+    </style>   
     <script src="js/quick-order.js"></script>
 </asp:Content>
 
@@ -52,40 +53,41 @@
           <table class="table">
             <thead>
                 <tr>
-                <th class="font-weight-bold">SN</th>
-                <th class="font-weight-bold">Dress Name</th>
-                <th style="width:150px" class="font-weight-bold text-center">Quantity</th>
-                <th class="font-weight-bold text-center">Add Mesurement</th>
-                <th class="font-weight-bold text-center">Add Style</th>
-                <th class="font-weight-bold text-center">Remove</th>
+                <th style="width:30px" class="font-weight-bold">SN</th>
+                <th class="font-weight-bold">Dress</th>
+                <th style="width:100px" class="font-weight-bold text-center">Quantity</th>
+                <th class="font-weight-bold text-center">Measurement</th>
+               
              </tr>
             </thead>
             <tbody>
               <template x-for="(item, index) in order" :key="index">
                 <tr>
                    <td x-text="index+1"></td>
-                   <td x-text="item.dress.dressName"></td>
+                   <td>
+                       <div class="d-flex">
+                            <p class="mb-1 font-weight-bold" x-text="item.dress.dressName"></p>
+                           <a class="red-text ml-2" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
+                       </div>
+                      
+                       <textarea x-model="item.orderDetails" rows="1" class="form-control" placeholder="dress details"></textarea>
+                   </td>
                    <td class="text-center">
                        <input class="form-control text-center" type="number" min="1" x-model.number="item.quantity" @wheel="(e)=> e.preventDefault()">
                    </td>
                    <td class="text-center">
-                       <a class="blue-text" @click="()=> onOpenMesurementStyleModal(true,index)">Mesurement</a>
+                       <button type="button" class="btn btn-cyan btn-font py-1 mr-2" @click="()=> onOpenMeasurementStyleModal(true,index)">Measurement</button>
+                       <button type="button" class="btn btn-unique btn-font py-1" @click="()=> onOpenMeasurementStyleModal(false,index)">Style</button>
                    </td>
-                   <td class="text-center">
-                       <a class="blue-text" @click="()=> onOpenMesurementStyleModal(false,index)">Style</a>
-                   </td>
-                   <td class="text-center">
-                       <a class="red-text" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-trash"></i></a>
-                   </td>
-               </tr>
+                </tr>
           </template>
           </tbody>
         </table>
        </div>
 
 
-        <!--mesurement modal-->
-        <div class="modal fade" id="addMesurement" tabindex="-1" role="dialog">
+        <!--measurement modal-->
+        <div class="modal fade" id="addMeasurement" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header text-center">
@@ -96,14 +98,14 @@
                 </div>           
                 <div class="modal-body mx-3">
                    <div class="row mt-3">
-                    <template x-for="group in selectedIndex !== null && order[selectedIndex].mesurements" :key="group.MeasurementGroupId">
+                    <template x-for="group in selectedIndex !== null && order[selectedIndex].measurements" :key="group.MeasurementGroupId">
                         <div class="col-sm-4 col-lg-3 mb-4">
                         <div class="card px-3 pt-3 h-100">
-                            <template x-for="mesure in group.Measurements" :key="mesure.MeasurementTypeID">
+                            <template x-for="measure in group.Measurements" :key="measure.MeasurementTypeID">
                             <div class="mb-2">
                                 <div class="md-form md-outline my-0">
-                                    <label :class="mesure.Measurement && 'active'" :for="mesure.MeasurementTypeID" x-text="mesure.MeasurementType"></label>
-                                    <input :id="mesure.MeasurementTypeID" type="text" class="form-control" x-model="mesure.Measurement" autocomplete="off">
+                                    <label :class="measure.Measurement && 'active'" :for="measure.MeasurementTypeID" x-text="measure.MeasurementType"></label>
+                                    <input :id="measure.MeasurementTypeID" type="text" class="form-control" x-model="measure.Measurement" autocomplete="off">
                                 </div>
                             </div>
                             </template>
@@ -200,7 +202,7 @@
                             </template>
                             <template x-if="!customer.isNewCustomer">
                               <div>
-                                <button @click="setMesurements" type="button" :disabled="customer.isLoading" class="btn btn-success">Set Mesurements</button>
+                                <button @click="setMeasurements" type="button" :disabled="customer.isLoading" class="btn btn-success">Set Measurements</button>
                                 <button data-dismiss="modal" type="button" :disabled="customer.isLoading" class="btn btn-outline-success">Not Set</button>
                               </div>
                             </template>
