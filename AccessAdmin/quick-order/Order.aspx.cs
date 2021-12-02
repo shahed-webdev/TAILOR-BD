@@ -306,9 +306,8 @@ namespace TailorBD.AccessAdmin.quick_order
             return dress;
         }
 
-
+        //post order
         [WebMethod]
-        [ScriptMethod(UseHttpGet = true)]
         public static int PostOrder(OrderPostModel model)
         {
             var institutionId = Convert.ToInt32(HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
@@ -433,7 +432,5 @@ namespace TailorBD.AccessAdmin.quick_order
             }
             return dressList;
         }
-
-
     }
 }

@@ -15,18 +15,14 @@ const helpers = {
 function initData() {
     return {
         isPageLoading: false,
-
-        apiData: {
-            customerId: 0,
-            clothForId: 0
-        },
+        apiData: {customerId: 0, clothForId: 0 },
 
         //order list data
         selectedIndex: null,
         order: [], //[{OrderDetails:'', dress: {}, measurements:[], styles:[], payments:[] }],
 
         //get dress dropdown
-        dressNames: { isLoading: true,data: [] },
+        dressNames: { isLoading: true, data: [] },
 
         async getDress() {
             const { customerId, clothForId } = this.apiData;
@@ -105,18 +101,70 @@ function initData() {
             }
         },
 
-        //payments
-        dressPayment : { paymentFor: '', amount: '' },
+        //payments modal
+        savedDressPayment: [],
+        async onOpenPaymentModal(dressId,index) {
+            try {
+                this.isPageLoading = true;
+                const response = await fetch(`${helpers.baseUrl}/DressPriceDlls?dressId=${dressId}`, helpers.header);
+                const result = await response.json();
+                this.isPageLoading = false;
 
-        //modal
-        onOpenPaymentModal(index) {
-            this.selectedIndex = index;
-            $("#addPaymentModal").modal("show");
+                this.savedDressPayment = result.d;
+                this.selectedIndex = index;
+                $("#addPaymentModal").modal("show");
+            } catch (error) {
+                console.log(error)
+                return null;
+            }
+
+            
         },
 
-        //add payment to cart
+        //on change saved payment
+        onChangeSavedPayment(evt, index) {
+            const selectElement = evt.target;
+
+            const value = selectElement.value;
+            const text = selectElement.options[selectElement.selectedIndex].text
+            if (!value) return;
+
+            this.dressPayment.paymentFor = text;
+            this.dressPayment.amount = +value;
+            this.addPayment(index);
+        },
+
+        //add dress payment
+        dressPayment: { paymentFor: '', amount: '' },
         addPayment(index) {
             const { paymentFor, amount } = this.dressPayment;
+            const orderPayment = this.order[index];
+            orderPayment.payments = orderPayment.payments || [];
+
+            //check payment added or not
+            const isAdded = orderPayment.payments.some(item => item.paymentFor.toLocaleLowerCase() === paymentFor.toLocaleLowerCase());
+
+            if (isAdded) {
+                $.notify(`${paymentFor} already added`, { position: "to center" });
+                return;
+            }
+
+            orderPayment.payments.push({
+                paymentFor,
+                amount,
+                paymentDressQuantity: orderPayment.quantity
+            });
+
+            //reset form
+            this.dressPayment = { paymentFor: '', amount: '' };
+
+            $.notify(`${paymentFor} added successfully`, { position: "to center", className: "success" });
+        },
+
+        //add addFabrics
+        fabricPayment: { fabricCode: '', quantity: '', amount: '' },
+        addFabrics(index) {
+            const { fabricCode, quantity, amount } = this.fabricPayment;
             const orderPayment = this.order[index];
             orderPayment.payments = orderPayment.payments || [];
 
@@ -129,13 +177,13 @@ function initData() {
             }
 
             orderPayment.payments.push({
-                paymentFor,
+                paymentFor: fabricCode,
                 amount,
-                paymentDressQuantity: orderPayment.quantity
+                paymentDressQuantity: quantity
             });
 
             //reset form
-            this.dressPayment = { paymentFor: '', amount: '' };
+            this.fabricPayment = { fabricCode: '', quantity:'', amount: '' };
 
             console.log(this.order)
         },

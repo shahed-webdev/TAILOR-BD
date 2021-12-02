@@ -70,7 +70,7 @@
                       
                        <button type="button" class="btn btn-cyan btn-font py-1" @click="()=> onOpenMeasurementStyleModal(true,index)">Measurement</button>
                        <button type="button" class="btn btn-unique btn-font py-1 mx-2" @click="()=> onOpenMeasurementStyleModal(false,index)">Style</button>
-                       <button type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(index)">Payment</button>
+                       <button type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
                    </td>
                    <td class="text-center">
                        <input class="form-control text-center" type="number" min="1" x-model.number="item.quantity" @wheel="(e)=> e.preventDefault()">
@@ -86,37 +86,38 @@
           </tbody>
         </table>
        </div>
-        
-       <!--display added payment list-->
-       <div class="mt-4">
+       
+
+        <!--display added payment list-->
+        <div class="mt-4">
         <template x-for="(item, index) in order" :key="index">
             <div>
              <h4 x-show="item?.payments" x-text="item.dress.dressName"></h4>
                 <table x-show="item?.payments" class="table table-sm">
                   <thead>
-                <tr>
-                    <th class="font-weight-bold">Payment For</th>
-                    <th style="width: 100px" class="text-center font-weight-bold">Unit</th>
-                    <th class="font-weight-bold text-right">Unit Price</th>
-                    <th class="font-weight-bold text-right">Line Total</th>
-                </tr>
+                    <tr>
+                        <th class="font-weight-bold">Payment For</th>
+                        <th style="width: 100px" class="text-center font-weight-bold">Unit</th>
+                        <th class="font-weight-bold text-right">Unit Price</th>
+                        <th class="font-weight-bold text-right">Line Total</th>
+                    </tr>
                 </thead>
                   <tbody>
-            <template x-for="(payment, i) in item.payments" :key="i">
-                <tr>
-                    <td x-text="payment.paymentFor"></td>
-                    <td>
-                        <input min="1" x-model="payment.paymentDressQuantity" type="number" class="form-control text-center">
-                    </td>
-                    <td class="text-right">
-                        ৳<span x-text="payment.amount"></span>
-                    </td>
-                    <td class="text-right">
-                        ৳<span x-text="payment.amount*payment.paymentDressQuantity"></span>
-                    </td>
-                </tr>
-            </template>
-            </tbody>
+                    <template x-for="(payment, i) in item.payments" :key="i">
+                        <tr>
+                            <td x-text="payment.paymentFor"></td>
+                            <td>
+                                <input min="1" x-model="payment.paymentDressQuantity" type="number" class="form-control text-center">
+                            </td>
+                            <td class="text-right">
+                                ৳<span x-text="payment.amount"></span>
+                            </td>
+                            <td class="text-right">
+                                ৳<span x-text="payment.amount * payment.paymentDressQuantity"></span>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
                </table>
             </div>
         </template>
@@ -206,42 +207,55 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header text-center teal lighten-1 white-text">
-                    <h4 class="modal-title w-100">
-                        Add Payment: <strong x-text="selectedIndex !== null && order[selectedIndex].dress.dressName"></strong>
-                    </h4>
+                      <template x-if="savedDressPayment.length">
+                          <select @change="(e) => onChangeSavedPayment(e, selectedIndex)" class="form-control w-auto mr-3">
+                              <option value="">[ Select Saved Payment ]</option>
+                              <template x-for="(item,i) in savedDressPayment" :key="i">
+                                  <option :value="item.Price" x-text="item.PriceFor"></option>
+                              </template>
+                          </select>
+                      </template>
+                      <h4 class="modal-title">
+                           <strong x-text="selectedIndex !== null && order[selectedIndex].dress.dressName"></strong>
+                      </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-               
-                  <form @submit.prevent="()=>addPayment(selectedIndex)">
-                    <div class="modal-body mx-3">
-                        <div class="row">
-                            <div class="col-6">
+                    
+                  <div class="modal-body mx-3">
+                        <form @submit.prevent="() => addPayment(selectedIndex)">
+                            <div class="form-group">
                                 <label>Payment For</label>
                                 <input type="text" x-model="dressPayment.paymentFor" class="form-control" required>
                             </div>
-                            <div class="col-6">
+                            <div class="form-group">
                                 <label>Amount</label>
                                 <input  x-model.number="dressPayment.amount" type="number" min="0" step="0.01" class="form-control" autocomplete="off" required>
                             </div>
-                        </div>
-                       
-                       <div class="text-center mt-3">OR</div>
-         
-                        <div class="form-group">
-                            <label>Select Saved Payment</label>
-                            <select class="form-control">
-                                <option value="">[ Select Payment ]</option>
-                            </select>
-                        </div>
-
-                        <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn btn-teal">Add <i class="fa fa-paper-plane ml-1"></i></button>
-                        </div>
+                            <div class="form-group">
+                              <button type="submit" class="btn btn-teal w-100 m-0">Add Payment</button>
+                          </div>
+                        </form>
+                        
+                        <form @submit.prevent="() => addFabrics(selectedIndex)">
+                          <h5 class="font-weight-bold mt-4">Fabrics</h5>
+                           <div class="mb-3">
+                            <div class="form-group">
+                                <label>Fabric Code</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input x-model.number="fabricPayment.qunatity" type="number" min="0" step="0.01" class="form-control" autocomplete="off" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-cyan w-100 m-0">Add Fabric</button>
+                            </div>
+                         </div>
+                        </form>
                     </div>
-                  </form>
-                 </div>
+                </div>
               </div>
         </div>         
       
