@@ -96,7 +96,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
 
                     cmd.Connection = con;
-                    
+
                     con.Open();
                     var isCustomer = cmd.ExecuteScalar();
                     con.Close();
@@ -182,7 +182,7 @@ namespace TailorBD.AccessAdmin.quick_order
         public static DressMeasurementStyleViewModel GetDressMeasurementsStyles(int dressId, int customerId = 0)
         {
             var dress = new DressMeasurementStyleViewModel();
-            
+
             //dress details
             using (var conn = new SqlConnection())
             {
@@ -230,7 +230,7 @@ namespace TailorBD.AccessAdmin.quick_order
                                 measurementCmd.Parameters.AddWithValue("@Measurement_GroupID", measurementsGroup.MeasurementGroupId);
                                 measurementCmd.Parameters.AddWithValue("@CustomerID", customerId);
                                 measurementCmd.Connection = conn;
-                                
+
                                 using (var measurementDr = measurementCmd.ExecuteReader())
                                 {
                                     while (measurementDr.Read())
@@ -280,7 +280,7 @@ namespace TailorBD.AccessAdmin.quick_order
                                 styleCmd.Parameters.AddWithValue("@Dress_Style_CategoryID", styleGroup.DressStyleCategoryId);
                                 styleCmd.Parameters.AddWithValue("CustomerID", customerId);
                                 styleCmd.Connection = conn;
-                               
+
                                 using (var styleDr = styleCmd.ExecuteReader())
                                 {
                                     while (styleDr.Read())
@@ -312,7 +312,7 @@ namespace TailorBD.AccessAdmin.quick_order
         {
             var institutionId = Convert.ToInt32(HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
             var registrationId = Convert.ToInt32(HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
-            var OrderId = 0;
+            var orderId = 0;
             // Insert order
             using (var con = new SqlConnection())
             {
@@ -321,11 +321,11 @@ namespace TailorBD.AccessAdmin.quick_order
                 {
                     if (string.IsNullOrEmpty(model.OrderSn))
                     {
-                        cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo); Select scope_identity()";
+                        cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber],[DeliveryDate], [Discount], [OrderAmount]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo, @DeliveryDate, @Discount, @OrderAmount); Select scope_identity()";
                     }
                     else
                     {
-                        cmd.CommandText = @"INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo); Select scope_identity()";
+                        cmd.CommandText = @"INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber],[DeliveryDate], [Discount], [OrderAmount]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo, @DeliveryDate, @Discount, @OrderAmount); Select scope_identity()";
                         cmd.Parameters.AddWithValue("@orderNo", model.OrderSn);
                     }
 
@@ -333,8 +333,11 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
                     cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
                     cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                    cmd.Parameters.AddWithValue("@DeliveryDate", model.DeliveryDate);
+                    cmd.Parameters.AddWithValue("@Discount", model.Discount);
+                    cmd.Parameters.AddWithValue("@OrderAmount", model.OrderAmount);
                     con.Open();
-                    OrderId = (int)cmd.ExecuteScalar();
+                    orderId = (int)cmd.ExecuteScalar();
                     con.Close();
                 }
             }
@@ -356,7 +359,7 @@ namespace TailorBD.AccessAdmin.quick_order
                         cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
                         cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
                         cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
-                        cmd.Parameters.AddWithValue("@OrderID", OrderId);
+                        cmd.Parameters.AddWithValue("@OrderID", orderId);
                         cmd.Parameters.AddWithValue("@DressID", list.DressId);
 
                         cmd.Parameters.AddWithValue("@List_Measurement", list.ListMeasurement);
@@ -372,7 +375,31 @@ namespace TailorBD.AccessAdmin.quick_order
                 }
             }
 
-            return OrderId;
+            // Insert order payment
+            if (model.PaidAmount > 0)
+            {
+                using (var con = new SqlConnection())
+                {
+                    con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"]
+                        .ConnectionString;
+                    using (var cmd = new SqlCommand())
+                    {
+                        cmd.CommandText =
+                            @"INSERT INTO Payment_Record(OrderID, CustomerID, RegistrationID, InstitutionID, Amount, Payment_TimeStatus, AccountID)VALUES(@OrderID,@CustomerID,@RegistrationID,@InstitutionID,@Amount, 'Advance',@AccountID)";
+                        cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                        cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
+                        cmd.Parameters.AddWithValue("@OrderID", orderId);
+                        cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                        cmd.Parameters.AddWithValue("@Amount", model.PaidAmount);
+                        cmd.Parameters.AddWithValue("@AccountID", model.AccountId);
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                    }
+                }
+            }
+
+            return orderId;
         }
 
         //Get Discount limit %
@@ -432,5 +459,41 @@ namespace TailorBD.AccessAdmin.quick_order
             }
             return dressList;
         }
+
+        //Account dropdown
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<AccountDllModel> AccountDlls()
+        {
+            var accountList = new List<AccountDllModel>();
+            using (var conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SELECT  AccountID, AccountName, Default_Status FROM Account WHERE (InstitutionID = @InstitutionID) ORDER BY AccountName";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (var sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var dressPrice = new AccountDllModel
+                            {
+                                AccountId = Convert.ToInt32(sdr["AccountID"]),
+                                AccountName = sdr["AccountName"].ToString(),
+                                IsDefault = Convert.ToBoolean(sdr["Default_Status"])
+                            };
+                            accountList.Add(dressPrice);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return accountList;
+        }
+
     }
 }

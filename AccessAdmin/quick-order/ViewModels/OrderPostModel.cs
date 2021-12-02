@@ -17,6 +17,7 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
         public DateTime? DeliveryDate { get; set; }
         public double PaidAmount { get; set; }
         public double Discount { get; set; }
+        public double OrderAmount { get; set; }
 
         public List<OrderListModel> OrderList { get; set; }
     }
