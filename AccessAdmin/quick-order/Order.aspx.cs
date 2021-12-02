@@ -534,5 +534,199 @@ namespace TailorBD.AccessAdmin.quick_order
             return accountList;
         }
 
+
+        //Get Discount limit %
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static OrderViewModel GetOrderDetails(int orderId)
+        {
+            var order = new OrderViewModel();
+
+            //dress details
+            using (var conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SELECT  [Order].OrderID, [Order].OrderSerialNumber, [Order].Cloth_For_ID, [Order].CustomerID, Customer.CustomerName, Customer.Phone, [Order].DeliveryDate, [Order].OrderAmount, [Order].PaidAmount, [Order].Discount FROM  [Order] INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID WHERE ([Order].OrderID = @OrderID) AND ([Order].InstitutionID = @InstitutionID)";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                    cmd.Parameters.AddWithValue("@DressID", orderId);
+
+                    cmd.Connection = conn;
+
+                    conn.Open();
+                    using (var orderDr = cmd.ExecuteReader())
+                    {
+                        while (orderDr.Read())
+                        {
+                            order.OrderId = Convert.ToInt32(orderDr["OrderID"]);
+                            order.OrderSn = orderDr["OrderSerialNumber"].ToString();
+                            order.ClothForId = Convert.ToInt32(orderDr["Cloth_For_ID"]);
+                            order.CustomerId = Convert.ToInt32(orderDr["CustomerID"]);
+                            order.CustomerName = orderDr["CustomerName"].ToString();
+                            order.Phone = orderDr["Phone"].ToString();
+                            order.DeliveryDate = (DateTime?)(orderDr["DeliveryDate"] ?? Convert.ToDateTime(orderDr["DeliveryDate"]));
+                            order.OrderAmount = Convert.ToDouble(orderDr["OrderAmount"]);
+                            order.PaidAmount = Convert.ToDouble(orderDr["PaidAmount"]);
+                            order.Discount = Convert.ToDouble(orderDr["Discount"]);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+
+            //dress measurement
+            using (var conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var listCmd = new SqlCommand())
+                {
+                    listCmd.CommandText = @"SELECT OrderListID, DressID, DressQuantity, Details FROM  OrderList WHERE (OrderID = @OrderID)";
+                    listCmd.Parameters.AddWithValue("@DressID", orderId);
+
+                    listCmd.Connection = conn;
+                    conn.Open();
+                    using (var listSdr = listCmd.ExecuteReader())
+                    {
+                        while (listSdr.Read())
+                        {
+                            var orderList = new OrderListViewModel
+                            {
+                                OrderListId = Convert.ToInt32(listSdr["OrderListID"]),
+                                DressId = Convert.ToInt32(listSdr["DressID"]),
+                                DressQuantity = Convert.ToDouble(listSdr["DressQuantity"]),
+                                Details = listSdr["Details"].ToString()
+                            };
+
+                            //dress Measurement
+                            using (var cmd = new SqlCommand())
+                            {
+                                cmd.CommandText = "SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending FROM Measurement_Type WHERE(InstitutionID = @InstitutionID) AND(DressID = @DressID) ORDER BY Ascending";
+                                cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                                cmd.Parameters.AddWithValue("@DressID", orderList.DressId);
+
+                                cmd.Connection = conn;
+
+                                using (var sdr = cmd.ExecuteReader())
+                                {
+                                    while (sdr.Read())
+                                    {
+                                        var measurementsGroup = new MeasurementsGroupModel
+                                        {
+                                            MeasurementGroupId = Convert.ToInt32(sdr["Measurement_GroupID"])
+                                        };
+
+                                        using (var measurementCmd = new SqlCommand())
+                                        {
+                                            measurementCmd.CommandText = @"SELECT Measurement_Type.MeasurementTypeID, Measurement_Type.MeasurementType, OrderList_M.Measurement, Measurement_Type.Measurement_Group_SerialNo FROM  Measurement_Type LEFT OUTER JOIN  (SELECT  Measurement, MeasurementTypeID FROM Ordered_Measurement WHERE (OrderListID = @OrderListID)) AS OrderList_M ON Measurement_Type.MeasurementTypeID = OrderList_M.MeasurementTypeID WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)";
+                                            measurementCmd.Parameters.AddWithValue("@Measurement_GroupID", measurementsGroup.MeasurementGroupId);
+                                            measurementCmd.Parameters.AddWithValue("@OrderListID", orderList.OrderListId);
+                                            measurementCmd.Connection = conn;
+
+                                            using (var measurementDr = measurementCmd.ExecuteReader())
+                                            {
+                                                while (measurementDr.Read())
+                                                {
+                                                    var measurement = new MeasurementsModel
+                                                    {
+                                                        MeasurementTypeID = Convert.ToInt32(measurementDr["MeasurementTypeID"]),
+                                                        MeasurementType = measurementDr["MeasurementType"].ToString(),
+                                                        Measurement = measurementDr["Measurement"].ToString()
+                                                    };
+                                                    measurementsGroup.Measurements.Add(measurement);
+                                                }
+                                            }
+
+                                        }
+                                        orderList.Measurements.Add(measurementsGroup);
+                                    }
+                                }
+
+                            }
+
+
+                            //dress Style
+                            using (var cmd = new SqlCommand())
+                            {
+                                cmd.CommandText = "SELECT DISTINCT Dress_Style_Category.Dress_Style_Category_Name, Dress_Style.Dress_Style_CategoryID, ISNULL(Dress_Style_Category.CategorySerial, 99999) AS SN FROM Dress_Style INNER JOIN Dress_Style_Category ON Dress_Style.Dress_Style_CategoryID = Dress_Style_Category.Dress_Style_CategoryID WHERE (Dress_Style.DressID = @DressID) ORDER BY SN";
+                                cmd.Parameters.AddWithValue("@DressID", orderList.DressId);
+
+                                cmd.Connection = conn;
+
+                                using (var sdr = cmd.ExecuteReader())
+                                {
+                                    while (sdr.Read())
+                                    {
+                                        var styleGroup = new StyleGroupModel
+                                        {
+                                            DressStyleCategoryId = Convert.ToInt32(sdr["Dress_Style_CategoryID"]),
+                                            DressStyleCategoryName = sdr["Dress_Style_Category_Name"].ToString()
+                                        };
+
+                                        using (var styleCmd = new SqlCommand())
+                                        {
+                                            styleCmd.CommandText = @"SELECT  Dress_Style.Dress_StyleID, Dress_Style.Dress_Style_Name, OrderList_DS.DressStyleMesurement, CAST(CASE WHEN OrderList_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck FROM Dress_Style LEFT OUTER JOIN (SELECT DressStyleMesurement, Dress_StyleID FROM Ordered_Dress_Style WHERE (OrderListID = @OrderListID)) AS OrderList_DS ON Dress_Style.Dress_StyleID = OrderList_DS.Dress_StyleID WHERE (Dress_Style.Dress_Style_CategoryID = @Dress_Style_CategoryID) ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)";
+                                            styleCmd.Parameters.AddWithValue("@Dress_Style_CategoryID", styleGroup.DressStyleCategoryId);
+                                            styleCmd.Parameters.AddWithValue("@OrderListID", orderList.OrderListId);
+                                            styleCmd.Connection = conn;
+
+                                            using (var styleDr = styleCmd.ExecuteReader())
+                                            {
+                                                while (styleDr.Read())
+                                                {
+                                                    var style = new StyleModel
+                                                    {
+                                                        DressStyleId = Convert.ToInt32(styleDr["Dress_StyleID"]),
+                                                        DressStyleName = styleDr["Dress_Style_Name"].ToString(),
+                                                        DressStyleMesurement = styleDr["DressStyleMesurement"].ToString(),
+                                                        IsCheck = Convert.ToBoolean(styleDr["IsCheck"])
+                                                    };
+                                                    styleGroup.Styles.Add(style);
+                                                }
+                                            }
+                                        }
+                                        orderList.Styles.Add(styleGroup);
+                                    }
+                                }
+                            }
+
+                            // price
+                            using (var cmd = new SqlCommand())
+                            {
+                                cmd.CommandText = @"SELECT OrderPaymentID, FabricID, Details, UnitPrice, Unit, Amount FROM Order_Payment WHERE (OrderListID = @OrderListID)";
+                                cmd.Parameters.AddWithValue("@OrderListID", orderList.OrderListId);
+                                cmd.Connection = conn;
+
+                                using (var dr = cmd.ExecuteReader())
+                                {
+                                    while (dr.Read())
+                                    {
+                                        var style = new OrderPaymentViewModel
+                                        {
+                                            OrderPaymentId = Convert.ToInt32(dr["OrderPaymentID"]),
+                                            FabricId = Convert.ToInt32(dr["FabricID"]),
+                                            For = dr["Details"].ToString(),
+                                            Quantity = Convert.ToDouble(dr["Unit"]),
+                                            UnitPrice = Convert.ToDouble(dr["UnitPrice"]),
+                                            Amount = Convert.ToDouble(dr["Amount"])
+                                        };
+                                        orderList.Payments.Add(style);
+                                    }
+                                }
+                            }
+
+                            order.OrderList.Add(orderList);
+                        }
+
+                    }
+                    conn.Close();
+                }
+            }
+
+
+
+
+            return order;
+        }
     }
 }
