@@ -1,4 +1,12 @@
 ﻿
+
+//set local store
+function getStore() {
+    const store = localStorage.getItem("order-data");
+    return store ? JSON.parse(store) : null;
+}
+
+
 //api helpers methods
 const helpers = {
     baseUrl: 'Order.aspx',
@@ -13,14 +21,27 @@ const helpers = {
 
 //get dress from api
 function initData() {
+    const { apiData, orderNumber, order, customer } = getStore();
+  
     return {
+        //save to local store
+        saveData() {
+            const data = {
+                apiData: this.apiData,
+                orderNumber: this.orderNumber,
+                order: this.order,
+                customer: this.customer
+            };
+            localStorage.setItem("order-data", JSON.stringify(data));
+        },
+
         isPageLoading: false,
-        apiData: {customerId: 0, clothForId: 0 },
+        apiData: apiData.customerId ? apiData: { customerId: 0, clothForId: 0 },
 
         //order list data
-        orderNumber: null,
+        orderNumber: orderNumber || null,
         selectedIndex: null,
-        order: [], //[{OrderDetails:'', dress: {}, measurements:[], styles:[], payments:[] }],
+        order: order || [], //[{OrderDetails: '', dress: {}, measurements:[], styles:[], payments:[] }],
 
         //get order number
         async getOrderNumber() {
@@ -29,7 +50,9 @@ function initData() {
 
             this.dressNames.isLoading = false;
             this.orderNumber = result.d;
-            console.log(result.d)
+
+            //save to local store
+            this.saveData();
         },
 
         //get dress dropdown
@@ -72,6 +95,9 @@ function initData() {
                 measurements: response.MeasurementGroups,
                 styles: response.StyleGroups
             })
+
+            //save to local store
+            this.saveData();
         },
 
         //remove Dress from cart
@@ -80,6 +106,9 @@ function initData() {
             if (confirmDelete) {
                 this.order = this.order.filter(item => item.dress.dressId !== dressId);
                 this.selectedIndex = null;
+
+                //save to local store
+                this.saveData();
             }
         },
 
@@ -114,9 +143,11 @@ function initData() {
 
         //payments modal
         savedDressPayment: [],
-        async onOpenPaymentModal(dressId,index) {
+
+        async onOpenPaymentModal(dressId, index) {
             try {
                 this.isPageLoading = true;
+
                 const response = await fetch(`${helpers.baseUrl}/DressPriceDlls?dressId=${dressId}`, helpers.header);
                 const result = await response.json();
                 this.isPageLoading = false;
@@ -124,8 +155,10 @@ function initData() {
                 this.savedDressPayment = result.d;
                 this.selectedIndex = index;
                 $("#addPaymentModal").modal("show");
+
             } catch (error) {
                 console.log(error)
+                this.isPageLoading = false;
                 return null;
             }
 
@@ -146,11 +179,11 @@ function initData() {
         },
 
         //add dress payment
-        dressPayment: { For:'', Quantity:'', Unit_Price:'', FabricID:'' },
+        dressPayment: { For: '', Unit_Price: '' },
 
         //add payment
         addPayment(index) {
-            const { For, Unit_Price, Quantity } = this.dressPayment;
+            const { For, Unit_Price } = this.dressPayment;
             const orderPayment = this.order[index];
             orderPayment.payments = orderPayment.payments || [];
 
@@ -162,10 +195,13 @@ function initData() {
                 return;
             }
 
-            orderPayment.payments.push({ For, Unit_Price, Quantity: Quantity ? Quantity: orderPayment.quantity});
+            orderPayment.payments.push({ For, Unit_Price, Quantity: orderPayment.quantity});
+
+            //save to local store
+            this.saveData();
 
             //reset form
-            this.dressPayment = { For: '', Quantity: '', Unit_Price: '', FabricID: '' };
+            this.dressPayment = { For: '', Unit_Price: '' };
 
             $.notify(`${For} added successfully`, { position: "to center", className: "success" });
         },
@@ -179,9 +215,9 @@ function initData() {
 
 
         //customer
-        customer: { isLoading: false,isNewCustomer: true,data: {}},
+        customer: apiData.customerId ? customer : { isLoading: false, isNewCustomer: true, data: {}},
 
-        //find
+        //find customer
         findCustomer(evt) {
             //reset if change text
             this.apiData.customerId = 0;
@@ -220,6 +256,10 @@ function initData() {
                     this.apiData.clothForId = item.Cloth_For_ID;
                     this.customer.isNewCustomer = false;
 
+                    this.getDress();
+                    //save to local store
+                    this.saveData();
+
                     return item;
                 }
             })
@@ -245,6 +285,9 @@ function initData() {
                 if (result.d.IsSuccess) {
                     this.customer.data = result.d.Data;
                     this.apiData.customerId = result.d.Data.CustomerID;
+
+                    //save to local store
+                    this.saveData();
                 }
             } catch (e) {
                 console.log("customer added error");
@@ -267,13 +310,74 @@ function initData() {
                 item.orderDetails = response.OrderDetails;
                 item.measurements = response.MeasurementGroups;
                 item.styles = response.StyleGroups;
-                console.log(response)
-            })
+            });
+
+            //save to local store
+            this.saveData();
 
             $("#addCustomerModal").modal("hide");
         },
 
+        //find fabrics
+        fabricsPayment: { For: '', Quantity: '', Unit_Price: '', FabricID: '', StockFabricQuantity: 0, FabricsName:'' },
+        findFabrics(evt) {
+            this.fabricsPayment.FabricID = "";
 
+            $(`#${evt.target.id}`).typeahead({
+                minLength: 1,
+                displayText: item => {
+                    return `${item.FabricCode}, ${item.FabricsName}`;
+                },
+                afterSelect: function (item) {
+                    this.$element[0].value = item.FabricCode;
+                },
+                source: (request, result) => {
+                    $.ajax({
+                        url: `Order.aspx/FindFabrics?prefix=${JSON.stringify(request)}`,
+                        contentType: "application/json; charset=utf-8",
+                        success: response => {
+                            result(response.d);
+                        },
+                        error: err => {
+                            console.log(err);
+                        }
+                    });
+                },
+                updater: item => {
+                    this.fabricsPayment.For = item.FabricCode;
+                    this.fabricsPayment.FabricID = item.FabricId;
+                    this.fabricsPayment.Unit_Price = item.SellingUnitPrice;
+                    this.fabricsPayment.StockFabricQuantity = item.StockFabricQuantity;
+                    return item;
+                }
+            })
+        },
+
+        //add fabrics
+        addFabric(index) {
+            const { For, Unit_Price, Quantity, FabricID } = this.fabricsPayment;
+
+            if (!FabricID) return $.notify(`Add fabric`, { position: "to center" });
+
+            const orderPayment = this.order[index];
+            orderPayment.payments = orderPayment.payments || [];
+
+            //check payment added or not
+            const isAdded = orderPayment.payments.some(item => item.For.toLocaleLowerCase() === For.toLocaleLowerCase());
+
+            if (isAdded) return $.notify(`${For} already added`, { position: "to center" });
+            
+
+            orderPayment.payments.push({ For, Unit_Price, Quantity, FabricID });
+
+            //save to local store
+            this.saveData();
+
+            $.notify(`${For} added successfully`, { position: "to center", className: "success" });
+
+            //reset form
+            this.fabricsPayment = { For: '', Quantity: '', Unit_Price: '', FabricID: '', StockFabricQuantity: 0 };
+        },
 
         //*** SUBMIT ORDER **//
         async submitOrder() {
@@ -342,6 +446,7 @@ function initData() {
 
                // $.notify(result.d.Message, { position: "to center", className: result.d.IsSuccess ? "success" : "error" });
                 console.log(result.d)
+                
              
             } catch (e) {
                 $.notify(e.message, { position: "to center" });

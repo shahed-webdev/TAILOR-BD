@@ -78,43 +78,7 @@ namespace TailorBD.AccessAdmin.quick_order
             return customers;
         }
 
-        //find customer autocomplete
-        [WebMethod]
-        [ScriptMethod(UseHttpGet = true)]
-        public static List<FabricViewModel> FindFabrics(string prefix)
-        {
-            var fabrics = new List<FabricViewModel>();
-            using (var conn = new SqlConnection())
-            {
-                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
-                using (var cmd = new SqlCommand())
-                {
-                    cmd.CommandText = @"SELECT top(10) Fabrics.FabricCode, Fabrics.FabricsName, Fabrics.SellingUnitPrice, Fabrics.StockFabricQuantity, Fabrics_Mesurement_Unit.UnitName, Fabrics.FabricID, Fabrics.InstitutionID FROM  Fabrics INNER JOIN Fabrics_Mesurement_Unit ON Fabrics.FabricMesurementUnitID = Fabrics_Mesurement_Unit.FabricMesurementUnitID WHERE (Fabrics.InstitutionID = @InstitutionID) AND (Fabrics.StockFabricQuantity <> 0) AND Fabrics.FabricCode like @FabricCode + '%'";
-                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
-                    cmd.Parameters.AddWithValue("@FabricCode", prefix);
-                    cmd.Connection = conn;
-                    conn.Open();
-                    using (var sdr = cmd.ExecuteReader())
-                    {
-                        while (sdr.Read())
-                        {
-                            var fabric = new FabricViewModel
-                            {
-                                FabricId = Convert.ToInt32(sdr["FabricID"]),
-                                FabricCode = sdr["FabricCode"].ToString(),
-                                FabricsName = sdr["FabricsName"].ToString(),
-                                SellingUnitPrice = Convert.ToDouble(sdr["SellingUnitPrice"]),
-                                StockFabricQuantity = Convert.ToDouble(sdr["StockFabricQuantity"]),
-                                UnitName = sdr["UnitName"].ToString()
-                            };
-                            fabrics.Add(fabric);
-                        }
-                    }
-                    conn.Close();
-                }
-            }
-            return fabrics;
-        }
+        
         //add new customer
         [WebMethod]
         public static ResponseModel<CustomerViewModel> AddNewCustomer(CustomerViewModel model)
@@ -341,6 +305,46 @@ namespace TailorBD.AccessAdmin.quick_order
 
             return dress;
         }
+
+
+        //find fabrics autocomplete
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<FabricViewModel> FindFabrics(string prefix)
+        {
+            var fabrics = new List<FabricViewModel>();
+            using (var conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SELECT top(10) Fabrics.FabricCode, Fabrics.FabricsName, Fabrics.SellingUnitPrice, Fabrics.StockFabricQuantity, Fabrics_Mesurement_Unit.UnitName, Fabrics.FabricID, Fabrics.InstitutionID FROM  Fabrics INNER JOIN Fabrics_Mesurement_Unit ON Fabrics.FabricMesurementUnitID = Fabrics_Mesurement_Unit.FabricMesurementUnitID WHERE (Fabrics.InstitutionID = @InstitutionID) AND (Fabrics.StockFabricQuantity <> 0) AND Fabrics.FabricCode like @FabricCode + '%'";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                    cmd.Parameters.AddWithValue("@FabricCode", prefix);
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (var sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var fabric = new FabricViewModel
+                            {
+                                FabricId = Convert.ToInt32(sdr["FabricID"]),
+                                FabricCode = sdr["FabricCode"].ToString(),
+                                FabricsName = sdr["FabricsName"].ToString(),
+                                SellingUnitPrice = Convert.ToDouble(sdr["SellingUnitPrice"]),
+                                StockFabricQuantity = Convert.ToDouble(sdr["StockFabricQuantity"]),
+                                UnitName = sdr["UnitName"].ToString()
+                            };
+                            fabrics.Add(fabric);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return fabrics;
+        }
+
 
         //post order
         [WebMethod]

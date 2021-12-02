@@ -62,8 +62,8 @@
       
          <form @submit.prevent="submitOrder">
            <!--dress list-->
-           <div x-show="order.length" class="card card-body">
-          <table class="table table-sm">
+            <div x-show="order.length" class="card card-body">
+               <table class="table table-sm">
             <thead>
                 <tr>
                 <th style="width:30px" class="font-weight-bold">SN</th>
@@ -85,10 +85,10 @@
                        <button type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
                    </td>
                    <td class="text-center">
-                       <input class="form-control text-center" type="number" min="1" x-model.number="item.quantity" @wheel="(e)=> e.preventDefault()" required>
+                       <input @change="saveData" x-model.number="item.quantity" class="form-control text-center" type="number" min="1" @wheel="(e)=> e.preventDefault()" required>
                    </td>
                    <td class="text-center">
-                       <input x-model="item.orderDetails" class="form-control" placeholder="dress details">
+                       <input @change="saveData" x-model="item.orderDetails" type="text" class="form-control" placeholder="dress details">
                    </td>
                     <td>
                         <a class="red-text ml-2" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
@@ -97,15 +97,15 @@
           </template>
           </tbody>
         </table>
-       </div>
+            </div>
        
 
             <!-- payment list-->
             <div class="mt-4">
-            <template x-for="(item, index) in order" :key="index">
+             <template x-for="(item, index) in order" :key="index">
                 <div>
                  <h4 x-show="item?.payments" x-text="item.dress.dressName"></h4>
-                    <table x-show="item?.payments" class="table table-sm">
+                    <table x-show="item?.payments" class="table table-sm table-fixed">
                       <thead>
                         <tr>
                             <th class="font-weight-bold">Payment For</th>
@@ -120,7 +120,7 @@
                             <tr>
                                 <td x-text="payment.For"></td>
                                 <td>
-                                    <input min="1" x-model="payment.Quantity" type="number" class="form-control text-center" required>
+                                    <input @change="saveData" x-model.number="payment.Quantity" min="1" type="number" class="form-control text-center" required>
                                 </td>
                                 <td class="text-right">
                                     ৳<span x-text="payment.Unit_Price"></span>
@@ -136,8 +136,8 @@
                     </tbody>
                    </table>
                 </div>
-            </template>
-       </div>
+             </template>
+           </div>
              
            <template x-if="order.length">
              <button type="submit" class="btn btn-cyan">Submit Order</button>
@@ -164,7 +164,7 @@
                             <div class="mb-2">
                                 <div class="md-form md-outline my-0">
                                     <label :class="measure.Measurement && 'active'" :for="measure.MeasurementTypeID" x-text="measure.MeasurementType"></label>
-                                    <input :id="measure.MeasurementTypeID" type="text" class="form-control" x-model="measure.Measurement" autocomplete="off">
+                                    <input x-model="measure.Measurement" @change="saveData" :id="measure.MeasurementTypeID" type="text" class="form-control" autocomplete="off">
                                 </div>
                             </div>
                             </template>
@@ -204,10 +204,10 @@
                                 <template x-for="style in styleGroup.Styles" :key="style.DressStyleId">
                                     <div class="mb-3">    
                                         <div class="custom-control custom-checkbox mb-1">
-                                        <input @change="style.DressStyleMesurement = style.IsCheck ? style.DressStyleMesurement : ''" :id="style.DressStyleId" x-model="style.IsCheck" type="checkbox" class="custom-control-input">
-                                        <label class="custom-control-label" x-text="style.DressStyleName" :for="style.DressStyleId"></label>
+                                            <input @blur="saveData" @change="style.DressStyleMesurement = style.IsCheck ? style.DressStyleMesurement : ''" :id="style.DressStyleId" x-model="style.IsCheck" type="checkbox" class="custom-control-input">
+                                            <label class="custom-control-label" x-text="style.DressStyleName" :for="style.DressStyleId"></label>
                                         </div>
-                                    <input type="text" class="form-control" :disabled="!style.IsCheck" x-model="style.DressStyleMesurement" autocomplete="off">
+                                        <input type="text" class="form-control" :disabled="!style.IsCheck" x-model="style.DressStyleMesurement" @change="saveData" autocomplete="off">
                                     </div>
                                 </template>
                             </div>
@@ -258,19 +258,19 @@
                           </div>
                         </form>
                         
-                        <form @submit.prevent="() => addPayment(selectedIndex)">
+                        <form @submit.prevent="() => addFabric(selectedIndex)">
                           <h5 class="font-weight-bold mt-4">Fabrics</h5>
                            <div class="mb-3">
                             <div class="form-group">
                                 <label>Fabric Code</label>
-                                <input type="text" class="form-control" required>
+                                <input @keyup="findFabrics" id="findFabrics" type="text" class="form-control" autocomplete="off" required>
                             </div>
                             <div class="form-group">
                                 <label>Quantity</label>
-                                <input x-model.number="dressPayment.Qunatity" type="number" min="0" step="0.01" class="form-control" autocomplete="off" required>
+                                <input x-model.number="fabricsPayment.Quantity" type="number" min="1" :max="fabricsPayment.StockFabricQuantity" class="form-control" autocomplete="off" required>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-cyan w-100 m-0">Add Fabric</button>
+                                <button type="submit" :disabled="fabricsPayment.FabricID === ''" class="btn btn-cyan w-100 m-0">Add Fabric</button>
                             </div>
                          </div>
                         </form>
