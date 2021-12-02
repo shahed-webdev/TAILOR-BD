@@ -33,7 +33,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.Connection = con;
 
                     con.Open();
-                    orderNumber = (int)cmd.ExecuteScalar();
+                    orderNumber = Convert.ToInt32(cmd.ExecuteScalar());
                     con.Close();
                 }
             }
@@ -349,7 +349,7 @@ namespace TailorBD.AccessAdmin.quick_order
             var institutionId = Convert.ToInt32(HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
             var registrationId = Convert.ToInt32(HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
             var orderId = 0;
-            
+
             // Insert order
             using (var con = new SqlConnection())
             {
@@ -370,12 +370,12 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
                     cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
                     cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
-                    cmd.Parameters.AddWithValue("@DeliveryDate", model.DeliveryDate);
+                    cmd.Parameters.AddWithValue("@DeliveryDate", (object)model.DeliveryDate ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@Discount", model.Discount);
                     cmd.Parameters.AddWithValue("@OrderAmount", model.OrderAmount);
                     cmd.Connection = con;
                     con.Open();
-                    orderId = (int)cmd.ExecuteScalar();
+                    orderId = Convert.ToInt32(cmd.ExecuteScalar());
                     con.Close();
                 }
             }
@@ -457,7 +457,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.Connection = con;
 
                     con.Open();
-                    discountLimitPercentage = (int)cmd.ExecuteScalar();
+                    discountLimitPercentage = Convert.ToInt32(cmd.ExecuteScalar());
                     con.Close();
                 }
             }
