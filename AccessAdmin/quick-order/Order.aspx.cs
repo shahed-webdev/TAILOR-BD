@@ -17,7 +17,7 @@ namespace TailorBD.AccessAdmin.quick_order
 
         }
 
-        //Get Order Number First
+        //get order number first
         [WebMethod]
         [ScriptMethod(UseHttpGet = true)]
         public static int GetOrderNumber()
@@ -28,7 +28,6 @@ namespace TailorBD.AccessAdmin.quick_order
                 con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;select @orderNo";
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Connection = con;
@@ -313,6 +312,7 @@ namespace TailorBD.AccessAdmin.quick_order
             var institutionId = Convert.ToInt32(HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
             var registrationId = Convert.ToInt32(HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
             var orderId = 0;
+            
             // Insert order
             using (var con = new SqlConnection())
             {
@@ -336,6 +336,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.Parameters.AddWithValue("@DeliveryDate", model.DeliveryDate);
                     cmd.Parameters.AddWithValue("@Discount", model.Discount);
                     cmd.Parameters.AddWithValue("@OrderAmount", model.OrderAmount);
+                    cmd.Connection = con;
                     con.Open();
                     orderId = (int)cmd.ExecuteScalar();
                     con.Close();
@@ -350,6 +351,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 {
                     cmd.CommandText = @"SP_Order_Place";
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Connection = con;
                     con.Open();
                     foreach (var list in model.OrderList)
                     {
@@ -380,18 +382,17 @@ namespace TailorBD.AccessAdmin.quick_order
             {
                 using (var con = new SqlConnection())
                 {
-                    con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"]
-                        .ConnectionString;
+                    con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                     using (var cmd = new SqlCommand())
                     {
-                        cmd.CommandText =
-                            @"INSERT INTO Payment_Record(OrderID, CustomerID, RegistrationID, InstitutionID, Amount, Payment_TimeStatus, AccountID)VALUES(@OrderID,@CustomerID,@RegistrationID,@InstitutionID,@Amount, 'Advance',@AccountID)";
+                        cmd.CommandText = @"INSERT INTO Payment_Record(OrderID, CustomerID, RegistrationID, InstitutionID, Amount, Payment_TimeStatus, AccountID)VALUES(@OrderID,@CustomerID,@RegistrationID,@InstitutionID,@Amount, 'Advance',@AccountID)";
                         cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                         cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
                         cmd.Parameters.AddWithValue("@OrderID", orderId);
                         cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
                         cmd.Parameters.AddWithValue("@Amount", model.PaidAmount);
                         cmd.Parameters.AddWithValue("@AccountID", model.AccountId);
+                        cmd.Connection = con;
                         con.Open();
                         cmd.ExecuteNonQuery();
                         con.Close();
@@ -401,6 +402,7 @@ namespace TailorBD.AccessAdmin.quick_order
 
             return orderId;
         }
+
 
         //Get Discount limit %
         [WebMethod]

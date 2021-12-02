@@ -18,8 +18,19 @@ function initData() {
         apiData: {customerId: 0, clothForId: 0 },
 
         //order list data
+        orderNumber: null,
         selectedIndex: null,
         order: [], //[{OrderDetails:'', dress: {}, measurements:[], styles:[], payments:[] }],
+
+        //get order number
+        async getOrderNumber() {
+            const response = await fetch(`${helpers.baseUrl}/GetOrderNumber`, helpers.header);
+            const result = await response.json();
+
+            this.dressNames.isLoading = false;
+            this.orderNumber = result.d;
+            console.log(result.d)
+        },
 
         //get dress dropdown
         dressNames: { isLoading: true, data: [] },
@@ -129,64 +140,43 @@ function initData() {
             const text = selectElement.options[selectElement.selectedIndex].text
             if (!value) return;
 
-            this.dressPayment.paymentFor = text;
-            this.dressPayment.amount = +value;
+            this.dressPayment.For = text;
+            this.dressPayment.Unit_Price = +value;
             this.addPayment(index);
         },
 
         //add dress payment
-        dressPayment: { paymentFor: '', amount: '' },
+        dressPayment: { For:'', Quantity:'', Unit_Price:'', FabricID:'' },
+
+        //add payment
         addPayment(index) {
-            const { paymentFor, amount } = this.dressPayment;
+            const { For, Unit_Price, Quantity } = this.dressPayment;
             const orderPayment = this.order[index];
             orderPayment.payments = orderPayment.payments || [];
 
             //check payment added or not
-            const isAdded = orderPayment.payments.some(item => item.paymentFor.toLocaleLowerCase() === paymentFor.toLocaleLowerCase());
+            const isAdded = orderPayment.payments.some(item => item.For.toLocaleLowerCase() === For.toLocaleLowerCase());
 
             if (isAdded) {
-                $.notify(`${paymentFor} already added`, { position: "to center" });
+                $.notify(`${For} already added`, { position: "to center" });
                 return;
             }
 
-            orderPayment.payments.push({
-                paymentFor,
-                amount,
-                paymentDressQuantity: orderPayment.quantity
-            });
+            orderPayment.payments.push({ For, Unit_Price, Quantity: Quantity ? Quantity: orderPayment.quantity});
 
             //reset form
-            this.dressPayment = { paymentFor: '', amount: '' };
+            this.dressPayment = { For: '', Quantity: '', Unit_Price: '', FabricID: '' };
 
-            $.notify(`${paymentFor} added successfully`, { position: "to center", className: "success" });
+            $.notify(`${For} added successfully`, { position: "to center", className: "success" });
         },
 
-        //add addFabrics
-        fabricPayment: { fabricCode: '', quantity: '', amount: '' },
-        addFabrics(index) {
-            const { fabricCode, quantity, amount } = this.fabricPayment;
-            const orderPayment = this.order[index];
-            orderPayment.payments = orderPayment.payments || [];
 
-            //check payment added or not
-            const isAdded = orderPayment.payments.some(item => item.paymentFor.toLocaleLowerCase() === paymentFor.toLocaleLowerCase());
-
-            if (isAdded) {
-                $.notify(`${paymentFor} already added`, { position: "to center" }, "error");
-                return;
-            }
-
-            orderPayment.payments.push({
-                paymentFor: fabricCode,
-                amount,
-                paymentDressQuantity: quantity
-            });
-
-            //reset form
-            this.fabricPayment = { fabricCode: '', quantity:'', amount: '' };
-
-            console.log(this.order)
+        //remove payment
+        removePayment(paymentFor, index) {
+            const orderPayment = this.order[index]
+            orderPayment.payments = orderPayment.payments.filter(item => item.For !== paymentFor);
         },
+
 
         //customer
         customer: { isLoading: false,isNewCustomer: true,data: {}},
@@ -281,6 +271,81 @@ function initData() {
             })
 
             $("#addCustomerModal").modal("hide");
+        },
+
+
+
+        //*** SUBMIT ORDER **//
+        async submitOrder() {
+            if (!this.apiData.customerId) return $.notify(`Customer Not Added`, { position: "to center" });
+
+            //create new model
+            const OrderList = this.order.map(item => {
+                return {
+                    DressId: item.dress.dressId,
+                    DressQuantity: item.quantity,
+                    Details: item.orderDetails,
+                    ListMeasurement: item.measurements.map(g => g.Measurements),
+                    ListStyle: item.styles.map(s => s.Styles),
+                    ListPayment: JSON.stringify(item.payments)
+                }
+            });
+
+            //set flat array
+            OrderList.forEach(item => {
+                const measureMapped = item.ListMeasurement.flatMap(m => m);
+                const styleMapped = item.ListStyle.flatMap(m => m);
+
+                //measure
+                item.ListMeasurement = JSON.stringify(measureMapped.reduce((measure, obj) => {
+                        if (obj.Measurement)
+                            measure.push({ id: obj.MeasurementTypeID, value: obj.Measurement });
+
+                        return measure;
+                    },
+                    []));
+
+                //style
+                item.ListStyle = JSON.stringify(styleMapped.reduce((style, obj) => {
+                        if (obj.IsCheck)
+                            style.push({ id: obj.DressStyleId, value: obj.DressStyleMesurement });
+
+                        return style;
+                    },
+                    []));
+            });
+
+            //customer info
+            const { CustomerID, Cloth_For_ID } = this.customer.data;
+
+            const model = {
+                OrderSn: this.orderNumber || '',
+                ClothForId: Cloth_For_ID,
+                CustomerId: CustomerID,
+                AccountId: 1,
+                PaidAmount: 0,
+                Discount: 0,
+                OrderAmount: 100,
+                OrderList // [ DressId, DressQuantity, Details, ListMeasurement[], ListStyle[], ListPayment[] ]
+            }
+
+            console.log(model)
+
+            try {
+                const response = await fetch(`${helpers.baseUrl}/PostOrder`,{
+                    method: "POST",
+                    headers: helpers.header.headers,
+                    body: JSON.stringify({ model })
+                });
+
+                const result = await response.json();
+
+               // $.notify(result.d.Message, { position: "to center", className: result.d.IsSuccess ? "success" : "error" });
+                console.log(result.d)
+             
+            } catch (e) {
+                $.notify(e.message, { position: "to center" });
+            }
         }
     }
 }
