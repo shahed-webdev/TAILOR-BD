@@ -6,7 +6,6 @@
         .btn-font { padding: .4rem 1rem; font-size: .9rem; margin: 0 }
         .table td { vertical-align: middle; }
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
-        #addCustomerModal .dropdown-menu { z-index: 99999999; }
     </style>   
     <script src="js/quick-order.js"></script>
 </asp:Content>
@@ -104,8 +103,8 @@
             <div class="mt-4">
              <template x-for="(item, index) in order" :key="index">
                 <div>
-                 <h4 x-show="item?.payments" x-text="item.dress.dressName"></h4>
-                    <table x-show="item?.payments" class="table table-sm table-fixed">
+                 <h4 x-show="item?.payments && item?.payments.length" x-text="item.dress.dressName"></h4>
+                    <table x-show="item?.payments && item?.payments.length" class="table table-sm table-fixed">
                       <thead>
                         <tr>
                             <th class="font-weight-bold">Payment For</th>
@@ -120,7 +119,7 @@
                             <tr>
                                 <td x-text="payment.For"></td>
                                 <td>
-                                    <input @change="saveData" x-model.number="payment.Quantity" min="1" type="number" class="form-control text-center" required>
+                                    <input @change="saveData" @input="calculateTotal" x-model.number="payment.Quantity" min="1" type="number" class="form-control text-center" required>
                                 </td>
                                 <td class="text-right">
                                     ৳<span x-text="payment.Unit_Price"></span>
@@ -140,7 +139,37 @@
            </div>
              
            <template x-if="order.length">
-             <button type="submit" class="btn btn-cyan">Submit Order</button>
+               <div class="d-flex justify-content-end">
+                   <div>
+                   <template x-if="calculateTotal() > 0">
+                     <div class="text-right pr-3">
+                       <h5 class="font-weight-bold">
+                           Total: ৳<span x-text="calculateTotal()"></span>
+                       </h5>
+                       <div x-init="getDiscountLimit()" class="form-group">
+                           <label>Discount Amount</label>
+                           <input x-model.number="orderPayment.Discount" min="0" :max="(discountLimit/100) * calculateTotal()" type="number" step="0.01" class="form-control text-right">
+                       </div>
+                       <div class="form-group">
+                           <label>Paid Amount</label>
+                           <input x-model.number="orderPayment.PaidAmount" type="number" step="0.01" min="1" :max="calculateTotal() - orderPayment.Discount" class="form-control text-right">
+                       </div>
+                       <div class="form-group">
+                           <label>Payment Method</label>
+                           <select x-init="getAccount()" x-model.number="orderPayment.AccountId" class="form-control">
+                             <option value="">[ SELECT ]</option>
+                               <template x-for="account in paymentMethod" :key="account.AccountId">
+                                   <option :selected="account.IsDefault" :value="account.AccountId" x-text="account.AccountName"></option>
+                               </template>
+                           </select>
+                       </div>
+                     </div>
+                   </template>
+                   <div class="text-right pr-3">
+                       <button type="submit" class="btn btn-cyan m-0">Submit Order</button>
+                   </div>
+                   </div>
+               </div>
            </template>
          </form>
       
@@ -343,7 +372,7 @@
 	        </path>
           </svg>
         </div>
-  </div>  
+  </div>
 </asp:Content>
 
 

@@ -197,6 +197,7 @@
     <Content Include="AccessAdmin\Order\Print_A4_Mesurement.aspx" />
     <Content Include="AccessAdmin\Order\Print_Mesurement.aspx" />
     <Content Include="AccessAdmin\Profile.aspx" />
+    <Content Include="AccessAdmin\quick-order\js\autocomplete.js" />
     <Content Include="AccessAdmin\quick-order\js\quick-order.js" />
     <Content Include="AccessAdmin\quick-order\Order.aspx" />
     <Content Include="AccessAdmin\quick-order\style\main-maser.css" />

@@ -318,7 +318,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText = @"SELECT top(10) Fabrics.FabricCode, Fabrics.FabricsName, Fabrics.SellingUnitPrice, Fabrics.StockFabricQuantity, Fabrics_Mesurement_Unit.UnitName, Fabrics.FabricID, Fabrics.InstitutionID FROM  Fabrics INNER JOIN Fabrics_Mesurement_Unit ON Fabrics.FabricMesurementUnitID = Fabrics_Mesurement_Unit.FabricMesurementUnitID WHERE (Fabrics.InstitutionID = @InstitutionID) AND (Fabrics.StockFabricQuantity <> 0) AND Fabrics.FabricCode like @FabricCode + '%'";
+                    cmd.CommandText = @"SELECT top(3) Fabrics.FabricCode, Fabrics.FabricsName, Fabrics.SellingUnitPrice, Fabrics.StockFabricQuantity, Fabrics_Mesurement_Unit.UnitName, Fabrics.FabricID, Fabrics.InstitutionID FROM  Fabrics INNER JOIN Fabrics_Mesurement_Unit ON Fabrics.FabricMesurementUnitID = Fabrics_Mesurement_Unit.FabricMesurementUnitID WHERE (Fabrics.InstitutionID = @InstitutionID) AND (Fabrics.StockFabricQuantity <> 0) AND Fabrics.FabricCode like @FabricCode + '%'";
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Parameters.AddWithValue("@FabricCode", prefix);
                     cmd.Connection = conn;
@@ -539,7 +539,7 @@ namespace TailorBD.AccessAdmin.quick_order
         }
 
 
-        //Get Discount limit %
+        //Get Order Details
         [WebMethod]
         [ScriptMethod(UseHttpGet = true)]
         public static OrderViewModel GetOrderDetails(int orderId)
