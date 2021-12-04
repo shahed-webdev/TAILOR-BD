@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/QuickOrder.Master" AutoEventWireup="true" CodeBehind="UpdateOrder.aspx.cs" Inherits="TailorBD.AccessAdmin.quick_order.UpdateOrder" %>
+﻿<%@ Page Title="Update Order" Language="C#" MasterPageFile="~/QuickOrder.Master" AutoEventWireup="true" CodeBehind="UpdateOrder.aspx.cs" Inherits="TailorBD.AccessAdmin.quick_order.UpdateOrder" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <style>
         .loading-overlay { z-index: 999; position: fixed; bottom: 0; top: 0; left: 0; right: 0; background-color: rgba(0,0,0,.1); display: flex; justify-content: center; align-items: center; }
@@ -38,13 +38,11 @@
         </div>
 
         <!--customer info-->
-    <div class="d-flex">
-      <h5 x-text="customer.CustomerName" class="font-weight-bold"></h5>
-    <span x-text="customer.Phone" class="font-weight-bold ml-2"></span>
-    </div>
-        
-       
-      
+        <div class="d-flex">
+          <h5 x-text="customer.CustomerName" class="font-weight-bold"></h5>
+          <span x-text="customer.Phone" class="font-weight-bold ml-2"></span>
+        </div>
+
          <form @submit.prevent="submitOrder">
            <!--dress list-->
             <div x-show="order.length" class="card card-body">
@@ -70,13 +68,13 @@
                        <button type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
                    </td>
                    <td class="text-center">
-                       <input @change="saveData" x-model.number="item.quantity" class="form-control text-center" type="number" min="1" @wheel="(e)=> e.preventDefault()" required>
+                       <input x-model.number="item.quantity" class="form-control text-center" type="number" min="1" @wheel="(e)=> e.preventDefault()" required>
                    </td>
                    <td class="text-center">
-                       <input @change="saveData" x-model="item.orderDetails" type="text" class="form-control" placeholder="dress details">
+                       <input x-model="item.orderDetails" type="text" class="form-control" placeholder="dress details">
                    </td>
                     <td>
-                        <a class="red-text ml-2" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
+                        <a class="red-text ml-2" @click="() => removeDress(item.dress.dressId, item.orderListId)"><i class="fas fa-times"></i></a>
                     </td>
                 </tr>
           </template>
@@ -105,7 +103,7 @@
                             <tr>
                                 <td x-text="payment.For"></td>
                                 <td>
-                                    <input @change="saveData" @input="calculateTotal" x-model.number="payment.Quantity" min="1" step="0.01" type="number" class="form-control text-center" required>
+                                    <input @change="calculateTotal" x-model.number="payment.Quantity" min="1" step="0.01" type="number" class="form-control text-center" required>
                                 </td>
                                 <td class="text-right">
                                     ৳<span x-text="payment.UnitPrice"></span>
@@ -114,7 +112,7 @@
                                     ৳<span x-text="payment.UnitPrice * payment.Quantity"></span>
                                 </td>
                                 <td class="text-center">
-                                    <a class="red-text ml-2" @click="()=> removePayment(payment.For, index)"><i class="fas fa-times"></i></a>
+                                    <a class="red-text ml-2" @click="()=> removePayment(payment.For, payment.OrderPaymentId, index)"><i class="fas fa-times"></i></a>
                                 </td>
                             </tr>
                         </template>
@@ -128,31 +126,9 @@
                <div class="d-flex justify-content-end">
                    <div>
                    <template x-if="calculateTotal() > 0">
-                     <div class="text-right pr-3">
-                       <h5 class="font-weight-bold">
+                       <h5 class="font-weight-bold text-right pr-3">
                            Total: ৳<span x-text="orderTotalAmount"></span>
                        </h5>
-                       <div x-init="getDiscountLimit()" class="form-group">
-                           <label>Discount Amount</label>
-                           <input x-model.number="orderPayment.Discount" min="0" :max="(discountLimit/100) * orderTotalAmount" type="number" step="0.01" class="form-control text-right">
-                       </div>
-                       <div class="form-group">
-                           <label>Paid Amount</label>
-                           <input x-model.number="orderPayment.PaidAmount" type="number" step="0.01" min="1" :max="orderTotalAmount - orderPayment.Discount" class="form-control text-right">
-                       </div>
-                         <div>
-                             <p class="font-weight-bold red-text">Due Amount: ৳<strong x-text="(orderTotalAmount - orderPayment.Discount) - orderPayment.PaidAmount"></strong></p>
-                         </div>
-                       <div class="form-group">
-                           <label>Payment Method</label>
-                           <select x-init="getAccount()" x-model.number="orderPayment.AccountId" class="form-control">
-                             <option value="">[ SELECT ]</option>
-                               <template x-for="account in paymentMethod" :key="account.AccountId">
-                                   <option :selected="account.IsDefault" :value="account.AccountId" x-text="account.AccountName"></option>
-                               </template>
-                           </select>
-                       </div>
-                     </div>
                    </template>
                    <div class="text-right pr-3">
                        <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0">Submit Order</button>
@@ -182,7 +158,7 @@
                             <div class="mb-2">
                                 <div class="md-form md-outline my-0">
                                     <label :class="measure.Measurement && 'active'" :for="measure.MeasurementTypeID" x-text="measure.MeasurementType"></label>
-                                    <input x-model="measure.Measurement" @change="saveData" :id="measure.MeasurementTypeID" type="text" class="form-control" autocomplete="off">
+                                    <input x-model="measure.Measurement" :id="measure.MeasurementTypeID" type="text" class="form-control" autocomplete="off">
                                 </div>
                             </div>
                             </template>
@@ -222,10 +198,10 @@
                                 <template x-for="style in styleGroup.Styles" :key="style.DressStyleId">
                                     <div class="mb-3">    
                                         <div class="custom-control custom-checkbox mb-1">
-                                            <input @blur="saveData" @change="style.DressStyleMesurement = style.IsCheck ? style.DressStyleMesurement : ''" :id="style.DressStyleId" x-model="style.IsCheck" type="checkbox" class="custom-control-input">
+                                            <input @change="style.DressStyleMesurement = style.IsCheck ? style.DressStyleMesurement : ''" :id="style.DressStyleId" x-model="style.IsCheck" type="checkbox" class="custom-control-input">
                                             <label class="custom-control-label" x-text="style.DressStyleName" :for="style.DressStyleId"></label>
                                         </div>
-                                        <input type="text" class="form-control" :disabled="!style.IsCheck" x-model="style.DressStyleMesurement" @change="saveData" autocomplete="off">
+                                        <input type="text" class="form-control" :disabled="!style.IsCheck" x-model="style.DressStyleMesurement" autocomplete="off">
                                     </div>
                                 </template>
                             </div>

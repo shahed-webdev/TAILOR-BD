@@ -12,8 +12,8 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
         public int ClothForId { get; set; }
         public int CustomerId { get; set; }
         public List<OrderListEditModel> OrderList { get; set; }
-        public string DeletedOrderPaymentIds { get; set; }
-        public string DeletedOrderListIds { get; set; }
+        public string DeletedOrderPaymentIds { get; set; } //[{ OrderPaymentID: 1 }]
+        public string DeletedOrderListIds { get; set; } //[{ OrderListID: 1 }]
     }
 
     public class OrderListEditModel
