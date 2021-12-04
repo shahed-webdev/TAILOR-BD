@@ -201,6 +201,7 @@
     <Content Include="AccessAdmin\quick-order\js\quick-order.js" />
     <Content Include="AccessAdmin\quick-order\Order.aspx" />
     <Content Include="AccessAdmin\quick-order\style\main-maser.css" />
+    <Content Include="AccessAdmin\quick-order\UpdateOrder.aspx" />
     <Content Include="AccessAdmin\Reports\CSS\Ico\Complete.png" />
     <Content Include="AccessAdmin\Reports\CSS\Ico\InComplete.png" />
     <Content Include="AccessAdmin\Reports\CSS\Report_Print.css" />
@@ -820,6 +821,13 @@
     </Compile>
     <Compile Include="AccessAdmin\quick-order\Order.aspx.designer.cs">
       <DependentUpon>Order.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccessAdmin\quick-order\UpdateOrder.aspx.cs">
+      <DependentUpon>UpdateOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccessAdmin\quick-order\UpdateOrder.aspx.designer.cs">
+      <DependentUpon>UpdateOrder.aspx</DependentUpon>
     </Compile>
     <Compile Include="AccessAdmin\quick-order\ViewModels\AccountDllModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\CustomerViewModel.cs" />

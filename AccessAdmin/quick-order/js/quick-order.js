@@ -381,7 +381,8 @@ function initData() {
             orderPayment.payments = orderPayment.payments || [];
 
             //check payment added or not
-            const isAdded = orderPayment.payments.some(item => item.For.toLocaleLowerCase() === For.toLocaleLowerCase());
+            const codeName = `Fabric Code: ${For}`
+            const isAdded = orderPayment.payments.some(item => item.For.toLocaleLowerCase() === codeName.toLocaleLowerCase());
 
             if (isAdded) return $.notify(`${For} already added`, { position: "to center" });
 
@@ -415,16 +416,19 @@ function initData() {
         },
 
 
-
+        
         //*** SUBMIT ORDER **//
         orderPayment : { OrderAmount: 0, Discount: 0, PaidAmount: 0, AccountId: null },
 
         //calculate order total amount
+        orderTotalAmount: 0,
         calculateTotal() {
             const isPayment = this.order.filter(item => item.payments && item.payments).map(item => item.payments).flat(1);
             if (!isPayment.length) return 0;
 
             const total = isPayment.map(item => item.Quantity * item.Unit_Price).reduce((prev, current) => prev + current)
+            this.orderTotalAmount = total;
+
             return total || 0;
         },
 
@@ -469,16 +473,19 @@ function initData() {
 
             //customer info
             const { CustomerID, Cloth_For_ID } = this.customer.data;
-            const { OrderAmount, Discount, PaidAmount, AccountId } = this.orderPayment;
+            const { Discount, PaidAmount, AccountId } = this.orderPayment;
+
+           
+            const defaultAccount = this.paymentMethod.filter(item => item.IsDefault)[0];
 
             const model = {
                 OrderSn: this.orderNumber || '',
                 ClothForId: Cloth_For_ID,
                 CustomerId: CustomerID,
-                OrderAmount,
+                OrderAmount: this.calculateTotal(),
                 Discount,
                 PaidAmount,
-                AccountId,
+                AccountId: AccountId || defaultAccount.AccountId,
                 OrderList // [ DressId, DressQuantity, Details, ListMeasurement[], ListStyle[], ListPayment[] ]
             }
 
