@@ -362,11 +362,11 @@ namespace TailorBD.AccessAdmin.quick_order
                 {
                     if (string.IsNullOrEmpty(model.OrderSn))
                     {
-                        cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber],[DeliveryDate], [Discount], [OrderAmount]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo, @DeliveryDate, @Discount, @OrderAmount); Select scope_identity()";
+                        cmd.CommandText = @"DECLARE @orderNo int;EXEC @orderNo = [dbo].[Sp_GetUpdatedOrderNo] @InstitutionID;INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber],[DeliveryDate]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo, @DeliveryDate); Select scope_identity()";
                     }
                     else
                     {
-                        cmd.CommandText = @"INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber],[DeliveryDate], [Discount], [OrderAmount]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo, @DeliveryDate, @Discount, @OrderAmount); Select scope_identity()";
+                        cmd.CommandText = @"INSERT INTO[Order] ([CustomerID], [RegistrationID], [InstitutionID], [Cloth_For_ID], [OrderDate],[OrderSerialNumber],[DeliveryDate]) VALUES (@CustomerID, @RegistrationID, @InstitutionID, @Cloth_For_ID, getdate(),@orderNo, @DeliveryDate); Select scope_identity()";
                         cmd.Parameters.AddWithValue("@orderNo", model.OrderSn);
                     }
 
@@ -375,8 +375,6 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
                     cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
                     cmd.Parameters.AddWithValue("@DeliveryDate", (object)model.DeliveryDate ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Discount", model.Discount);
-                    cmd.Parameters.AddWithValue("@OrderAmount", model.OrderAmount);
                     cmd.Connection = con;
                     con.Open();
                     orderId = Convert.ToInt32(cmd.ExecuteScalar());
@@ -434,6 +432,26 @@ namespace TailorBD.AccessAdmin.quick_order
                         cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
                         cmd.Parameters.AddWithValue("@Amount", model.PaidAmount);
                         cmd.Parameters.AddWithValue("@AccountID", model.AccountId);
+                        cmd.Connection = con;
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                    }
+                }
+            }
+
+            // update order discount amount
+            if (model.Discount > 0)
+            {
+                using (var con = new SqlConnection())
+                {
+                    con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                    using (var cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = @"UPDATE [Order] SET  Discount = @Discount WHERE (OrderID = @OrderID)";
+                        cmd.Parameters.AddWithValue("@OrderID", orderId);
+                        cmd.Parameters.AddWithValue("@Discount", model.Discount);
+
                         cmd.Connection = con;
                         con.Open();
                         cmd.ExecuteNonQuery();
@@ -570,7 +588,7 @@ namespace TailorBD.AccessAdmin.quick_order
                             order.CustomerId = Convert.ToInt32(orderDr["CustomerID"]);
                             order.CustomerName = orderDr["CustomerName"].ToString();
                             order.Phone = orderDr["Phone"].ToString();
-                           order.DeliveryDate = (DateTime?)(orderDr["DeliveryDate"] ?? Convert.ToDateTime(orderDr["DeliveryDate"]));
+                            order.DeliveryDate = (DateTime?)(orderDr["DeliveryDate"] ?? Convert.ToDateTime(orderDr["DeliveryDate"]));
                             order.OrderAmount = Convert.ToDouble(orderDr["OrderAmount"]);
                             order.PaidAmount = Convert.ToDouble(orderDr["PaidAmount"]);
                             order.Discount = Convert.ToDouble(orderDr["Discount"]);
@@ -586,7 +604,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var listCmd = new SqlCommand())
                 {
-                    listCmd.CommandText = @"SELECT OrderListID, DressID, DressQuantity, Details FROM  OrderList WHERE (OrderID = @OrderID)";
+                    listCmd.CommandText = @"SELECT  OrderList.OrderListID, OrderList.DressID, OrderList.DressQuantity, OrderList.Details, Dress.Dress_Name FROM  OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID WHERE (OrderList.OrderID = @OrderID)";
                     listCmd.Parameters.AddWithValue("@OrderID", orderId);
 
                     listCmd.Connection = conn;
@@ -599,6 +617,7 @@ namespace TailorBD.AccessAdmin.quick_order
                             {
                                 OrderListId = Convert.ToInt32(listSdr["OrderListID"]),
                                 DressId = Convert.ToInt32(listSdr["DressID"]),
+                                DressName = listSdr["Dress_Name"].ToString(),
                                 DressQuantity = Convert.ToDouble(listSdr["DressQuantity"]),
                                 Details = listSdr["Details"].ToString()
                             };
@@ -709,7 +728,7 @@ namespace TailorBD.AccessAdmin.quick_order
                                         var style = new OrderPaymentViewModel
                                         {
                                             OrderPaymentId = Convert.ToInt32(dr["OrderPaymentID"]),
-                                            // FabricId = dr["FabricID"] == null ? (int?)null: Convert.ToInt32(dr["FabricID"]),
+                                            FabricId = dr["FabricID"] as int? ?? null,
                                             For = dr["Details"].ToString(),
                                             Quantity = Convert.ToDouble(dr["Unit"]),
                                             UnitPrice = Convert.ToDouble(dr["UnitPrice"]),

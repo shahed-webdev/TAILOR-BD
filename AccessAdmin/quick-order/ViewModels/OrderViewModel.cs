@@ -33,6 +33,7 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
 
         public int OrderListId { get; set; }
         public int DressId { get; set; }
+        public string DressName { get; set; }
         public List<MeasurementsGroupModel> Measurements { get; set; }
         public List<StyleGroupModel> Styles { get; set; }
         public List<OrderPaymentViewModel> Payments { get; set; }
