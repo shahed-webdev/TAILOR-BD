@@ -48,6 +48,13 @@ function initData() {
         selectedIndex: null,
         order: order, //[{OrderDetails: '', dress: {}, measurements:[], styles:[], payments:[] }],
 
+
+        async getOrder() {
+            const response = await fetch(`${helpers.baseUrl}/GetOrderDetails?orderId=207452`, helpers.header);
+            const result = await response.json();
+            console.log(result.d);
+        },
+
         //get order number
         async getOrderNumber() {
             const response = await fetch(`${helpers.baseUrl}/GetOrderNumber`, helpers.header);

@@ -553,9 +553,9 @@ namespace TailorBD.AccessAdmin.quick_order
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText = @"SELECT  [Order].OrderID, [Order].OrderSerialNumber, [Order].Cloth_For_ID, [Order].CustomerID, Customer.CustomerName, Customer.Phone, [Order].DeliveryDate, [Order].OrderAmount, [Order].PaidAmount, [Order].Discount FROM  [Order] INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID WHERE ([Order].OrderID = @OrderID) AND ([Order].InstitutionID = @InstitutionID)";
+                    cmd.CommandText = @"SELECT [Order].OrderID, [Order].OrderSerialNumber, [Order].Cloth_For_ID, [Order].CustomerID, Customer.CustomerName, Customer.Phone, [Order].DeliveryDate, [Order].OrderAmount, [Order].PaidAmount, [Order].Discount FROM  [Order] INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID WHERE ([Order].OrderID = @OrderID) AND ([Order].InstitutionID = @InstitutionID)";
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
-                    cmd.Parameters.AddWithValue("@DressID", orderId);
+                    cmd.Parameters.AddWithValue("@OrderID", orderId);
 
                     cmd.Connection = conn;
 
@@ -570,7 +570,7 @@ namespace TailorBD.AccessAdmin.quick_order
                             order.CustomerId = Convert.ToInt32(orderDr["CustomerID"]);
                             order.CustomerName = orderDr["CustomerName"].ToString();
                             order.Phone = orderDr["Phone"].ToString();
-                            order.DeliveryDate = (DateTime?)(orderDr["DeliveryDate"] ?? Convert.ToDateTime(orderDr["DeliveryDate"]));
+                           order.DeliveryDate = (DateTime?)(orderDr["DeliveryDate"] ?? Convert.ToDateTime(orderDr["DeliveryDate"]));
                             order.OrderAmount = Convert.ToDouble(orderDr["OrderAmount"]);
                             order.PaidAmount = Convert.ToDouble(orderDr["PaidAmount"]);
                             order.Discount = Convert.ToDouble(orderDr["Discount"]);
@@ -587,7 +587,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 using (var listCmd = new SqlCommand())
                 {
                     listCmd.CommandText = @"SELECT OrderListID, DressID, DressQuantity, Details FROM  OrderList WHERE (OrderID = @OrderID)";
-                    listCmd.Parameters.AddWithValue("@DressID", orderId);
+                    listCmd.Parameters.AddWithValue("@OrderID", orderId);
 
                     listCmd.Connection = conn;
                     conn.Open();
@@ -709,7 +709,7 @@ namespace TailorBD.AccessAdmin.quick_order
                                         var style = new OrderPaymentViewModel
                                         {
                                             OrderPaymentId = Convert.ToInt32(dr["OrderPaymentID"]),
-                                            FabricId = Convert.ToInt32(dr["FabricID"]),
+                                            // FabricId = dr["FabricID"] == null ? (int?)null: Convert.ToInt32(dr["FabricID"]),
                                             For = dr["Details"].ToString(),
                                             Quantity = Convert.ToDouble(dr["Unit"]),
                                             UnitPrice = Convert.ToDouble(dr["UnitPrice"]),
@@ -722,15 +722,10 @@ namespace TailorBD.AccessAdmin.quick_order
 
                             order.OrderList.Add(orderList);
                         }
-
                     }
                     conn.Close();
                 }
             }
-
-
-
-
             return order;
         }
 

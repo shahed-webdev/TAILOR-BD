@@ -24,6 +24,13 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
 
     public class OrderListViewModel
     {
+        public OrderListViewModel()
+        {
+            Measurements = new List<MeasurementsGroupModel>();
+            Styles = new List<StyleGroupModel>();
+            Payments = new List<OrderPaymentViewModel>();
+        }
+
         public int OrderListId { get; set; }
         public int DressId { get; set; }
         public List<MeasurementsGroupModel> Measurements { get; set; }
@@ -36,7 +43,7 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
     public class OrderPaymentViewModel
     {
         public int OrderPaymentId { get; set; }
-        public int FabricId { get; set; }
+        public int? FabricId { get; set; }
         public string For { get; set; }
         public double Quantity { get; set; }
         public double UnitPrice { get; set; }
