@@ -78,7 +78,7 @@ namespace TailorBD.AccessAdmin.quick_order
             return customers;
         }
 
-        
+
         //add new customer
         [WebMethod]
         public static ResponseModel<CustomerViewModel> AddNewCustomer(CustomerViewModel model)
@@ -731,6 +731,95 @@ namespace TailorBD.AccessAdmin.quick_order
 
 
             return order;
+        }
+
+
+        //post order
+        [WebMethod]
+        public static int EditOrder(OrderEditModel model)
+        {
+            var institutionId = Convert.ToInt32(HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+            var registrationId = Convert.ToInt32(HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
+
+            using (var con = new SqlConnection())
+            {
+                con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                con.Open();
+                foreach (var list in model.OrderList)
+                {
+                    //Insert order List
+                    if (list.OrderListId == null)
+                    {
+                        using (var cmd = new SqlCommand())
+                        {
+                            cmd.CommandText = @"SP_Order_Place";
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Connection = con;
+
+                            cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                            cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
+                            cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
+                            cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                            cmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                            cmd.Parameters.AddWithValue("@DressID", list.DressId);
+
+                            cmd.Parameters.AddWithValue("@List_Measurement", list.ListMeasurement);
+                            cmd.Parameters.AddWithValue("@List_Style", list.ListStyle);
+                            cmd.Parameters.AddWithValue("@List_payment", list.ListPayment);
+
+                            cmd.Parameters.AddWithValue("@DressQuantity", list.DressQuantity);
+                            cmd.Parameters.AddWithValue("@Details", list.Details);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        using (var cmd = new SqlCommand())
+                        {
+                            cmd.CommandText = @"SP_Order_Edit";
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Connection = con;
+
+                            cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                            cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
+                            cmd.Parameters.AddWithValue("@Cloth_For_ID", model.ClothForId);
+                            cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                            cmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                            cmd.Parameters.AddWithValue("@OrderListID", list.OrderListId);
+                            cmd.Parameters.AddWithValue("@DressID", list.DressId);
+
+                            cmd.Parameters.AddWithValue("@List_Measurement", list.ListMeasurement);
+                            cmd.Parameters.AddWithValue("@List_Style", list.ListStyle);
+                            cmd.Parameters.AddWithValue("@List_payment", list.ListPayment);
+
+                            cmd.Parameters.AddWithValue("@DressQuantity", list.DressQuantity);
+                            cmd.Parameters.AddWithValue("@Details", list.Details);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+
+                }
+
+
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SP_OrderList_Delete";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Connection = con;
+                    cmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                    cmd.Parameters.AddWithValue("@OrderListIDs", model.DeletedOrderListIds);
+                    cmd.Parameters.AddWithValue("@paymentIds", model.DeletedOrderPaymentIds);
+
+                    cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+
+
+            return model.OrderId;
         }
     }
 }
