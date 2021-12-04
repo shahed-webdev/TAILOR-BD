@@ -10,26 +10,21 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
-    <div class="col mb-5" x-data="initData()">
+    <div x-init="getOrder()" class="col mb-5" x-data="initData()">
         <h3 class="mb-4 font-weight-bold">
             Update Order:
-            <template x-if="orderNumber">
-                <span class="gray-text">
-                 <small>Order Number:</small>
-                 <small x-text="orderNumber"></small>
-                </span>
-            </template>
-            <template x-if="!orderNumber">
-              <small><a @click="getOrderNumber" class="blue-text">Get Order Number</a></small>
-            </template>
-        </h3>
+            <span class="gray-text">
+             <small>Order Number:</small>
+             <small x-text="orderNumber"></small>
+            </span>
+       </h3> 
         
         <!--dress dropdown-->
-        <div x-init="getOrder()" class="row align-items-center mb-4">
+        <div class="row align-items-center mb-4">
             <div class="col-sm-7 col-lg-9" x-data="{ dressId: 0 }">
                <form @submit.prevent="()=>addToListDress(dressId)">
                  <div class="d-flex flex-wrap">
-                  <select x-init="getDress()" x-model.number="dressId" :disabled="dressNames.isLoading" class="form-control w-auto" required>
+                  <select x-model.number="dressId" :disabled="dressNames.isLoading" class="form-control w-auto" required>
                     <option value="">[ SELECT DRESS ]</option>
                     <template x-for="dress in dressNames.data" :key="dress.DressId">
                        <option :class="dress.IsMeasurementAvailable && 'text-success'" :value="dress.DressId" x-text="dress.DressName"></option>
@@ -40,22 +35,14 @@
                </div>
               </form>
             </div>
-
-            <div class="col-sm-5 col-lg-3 text-right">
-                <button type="button" data-toggle="modal" data-target="#addCustomerModal" class="btn btn-font btn-teal">
-                    <i class="fas fa-user-plus"></i>
-                    Customer
-                </button>
-            </div>
         </div>
 
         <!--customer info-->
-        <template x-if="apiData.customerId">
-          <div class="d-flex">
-            <h5 x-text="customer.data.CustomerName" class="font-weight-bold"></h5>
-            <span x-text="customer.data.Phone" class="font-weight-bold ml-2"></span>
-          </div>
-        </template>
+    <div class="d-flex">
+      <h5 x-text="customer.CustomerName" class="font-weight-bold"></h5>
+    <span x-text="customer.Phone" class="font-weight-bold ml-2"></span>
+    </div>
+        
        
       
          <form @submit.prevent="submitOrder">
@@ -121,10 +108,10 @@
                                     <input @change="saveData" @input="calculateTotal" x-model.number="payment.Quantity" min="1" step="0.01" type="number" class="form-control text-center" required>
                                 </td>
                                 <td class="text-right">
-                                    ৳<span x-text="payment.Unit_Price"></span>
+                                    ৳<span x-text="payment.UnitPrice"></span>
                                 </td>
                                 <td class="text-right">
-                                    ৳<span x-text="payment.Unit_Price * payment.Quantity"></span>
+                                    ৳<span x-text="payment.UnitPrice * payment.Quantity"></span>
                                 </td>
                                 <td class="text-center">
                                     <a class="red-text ml-2" @click="()=> removePayment(payment.For, index)"><i class="fas fa-times"></i></a>
@@ -282,7 +269,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Amount</label>
-                                <input  x-model.number="dressPayment.Unit_Price" type="number" min="0" step="0.01" class="form-control" autocomplete="off" required>
+                                <input  x-model.number="dressPayment.UnitPrice" type="number" min="0" step="0.01" class="form-control" autocomplete="off" required>
                             </div>
                             <div class="form-group">
                               <button type="submit" class="btn btn-teal w-100 m-0">Add Payment</button>
@@ -311,56 +298,6 @@
         </div>         
       
 
-        <!--customer modal-->
-        <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header text-center teal lighten-1 white-text">
-                    <h4 class="modal-title w-100 font-weight-bold">Add Customer</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form @submit.prevent="addNewCustomer">
-                    <div class="modal-body mx-3">
-                        <div class="form-group">
-                            <label for="phone">Mobile number</label>
-                            <input @keyup="findCustomer" type="text" id="phone" placeholder="find customer by phone" x-model="customer.data.Phone" class="form-control" autocomplete="off" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="customerName">Customer name</label>
-                            <input @keyup="findCustomer" id="customerName" x-model="customer.data.CustomerName" placeholder="find customer by name" type="text" class="form-control" autocomplete="off" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="address">Address</label>
-                            <input type="text" id="address" x-model="customer.data.Address" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Gender</label>
-                            <select x-model="customer.data.Cloth_For_ID" class="form-control" required>
-                                <option value="1">পুরুষ</option>
-                                <option value="2">মহিলা</option>
-                                <option value="3">বাচ্চা</option>
-                            </select>
-                        </div>
-
-                        <div class="d-flex justify-content-center">
-                            <template x-if="customer.isNewCustomer">
-                               <button type="submit" :disabled="customer.isLoading" class="btn btn-teal">Add Customer <i class="fa fa-paper-plane ml-1"></i></button>
-                            </template>
-                            <template x-if="!customer.isNewCustomer">
-                              <div>
-                                <button @click="setMeasurements" type="button" :disabled="customer.isLoading" class="btn btn-success">Set Measurements</button>
-                                <button data-dismiss="modal" type="button" :disabled="customer.isLoading" class="btn btn-outline-success">Not Set</button>
-                              </div>
-                            </template>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div> 
-        
         
         <!--loading-->
         <div x-show="isPageLoading" class="loading-overlay">

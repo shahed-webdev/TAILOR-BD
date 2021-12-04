@@ -1,12 +1,4 @@
 ﻿
-
-//set local store
-function getStore() {
-    const store = localStorage.getItem("order-data");
-    return store ? JSON.parse(store) : {};
-}
-
-
 //api helpers methods
 const helpers = {
     baseUrl: 'Order.aspx',
@@ -21,60 +13,61 @@ const helpers = {
 
 //get dress from api
 function initData() {
-    const {
-        apiData = { customerId: 0, clothForId: 0 },
-        orderNumber = null,
-        order = [],
-        customer = { isLoading: false, isNewCustomer: true, data: { } }
-    } = getStore();
-
     return {
-        //save to local store
-        saveData() {
-            const data = {
-                apiData: this.apiData,
-                orderNumber: this.orderNumber,
-                order: this.order,
-                customer: this.customer
-            };
-            localStorage.setItem("order-data", JSON.stringify(data));
-        },
-
         isPageLoading: false,
-        apiData: apiData,
 
         //order list data
-        orderNumber: orderNumber,
+        orderNumber: null,
         selectedIndex: null,
-        order: order, //[{OrderDetails: '', dress: {}, measurements:[], styles:[], payments:[] }],
+        order: [], //[{OrderDetails: '', dress: {}, measurements:[], styles:[], payments:[] }],
 
-
+        //get order
         async getOrder() {
+            this.isPageLoading = true;
+
             const response = await fetch(`${helpers.baseUrl}/GetOrderDetails?orderId=207452`, helpers.header);
             const result = await response.json();
-            console.log(result.d);
-        },
 
-        //get order number
-        async getOrderNumber() {
-            const response = await fetch(`${helpers.baseUrl}/GetOrderNumber`, helpers.header);
-            const result = await response.json();
+            const {
+                ClothForId,
+                CustomerId,
+                CustomerName,
+                Phone,
+                OrderId,
+                OrderList,
+                OrderSn,
+                OrderAmount,
+                Discount,
+                PaidAmount
+            } = result.d;
 
-            this.dressNames.isLoading = false;
-            this.orderNumber = result.d;
+            this.orderNumber = OrderSn;
+            this.order = OrderList.map(item => {
+                return {
+                    dress: {
+                        dressId: item.DressId,
+                        dressName: "d"
+                    },
+                    orderDetails: item.Details,
+                    quantity: item.DressQuantity,
+                    measurements: item.Measurements,
+                    styles: item.Styles,
+                    payments: item.Payments
+                }
+            });
 
-            //save to local store
-            this.saveData();
+            this.customer = { CustomerId, CustomerName, Phone }
+            await this.getDress(CustomerId, ClothForId);
+
+            this.isPageLoading = false;
         },
 
         //get dress dropdown
         dressNames: { isLoading: true, data: [] },
 
-        async getDress() {
-            const { customerId, clothForId } = this.apiData;
-            const response =
-                await fetch(`${helpers.baseUrl}/DressDlls?customerId=${customerId}&clothForId=${clothForId}`,
-                    helpers.header);
+        async getDress(customerId, clothForId) {
+            const url = `${helpers.baseUrl}/DressDlls?customerId=${customerId}&clothForId=${clothForId}`;
+            const response = await fetch(url,helpers.header);
             const result = await response.json();
 
             this.dressNames.isLoading = false;
@@ -108,9 +101,6 @@ function initData() {
                 measurements: response.MeasurementGroups,
                 styles: response.StyleGroups
             })
-
-            //save to local store
-            this.saveData();
         },
 
         //remove Dress from cart
@@ -119,9 +109,6 @@ function initData() {
             if (confirmDelete) {
                 this.order = this.order.filter(item => item.dress.dressId !== dressId);
                 this.selectedIndex = null;
-
-                //save to local store
-                this.saveData();
             }
         },
 
@@ -138,14 +125,12 @@ function initData() {
 
         //get measurement and styles
         async getMeasurementsStyles(dressId) {
-            const { customerId } = this.apiData;
+            const { CustomerId } = this.customer;
             this.isPageLoading = true;
 
             try {
-                const response =
-                    await fetch(
-                        `${helpers.baseUrl}/GetDressMeasurementsStyles?dressId=${dressId}&customerId=${customerId}`,
-                        helpers.header);
+                const url = `${helpers.baseUrl}/GetDressMeasurementsStyles?dressId=${dressId}&customerId=${CustomerId}`
+                const response = await fetch(url, helpers.header);
                 const result = await response.json();
                 this.isPageLoading = false;
 
@@ -189,16 +174,16 @@ function initData() {
             if (!value) return;
 
             this.dressPayment.For = text;
-            this.dressPayment.Unit_Price = +value;
+            this.dressPayment.UnitPrice = +value;
             this.addPayment(index);
         },
 
         //add dress payment
-        dressPayment: { For: '', Unit_Price: '' },
+        dressPayment: { For: '', UnitPrice: '' },
 
         //add payment
         addPayment(index) {
-            const { For, Unit_Price } = this.dressPayment;
+            const { For, UnitPrice } = this.dressPayment;
             const orderPayment = this.order[index];
             orderPayment.payments = orderPayment.payments || [];
 
@@ -211,13 +196,10 @@ function initData() {
                 return;
             }
 
-            orderPayment.payments.push({ For, Unit_Price, Quantity: orderPayment.quantity });
-
-            //save to local store
-            this.saveData();
+            orderPayment.payments.push({ For, UnitPrice, Quantity: orderPayment.quantity });
 
             //reset form
-            this.dressPayment = { For: '', Unit_Price: '' };
+            this.dressPayment = { For: '', UnitPrice: '' };
 
             $.notify(`${For} added successfully`, { position: "to center", className: "success" });
         },
@@ -226,114 +208,10 @@ function initData() {
         removePayment(paymentFor, index) {
             const orderPayment = this.order[index]
             orderPayment.payments = orderPayment.payments.filter(item => item.For !== paymentFor);
-
-            //save to local store
-            this.saveData();
         },
 
         //customer
-        customer: customer,
-
-        //find customer
-        findCustomer(evt) {
-            //reset if change text
-            this.apiData.customerId = 0;
-            this.apiData.clothForId = 0;
-            this.customer.isNewCustomer = true;
-
-            $(`#${evt.target.id}`).typeahead({
-                minLength: 1,
-                displayText: item => {
-                    return `${item.CustomerName}, ${item.Phone}`;
-                },
-                afterSelect: function(item) {
-                    this.$element[0].value = item.CustomerName;
-                },
-                source: (request, result) => {
-                    this.customer.isLoading = true;
-
-                    $.ajax({
-                        url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
-                        contentType: "application/json; charset=utf-8",
-                        success: response => {
-                            result(response.d);
-                            this.customer.isLoading = false;
-                        },
-                        error: err => {
-                            console.log(err);
-                            this.customer.isLoading = false;
-                        }
-                    });
-                },
-                updater: item => {
-                    //set customer info
-                    this.customer.data = item;
-                    this.apiData.customerId = +item.CustomerID;
-                    this.apiData.clothForId = item.Cloth_For_ID;
-                    this.customer.isNewCustomer = false;
-
-                    this.getDress();
-                    //save to local store
-                    this.saveData();
-
-                    return item;
-                }
-            })
-        },
-
-        //add new
-        async addNewCustomer() {
-            const { Phone, CustomerName, Address, Cloth_For_ID = 1 } = this.customer.data;
-            const model = { Phone, CustomerName, Address, Cloth_For_ID }
-
-            try {
-                const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`,
-                    {
-                        method: "POST",
-                        headers: helpers.header.headers,
-                        body: JSON.stringify({ model })
-                    });
-
-                const result = await response.json();
-
-                $.notify(result.d.Message,
-                    { position: "to center", className: result.d.IsSuccess ? "success" : "error" });
-
-                if (result.d.IsSuccess) {
-                    this.customer.data = result.d.Data;
-                    this.apiData.customerId = result.d.Data.CustomerID;
-
-                    //save to local store
-                    this.saveData();
-                }
-            } catch (e) {
-                console.log("customer added error");
-                $.notify(e.message, { position: "to center", className: 'error' });
-            }
-        },
-
-        //set measurement
-        setMeasurements() {
-            this.getDress();
-
-            if (!this.order.length) {
-                $("#addCustomerModal").modal("hide");
-                return;
-            }
-
-            this.order.forEach(async item => {
-                const response = await this.getMeasurementsStyles(item.dress.dressId);
-
-                item.orderDetails = response.OrderDetails;
-                item.measurements = response.MeasurementGroups;
-                item.styles = response.StyleGroups;
-            });
-
-            //save to local store
-            this.saveData();
-
-            $("#addCustomerModal").modal("hide");
-        },
+        customer: {},
 
         //find fabrics
         fabricsPayment: {
@@ -371,7 +249,7 @@ function initData() {
                 updater: item => {
                     this.fabricsPayment.For = item.FabricCode;
                     this.fabricsPayment.FabricID = item.FabricId;
-                    this.fabricsPayment.Unit_Price = item.SellingUnitPrice;
+                    this.fabricsPayment.UnitPrice = item.SellingUnitPrice;
                     this.fabricsPayment.StockFabricQuantity = item.StockFabricQuantity;
                     return item;
                 }
@@ -380,7 +258,7 @@ function initData() {
 
         //add fabrics
         addFabric(index) {
-            const { For, Unit_Price, Quantity, FabricID } = this.fabricsPayment;
+            const { For, UnitPrice, Quantity, FabricID } = this.fabricsPayment;
 
             if (!FabricID) return $.notify(`Add fabric`, { position: "to center" });
 
@@ -393,15 +271,12 @@ function initData() {
 
             if (isAdded) return $.notify(`${For} already added`, { position: "to center" });
 
-            orderPayment.payments.push({ For: `Fabric Code: ${For}`, Unit_Price, Quantity, FabricID });
-
-            //save to local store
-            this.saveData();
+            orderPayment.payments.push({ For: `Fabric Code: ${For}`, UnitPrice, Quantity, FabricID });
 
             $.notify(`${For} added successfully`, { position: "to center", className: "success" });
 
             //reset form
-            this.fabricsPayment = { For: '', Quantity: '', Unit_Price: '', FabricID: '', StockFabricQuantity: 0 };
+            this.fabricsPayment = { For: '', Quantity: '', UnitPrice: '', FabricID: '', StockFabricQuantity: 0 };
         },
 
 
@@ -419,11 +294,9 @@ function initData() {
         async getAccount() {
             const response = await fetch(`${helpers.baseUrl}/AccountDlls`, helpers.header);
             const result = await response.json();
-            this.paymentMethod= result.d;
+            this.paymentMethod = result.d;
         },
 
-
-        
         //*** SUBMIT ORDER **//
         orderPayment : { OrderAmount: 0, Discount: 0, PaidAmount: 0, AccountId: null },
 
@@ -433,7 +306,7 @@ function initData() {
             const isPayment = this.order.filter(item => item.payments && item.payments).map(item => item.payments).flat(1);
             if (!isPayment.length) return 0;
 
-            const total = isPayment.map(item => item.Quantity * item.Unit_Price).reduce((prev, current) => prev + current)
+            const total = isPayment.map(item => item.Quantity * item.UnitPrice).reduce((prev, current) => prev + current)
             this.orderTotalAmount = total;
 
             return total || 0;
@@ -442,7 +315,7 @@ function initData() {
         //submit
         isSubmit: false,
         async submitOrder() {
-            if (!this.apiData.customerId) return $.notify(`Customer Not Added`, { position: "to center" });
+            if (!this.customer.CustomerId) return $.notify(`Customer Not Added`, { position: "to center" });
 
             //create new model
             const OrderList = this.order.map(item => {
