@@ -152,12 +152,20 @@
                   <HeaderStyle CssClass="NoPrint" />
                   <ItemStyle CssClass="NoPrint" />
                </asp:TemplateField>
+                <asp:TemplateField HeaderText="Update">
+                    <ItemTemplate>
+                        <a href="../quick-order/UpdateOrder.aspx?OrderID=<%#Eval("OrderID") %>">Update</a>
+                    </ItemTemplate>
+                    <HeaderStyle CssClass="NoPrint" />
+                    <ItemStyle CssClass="NoPrint" />
+                </asp:TemplateField>
             </Columns>
             <EmptyDataTemplate>
                No Order List Found!
             </EmptyDataTemplate>
             <PagerStyle CssClass="pgr" />
          </asp:GridView>
+
          <asp:SqlDataSource ID="CustomerOrderdDressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
             SelectCommand="SELECT [Order].OrderID, [Order].CustomerID, [Order].RegistrationID, [Order].Is_Print,[Order].InstitutionID, [Order].Cloth_For_ID, [Order].OrderDate, [Order].DeliveryDate,[Order].OrderAmount, [Order].PaidAmount, [Order].Discount, [Order].DueAmount, [Order].OrderSerialNumber, [Order].PaymentStatus, [Order].DeliveryStatus, [Order].WorkStatus,Customer.CustomerNumber, Customer.CustomerName, Customer.Phone, Customer.Address,
 STUFF((SELECT '; ' + Dress.Dress_Name + ' ' + CAST(OrderList.DressQuantity AS NVARCHAR(50)) + ' Piece ' FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID WHERE (OrderList.OrderID = [Order].OrderID) FOR XML PATH('')), 1, 1, '') AS Details FROM [Order] INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID WHERE ([Order].InstitutionID = @InstitutionID) AND ([Order].DeliveryStatus IN( N'Pending',N'PartlyDelivered')) AND ([Order].WorkStatus IN( N'incomplete',N'PartlyCompleted')) AND (Customer.Phone Like @Phone + '%') AND ([OrderSerialNumber] Like  @OrderSerialNumber) AND([Order].OrderDate BETWEEN ISNULL(@Fdate,'1-1-1760') AND ISNULL(@TDate,'1-1-3760')) AND (ISNULL(Customer.CustomerName,'') Like @CustomerName + '%') AND (ISNULL(Customer.Address,'') Like @Address+ '%') Order By [Order].OrderSerialNumber  desc"

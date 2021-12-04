@@ -96,7 +96,7 @@
           </template>
           </tbody>
         </table>
-            </div>
+     </div>
        
 
             <!-- payment list-->
@@ -169,9 +169,9 @@
                      </div>
                    </template>
                    <div class="text-right pr-3">
-                       <button type="submit" class="btn btn-cyan m-0">Submit Order</button>
+                       <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0">Submit Order</button>
                    </div>
-                   </div>
+                </div>
                </div>
            </template>
          </form>

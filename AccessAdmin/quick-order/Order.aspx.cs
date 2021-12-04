@@ -394,6 +394,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Connection = con;
                     con.Open();
+
                     foreach (var list in model.OrderList)
                     {
                         cmd.Parameters.Clear();
