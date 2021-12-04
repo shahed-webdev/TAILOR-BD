@@ -102,6 +102,7 @@ BEGIN
 DELETE FROM Ordered_Measurement  WHERE  OrderListID =@OrderListID
 DELETE FROM  Ordered_Measurement WHERE  OrderListID =@OrderListID
 DELETE FROM  Ordered_Dress_Style WHERE  OrderListID =@OrderListID
+UPDATE Fabrics SET TotalSellingQuantity = Fabrics.TotalSellingQuantity - Order_Payment.Unit FROM  Fabrics INNER JOIN Order_Payment ON Fabrics.FabricID = Order_Payment.FabricID WHERE (Order_Payment.OrderListID = @OrderListID)
 DELETE FROM  Order_Payment WHERE  OrderListID =@OrderListID
 DELETE FROM  OrderList WHERE  OrderListID =@OrderListID
 END
@@ -326,7 +327,8 @@ ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
                         </Columns>
                         <FooterStyle CssClass="Footer" />
                     </asp:GridView>
-                    <asp:SqlDataSource ID="PriceSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT OrderPaymentID, InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date FROM Order_Payment WHERE (InstitutionID = @InstitutionID) AND (OrderListID = @OrderListID)" DeleteCommand="DELETE FROM Order_Payment WHERE (OrderPaymentID = @OrderPaymentID)" InsertCommand="INSERT INTO Order_Payment(InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date) VALUES (@InstitutionID, @RegistrationID, @CustomerID, @OrderListID, @OrderID, @Amount, @Details, GETDATE())" UpdateCommand="UPDATE Order_Payment SET Amount = @Amount, Details = @Details WHERE (OrderPaymentID = @OrderPaymentID)">
+                    <asp:SqlDataSource ID="PriceSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT OrderPaymentID, InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date FROM Order_Payment WHERE (InstitutionID = @InstitutionID) AND (OrderListID = @OrderListID)" DeleteCommand="UPDATE Fabrics SET TotalSellingQuantity = Fabrics.TotalSellingQuantity - Order_Payment.Unit FROM  Fabrics INNER JOIN Order_Payment ON Fabrics.FabricID = Order_Payment.FabricID WHERE (Order_Payment.OrderPaymentID = @OrderPaymentID)
+DELETE FROM Order_Payment WHERE (OrderPaymentID = @OrderPaymentID)" InsertCommand="INSERT INTO Order_Payment(InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date) VALUES (@InstitutionID, @RegistrationID, @CustomerID, @OrderListID, @OrderID, @Amount, @Details, GETDATE())" UpdateCommand="UPDATE Order_Payment SET Amount = @Amount, Details = @Details WHERE (OrderPaymentID = @OrderPaymentID)">
                         <DeleteParameters>
                             <asp:Parameter Name="OrderPaymentID" />
                         </DeleteParameters>
