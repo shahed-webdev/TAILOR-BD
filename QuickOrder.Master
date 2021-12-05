@@ -18,7 +18,7 @@
     <!-- Material Design Bootstrap -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet" />
     <!-- custom -->
-    <link href="AccessAdmin/quick-order/style/main-maser.css" rel="stylesheet" />
+    <link href="AccessAdmin/quick-order/style/main-maser.css?v=1.0.1" rel="stylesheet" />
 
 
     <!-- JQuery -->
@@ -91,6 +91,10 @@
             <main class="row">
                 <%--side navbar--%>
                 <div class="side-navbar col-sm-3 col-xl-2">
+                    <a href="/AccessAdmin/quick-order/Order.aspx" class="quick-order-btn">
+                        Quick Order
+                    </a>
+
                     <asp:TreeView ID="LinkTreeView"
                         ExpandImageUrl="~/CSS/Image/Expand_Ico.png"
                         CollapseImageUrl="~/CSS/Image/Collaps_Ico.png"

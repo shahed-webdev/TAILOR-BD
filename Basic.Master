@@ -11,7 +11,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
    <!--start CSS -->
-   <link href="CSS/Basic.css" rel="stylesheet" type="text/css" />
+   <link href="CSS/Basic.css?v=1.0.1" rel="stylesheet" type="text/css" />
    <link href="CssGridview/Gridview.css" rel="stylesheet" />
 
    <!--start javascript -->
@@ -81,6 +81,10 @@
 
       <div class="Main_Wraper">
          <div class="Site_Navigation">
+             <a href="/AccessAdmin/quick-order/Order.aspx" class="quick-order-btn">
+                 Quick Order
+             </a>
+
             <asp:TreeView ID="LinkTreeView"
                ExpandImageUrl="~/CSS/Image/Expand_Ico.png"
                CollapseImageUrl="~/CSS/Image/Collaps_Ico.png"

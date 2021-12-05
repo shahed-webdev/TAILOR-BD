@@ -43,7 +43,6 @@ function initData() {
                 OrderId,
                 OrderList,
                 OrderSn,
-                OrderAmount,
                 Discount,
                 PaidAmount
             } = result.d;
@@ -64,7 +63,7 @@ function initData() {
                 }
             });
 
-            this.customer = { OrderId, CustomerId, ClothForId, CustomerName, Phone }
+            this.customer = { OrderId, CustomerId, ClothForId, CustomerName, Phone, previousPaid: PaidAmount + Discount }
             await this.getDress(CustomerId, ClothForId);
 
             this.isPageLoading = false;
@@ -223,7 +222,7 @@ function initData() {
             const orderPayment = this.order[index]
             orderPayment.payments = orderPayment.payments.filter(item => item.For !== paymentFor);
 
-            //Deleted Order Payment Ids
+            //deleted order payment ids
             if (orderPaymentId) {
                 this.DeletedOrderPaymentIds.push({ OrderPaymentID: orderPaymentId });
             }
@@ -313,7 +312,7 @@ function initData() {
         //*** SUBMIT ORDER **//
         isSubmit: false,
         async submitOrder() {
-            if (!this.customer.CustomerId) return $.notify(`Customer Not Added`, { position: "to center" });
+            if ((this.orderTotalAmount - this.customer.previousPaid) < 0) return $.notify(`Order amount less than previous paid`, { position: "to center" });
 
             //create new model
             const OrderList = this.order.map(item => {
@@ -323,7 +322,7 @@ function initData() {
                     Details: item.orderDetails,
                     ListMeasurement: item.measurements.map(g => g.Measurements),
                     ListStyle: item.styles.map(s => s.Styles),
-                    ListPayment: JSON.stringify(item.payments)
+                    ListPayment: item.payments? JSON.stringify(item.payments): "[]"
                 }
             });
 
@@ -358,27 +357,27 @@ function initData() {
                 OrderId,
                 ClothForId,
                 CustomerId,
-                DeletedOrderPaymentIds: this.DeletedOrderPaymentIds,
-                DeletedOrderListIds: this.DeletedOrderListIds,
+                DeletedOrderPaymentIds: JSON.stringify(this.DeletedOrderPaymentIds),
+                DeletedOrderListIds: JSON.stringify(this.DeletedOrderListIds),
                 OrderList // [ DressId, DressQuantity, Details, ListMeasurement[], ListStyle[], ListPayment[] ]
             }
-            console.log(model)
-            //try {
-            //    this.isSubmit = true;
-            //    const response = await fetch(`${helpers.baseUrl}/EditOrder`,{
-            //        method: "POST",
-            //        headers: helpers.header.headers,
-            //        body: JSON.stringify({ model })
-            //    });
 
-            //    const result = await response.json();
-            //    localStorage.removeItem("order-data")
+            try {
+                this.isSubmit = true;
+                const response = await fetch(`${helpers.baseUrl}/EditOrder`,{
+                    method: "POST",
+                    headers: helpers.header.headers,
+                    body: JSON.stringify({ model })
+                });
 
-            //    location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
-            //} catch (e) {
-            //    $.notify(e.message, { position: "to center" });
-            //    this.isSubmit = false;
-            //}
+                const result = await response.json();
+                localStorage.removeItem("order-data")
+                console.log(result.d)
+//                location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
+            } catch (e) {
+                $.notify(e.message, { position: "to center" });
+                this.isSubmit = false;
+            }
         }
     }
 }

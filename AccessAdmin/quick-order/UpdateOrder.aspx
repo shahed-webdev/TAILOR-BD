@@ -112,7 +112,7 @@
                                     ৳<span x-text="payment.UnitPrice * payment.Quantity"></span>
                                 </td>
                                 <td class="text-center">
-                                    <a class="red-text ml-2" @click="()=> removePayment(payment.For, payment.OrderPaymentId, item.orderListId, index)"><i class="fas fa-times"></i></a>
+                                    <a class="red-text ml-2" @click="()=> removePayment(payment.For, payment.OrderPaymentId, index)"><i class="fas fa-times"></i></a>
                                 </td>
                             </tr>
                         </template>
@@ -126,11 +126,16 @@
                <div class="d-flex justify-content-end">
                    <div>
                    <template x-if="calculateTotal() > 0">
-                       <h5 class="font-weight-bold text-right pr-3">
-                           Total: ৳<span x-text="orderTotalAmount"></span>
-                       </h5>
+                       <div class="text-right pr-3">
+                           <p class="red-text font-weight-bold" x-show="(orderTotalAmount-customer.previousPaid) < 0">
+                               Order amount less than previous paid
+                           </p>
+                           <h5 class="font-weight-bold">
+                               Total: ৳<span x-text="orderTotalAmount"></span>
+                           </h5>
+                       </div>
                    </template>
-                   <div class="text-right pr-3">
+                   <div x-show="(orderTotalAmount-customer.previousPaid) > 0" class="text-right pr-3">
                        <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0">Submit Order</button>
                    </div>
                 </div>
