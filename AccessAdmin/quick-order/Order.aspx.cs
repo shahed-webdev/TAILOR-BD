@@ -588,7 +588,7 @@ namespace TailorBD.AccessAdmin.quick_order
                             order.CustomerId = Convert.ToInt32(orderDr["CustomerID"]);
                             order.CustomerName = orderDr["CustomerName"].ToString();
                             order.Phone = orderDr["Phone"].ToString();
-                            order.DeliveryDate = (DateTime?)(orderDr["DeliveryDate"] ?? Convert.ToDateTime(orderDr["DeliveryDate"]));
+                            order.DeliveryDate = orderDr["DeliveryDate"] as DateTime?;
                             order.OrderAmount = Convert.ToDouble(orderDr["OrderAmount"]);
                             order.PaidAmount = Convert.ToDouble(orderDr["PaidAmount"]);
                             order.Discount = Convert.ToDouble(orderDr["Discount"]);
@@ -728,11 +728,11 @@ namespace TailorBD.AccessAdmin.quick_order
                                         var style = new OrderPaymentViewModel
                                         {
                                             OrderPaymentId = Convert.ToInt32(dr["OrderPaymentID"]),
-                                            FabricId = dr["FabricID"] as int? ?? null,
+                                            FabricId = dr["FabricID"] as int?,
                                             For = dr["Details"].ToString(),
-                                            Quantity = Convert.ToDouble(dr["Unit"]),
-                                            UnitPrice = Convert.ToDouble(dr["UnitPrice"]),
-                                            Amount = Convert.ToDouble(dr["Amount"])
+                                            Quantity = dr["Unit"] as double?,
+                                            UnitPrice = dr["UnitPrice"] as double?,
+                                            Amount = dr["Amount"] as double?
                                         };
                                         orderList.Payments.Add(style);
                                     }
