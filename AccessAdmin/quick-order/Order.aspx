@@ -152,7 +152,7 @@
                        </div>
                        <div class="form-group">
                            <label>Paid Amount</label>
-                           <input x-model.number="orderPayment.PaidAmount" type="number" step="0.01" min="1" :max="orderTotalAmount - orderPayment.Discount" class="form-control text-right">
+                           <input x-model.number="orderPayment.PaidAmount" type="number" step="0.01" min="0" :max="orderTotalAmount - orderPayment.Discount" class="form-control text-right">
                        </div>
                          <div>
                              <p class="font-weight-bold red-text">Due Amount: ৳<strong x-text="(orderTotalAmount - orderPayment.Discount) - orderPayment.PaidAmount"></strong></p>

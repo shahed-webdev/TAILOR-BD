@@ -119,9 +119,9 @@ function initData() {
                 this.order = this.order.filter(item => item.dress.dressId !== dressId);
                 this.selectedIndex = null;
 
-                //Deleted Order Payment Ids
+                //Deleted Order list Ids
                 if (orderListId) {
-                    this.DeletedOrderPaymentIds.push({ OrderListID: orderListId });
+                    this.DeletedOrderListIds.push({ OrderListID: orderListId });
                 }
             }
         },
@@ -224,7 +224,7 @@ function initData() {
             orderPayment.payments = orderPayment.payments.filter(item => item.For !== paymentFor);
 
             //Deleted Order Payment Ids
-            if (orderListId) {
+            if (orderPaymentId) {
                 this.DeletedOrderPaymentIds.push({ OrderPaymentID: orderPaymentId });
             }
         },

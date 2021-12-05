@@ -112,7 +112,7 @@
                                     ৳<span x-text="payment.UnitPrice * payment.Quantity"></span>
                                 </td>
                                 <td class="text-center">
-                                    <a class="red-text ml-2" @click="()=> removePayment(payment.For, payment.OrderPaymentId, index)"><i class="fas fa-times"></i></a>
+                                    <a class="red-text ml-2" @click="()=> removePayment(payment.For, payment.OrderPaymentId, item.orderListId, index)"><i class="fas fa-times"></i></a>
                                 </td>
                             </tr>
                         </template>

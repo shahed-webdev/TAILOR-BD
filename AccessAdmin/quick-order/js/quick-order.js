@@ -445,7 +445,7 @@ function initData() {
                     Details: item.orderDetails,
                     ListMeasurement: item.measurements.map(g => g.Measurements),
                     ListStyle: item.styles.map(s => s.Styles),
-                    ListPayment: JSON.stringify(item.payments)
+                    ListPayment: item.payments ? JSON.stringify(item.payments) : "[]"
                 }
             });
 
@@ -476,8 +476,6 @@ function initData() {
             //customer info
             const { CustomerID, Cloth_For_ID } = this.customer.data;
             const { Discount, PaidAmount, AccountId } = this.orderPayment;
-
-           
             const defaultAccount = this.paymentMethod.filter(item => item.IsDefault)[0];
 
             const model = {
@@ -501,7 +499,7 @@ function initData() {
 
                 const result = await response.json();
                 localStorage.removeItem("order-data")
-
+                console.log(result.d)
                 location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
             } catch (e) {
                 $.notify(e.message, { position: "to center" });
