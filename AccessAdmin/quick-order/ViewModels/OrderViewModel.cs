@@ -46,8 +46,8 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
         public int OrderPaymentId { get; set; }
         public int? FabricId { get; set; }
         public string For { get; set; }
-        public double Quantity { get; set; }
-        public double UnitPrice { get; set; }
-        public double Amount { get; set; }
+        public double? Quantity { get; set; }
+        public double? UnitPrice { get; set; }
+        public double? Amount { get; set; }
     }
 }

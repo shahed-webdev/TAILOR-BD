@@ -272,6 +272,12 @@ ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
                                                     </td>
                                                 </tr>
                                                 <tr>
+                                                    <td>পরিমাণ:</td>
+                                                    <td>
+                                                        <asp:TextBox ID="QuantityTextBox" onkeypress="return isNumberKey(event)" autocomplete="off" onDrop="blur();return false;" onpaste="return false" runat="server" CssClass="textbox" Width="130px" Text='<%#Bind("Unit") %>' />
+                                                        </td>
+                                                </tr>
+                                                <tr>
                                                     <td>কত টাকা:</td>
                                                     <td>
                                                         <asp:TextBox ID="AmountTextBox" onkeypress="return isNumberKey(event)" autocomplete="off" onDrop="blur();return false;" onpaste="return false" runat="server" CssClass="textbox" Width="130px" Text='<%#Bind("Amount") %>' />
@@ -284,9 +290,12 @@ ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
                                                         <asp:LinkButton ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" Text="যুক্ত করুন" ValidationGroup="I" />
                                                         /
                                                         <asp:LinkButton ID="InsertCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
-                                                        <br />
+                                                        
                                                         <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server" ControlToValidate="AmountTextBox" CssClass="EroorSummer" ErrorMessage="শুধু নাম্বার লিখা যাবে" ValidationExpression="^\d+$" ValidationGroup="I"></asp:RegularExpressionValidator>
-                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="AmountTextBox" CssClass="EroorSummer" ErrorMessage="Required" ValidationGroup="I"></asp:RequiredFieldValidator>
+                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="AmountTextBox" CssClass="EroorSummer" ErrorMessage="টাকার পরিমাণ দিতে হবে" ValidationGroup="I"></asp:RequiredFieldValidator>
+                                                        
+                                                        <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="QuantityTextBox" CssClass="EroorSummer" ErrorMessage="শুধু নাম্বার লিখা যাবে" ValidationExpression="^\d+$" ValidationGroup="I"></asp:RegularExpressionValidator>
+                                                        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="QuantityTextBox" CssClass="EroorSummer" ErrorMessage="পরিমাণ দিতে হবে" ValidationGroup="I"></asp:RequiredFieldValidator>
 
                                                     </td>
                                                 </tr>
@@ -310,6 +319,7 @@ ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
                                   <asp:Label ID="Label2" runat="server" Text='<%# Bind("Details") %>'></asp:Label>
                                </ItemTemplate>
                             </asp:TemplateField>
+                            <asp:BoundField DataField="Unit" HeaderText="পরিমাণ" ReadOnly="True" SortExpression="Unit" />
                             <asp:TemplateField HeaderText="কত টাকা" SortExpression="Amount">
                                <EditItemTemplate>
                                   <asp:TextBox ID="TextBox1" CssClass="textbox" onkeypress="return isNumberKey(event)" autocomplete="off" onDrop="blur();return false;" onpaste="return false" runat="server" Text='<%# Bind("Amount") %>'></asp:TextBox>
@@ -327,8 +337,8 @@ ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)">
                         </Columns>
                         <FooterStyle CssClass="Footer" />
                     </asp:GridView>
-                    <asp:SqlDataSource ID="PriceSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT OrderPaymentID, InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date FROM Order_Payment WHERE (InstitutionID = @InstitutionID) AND (OrderListID = @OrderListID)" DeleteCommand="UPDATE Fabrics SET TotalSellingQuantity = Fabrics.TotalSellingQuantity - Order_Payment.Unit FROM  Fabrics INNER JOIN Order_Payment ON Fabrics.FabricID = Order_Payment.FabricID WHERE (Order_Payment.OrderPaymentID = @OrderPaymentID)
-DELETE FROM Order_Payment WHERE (OrderPaymentID = @OrderPaymentID)" InsertCommand="INSERT INTO Order_Payment(InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date) VALUES (@InstitutionID, @RegistrationID, @CustomerID, @OrderListID, @OrderID, @Amount, @Details, GETDATE())" UpdateCommand="UPDATE Order_Payment SET Amount = @Amount, Details = @Details WHERE (OrderPaymentID = @OrderPaymentID)">
+                    <asp:SqlDataSource ID="PriceSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT OrderPaymentID, InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date, Unit, UnitPrice, FabricID FROM Order_Payment WHERE (InstitutionID = @InstitutionID) AND (OrderListID = @OrderListID)" DeleteCommand="UPDATE Fabrics SET TotalSellingQuantity = Fabrics.TotalSellingQuantity - Order_Payment.Unit FROM  Fabrics INNER JOIN Order_Payment ON Fabrics.FabricID = Order_Payment.FabricID WHERE (Order_Payment.OrderPaymentID = @OrderPaymentID)
+DELETE FROM Order_Payment WHERE (OrderPaymentID = @OrderPaymentID)" InsertCommand="INSERT INTO Order_Payment(InstitutionID, RegistrationID, CustomerID, OrderListID, OrderID, Amount, Details, Date, Unit, UnitPrice) VALUES (@InstitutionID, @RegistrationID, @CustomerID, @OrderListID, @OrderID, @Amount, @Details, GETDATE(), @Unit, (@Amount/@Unit))" UpdateCommand="UPDATE Order_Payment SET Amount = @Amount, Details = @Details, UnitPrice = @Amount / Unit WHERE (OrderPaymentID = @OrderPaymentID)">
                         <DeleteParameters>
                             <asp:Parameter Name="OrderPaymentID" />
                         </DeleteParameters>
@@ -338,8 +348,9 @@ DELETE FROM Order_Payment WHERE (OrderPaymentID = @OrderPaymentID)" InsertComman
                             <asp:ControlParameter ControlID="OrderListGridView" Name="CustomerID" PropertyName="SelectedDataKey[2]" />
                             <asp:ControlParameter ControlID="OrderListGridView" Name="OrderListID" PropertyName="SelectedDataKey[0]" />
                             <asp:QueryStringParameter Name="OrderID" QueryStringField="OrderID" />
-                            <asp:Parameter Name="Amount" />
+                            <asp:Parameter Name="Amount" Type="Double" />
                             <asp:Parameter Name="Details" />
+                            <asp:Parameter Name="Unit" Type="Double" />
                         </InsertParameters>
                         <SelectParameters>
                             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
