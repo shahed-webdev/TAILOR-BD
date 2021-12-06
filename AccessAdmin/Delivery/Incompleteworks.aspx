@@ -169,6 +169,11 @@
                      <asp:TextBox ID="StoreDetailsTextBox" runat="server" CssClass="textbox"></asp:TextBox>
                   </ItemTemplate>
                </asp:TemplateField>
+                <asp:TemplateField HeaderText="বিস্তারিত">
+                    <ItemTemplate>
+                        <asp:TextBox ID="DetailsTextBox" runat="server" CssClass="textbox"></asp:TextBox>
+                    </ItemTemplate>
+                </asp:TemplateField>
                <asp:TemplateField HeaderText="SMS">
                   <ItemTemplate>
                      <asp:CheckBox ID="SMSCheckBox" runat="server" Text=" " />
@@ -188,7 +193,7 @@
          <asp:SqlDataSource ID="CustomerOrderdDressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
             SelectCommand="SELECT [Order].OrderID, [Order].WorkStatus,[Order].CustomerID, [Order].RegistrationID, [Order].InstitutionID, [Order].Cloth_For_ID, [Order].OrderDate, [Order].DeliveryDate, [Order].OrderAmount, [Order].PaidAmount, [Order].Discount, [Order].DueAmount, [Order].OrderSerialNumber, [Order].PaymentStatus, [Order].DeliveryStatus, Customer.CustomerNumber, Customer.CustomerName, Customer.Phone, Customer.Address, SMS.Masking, SMS.SMS_Balance, Institution.InstitutionName FROM [Order] INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID INNER JOIN SMS ON Customer.InstitutionID = SMS.InstitutionID INNER JOIN Institution ON [Order].InstitutionID = Institution.InstitutionID WHERE ([Order].InstitutionID = @InstitutionID) AND ([Order].DeliveryStatus IN( N'Pending',N'PartlyDelivered')) AND ([Order].WorkStatus in( N'incomplete',N'PartlyCompleted')) AND (Customer.Phone Like '%' + @Phone + '%')  AND  (CAST([OrderSerialNumber] AS NVARCHAR(50)) IN(Select id from dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
  AND ([Order].DeliveryDate BETWEEN ISNULL(@Fdate,'1-1-1760') AND ISNULL(@TDate, '1-1-3760')) AND (ISNULL(Customer.CustomerName,'') Like '%' + @CustomerName + '%') AND (ISNULL(Customer.Address,'') Like '%' + @Address+ '%') order by (Case When [Order].DeliveryDate = cast(getdate() as date) Then 0 Else 1 End),ISNULL([Order].DeliveryDate,'1-1-3000')"
-            UpdateCommand="UPDATE [Order] SET StoreDatails = @StoreDatails WHERE (OrderID = @OrderID)" OnSelected="CustomerOrderdDressSQL_Selected" CancelSelectOnNullParameter="False">
+            UpdateCommand="UPDATE [Order] SET StoreDatails = @StoreDatails, Details= @Details WHERE (OrderID = @OrderID)" OnSelected="CustomerOrderdDressSQL_Selected" CancelSelectOnNullParameter="False">
             <SelectParameters>
                <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
                <asp:ControlParameter ControlID="MobileNoTextBox" DefaultValue="%" Name="Phone" PropertyName="Text" />
@@ -201,6 +206,7 @@
             <UpdateParameters>
                <asp:Parameter Name="StoreDatails" />
                <asp:Parameter Name="OrderID" />
+                <asp:Parameter Name="Details" />
             </UpdateParameters>
          </asp:SqlDataSource>
 
