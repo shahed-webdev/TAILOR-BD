@@ -150,23 +150,25 @@ function initData() {
         },
 
         //payments modal
+        isPaymentClick: false,
         savedDressPayment: [],
 
         async onOpenPaymentModal(dressId, index) {
             try {
-                this.isPageLoading = true;
+                this.isPaymentClick = true;
 
                 const response = await fetch(`${helpers.baseUrl}/DressPriceDlls?dressId=${dressId}`, helpers.header);
                 const result = await response.json();
-                this.isPageLoading = false;
 
+                this.isPaymentClick = false;
                 this.savedDressPayment = result.d;
                 this.selectedIndex = index;
+
                 $("#addPaymentModal").modal("show");
 
             } catch (error) {
                 console.log(error)
-                this.isPageLoading = false;
+                this.isPaymentClick = false;
                 return null;
             }
 

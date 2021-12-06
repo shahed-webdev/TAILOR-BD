@@ -69,7 +69,7 @@
                       
                        <button type="button" class="btn btn-cyan btn-font py-1" @click="()=> onOpenMeasurementStyleModal(true,index)">Measurement</button>
                        <button type="button" class="btn btn-unique btn-font py-1 mx-2" @click="()=> onOpenMeasurementStyleModal(false,index)">Style</button>
-                       <button type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
+                       <button :disabled="isPaymentClick" type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
                    </td>
                    <td class="text-center">
                        <input x-model.number="item.quantity" class="form-control text-center" type="number" min="1" @wheel="(e)=> e.preventDefault()" required>
@@ -132,12 +132,12 @@
                        <p class="red-text font-weight-bold" x-show="(orderTotalAmount-customer.previousPaid) < 0">Order amount less than previous paid</p>
                        
                        <h5 class="font-weight-bold">Total: ৳<span x-text="orderTotalAmount"></span></h5> 
-                       <h5 x-show="customer.Discount>0">Discount: ৳<span x-text="customer.Discount"></span></h5>
-                       <h5 x-show="customer.PaidAmount>0">Prev.Paid: ৳<span x-text="customer.PaidAmount"></span></h5>
-                       <h5 x-show="orderTotalAmount - (customer.PaidAmount+customer.Discount)>0" class="red-text">Due Amount: ৳<span x-text="orderTotalAmount - (customer.PaidAmount+customer.Discount)"></span></h5>
+                       <h5 x-show="customer.Discount > 0">Discount: ৳<span x-text="customer.Discount"></span></h5>
+                       <h5 x-show="customer.PaidAmount > 0">Prev.Paid: ৳<span x-text="customer.PaidAmount"></span></h5>
+                       <h5 x-show="orderTotalAmount - customer.previousPaid > 0" class="red-text">Due Amount: ৳<span x-text="orderTotalAmount - (customer.PaidAmount+customer.Discount)"></span></h5>
                     </div>
                    </template>
-                   <div x-show="(orderTotalAmount-customer.previousPaid) > 0" class="text-right pr-3">
+                   <div class="text-right pr-3">
                        <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0 mt-3">
                            <span x-show="isSubmit">Updating...</span>
                            <span x-show="!isSubmit">Update Order</span>

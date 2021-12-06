@@ -62,7 +62,7 @@
 
         <!--customer info-->
         <template x-if="apiData.customerId">
-          <div class="d-flex">
+          <div class="d-flex mb-2">
             <h5 x-text="customer.data.CustomerName" class="font-weight-bold"></h5>
             <span x-text="customer.data.Phone" class="font-weight-bold ml-2"></span>
           </div>
@@ -73,7 +73,7 @@
            <!--dress list-->
             <div x-show="order.length" class="card card-body">
                <table class="table table-sm">
-                <thead>
+                  <thead>
                     <tr>
                     <th style="width:30px" class="font-weight-bold">SN</th>
                     <th class="font-weight-bold">Dress</th>
@@ -82,16 +82,16 @@
                     <th style="width:10px"></th>
                  </tr>
                 </thead>
-                <tbody>
-              <template x-for="(item, index) in order" :key="index">
-                <tr>
+                  <tbody>
+                  <template x-for="(item, index) in order" :key="index">
+                   <tr>
                    <td x-text="index+1"></td>
                    <td>
                        <p class="font-weight-bold mb-1" x-text="item.dress.dressName"></p>
                       
                        <button type="button" class="btn btn-cyan btn-font py-1" @click="()=> onOpenMeasurementStyleModal(true,index)">Measurement</button>
                        <button type="button" class="btn btn-unique btn-font py-1 mx-2" @click="()=> onOpenMeasurementStyleModal(false,index)">Style</button>
-                       <button type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
+                       <button :disabled="isPaymentClick" type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
                    </td>
                    <td class="text-center">
                        <input @change="saveData" x-model.number="item.quantity" class="form-control text-center" type="number" min="1" @wheel="(e)=> e.preventDefault()" required>
@@ -103,9 +103,9 @@
                         <a class="red-text ml-2" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
                     </td>
                 </tr>
-          </template>
-          </tbody>
-               </table>
+                  </template>
+                </tbody>
+              </table>
           </div>
        
 
