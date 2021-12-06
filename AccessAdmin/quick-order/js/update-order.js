@@ -318,6 +318,7 @@ function initData() {
             const OrderList = this.order.map(item => {
                 return {
                     DressId: item.dress.dressId,
+                    OrderListId: item.orderListId,
                     DressQuantity: item.quantity,
                     Details: item.orderDetails,
                     ListMeasurement: item.measurements.map(g => g.Measurements),

@@ -749,7 +749,7 @@ namespace TailorBD.AccessAdmin.quick_order
         }
 
 
-        //post order
+        //update order
         [WebMethod]
         public static int EditOrder(OrderEditModel model)
         {
@@ -814,8 +814,6 @@ namespace TailorBD.AccessAdmin.quick_order
                             cmd.ExecuteNonQuery();
                         }
                     }
-
-
                 }
 
 
@@ -832,7 +830,6 @@ namespace TailorBD.AccessAdmin.quick_order
                 }
                 con.Close();
             }
-
 
             return model.OrderId;
         }
