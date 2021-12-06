@@ -833,5 +833,33 @@ namespace TailorBD.AccessAdmin.quick_order
 
             return model.OrderId;
         }
+
+        [WebMethod]
+        public static ResponseModel DeleteOrder(int orderId)
+        {
+            try
+            {
+                using (var con = new SqlConnection())
+                {
+                    con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                    con.Open();
+                    using (var cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = @"SP_Order_Delete";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Connection = con;
+                        cmd.Parameters.AddWithValue("@OrderID", orderId);
+                        cmd.ExecuteNonQuery();
+                    }
+                    con.Close();
+                }
+
+                return new ResponseModel(true, "Success");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel(false, ex.Message);
+            }
+        }
     }
 }

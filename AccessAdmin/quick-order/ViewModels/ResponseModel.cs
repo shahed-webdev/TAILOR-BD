@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace TailorBD.AccessAdmin.quick_order.ViewModels
+﻿namespace TailorBD.AccessAdmin.quick_order.ViewModels
 {
     public class ResponseModel<TObject>
     {
@@ -25,5 +20,22 @@ namespace TailorBD.AccessAdmin.quick_order.ViewModels
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
         public TObject Data { get; set; }
+    }
+
+
+    public class ResponseModel
+    {
+        public ResponseModel()
+        {
+
+        }
+        public ResponseModel(bool isSuccess, string message)
+        {
+            IsSuccess = isSuccess;
+            Message = message;
+        }
+
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
     }
 }
