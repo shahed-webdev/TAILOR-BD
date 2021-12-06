@@ -47,6 +47,10 @@ function initData() {
                 PaidAmount
             } = result.d;
 
+            if (!OrderId) {
+                return location.href = `../Order/OrdrList.aspx`;
+            }
+
             this.orderNumber = OrderSn;
             this.order = OrderList.map(item => {
                 return {
@@ -70,23 +74,32 @@ function initData() {
         },
 
         //delete Order
+        isDeleting: false,
         async deleteOrder() {
             try {
-                if (customer.PaidAmount === 0) 
+                if (this.customer.PaidAmount !== 0) {
                     return $.notify("Order not deleted, paid amount found", { position: "to center" });
+                }
 
-                const orderId = customer.OrderId;
+                const orderId = this.customer.OrderId;
+                this.isDeleting = true;
+
                 const response = await fetch(`${helpers.baseUrl}/DeleteOrder`, {
                     method: "POST",
                     headers: helpers.header.headers,
                     body: JSON.stringify({ orderId })
                 });
+
                 const result = await response.json();
 
-                if (result.d.IsSuccess)
+                if (result.d.IsSuccess) {
                     return location.href = `../Order/OrdrList.aspx`;
-                
+                } else {
+                    this.isDeleting = false;
+                }
+
             } catch (e) {
+                this.isDeleting = false;
                 console.log(e)
             }
         },
@@ -395,7 +408,7 @@ function initData() {
 
                 const result = await response.json();
                 localStorage.removeItem("order-data")
-               // location.href = `../Order/MoneyReceipt.aspx.aspx?OrderID=${result.d}`;
+                location.href = `../Order/MoneyReceipt.aspx?OrderID=${result.d}`;
 
             } catch (e) {
                 $.notify(e.message, { position: "to center" });

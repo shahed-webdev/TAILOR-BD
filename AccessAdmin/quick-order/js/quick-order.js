@@ -1,14 +1,4 @@
 ﻿
-
-// Data Picker Initialization
-$(function () {
-    $(".datepicker").pickadate({
-        format: "d mmmm, yyyy",
-        min: new Date()
-    });
-    $(".datepicker").removeAttr("readonly");
-});
-
 //set local store
 function getStore() {
     const store = localStorage.getItem("order-data");
@@ -427,7 +417,7 @@ function initData() {
 
         
         //*** SUBMIT ORDER **//
-        orderPayment: { OrderAmount: 0, Discount: 0, PaidAmount: 0, AccountId: null, DeliveryDate:'' },
+        orderPayment: { OrderAmount: 0, Discount: 0, PaidAmount: 0, AccountId: 0, DeliveryDate:'' },
 
         //calculate order total amount
         orderTotalAmount: 0,
@@ -444,7 +434,13 @@ function initData() {
         //submit
         isSubmit: false,
         async submitOrder(evt) {
-            if (!this.apiData.customerId) return $.notify(`Customer Not Added`, { position: "to center" });
+            if (!this.apiData.customerId) {
+                $("#addCustomerModal").modal("show");
+                return $.notify(`Customer Not Added`, { position: "to center" });
+            }
+
+            if (!this.order.length)
+                return $.notify(`No Dress Added`, { position: "to center" });
 
             //create new model
             const OrderList = this.order.map(item => {
@@ -494,7 +490,7 @@ function initData() {
                 OrderAmount: this.calculateTotal(),
                 Discount,
                 PaidAmount,
-                AccountId: AccountId || defaultAccount.AccountId,
+                AccountId: AccountId || defaultAccount? defaultAccount.AccountId: 0,
                 DeliveryDate: evt.target.DeliveryDate.value,
                 OrderList // [ DressId, DressQuantity, Details, ListMeasurement[], ListStyle[], ListPayment[] ]
             }
@@ -509,7 +505,7 @@ function initData() {
 
                 const result = await response.json();
                 localStorage.removeItem("order-data")
-                console.log(result.d)
+
                 location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
             } catch (e) {
                 $.notify(e.message, { position: "to center" });
@@ -518,3 +514,4 @@ function initData() {
         }
     }
 }
+

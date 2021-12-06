@@ -6,8 +6,17 @@
         .btn-font { padding: .4rem 1rem; font-size: .9rem; margin: 0 }
         .table td { vertical-align: middle; }
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
-    </style>   
-    <script src="js/quick-order.js"></script>
+    </style>  
+
+    <script src="js/quick-order.js?v=1.0.0"></script>
+    
+    <script>
+        $(function() {
+            // Data Picker Initialization
+            $(".datepicker").pickadate({ format: "d mmmm, yyyy", min: new Date() });
+            $(".datepicker").removeAttr("readonly");
+        });
+    </script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
@@ -20,6 +29,7 @@
                  <small x-text="orderNumber"></small>
                 </span>
             </template>
+
             <template x-if="!orderNumber">
               <small><a @click="getOrderNumber" class="blue-text">Get Order Number</a></small>
             </template>
@@ -59,20 +69,20 @@
         </template>
        
       
-         <form @submit.prevent="submitOrder">
+        <form @submit.prevent="submitOrder">
            <!--dress list-->
             <div x-show="order.length" class="card card-body">
                <table class="table table-sm">
-            <thead>
-                <tr>
-                <th style="width:30px" class="font-weight-bold">SN</th>
-                <th class="font-weight-bold">Dress</th>
-                <th style="width:100px" class="font-weight-bold text-center">Quantity</th>
-                <th class="font-weight-bold text-center">Details</th>
-                <th style="width:10px"></th>
-             </tr>
-            </thead>
-            <tbody>
+                <thead>
+                    <tr>
+                    <th style="width:30px" class="font-weight-bold">SN</th>
+                    <th class="font-weight-bold">Dress</th>
+                    <th style="width:100px" class="font-weight-bold text-center">Quantity</th>
+                    <th class="font-weight-bold text-center">Details</th>
+                    <th style="width:10px"></th>
+                 </tr>
+                </thead>
+                <tbody>
               <template x-for="(item, index) in order" :key="index">
                 <tr>
                    <td x-text="index+1"></td>
@@ -95,8 +105,8 @@
                 </tr>
           </template>
           </tbody>
-        </table>
-     </div>
+               </table>
+          </div>
        
 
             <!-- payment list-->
@@ -138,37 +148,38 @@
              </template>
            </div>
              
-           <template x-if="order.length">
-               <div class="d-flex justify-content-end">
-                   <div>
-                   <template x-if="calculateTotal() > 0">
-                     <div class="text-right pr-3">
-                       <h5 class="font-weight-bold">
-                           Total: ৳<span x-text="orderTotalAmount"></span>
-                       </h5>
-                       <div x-init="getDiscountLimit()" class="form-group">
-                           <label>Discount Amount</label>
-                           <input x-model.number="orderPayment.Discount" min="0" :max="(discountLimit/100) * orderTotalAmount" type="number" step="0.01" class="form-control text-right">
-                       </div>
-                       <div class="form-group">
-                           <label>Paid Amount</label>
-                           <input x-model.number="orderPayment.PaidAmount" type="number" step="0.01" min="0" :max="orderTotalAmount - orderPayment.Discount" class="form-control text-right">
-                       </div>
-                         <div>
-                             <p class="font-weight-bold red-text">Due Amount: ৳<strong x-text="(orderTotalAmount - orderPayment.Discount) - orderPayment.PaidAmount"></strong></p>
-                         </div>
-                       <div class="form-group">
-                           <label>Payment Method</label>
-                           <select x-init="getAccount()" x-model.number="orderPayment.AccountId" class="form-control">
-                             <option value="">[ SELECT ]</option>
-                               <template x-for="account in paymentMethod" :key="account.AccountId">
-                                   <option :selected="account.IsDefault" :value="account.AccountId" x-text="account.AccountName"></option>
-                               </template>
-                           </select>
-                       </div>
+         
+            <div class="d-flex justify-content-end">
+                <div>
+                <template x-if="calculateTotal() > 0">
+                  <div class="text-right pr-3">
+                   <h5 class="font-weight-bold">
+                       Total: ৳<span x-text="orderTotalAmount"></span>
+                   </h5>
+                   <div x-init="getDiscountLimit()" class="form-group">
+                       <label>Discount Amount</label>
+                       <input x-model.number="orderPayment.Discount" min="0" :max="(discountLimit/100) * orderTotalAmount" type="number" step="0.01" class="form-control text-right">
+                   </div>
+                   <div class="form-group">
+                       <label>Paid Amount</label>
+                       <input x-model.number="orderPayment.PaidAmount" type="number" step="0.01" min="0" :max="orderTotalAmount - orderPayment.Discount" class="form-control text-right">
+                   </div>
+                     <div>
+                         <p class="font-weight-bold red-text">Due Amount: ৳<strong x-text="(orderTotalAmount - orderPayment.Discount) - orderPayment.PaidAmount"></strong></p>
                      </div>
-                   </template>
-                   <div class="text-right pr-3">
+                   <div class="form-group">
+                       <label>Payment Method</label>
+                       <select x-init="getAccount()" x-model.number="orderPayment.AccountId" class="form-control">
+                         <option value="">[ SELECT ]</option>
+                           <template x-for="account in paymentMethod" :key="account.AccountId">
+                               <option :selected="account.IsDefault" :value="account.AccountId" x-text="account.AccountName"></option>
+                           </template>
+                       </select>
+                   </div>
+                 </div>
+                </template>
+
+                <div x-show="order.length > 0" class="text-right pr-3">
                        <div class="form-group">
                            <label>Delivery Date</label>
                            <input type="text" name="DeliveryDate" class="form-control datepicker text-right" required>
@@ -178,10 +189,9 @@
                            <span x-show="!isSubmit">Submit Order</span>
                        </button>
                    </div>
-                </div>
-               </div>
-           </template>
-         </form>
+            </div>
+          </div>
+        </form>
       
 
         <!--measurement modal-->

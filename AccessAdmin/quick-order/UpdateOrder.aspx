@@ -5,8 +5,9 @@
         .btn-font { padding: .4rem 1rem; font-size: .9rem; margin: 0 }
         .table td { vertical-align: middle; }
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
-    </style>   
-    <script src="js/update-order.js"></script>
+    </style> 
+
+    <script src="js/update-order.js?v=1.0.0"></script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
@@ -19,7 +20,7 @@
                   <small x-text="orderNumber"></small>
               </span>
           </h3>
-            <button @click="deleteOrder" :disabled="customer.PaidAmount > 0" x-show="!isPageLoading" type="button" class="btn btn-danger">Delete Order</button>
+            <button @click="deleteOrder" :disabled="customer.PaidAmount > 0 || isDeleting" x-show="!isPageLoading" type="button" class="btn btn-danger">Delete Order</button>
         </div>
 
         <!--dress dropdown-->
@@ -41,12 +42,12 @@
         </div>
 
         <!--customer info-->
-        <div class="d-flex">
-          <h5 x-text="customer.CustomerName" class="font-weight-bold"></h5>
+        <div class="d-flex mb-3">
+          <h5 x-text="customer.CustomerName" class="font-weight-bold"></h5>,
           <span x-text="customer.Phone" class="font-weight-bold ml-2"></span>
         </div>
 
-         <form @submit.prevent="submitOrder">
+        <form @submit.prevent="submitOrder">
            <!--dress list-->
             <div x-show="order.length" class="card card-body">
                <table class="table table-sm">
