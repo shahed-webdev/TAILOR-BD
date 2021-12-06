@@ -1,5 +1,14 @@
 ﻿
 
+// Data Picker Initialization
+$(function () {
+    $(".datepicker").pickadate({
+        format: "d mmmm, yyyy",
+        min: new Date()
+    });
+    $(".datepicker").removeAttr("readonly");
+});
+
 //set local store
 function getStore() {
     const store = localStorage.getItem("order-data");
@@ -418,7 +427,7 @@ function initData() {
 
         
         //*** SUBMIT ORDER **//
-        orderPayment : { OrderAmount: 0, Discount: 0, PaidAmount: 0, AccountId: null },
+        orderPayment: { OrderAmount: 0, Discount: 0, PaidAmount: 0, AccountId: null, DeliveryDate:'' },
 
         //calculate order total amount
         orderTotalAmount: 0,
@@ -434,7 +443,7 @@ function initData() {
 
         //submit
         isSubmit: false,
-        async submitOrder() {
+        async submitOrder(evt) {
             if (!this.apiData.customerId) return $.notify(`Customer Not Added`, { position: "to center" });
 
             //create new model
@@ -486,6 +495,7 @@ function initData() {
                 Discount,
                 PaidAmount,
                 AccountId: AccountId || defaultAccount.AccountId,
+                DeliveryDate: evt.target.DeliveryDate.value,
                 OrderList // [ DressId, DressQuantity, Details, ListMeasurement[], ListStyle[], ListPayment[] ]
             }
 

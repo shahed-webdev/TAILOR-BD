@@ -63,11 +63,30 @@ function initData() {
                 }
             });
 
-            this.customer = { OrderId, CustomerId, ClothForId, CustomerName, Phone, previousPaid: PaidAmount + Discount }
+            this.customer = { OrderId, CustomerId, ClothForId, CustomerName, Phone, PaidAmount, Discount, previousPaid: PaidAmount + Discount }
             await this.getDress(CustomerId, ClothForId);
 
             this.isPageLoading = false;
         },
+
+        //delete Order
+        async deleteOrder() {
+            try {
+                if (customer.PaidAmount === 0) 
+                    return $.notify("Order not deleted, paid amount found", { position: "to center" });
+
+                const orderId = customer.OrderId;
+                const response = await fetch(`${helpers.baseUrl}/DeleteOrder?orderId=${orderId}`, helpers.header);
+                const result = await response.json();
+
+                if (result.d) 
+                    return location.href = `../Order/OrdrList.aspx`;
+                
+            } catch (e) {
+                console.log(e)
+            }
+        },
+
 
         //get dress dropdown
         dressNames: { isLoading: true, data: [] },
@@ -88,7 +107,7 @@ function initData() {
                 const isAdded = this.order.some(item => item.dress.dressId === dressId);
 
                 if (isAdded) {
-                    $.notify("dress already added", { position: "to center" }, "error");
+                    $.notify("dress already added", { position: "to center" });
                     return;
                 }
             }
@@ -323,7 +342,7 @@ function initData() {
                     Details: item.orderDetails,
                     ListMeasurement: item.measurements.map(g => g.Measurements),
                     ListStyle: item.styles.map(s => s.Styles),
-                    ListPayment: item.payments? JSON.stringify(item.payments): "[]"
+                    ListPayment: item.payments ? JSON.stringify(item.payments.filter(item => !item.OrderPaymentId)): "[]"
                 }
             });
 
@@ -362,7 +381,7 @@ function initData() {
                 DeletedOrderListIds: JSON.stringify(this.DeletedOrderListIds),
                 OrderList // [ DressId, DressQuantity, Details, ListMeasurement[], ListStyle[], ListPayment[] ]
             }
-
+     
             try {
                 this.isSubmit = true;
                 const response = await fetch(`${helpers.baseUrl}/EditOrder`,{
@@ -373,8 +392,8 @@ function initData() {
 
                 const result = await response.json();
                 localStorage.removeItem("order-data")
-                console.log(result.d)
-//                location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
+                location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
+
             } catch (e) {
                 $.notify(e.message, { position: "to center" });
                 this.isSubmit = false;

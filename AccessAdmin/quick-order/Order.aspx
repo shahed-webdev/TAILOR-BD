@@ -169,7 +169,14 @@
                      </div>
                    </template>
                    <div class="text-right pr-3">
-                       <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0">Submit Order</button>
+                       <div class="form-group">
+                           <label>Delivery Date</label>
+                           <input type="text" name="DeliveryDate" class="form-control datepicker text-right" required>
+                       </div>
+                       <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0">
+                           <span x-show="isSubmit">Submitting...</span>
+                           <span x-show="!isSubmit">Submit Order</span>
+                       </button>
                    </div>
                 </div>
                </div>

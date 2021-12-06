@@ -11,14 +11,17 @@
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
     <div x-init="getOrder()" class="col mb-5" x-data="initData()">
-        <h3 class="mb-4 font-weight-bold">
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+          <h3 class="font-weight-bold">
             Update Order:
-            <span class="gray-text">
-             <small>Order Number:</small>
-             <small x-text="orderNumber"></small>
-            </span>
-       </h3> 
-        
+              <span x-show="!isPageLoading" class="gray-text">
+                  <small>Order Number:</small>
+                  <small x-text="orderNumber"></small>
+              </span>
+          </h3>
+            <button @click="deleteOrder" :disabled="customer.PaidAmount > 0" x-show="!isPageLoading" type="button" class="btn btn-danger">Delete Order</button>
+        </div>
+
         <!--dress dropdown-->
         <div class="row align-items-center mb-4">
             <div class="col-sm-7 col-lg-9" x-data="{ dressId: 0 }">
@@ -47,7 +50,7 @@
            <!--dress list-->
             <div x-show="order.length" class="card card-body">
                <table class="table table-sm">
-            <thead>
+                <thead>
                 <tr>
                 <th style="width:30px" class="font-weight-bold">SN</th>
                 <th class="font-weight-bold">Dress</th>
@@ -56,7 +59,7 @@
                 <th style="width:10px"></th>
              </tr>
             </thead>
-            <tbody>
+                <tbody>
               <template x-for="(item, index) in order" :key="index">
                 <tr>
                    <td x-text="index+1"></td>
@@ -79,8 +82,8 @@
                 </tr>
           </template>
           </tbody>
-        </table>
-     </div>
+              </table>
+            </div>
        
 
             <!-- payment list-->
@@ -102,9 +105,7 @@
                         <template x-for="(payment, i) in item.payments" :key="i">
                             <tr>
                                 <td x-text="payment.For"></td>
-                                <td>
-                                    <input @change="calculateTotal" x-model.number="payment.Quantity" min="1" step="0.01" type="number" class="form-control text-center" required>
-                                </td>
+                                <td class="text-center" x-text="payment.Quantity"></td>
                                 <td class="text-right">
                                     ৳<span x-text="payment.UnitPrice"></span>
                                 </td>
@@ -124,19 +125,22 @@
              
            <template x-if="order.length">
                <div class="d-flex justify-content-end">
-                   <div>
+                <div>
                    <template x-if="calculateTotal() > 0">
-                       <div class="text-right pr-3">
-                           <p class="red-text font-weight-bold" x-show="(orderTotalAmount-customer.previousPaid) < 0">
-                               Order amount less than previous paid
-                           </p>
-                           <h5 class="font-weight-bold">
-                               Total: ৳<span x-text="orderTotalAmount"></span>
-                           </h5>
-                       </div>
+                    <div class="text-right pr-3">
+                       <p class="red-text font-weight-bold" x-show="(orderTotalAmount-customer.previousPaid) < 0">Order amount less than previous paid</p>
+                       
+                       <h5 class="font-weight-bold">Total: ৳<span x-text="orderTotalAmount"></span></h5> 
+                       <h5 x-show="customer.Discount>0">Discount: ৳<span x-text="customer.Discount"></span></h5>
+                       <h5 x-show="customer.PaidAmount>0">Prev.Paid: ৳<span x-text="customer.PaidAmount"></span></h5>
+                       <h5 x-show="orderTotalAmount - (customer.PaidAmount+customer.Discount)>0" class="red-text">Due Amount: ৳<span x-text="orderTotalAmount - (customer.PaidAmount+customer.Discount)"></span></h5>
+                    </div>
                    </template>
                    <div x-show="(orderTotalAmount-customer.previousPaid) > 0" class="text-right pr-3">
-                       <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0">Submit Order</button>
+                       <button :disabled="isSubmit" type="submit" class="btn btn-cyan m-0 mt-3">
+                           <span x-show="isSubmit">Updating...</span>
+                           <span x-show="!isSubmit">Update Order</span>
+                       </button>
                    </div>
                 </div>
                </div>
