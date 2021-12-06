@@ -834,6 +834,8 @@ namespace TailorBD.AccessAdmin.quick_order
             return model.OrderId;
         }
 
+
+        //DeleteOrder
         [WebMethod]
         public static ResponseModel DeleteOrder(int orderId)
         {

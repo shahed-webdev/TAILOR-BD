@@ -76,10 +76,14 @@ function initData() {
                     return $.notify("Order not deleted, paid amount found", { position: "to center" });
 
                 const orderId = customer.OrderId;
-                const response = await fetch(`${helpers.baseUrl}/DeleteOrder?orderId=${orderId}`, helpers.header);
+                const response = await fetch(`${helpers.baseUrl}/DeleteOrder`, {
+                    method: "POST",
+                    headers: helpers.header.headers,
+                    body: JSON.stringify({ orderId })
+                });
                 const result = await response.json();
 
-                if (result.d) 
+                if (result.d.IsSuccess)
                     return location.href = `../Order/OrdrList.aspx`;
                 
             } catch (e) {
@@ -220,8 +224,7 @@ function initData() {
             orderPayment.payments = orderPayment.payments || [];
 
             //check payment added or not
-            const isAdded =
-                orderPayment.payments.some(item => item.For.toLocaleLowerCase() === For.toLocaleLowerCase());
+            const isAdded = orderPayment.payments.some(item => item.For.toLocaleLowerCase() === For.toLocaleLowerCase());
 
             if (isAdded) {
                 $.notify(`${For} already added`, { position: "to center" });
@@ -254,7 +257,7 @@ function initData() {
         fabricsPayment: {
             For: '',
             Quantity: '',
-            Unit_Price: '',
+            UnitPrice: '',
             FabricID: '',
             StockFabricQuantity: 0,
             FabricsName: ''
@@ -392,7 +395,7 @@ function initData() {
 
                 const result = await response.json();
                 localStorage.removeItem("order-data")
-                location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
+               // location.href = `../Order/MoneyReceipt.aspx.aspx?OrderID=${result.d}`;
 
             } catch (e) {
                 $.notify(e.message, { position: "to center" });

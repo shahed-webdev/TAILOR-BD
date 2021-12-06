@@ -269,7 +269,7 @@
                                 <input @keyup="findFabrics" id="findFabrics" x-model="fabricsPayment.For" type="text" class="form-control" autocomplete="off" required>
                             </div>
                             <div class="form-group">
-                                <label>Quantity <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity"></span></span></label>
+                                <label>Quantity <span x-show="fabricsPayment.StockFabricQuantity > 0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity"></span></span></label>
                                 <input x-model.number="fabricsPayment.Quantity" type="number" min="1" :max="fabricsPayment.StockFabricQuantity" step="0.01" class="form-control" autocomplete="off" required>
                             </div>
                             <div class="form-group">
