@@ -129,7 +129,7 @@
                             <tr>
                                 <td x-text="payment.For"></td>
                                 <td>
-                                    <input @change="saveData" @input="calculateTotal" x-model.number="payment.Quantity" min="1" step="0.01" type="number" class="form-control text-center" required>
+                                    <input @change="saveData" @input="calculateTotal" x-model.number="payment.Quantity" min="1" :max="payment.StockFabricQuantity" step="0.01" type="number" class="form-control text-center" required>
                                 </td>
                                 <td class="text-right">
                                     ৳<span x-text="payment.Unit_Price"></span>
@@ -311,17 +311,13 @@
                           <h5 class="font-weight-bold mt-4">Fabrics</h5>
                            <div class="mb-3">
                             <div class="form-group">
-                                <label>Fabric Code</label>
+                                <label>
+                                    Fabric Code
+                                    <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity"></span></span>
+                                </label>
                                 <input @keyup="findFabrics" id="findFabrics" x-model="fabricsPayment.For" type="text" class="form-control" autocomplete="off" required>
                             </div>
-                            <div class="form-group">
-                                <label>Quantity <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity"></span></span></label>
-                                <input x-model.number="fabricsPayment.Quantity" type="number" min="1" :max="fabricsPayment.StockFabricQuantity" step="0.01" class="form-control" autocomplete="off" required>
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" :disabled="fabricsPayment.FabricID === ''" class="btn btn-cyan w-100 m-0">Add Fabric</button>
-                            </div>
-                         </div>
+                           </div>
                         </form>
                     </div>
                 </div>

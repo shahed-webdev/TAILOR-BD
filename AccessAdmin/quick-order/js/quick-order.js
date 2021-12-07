@@ -228,7 +228,8 @@ function initData() {
         //customer
         customer: customer,
 
-        //find customer
+        //find customer de bounce 
+        customerTimerId: null,
         findCustomer(evt) {
             //reset if change text
             this.apiData.customerId = 0;
@@ -245,19 +246,23 @@ function initData() {
                 },
                 source: (request, result) => {
                     this.customer.isLoading = true;
+                    clearTimeout(this.customerTimerId);
 
-                    $.ajax({
-                        url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
-                        contentType: "application/json; charset=utf-8",
-                        success: response => {
-                            result(response.d);
-                            this.customer.isLoading = false;
+                    this.customerTimerId = setTimeout(() => {
+                            $.ajax({
+                                url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
+                                contentType: "application/json; charset=utf-8",
+                                success: response => {
+                                    result(response.d);
+                                    this.customer.isLoading = false;
+                                },
+                                error: err => {
+                                    console.log(err);
+                                    this.customer.isLoading = false;
+                                }
+                            });
                         },
-                        error: err => {
-                            console.log(err);
-                            this.customer.isLoading = false;
-                        }
-                    });
+                        700)
                 },
                 updater: item => {
                     //set customer info
@@ -339,11 +344,14 @@ function initData() {
             FabricsName: ''
         },
 
+        //de bounce 
+        fabricTimerId : null,
         findFabrics(evt) {
             this.fabricsPayment.FabricID = "";
 
             $(`#${evt.target.id}`).typeahead({
                 minLength: 1,
+                hint: true,
                 displayText: item => {
                     return `${item.FabricCode}, ${item.FabricsName}`;
                 },
@@ -351,32 +359,42 @@ function initData() {
                     this.$element[0].value = item.FabricCode;
                 },
                 source: (request, result) => {
-                    $.ajax({
-                        url: `Order.aspx/FindFabrics?prefix=${JSON.stringify(request)}`,
-                        contentType: "application/json; charset=utf-8",
-                        success: response => {
-                            result(response.d);
+                    clearTimeout(this.fabricTimerId);
+
+                    this.fabricTimerId = setTimeout(() => {
+                            $.ajax({
+                                url: `Order.aspx/FindFabrics?prefix=${JSON.stringify(request)}`,
+                                contentType: "application/json; charset=utf-8",
+                                success: response => {
+                                    result(response.d);
+                                },
+                                error: err => {
+                                    console.log(err);
+                                }
+                            });
                         },
-                        error: err => {
-                            console.log(err);
-                        }
-                    });
+                        700)
                 },
                 updater: item => {
                     this.fabricsPayment.For = item.FabricCode;
                     this.fabricsPayment.FabricID = item.FabricId;
                     this.fabricsPayment.Unit_Price = item.SellingUnitPrice;
                     this.fabricsPayment.StockFabricQuantity = item.StockFabricQuantity;
+
+                    this.addFabric(this.selectedIndex);
+
                     return item;
                 }
-            })
+            });
         },
 
         //add fabrics
         addFabric(index) {
-            const { For, Unit_Price, Quantity, FabricID } = this.fabricsPayment;
+            const { For, Unit_Price, FabricID, StockFabricQuantity } = this.fabricsPayment;
 
             if (!FabricID) return $.notify(`Add fabric`, { position: "to center" });
+
+            if (StockFabricQuantity < 1) return $.notify(`Fabric not in stock`, { position: "to center" });
 
             const orderPayment = this.order[index];
             orderPayment.payments = orderPayment.payments || [];
@@ -387,7 +405,7 @@ function initData() {
 
             if (isAdded) return $.notify(`${For} already added`, { position: "to center" });
 
-            orderPayment.payments.push({ For: `Fabric Code: ${For}`, Unit_Price, Quantity, FabricID });
+            orderPayment.payments.push({ For: `Fabric Code: ${For}`, Unit_Price, Quantity:1, FabricID, StockFabricQuantity });
 
             //save to local store
             this.saveData();
