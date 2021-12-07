@@ -160,11 +160,12 @@ FROM Customer INNER JOIN [Order] ON Customer.CustomerID = [Order].CustomerID INN
                <asp:BoundField DataField="OrderDate" HeaderText="অর্ডারের তারিখ" SortExpression="OrderDate" DataFormatString="{0:d MMM yyyy}" />
                <asp:BoundField DataField="DeliveryDate" HeaderText="ডেলিভারী তারিখ" SortExpression="DeliveryDate" DataFormatString="{0:d MMM yyyy}" />
                <asp:BoundField DataField="DeliveryInsertDate" HeaderText="ডেলিভারী" SortExpression="DeliveryInsertDate" DataFormatString="{0:d MMM yyyy}" />
-               <asp:TemplateField HeaderText="বাকি টাকা" SortExpression="DueAmount">
+                <asp:TemplateField HeaderText="বাকি টাকা" SortExpression="DueAmount">
                   <ItemTemplate>
                      <asp:Label ID="Label3" runat="server" Text='<%# Bind("DueAmount","{0:0.00}") %>'></asp:Label>
                   </ItemTemplate>
                </asp:TemplateField>
+                <asp:BoundField DataField="OrderDetils" HeaderText="বিস্তারিত" SortExpression="OrderDetils"/>
             </Columns>
             <EmptyDataTemplate>
                Empty
@@ -173,7 +174,7 @@ FROM Customer INNER JOIN [Order] ON Customer.CustomerID = [Order].CustomerID INN
             <PagerStyle CssClass="pgr " />
          </asp:GridView>
          <asp:SqlDataSource ID="CustomerOrderdDressSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-            SelectCommand="SELECT DISTINCT Order_Delivery_Date.OrderID, [Order].OrderSerialNumber, Customer.CustomerNumber, Customer.CustomerName, Customer.Phone, Customer.Address, [Order].OrderDate, Order_Delivery_Date.DeliveryInsertDate,   [Order].DeliveryDate, [Order].DueAmount,
+            SelectCommand="SELECT DISTINCT Order_Delivery_Date.OrderID,[Order].Details AS OrderDetils, [Order].OrderSerialNumber, Customer.CustomerNumber, Customer.CustomerName, Customer.Phone, Customer.Address, [Order].OrderDate, Order_Delivery_Date.DeliveryInsertDate,   [Order].DeliveryDate, [Order].DueAmount,
  STUFF((SELECT '; ' + D.Dress_Name + ' ' + CAST(ODD.DQuantity AS NVARCHAR(50)) + ' Piece ' FROM OrderList as OL INNER JOIN Dress AS D ON OL.DressID = D.DressID INNER JOIN Order_Delivery_Date AS ODD ON OL.OrderListID = ODD.OrderListID WHERE (ODD.OrderID = Order_Delivery_Date.OrderID) AND (ODD.DeliveryInsertDate = Order_Delivery_Date.DeliveryInsertDate)  FOR XML PATH('')), 1, 1, '') AS Details
 FROM Customer INNER JOIN [Order] ON Customer.CustomerID = [Order].CustomerID INNER JOIN
  Order_Delivery_Date  ON [Order].OrderID = Order_Delivery_Date.OrderID WHERE 

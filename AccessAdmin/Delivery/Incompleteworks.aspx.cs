@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -12,7 +9,7 @@ namespace TailorBD.AccessAdmin.Delivery
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         protected void CompleteButton_Click(object sender, EventArgs e)
@@ -27,6 +24,7 @@ namespace TailorBD.AccessAdmin.Delivery
                 {
                     CheckBox CompleteCheckBox = (CheckBox)row.FindControl("CompleteCheckBox");
                     TextBox StoreDetailsTextBox = (TextBox)row.FindControl("StoreDetailsTextBox");
+                    TextBox DetailsTextBox = (TextBox)row.FindControl("DetailsTextBox");
                     CheckBox SMSCheckBox = (CheckBox)row.FindControl("SMSCheckBox");
 
                     string OrderListSMS = "";
@@ -52,6 +50,7 @@ namespace TailorBD.AccessAdmin.Delivery
 
                                 CustomerOrderdDressSQL.UpdateParameters["OrderID"].DefaultValue = CustomerOrderdDressGridView.DataKeys[row.DataItemIndex % CustomerOrderdDressGridView.PageSize]["OrderID"].ToString();
                                 CustomerOrderdDressSQL.UpdateParameters["StoreDatails"].DefaultValue = StoreDetailsTextBox.Text;
+                                CustomerOrderdDressSQL.UpdateParameters["Details"].DefaultValue = DetailsTextBox.Text;
                                 CustomerOrderdDressSQL.Update();
 
                                 Order_WorkComplete_DateSQL.InsertParameters["OrderID"].DefaultValue = CustomerOrderdDressGridView.DataKeys[row.DataItemIndex % CustomerOrderdDressGridView.PageSize]["OrderID"].ToString();
@@ -155,7 +154,7 @@ namespace TailorBD.AccessAdmin.Delivery
                     e.Row.CssClass = "Today";
                 }
 
-               
+
                 if (OrderDate < DateTime.Today)
                 {
                     e.Row.CssClass = "Over_Today";
