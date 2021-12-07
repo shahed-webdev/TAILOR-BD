@@ -56,7 +56,7 @@
             </SelectParameters>
          </asp:SqlDataSource>
 
-         <asp:GridView ID="ExtraIncomeGridView" runat="server" AutoGenerateColumns="False" CssClass="mGrid" DataKeyNames="Extra_IncomeID" DataSourceID="ExtraIncomeSQL" AllowPaging="True" PageSize="20">
+         <asp:GridView ID="ExtraIncomeGridView" runat="server" AutoGenerateColumns="False" CssClass="mGrid" DataKeyNames="Extra_IncomeID" DataSourceID="ExtraIncomeSQL" AllowPaging="True" PageSize="20" AllowSorting="True">
             <Columns>
                <asp:BoundField DataField="Extra_Income_CategoryName" HeaderText="আয়ের ধরণ" ReadOnly="True" SortExpression="Extra_Income_CategoryName" />
                <asp:BoundField DataField="Extra_IncomeFor" HeaderText="কি বাবদ" SortExpression="Extra_IncomeFor" />
@@ -97,7 +97,7 @@
             DeleteCommand="set context_info @RegistrationID
 DELETE FROM [Extra_Income] WHERE [Extra_IncomeID] = @Extra_IncomeID" 
             InsertCommand="INSERT INTO Extra_Income(InstitutionID, RegistrationID, Extra_IncomeCategoryID, Extra_IncomeAmount, Extra_IncomeFor, AccountID) VALUES (@InstitutionID, @RegistrationID, @Extra_IncomeCategoryID, @Extra_IncomeAmount, @Extra_IncomeFor,@AccountID)" 
-            SelectCommand="SELECT Extra_Income.Extra_IncomeAmount, Extra_Income.Extra_IncomeFor, Extra_Income.Extra_IncomePayment_Method, Extra_Income.Extra_IncomeDate, Extra_IncomeCategory.Extra_Income_CategoryName, Extra_Income.Extra_IncomeID FROM Extra_Income INNER JOIN Extra_IncomeCategory ON Extra_Income.Extra_IncomeCategoryID = Extra_IncomeCategory.Extra_IncomeCategoryID WHERE (Extra_Income.InstitutionID = @InstitutionID) AND (Extra_Income.Extra_IncomeCategoryID = @Extra_IncomeCategoryID OR @Extra_IncomeCategoryID = 0) AND (Extra_Income.Extra_IncomeDate BETWEEN @Fdate AND @TDate) OR (Extra_Income.InstitutionID = @InstitutionID) AND (Extra_Income.Extra_IncomeCategoryID = @Extra_IncomeCategoryID OR @Extra_IncomeCategoryID = 0) AND (@Fdate = '1-1-1760') AND (@TDate = '1-1-1760')"
+            SelectCommand="SELECT Extra_Income.Extra_IncomeAmount, Extra_Income.Extra_IncomeFor, Extra_Income.Extra_IncomePayment_Method, Extra_Income.Extra_IncomeDate, Extra_IncomeCategory.Extra_Income_CategoryName, Extra_Income.Extra_IncomeID FROM Extra_Income INNER JOIN Extra_IncomeCategory ON Extra_Income.Extra_IncomeCategoryID = Extra_IncomeCategory.Extra_IncomeCategoryID WHERE (Extra_Income.InstitutionID = @InstitutionID) AND (Extra_Income.Extra_IncomeCategoryID = @Extra_IncomeCategoryID) AND (Extra_Income.Extra_IncomeDate BETWEEN @Fdate AND @TDate) OR (Extra_Income.InstitutionID = @InstitutionID) AND (Extra_Income.Extra_IncomeDate BETWEEN @Fdate AND @TDate) AND (@Extra_IncomeCategoryID = 0) OR (Extra_Income.InstitutionID = @InstitutionID) AND (Extra_Income.Extra_IncomeCategoryID = @Extra_IncomeCategoryID) AND (@Fdate = '1-1-1760') AND (@TDate = '1-1-1760') OR (Extra_Income.InstitutionID = @InstitutionID) AND (@Extra_IncomeCategoryID = 0) AND (@Fdate = '1-1-1760') AND (@TDate = '1-1-1760') ORDER BY Extra_Income.Extra_IncomeID DESC"
              UpdateCommand="set context_info @RegistrationID
 UPDATE Extra_Income SET Extra_IncomeAmount = @Extra_IncomeAmount, Extra_IncomeFor = @Extra_IncomeFor WHERE (Extra_IncomeID = @Extra_IncomeID)">
             <DeleteParameters>
