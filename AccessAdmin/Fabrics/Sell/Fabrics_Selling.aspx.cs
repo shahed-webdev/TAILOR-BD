@@ -132,8 +132,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell
 
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText =
-                        "SELECT FabricID FROM Fabrics WHERE (InstitutionID = @InstitutionID) AND (StockFabricQuantity >= @SellingQuantity) AND (FabricID = @FabricID)";
+                    cmd.CommandText = "SELECT FabricID FROM Fabrics WHERE (InstitutionID = @InstitutionID) AND (StockFabricQuantity >= @SellingQuantity) AND (FabricID = @FabricID)";
                     cmd.Parameters.AddWithValue("@FabricID", fabricIdLabel.Text);
                     cmd.Parameters.AddWithValue("@InstitutionID", Request.Cookies["InstitutionID"].Value);
                     cmd.Parameters.AddWithValue("@SellingQuantity", sellingQuantity.Text);

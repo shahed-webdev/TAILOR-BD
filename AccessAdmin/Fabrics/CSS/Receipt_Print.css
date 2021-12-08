@@ -15,6 +15,6 @@
 @page { margin: 0 192px; }
 
 @media print {
- .Site_Navigation, .UserPanel, .ContinueButton, .NoPrint ,.footer,.print,.Logo,.Setting, .headerBack { display: none; }
+ .UserPanel, .ContinueButton, .NoPrint ,.footer,.print,.Logo,.Setting, .headerBack { display: none; }
  .maincontain { width: 100%; left: 0; margin: 0; padding: 0; }
 }

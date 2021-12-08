@@ -14,10 +14,10 @@ main { min-height: 720px; }
 /*---side navbar----------*/
 .side-navbar { border: none; }
 .side-navbar a:hover { color: #333; text-decoration: none; }
-.tree-node { color: #333; padding:14px 3px; border-bottom: 1px solid #ddd; width: 100%; }
-.root-node { border-bottom: 1px solid #e3e3e3; color: #00b7ad; font-size: 17px; font-weight: bold; width: 100%; }
+.tree-node { color: #444; padding: 0.5rem 0.2rem; border-bottom: 1px solid #ddd; width: 100%; }
+.root-node { color: #333; padding: 0.8rem 0.5rem; border-bottom: 1px solid #e3e3e3; font-size: 17px; font-weight: bold; width: 100%; }
 
-.leaf-node { font: 15px Arial,Sans-Serif; padding: 4px 4px 4px 0; }
+.leaf-node { padding: 4px 4px 4px 0; }
 .leaf-node:hover { text-decoration: underline; }
 .selected-node { color: #00b4aa; }
 

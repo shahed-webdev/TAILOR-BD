@@ -9,37 +9,111 @@
         
         <!--add fabric-->
         <div class="row align-items-center mb-4">
-            <div class="col-sm-7 col-lg-9" x-data="{ dressId: 0 }">
-                <form @submit.prevent="() => addFabric(selectedIndex)">
-                    <div class="mb-3">
-                        <div class="form-group">
-                            <label>
-                                Fabric Code
-                                <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity"></span></span>
-                            </label>
-                            <input @keyup="findFabrics" id="findFabrics" x-model="fabricsPayment.For" type="text" class="form-control" autocomplete="off" required>
-                        </div>
+            <div class="col-sm-4 col-lg-5">
+                <form @submit.prevent="addFabric">
+                    <div class="form-group">
+                        <label>Fabric Code
+                            <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity.toFixed(2)"></span></span>
+                        </label>
+                        <input @keyup="findFabrics" id="findFabrics" placeholder="find fabric by code" x-model="fabricsPayment.FabricCode" type="text" class="form-control" autocomplete="off" required>
                     </div>
-                </form>
-            </div>
-
-            <div class="col-sm-5 col-lg-3 text-right">
-                <button type="button" data-toggle="modal" data-target="#addCustomerModal" class="btn btn-font btn-elegant">
-                    <i class="fas fa-user-plus"></i>
-                    Customer
-                </button>
+               </form> 
             </div>
         </div>
 
-        <!--customer info-->
-        <template x-if="customer.customerId">
-          <div class="d-flex mb-2">
-            <h5 x-text="customer.data.CustomerName" class="font-weight-bold"></h5>
-            <span x-text="customer.data.Phone" class="font-weight-bold ml-2"></span>
-          </div>
-        </template>
        
+       
+        <form @submit.prevent="submitOrder">
+            <div x-show="order.length" class="row">
+                <div class="col-lg-8 col-xl-9 mb-3">
+                    <div class="card card-body">
+                        <table class="table table-sm">
+                            <thead>
+                            <tr>
+                                <th class="font-weight-bold text-center">SN</th>
+                                <th class="font-weight-bold">Fabric</th>
+                                <th class="font-weight-bold text-center">Quantity</th>
+                                <th class="font-weight-bold text-center">Unit Price</th>
+                                <th class="font-weight-bold text-right">Line Total</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <template x-for="(item, index) in order" :key="index">
+                                <tr>
+                                    <td class="text-center" x-text="index+1"></td><td>
+                                        <p x-text="item.FabricCode" class="font-weight-bold mb-1"></p>
+                                        <small x-text="item.FabricsName"></small>
+                                    </td>
+                                    <td class="text-center">
+                                        <input @input="calculateTotal" @change="saveData" x-model.number="item.Quantity" class="form-control text-center" type="number" min="0.01" :max="item.StockFabricQuantity" step="0.01" @wheel="(e)=> e.preventDefault()" required>
+                                    </td>
+                                    <td class="text-center">
+                                        <input @input="calculateTotal" @change="saveData" x-model.number="item.UnitPrice" class="form-control text-center" type="number" min="0.01" step="0.01" @wheel="(e)=> e.preventDefault()" required>
+                                    </td>
+                                    <td class="text-right">
+                                        ৳<span x-text="item.UnitPrice * item.Quantity"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="red-text ml-2" @click="()=>removeFabric(item.FabricId)"><i class="fas fa-times"></i></a>
+                                    </td>
+                                </tr>
+                            </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
+                <div class="col-lg-4 col-xl-3">
+                    <template x-if="calculateTotal() > 0">
+                      <div class="card card-body">
+                        <div class="text-right">
+                            <h5 class="font-weight-bold">
+                                Total: ৳<span x-text="orderTotalAmount"></span>
+                            </h5>
+
+                            <div class="form-group">
+                                <label>Discount Amount</label>
+                                <input x-model.number="orderPayment.Discount" min="0" :max="orderTotalAmount" type="number" step="0.01" class="form-control text-right">
+                            </div>
+                            <div class="form-group">
+                                <label>Paid Amount</label>
+                                <input x-model.number="orderPayment.PaidAmount" type="number" step="0.01" min="0" :max="orderTotalAmount - orderPayment.Discount" class="form-control text-right">
+                            </div>
+                            <div>
+                                <p class="font-weight-bold red-text">Due Amount: ৳<strong x-text="(orderTotalAmount - orderPayment.Discount) - orderPayment.PaidAmount"></strong></p>
+                            </div>
+                            <div class="form-group">
+                                <label>Payment Method</label>
+                                <select x-init="getAccount()" x-model.number="orderPayment.AccountId" class="form-control">
+                                    <option value="">[ SELECT ]</option>
+                                    <template x-for="account in paymentMethod" :key="account.AccountId">
+                                        <option :selected="account.IsDefault" :value="account.AccountId" x-text="account.AccountName"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </div>
+                          <a data-toggle="modal" data-target="#addCustomerModal" class="text-primary">
+                              <i class="fas fa-user-plus"></i>
+                              Customer
+                          </a>
+                          <!--customer info-->
+                          <template x-if="customer.customerId">
+                              <div class="my-2">
+                                  <span x-text="customer.data.CustomerName"></span>,
+                                  <span x-text="customer.data.Phone"></span>
+                              </div>
+                          </template>
+
+                        <button :disabled="isSubmit" type="submit" class="btn btn-teal mt-3 w-100">
+                            <span x-show="isSubmit">Submitting...</span>
+                            <span x-show="!isSubmit">Submit</span>
+                        </button>
+                    </div>
+                    </template>
+                </div>
+            </div>
+        </form>
 
 
         <!--customer modal-->
@@ -56,11 +130,11 @@
                     <div class="modal-body mx-3">
                         <div class="form-group">
                             <label for="phone">Mobile number</label>
-                            <input @keyup="findCustomer" type="text" id="phone" placeholder="find customer by phone" x-model="customer.data.Phone" class="form-control" autocomplete="off" required>
+                            <input @keyup="findCustomer" type="text" id="phone" placeholder="Find customer by phone" x-model="customer.data.Phone" class="form-control" autocomplete="off" required>
                         </div>
                         <div class="form-group">
                             <label for="customerName">Customer name</label>
-                            <input @keyup="findCustomer" id="customerName" x-model="customer.data.CustomerName" placeholder="find customer by name" type="text" class="form-control" autocomplete="off" required>
+                            <input @keyup="findCustomer" id="customerName" x-model="customer.data.CustomerName" placeholder="Find customer by name" type="text" class="form-control" autocomplete="off" required>
                         </div>
                         <div class="form-group">
                             <label for="address">Address</label>
@@ -68,7 +142,7 @@
                         </div>
                         <div class="form-group">
                             <label>Gender</label>
-                            <select x-model="customer.data.Cloth_For_ID" class="form-control" required>
+                            <select x-model="customer.data.ClothForId" class="form-control" required>
                                 <option value="1">পুরুষ</option>
                                 <option value="2">মহিলা</option>
                                 <option value="3">বাচ্চা</option>
@@ -80,10 +154,7 @@
                                <button type="submit" :disabled="customer.isLoading" class="btn btn-teal">Add Customer <i class="fa fa-paper-plane ml-1"></i></button>
                             </template>
                             <template x-if="!customer.isNewCustomer">
-                              <div>
-                                <button @click="setMeasurements" type="button" :disabled="customer.isLoading" class="btn btn-success">Set Measurements</button>
-                                <button data-dismiss="modal" type="button" :disabled="customer.isLoading" class="btn btn-outline-success">Not Set</button>
-                              </div>
+                                <button data-dismiss="modal" type="button" class="btn btn-outline-danger">Close</button>
                             </template>
                         </div>
                     </div>

@@ -13,7 +13,7 @@
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
     <!--start CSS -->
-    <link href="CSS/Basic.css?v=1.0.1" rel="stylesheet" type="text/css" />
+    <link href="CSS/basic-master.css?v=1.0.1" rel="stylesheet" type="text/css" />
     <link href="CssGridview/Gridview.css?v=1.0.0" rel="stylesheet" />
 
     <!--start javascript -->
@@ -33,9 +33,7 @@
                 <div class="NameAndLogo">
                     <asp:FormView ID="LogoFormView" runat="server" DataKeyNames="InstitutionID" DataSourceID="LogoSQL" RenderOuterTable="False">
                         <ItemTemplate>
-                            <div class="Logo">
-                                <img alt="" src="../../../Handler/TailorInfo.ashx?Img=<%#Eval("InstitutionID") %>" class="Logo_Img" />
-                            </div>
+                            <img alt="" src="/Handler/TailorInfo.ashx?Img=<%#Eval("InstitutionID") %>" class="Logo_Img" />
                             <div class="Ins_Name">
                                 <asp:Label ID="InstitutionNameLabel" runat="server" Text='<%# Bind("InstitutionName") %>' />
                             </div>

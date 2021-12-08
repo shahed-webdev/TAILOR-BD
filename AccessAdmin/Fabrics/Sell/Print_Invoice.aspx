@@ -9,7 +9,7 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
     <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server" />
-    
+
     <asp:FormView ID="SellFormView" runat="server" DataKeyNames="FabricsSellingID" DataSourceID="SellSQL" Width="100%">
         <ItemTemplate>
             <a href="Fabrics_Selling.aspx" class="NoPrint"><< বিক্রি করুন</a>
@@ -177,13 +177,14 @@
             PopupDragHandleControlID="MHeader" />
     </div>
 
-    <asp:TextBox ID="PhoneTextBox" placeholder="Mobile Number" CssClass="textbox" runat="server"></asp:TextBox>
-
-    <asp:Button ID="SMSButton" ValidationGroup="1" runat="server" Text="Send SMS" OnClick="SMSButton_Click" CssClass="ContinueButton NoPrint" />
-    <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="PhoneTextBox" CssClass="EroorSummer" ErrorMessage="Invalid" ValidationExpression="(88)?((011)|(015)|(016)|(017)|(018)|(019)|(013)|(014))\d{8,8}" ValidationGroup="1"></asp:RegularExpressionValidator>
+    <div class="NoPrint">
+        <asp:TextBox ID="PhoneTextBox" placeholder="Mobile Number" CssClass="textbox" runat="server"></asp:TextBox>
+        <asp:Button ID="SMSButton" ValidationGroup="1" runat="server" Text="Send SMS" OnClick="SMSButton_Click" CssClass="ContinueButton NoPrint" />
+        <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="PhoneTextBox" CssClass="EroorSummer" ErrorMessage="Invalid" ValidationExpression="(88)?((011)|(015)|(016)|(017)|(018)|(019)|(013)|(014))\d{8,8}" ValidationGroup="1"></asp:RegularExpressionValidator>
+    </div>
 
     <asp:LinkButton ID="M_ReceiptLinkButton" CssClass="Setting" Text="মানি রিসিট প্রিন্ট সেটিং" runat="server" OnClientClick="return M_Receipt()" />
-     <button type="submit" onclick="window.print()" class="print" />
+    <button type="button" onclick="window.print()" class="print"></button>
 
     <script>
         if ($("[id*=DiscountAmoutLabel]").text() != "0") {

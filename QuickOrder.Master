@@ -89,7 +89,7 @@
             <%--main--%>
             <main class="row">
                 <%--side navbar--%>
-                <div class="side-navbar col-sm-3 col-xl-2">
+                <div class="side-navbar col-sm-3 col-xl-2 d-print-none">
                     <a href="/AccessAdmin/quick-order/Order.aspx" class="quick-order-btn">
                         Quick Order
                     </a>

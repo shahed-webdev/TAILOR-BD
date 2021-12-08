@@ -9,12 +9,12 @@ h3 { border-bottom: 1px solid #ddd; color: #00b4aa; font-size: 20px; margin: 0 0
 hr { border: 0; height: 1px; background: -webkit-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.75),rgba(0,0,0,0)); background: -moz-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.75),rgba(0,0,0,0)); background: -ms-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.75),rgba(0,0,0,0)); background: -o-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.75),rgba(0,0,0,0)); }
 
 .headerBack { background-color: #00b4aa; padding: 1rem; margin-bottom: 20px; }
-.ManuWraper { display: flex; justify-content: space-between; align-items: center }
 
-.NameAndLogo { display: flex; align-items: center }
+.ManuWraper {text-align: center; display: block; justify-content: space-between; align-items: center }
+.NameAndLogo { display: block; align-items: center }
 .Logo_Img { height: 60px; border-radius: 5px; }
 
-.Ins_Name { margin-left: 1rem ; font-size: 30px; font-weight: bold; color: #fff; }
+.Ins_Name { font-size: 20px; font-weight: normal; color: #fff; }
 .Ins_Address { display:none; text-align:center; color:#000}
 
 
@@ -29,25 +29,14 @@ hr { border: 0; height: 1px; background: -webkit-linear-gradient(left,rgba(0,0,0
 .LoginButton { background-color: #FFF; border: 1px solid #DDD; color: #666; cursor: pointer; font-size: 10pt; height: 27px; padding-bottom: 3px; width: 55px; }
 .LoginButton:hover { border: 1px solid #ddd; color: #fff; background-color: #3F7B09; }
 
-/*-----End login-----*/
-/* .Main_Wraper { margin: auto; min-height: 800px; width: 100%; } */
-/* .Site_Navigation { border: none; float: left; padding: 0 0.5% 1%; width: 17%; margin-left: 10px; } */
 
-/*---Treeview Style---*/
-/* .treeNode { color: #333; font: bold 16px Arial,sans-serif; padding: 6px 3px; border-bottom: 1px solid #ddd; width: 100%; } */
-/* .rootNode { border-bottom: 1px solid #e3e3e3; color: #00b7ad; font-size: 20px; font-weight: bold; padding: 4px 0 6px 3px; width: 100%; } */
-/* .Site_Navigation a:hover { color: #333; text-decoration: none; } */
-/* .leafNode { font: 15px Arial,Sans-Serif; padding: 4px 4px 4px 0; } */
-/* .leafNode:hover { text-decoration: underline; } */
-/* .Selected_Node { color: #cc0062; } */
-
-#main-master { display: flex; min-height: 720px; margin-bottom: 2rem }
+#main-master { display: block; min-height: 720px; margin-bottom: 2rem }
 .main-container { flex: 1; padding:0 15px; }
 
-.side-navbar { border: none; padding: 0 15px; width: 17%; }
+.side-navbar { border: none; padding: 0 15px; width: auto }
 .side-navbar a:hover { color: #333; text-decoration: none; }
-.tree-node { color: #333; padding: 14px 3px; border-bottom: 1px solid #ddd; width: 100%; }
-.root-node { border-bottom: 1px solid #e3e3e3; color: #00b7ad; font-size: 17px; font-weight: bold; width: 100%; }
+.tree-node { color: #444; padding: 0.5rem 0.2rem; border-bottom: 1px solid #ddd; width: 100%; }
+.root-node { color: #333; padding: 0.8rem 0.5rem; border-bottom: 1px solid #e3e3e3; font-size: 17px; font-weight: bold; width: 100%; }
 
 .leaf-node { font: 15px Arial,Sans-Serif; padding: 4px 4px 4px 0; }
 .leaf-node:hover { text-decoration: underline; }
@@ -149,15 +138,19 @@ input[type="radio"]:checked + label { -moz-user-select: none; background-image: 
 
 @media print {
     .Ins_Address { display: block; }
+    .side-navbar{display: none}
 }
 
 /****Resposive Design************/
-@media screen and (max-width: 769px) /* Tablet &Mobile*/ {
-    .ManuWraper { display: block; text-align: center; }
-    .NameAndLogo { display: block; }
-    .Ins_Name { margin-left: 0; font-size: 20px; font-weight: normal; }
 
-    #main-master { display: block; }
-    .side-navbar { border: none; padding: 0 15px; width: auto; margin-bottom: 2rem }
+
+@media screen and (min-width: 800px) /* Tablet &Mobile*/ {
+    .ManuWraper { display: flex; }
+    .NameAndLogo { display: flex; }
+    .Ins_Name { margin-left: 1rem; font-size: 30px; font-weight: bold; }
+
+    #main-master { display: flex; }
+    .side-navbar { max-width: 16.666667%; width: 100% }
 }
+
 /***************end*************************/

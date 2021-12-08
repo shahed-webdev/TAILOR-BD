@@ -264,7 +264,7 @@
     <Content Include="CssGridview\Cmd_Ico\select_arrow.png" />
     <Content Include="CssGridview\Cmd_Ico\View.png" />
     <Content Include="CssGridview\Gridview.css" />
-    <Content Include="CSS\Basic.css" />
+    <Content Include="CSS\basic-master.css" />
     <Content Include="CSS\Default.css" />
     <Content Include="CSS\DesignMaster.css" />
     <Content Include="CSS\Image\Add_Expense.png" />

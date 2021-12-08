@@ -22,7 +22,7 @@ const helpers = {
 function initData() {
     const {
         order = [],
-        customer = { customerId: 0, isLoading: false, isNewCustomer: true, data: {} }
+        customer = { customerId: '', ClothForId:'', isLoading: false, isNewCustomer: true, data: {} }
     } = getStore();
 
     return {
@@ -38,19 +38,17 @@ function initData() {
 
         isPageLoading: false,
         selectedIndex: null,
-        order: order, //[{OrderDetails: '', dress: {}, measurements:[], styles:[], payments:[] }],
-
+        order,
 
 
         //customer
-        customer: customer,
+        customer,
 
         //find customer de bounce 
         customerTimerId: null,
         findCustomer(evt) {
             //reset if change text
-            this.apiData.customerId = 0;
-            this.apiData.clothForId = 0;
+            this.customer.customerId = 0;
             this.customer.isNewCustomer = true;
 
             $(`#${evt.target.id}`).typeahead({
@@ -58,7 +56,7 @@ function initData() {
                 displayText: item => {
                     return `${item.CustomerName}, ${item.Phone}`;
                 },
-                afterSelect: function (item) {
+                afterSelect: function(item) {
                     this.$element[0].value = item.CustomerName;
                 },
                 source: (request, result) => {
@@ -66,35 +64,32 @@ function initData() {
                     clearTimeout(this.customerTimerId);
 
                     this.customerTimerId = setTimeout(() => {
-                        $.ajax({
-                            url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
-                            contentType: "application/json; charset=utf-8",
-                            success: response => {
-                                result(response.d);
-                                this.customer.isLoading = false;
-                            },
-                            error: err => {
-                                console.log(err);
-                                this.customer.isLoading = false;
-                            }
-                        });
-                    },
+                            $.ajax({
+                                url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
+                                contentType: "application/json; charset=utf-8",
+                                success: response => {
+                                    result(response.d);
+                                    this.customer.isLoading = false;
+                                },
+                                error: err => {
+                                    console.log(err);
+                                    this.customer.isLoading = false;
+                                }
+                            });
+                        },
                         700)
                 },
                 updater: item => {
                     //set customer info
                     this.customer.data = item;
-                    this.apiData.customerId = +item.CustomerID;
-                    this.apiData.clothForId = item.Cloth_For_ID;
+                    this.customer.customerId = +item.CustomerID;
                     this.customer.isNewCustomer = false;
 
-                    this.getDress();
                     //save to local store
                     this.saveData();
-
                     return item;
                 }
-            })
+            });
         },
 
         //add new
@@ -128,7 +123,6 @@ function initData() {
             }
         },
 
-   
 
         //find fabrics
         fabricsPayment: {
@@ -207,6 +201,13 @@ function initData() {
             this.fabricsPayment = { FabricCode: '', FabricsName:'', Quantity: 0, UnitPrice: 0, FabricId: '', StockFabricQuantity: 0 };
         },
 
+        //remove fabric
+        removeFabric(id) {
+            this.order = this.order.filter(item => item.FabricId !== id);
+
+            //save to local store
+            this.saveData();
+        },
 
         //get account
         paymentMethod: [],
@@ -219,15 +220,12 @@ function initData() {
 
 
         //*** SUBMIT ORDER **//
-        orderPayment: { OrderAmount: 0, Discount: 0, PaidAmount: 0, AccountId: 0, DeliveryDate: '' },
+        orderPayment: { PaidAmount: 0, Discount: 0, AccountId: 0 },
 
         //calculate order total amount
         orderTotalAmount: 0,
         calculateTotal() {
-            const isPayment = this.order.filter(item => item.payments && item.payments).map(item => item.payments).flat(1);
-            if (!isPayment.length) return 0;
-
-            const total = isPayment.map(item => item.Quantity * item.Unit_Price).reduce((prev, current) => prev + current)
+            const total = this.order.map(item => item.Quantity * item.UnitPrice).reduce((prev, current) => prev + current)
             this.orderTotalAmount = total;
 
             return total || 0;
@@ -236,83 +234,50 @@ function initData() {
         //submit
         isSubmit: false,
         async submitOrder(evt) {
-            if (!this.apiData.customerId) {
-                $("#addCustomerModal").modal("show");
-                return $.notify(`Customer Not Added`, { position: "to center" });
+            const { Discount, PaidAmount, AccountId } = this.orderPayment;
+            const due = (this.orderTotalAmount - Discount) - PaidAmount;
+
+            if (due) {
+                if (!this.customer.customerId) {
+                    $("#addCustomerModal").modal("show");
+                    return $.notify(`Add customer to selling due`, { position: "to center" });
+                }
             }
 
+          
             if (!this.order.length)
-                return $.notify(`No Dress Added`, { position: "to center" });
+                return $.notify(`No Fabric Added`, { position: "to center" });
 
-            //create new model
-            const OrderList = this.order.map(item => {
-                return {
-                    DressId: item.dress.dressId,
-                    DressQuantity: item.quantity,
-                    Details: item.orderDetails,
-                    ListMeasurement: item.measurements.map(g => g.Measurements),
-                    ListStyle: item.styles.map(s => s.Styles),
-                    ListPayment: item.payments ? JSON.stringify(item.payments) : "[]"
-                }
-            });
-
-            //set flat array
-            OrderList.forEach(item => {
-                const measureMapped = item.ListMeasurement.flatMap(m => m);
-                const styleMapped = item.ListStyle.flatMap(m => m);
-
-                //measure
-                item.ListMeasurement = JSON.stringify(measureMapped.reduce((measure, obj) => {
-                    if (obj.Measurement)
-                        measure.push({ id: obj.MeasurementTypeID, value: obj.Measurement });
-
-                    return measure;
-                },
-                    []));
-
-                //style
-                item.ListStyle = JSON.stringify(styleMapped.reduce((style, obj) => {
-                    if (obj.IsCheck)
-                        style.push({ id: obj.DressStyleId, value: obj.DressStyleMesurement });
-
-                    return style;
-                },
-                    []));
-            });
-
+     
             //customer info
-            const { CustomerID, Cloth_For_ID } = this.customer.data;
-            const { Discount, PaidAmount, AccountId } = this.orderPayment;
+            const { CustomerId } = this.customer;
             const defaultAccount = this.paymentMethod.filter(item => item.IsDefault)[0];
 
             const model = {
-                OrderSn: this.orderNumber || '',
-                ClothForId: Cloth_For_ID,
-                CustomerId: CustomerID,
-                OrderAmount: this.calculateTotal(),
+                CustomerId,
+                TotalAmount: this.calculateTotal(),
                 Discount,
                 PaidAmount,
                 AccountId: AccountId || defaultAccount ? defaultAccount.AccountId : 0,
-                DeliveryDate: evt.target.DeliveryDate.value,
-                OrderList // [ DressId, DressQuantity, Details, ListMeasurement[], ListStyle[], ListPayment[] ]
+                FabricList: this.order
             }
 
-            try {
-                this.isSubmit = true;
-                const response = await fetch(`${helpers.baseUrl}/PostOrder`, {
-                    method: "POST",
-                    headers: helpers.header.headers,
-                    body: JSON.stringify({ model })
-                });
+            //try {
+            //    this.isSubmit = true;
+            //    const response = await fetch(`${helpers.baseUrl}/PostFabric`, {
+            //        method: "POST",
+            //        headers: helpers.header.headers,
+            //        body: JSON.stringify({ model })
+            //    });
 
-                const result = await response.json();
-                localStorage.removeItem("order-data")
+            //    const result = await response.json();
+            //    localStorage.removeItem("fabric-data")
 
-                location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
-            } catch (e) {
-                $.notify(e.message, { position: "to center" });
-                this.isSubmit = false;
-            }
+            //    location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
+            //} catch (e) {
+            //    $.notify(e.message, { position: "to center" });
+            //    this.isSubmit = false;
+            //}
         }
     }
 }
