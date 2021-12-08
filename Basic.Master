@@ -4,122 +4,120 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
-   <title>Tailor BD</title>
+    <title>Tailor BD</title>
 
-   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-   <meta name="robots" content="default, index, follow" />
-   <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="robots" content="default, index, follow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-   <!--start CSS -->
-   <link href="CSS/Basic.css?v=1.0.1" rel="stylesheet" type="text/css" />
-   <link href="CssGridview/Gridview.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <!--start CSS -->
+    <link href="CSS/Basic.css?v=1.0.1" rel="stylesheet" type="text/css" />
+    <link href="CssGridview/Gridview.css?v=1.0.0" rel="stylesheet" />
 
-   <!--start javascript -->
-   <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-   <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <!--start javascript -->
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
 
-   <asp:ContentPlaceHolder ID="head" runat="server" />
+    <asp:ContentPlaceHolder ID="head" runat="server" />
 </head>
 
 <body onload="checkCookies()">
-   <form id="Form1" runat="server">
+    <form id="Form1" runat="server">
 
-      <div class="headerBack">
-         <!--headerBack-->
-         <div class="ManuWraper">
-            <div class="NameAndLogo">
-               <asp:FormView ID="LogoFormView" runat="server" DataKeyNames="InstitutionID" DataSourceID="LogoSQL" Width="100%">
-                  <ItemTemplate>
-                     <div class="Logo">
-                        <img alt="" src="../../../Handler/TailorInfo.ashx?Img=<%#Eval("InstitutionID") %>" class="Logo_Img" /></div>
-                     <div class="Ins_Name">
-                        <asp:Label ID="InstitutionNameLabel" runat="server" Text='<%# Bind("InstitutionName") %>' />
-                     </div>
-                     <div class="Ins_Address">
-                        <asp:Label ID="Label1" runat="server" Text='<%# Bind("Address") %>' />
-                     </div>
-                  </ItemTemplate>
-               </asp:FormView>
-               <asp:SqlDataSource ID="LogoSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-                  SelectCommand="SELECT InstitutionName, InstitutionID, Address FROM Institution WHERE (InstitutionID = @InstitutionID)">
-                  <SelectParameters>
-                     <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
-                  </SelectParameters>
-               </asp:SqlDataSource>
+        <header class="headerBack">
+            <!--headerBack-->
+            <div class="ManuWraper">
+                <div class="NameAndLogo">
+                    <asp:FormView ID="LogoFormView" runat="server" DataKeyNames="InstitutionID" DataSourceID="LogoSQL" RenderOuterTable="False">
+                        <ItemTemplate>
+                            <div class="Logo">
+                                <img alt="" src="../../../Handler/TailorInfo.ashx?Img=<%#Eval("InstitutionID") %>" class="Logo_Img" />
+                            </div>
+                            <div class="Ins_Name">
+                                <asp:Label ID="InstitutionNameLabel" runat="server" Text='<%# Bind("InstitutionName") %>' />
+                            </div>
+                            <div class="Ins_Address">
+                                <asp:Label ID="Label1" runat="server" Text='<%# Bind("Address") %>' />
+                            </div>
+                        </ItemTemplate>
+                    </asp:FormView>
+                    <asp:SqlDataSource ID="LogoSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
+                        SelectCommand="SELECT InstitutionName, InstitutionID, Address FROM Institution WHERE (InstitutionID = @InstitutionID)">
+                        <SelectParameters>
+                            <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
+                        </SelectParameters>
+                    </asp:SqlDataSource>
+                </div>
 
-            </div>
+                <div class="UserPanel">
+                    <!--header_top for login-->
+                    <asp:LoginView ID="CustomerLoginView" runat="server">
+                        <AnonymousTemplate>
+                            <table>
+                                <tr>
+                                    <td><a href="../../Login.aspx">Login</a></td>
+                                </tr>
+                            </table>
 
-            <div class="UserPanel">
-               <!--header_top for login-->
-               <asp:LoginView ID="CustomerLoginView" runat="server">
-                  <AnonymousTemplate>
-                     <table>
-                        <tr>
-                           <td><a href="../../Login.aspx">Login</a></td>
-                        </tr>
-                     </table>
-
-                  </AnonymousTemplate>
-                  <LoggedInTemplate>
-                     <div class="Username">
-                        <span class="DfrColor">Welcome </span>|
+                        </AnonymousTemplate>
+                        <LoggedInTemplate>
+                            <div class="Username">
+                                <span class="DfrColor">Welcome </span>|
                          <asp:LoginName ID="CustomerLoginName" runat="server" />
-                        <br />
-                        <a href="../../../Profile_Redirect.aspx"><span class="DfrColor">Profile</span></a> | 
+                                <br />
+                                <a href="../../../Profile_Redirect.aspx"><span class="DfrColor">Profile</span></a> | 
                         <span class="LogOut">
-                           <asp:LoginStatus ID="LoginStatus1" runat="server" LogoutPageUrl="~/Default.aspx" LogoutAction="Redirect" OnLoggingOut="LoginStatus1_LoggingOut" />
+                            <asp:LoginStatus ID="LoginStatus1" runat="server" LogoutPageUrl="~/Default.aspx" LogoutAction="Redirect" OnLoggingOut="LoginStatus1_LoggingOut" />
                         </span>
-                     </div>
-                  </LoggedInTemplate>
-               </asp:LoginView>
+                            </div>
+                        </LoggedInTemplate>
+                    </asp:LoginView>
+                </div>
             </div>
-            <!--End header_top-->
+        </header>
 
-         </div>
-      </div>
+        <main id="main-master">
+            <div class="side-navbar">
+                <a href="/AccessAdmin/quick-order/Order.aspx" class="quick-order-btn">Quick Order
+                </a>
 
-      <div class="Main_Wraper">
-         <div class="Site_Navigation">
-             <a href="/AccessAdmin/quick-order/Order.aspx" class="quick-order-btn">
-                 Quick Order
-             </a>
+                <asp:TreeView ID="LinkTreeView"
+                    ExpandImageUrl="~/CSS/Image/Expand_Ico.png"
+                    CollapseImageUrl="~/CSS/Image/Collaps_Ico.png"
+                    NodeStyle-CssClass="tree-node"
+                    RootNodeStyle-CssClass="root-node"
+                    LeafNodeStyle-CssClass="leaf-node"
+                    SelectedNodeStyle-CssClass="selected-node"
+                    NodeWrap="true"
+                    runat="server">
+                </asp:TreeView>
+            </div>
 
-            <asp:TreeView ID="LinkTreeView"
-               ExpandImageUrl="~/CSS/Image/Expand_Ico.png"
-               CollapseImageUrl="~/CSS/Image/Collaps_Ico.png"
-               NodeStyle-CssClass="treeNode"
-               RootNodeStyle-CssClass="rootNode"
-               LeafNodeStyle-CssClass="leafNode"
-               SelectedNodeStyle-CssClass="Selected_Node"
-               NodeWrap="true"
-               runat="server">
-            </asp:TreeView>
-         </div>
+            <div class="main-container">
+                <!--main contain-->
+                <asp:ContentPlaceHolder ID="body" runat="server" />
+            </div>
+        </main>
 
-         <div class="maincontain">
-            <!--maincontain-->
-            <asp:ContentPlaceHolder ID="body" runat="server" />
-         </div>
+        <footer class="footer">
+            <span>Copyright © 2015-<span id="CYear"></span> Tailorbd.com All rights reserved</span>
+        </footer>
 
-      </div>
+        <script>
+            $(function () {
+                $("#CYear").text((new Date).getFullYear());
+            });
 
-      <div class="footer">
-         <span>Copyright © 2015-<span id="CYear"></span> Tailorbd.com All rights reserved</span>
-      </div>
-
-      <script>
-          $(function () {
-              $("#CYear").text((new Date).getFullYear());
-          });
-
-         function checkCookies() {
-            if (navigator.cookieEnabled != true) {
-               alert("System is not work coz (Cookies are not enabled your browser.)")
+            function checkCookies() {
+                if (navigator.cookieEnabled != true) {
+                    alert("System is not work coz (Cookies are not enabled your browser.)")
+                }
             }
-         }
-      </script>
-   </form>
+        </script>
+    </form>
 
 </body>
 </html>
