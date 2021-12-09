@@ -348,6 +348,10 @@
                             <input type="text" id="address" x-model="customer.data.Address" class="form-control">
                         </div>
                         <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" x-model="customer.data.Description" class="form-control">
+                        </div>
+                        <div class="form-group">
                             <label>Gender</label>
                             <select x-model="customer.data.Cloth_For_ID" class="form-control" required>
                                 <option value="1">পুরুষ</option>
@@ -355,7 +359,6 @@
                                 <option value="3">বাচ্চা</option>
                             </select>
                         </div>
-
                         <div class="d-flex justify-content-center">
                             <template x-if="customer.isNewCustomer">
                                <button type="submit" :disabled="customer.isLoading" class="btn btn-teal">Add Customer <i class="fa fa-paper-plane ml-1"></i></button>

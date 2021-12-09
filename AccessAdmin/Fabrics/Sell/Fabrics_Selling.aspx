@@ -157,6 +157,10 @@
                             <input type="text" id="address" x-model="customer.data.Address" class="form-control">
                         </div>
                         <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" x-model="customer.data.Description" class="form-control">
+                        </div>
+                        <div class="form-group">
                             <label>Gender</label>
                             <select x-model="customer.data.ClothForId" class="form-control" required>
                                 <option value="1">পুরুষ</option>

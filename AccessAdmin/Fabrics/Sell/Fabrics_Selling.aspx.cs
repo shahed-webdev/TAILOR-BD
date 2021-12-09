@@ -17,6 +17,8 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell
         protected void Page_Load(object sender, EventArgs e)
         {
         }
+
+
         //find customer autocomplete
         [WebMethod]
         [ScriptMethod(UseHttpGet = true)]
@@ -28,7 +30,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText = "select Top(3) CustomerID,Cloth_For_ID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND (Phone like @prefex + '%') or (CustomerName like @prefex + '%')";
+                    cmd.CommandText = "select Top(3) CustomerID, Cloth_For_ID, CustomerName, Phone, Address, Description from Customer where InstitutionID = @InstitutionID AND ((Phone like @prefex + '%') or (CustomerName like @prefex + '%'))";
                     cmd.Parameters.AddWithValue("@prefex", prefix);
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
 
@@ -45,6 +47,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell
                                 CustomerName = sdr["CustomerName"].ToString(),
                                 Phone = sdr["Phone"].ToString(),
                                 Address = sdr["Address"].ToString(),
+                                Description = sdr["Description"].ToString(),
                             };
                             customers.Add(dress);
                         }
@@ -87,13 +90,14 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell
                 //insert customer and get customerId
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Customer (RegistrationID, InstitutionID, Cloth_For_ID, CustomerName, Phone, Address, Date, CustomerNumber) VALUES (@RegistrationID,@InstitutionID,@Cloth_For_ID,@CustomerName,@Phone,@Address, GETDATE(),(SELECT [dbo].[CustomeSerialNumber](@InstitutionID))); select IDENT_CURRENT('Customer')";
+                    cmd.CommandText = @"INSERT INTO Customer (RegistrationID, InstitutionID, Cloth_For_ID, CustomerName, Phone, Address,Description, Date, CustomerNumber) VALUES (@RegistrationID,@InstitutionID,@Cloth_For_ID,@CustomerName,@Phone,@Address,@Description, GETDATE(),(SELECT [dbo].[CustomeSerialNumber](@InstitutionID))); select IDENT_CURRENT('Customer')";
                     cmd.Parameters.AddWithValue("@RegistrationID", HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Parameters.AddWithValue("@Cloth_For_ID", model.Cloth_For_ID);
                     cmd.Parameters.AddWithValue("@CustomerName", model.CustomerName.Trim());
                     cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
                     cmd.Parameters.AddWithValue("@Address", model.Address.Trim());
+                    cmd.Parameters.AddWithValue("@Description", model.Description.Trim());
                     cmd.Connection = con;
 
                     con.Open();
@@ -114,6 +118,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell
             }
             return new ResponseModel<CustomerViewModel>(true, "Customer added successfully", model);
         }
+
 
         //find fabrics autocomplete
         [WebMethod]

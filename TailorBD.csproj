@@ -200,7 +200,6 @@
     <Content Include="AccessAdmin\Order\Print_A4_Mesurement.aspx" />
     <Content Include="AccessAdmin\Order\Print_Mesurement.aspx" />
     <Content Include="AccessAdmin\Profile.aspx" />
-    <Content Include="AccessAdmin\quick-order\FabricSelling.aspx" />
     <Content Include="AccessAdmin\quick-order\js\autocomplete.js" />
     <Content Include="AccessAdmin\Fabrics\Sell\js\fabric-selling.js" />
     <Content Include="AccessAdmin\quick-order\js\update-order.js" />
@@ -827,13 +826,6 @@
     <Compile Include="AccessAdmin\Profile.aspx.designer.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
     </Compile>
-    <Compile Include="AccessAdmin\quick-order\FabricSelling.aspx.cs">
-      <DependentUpon>FabricSelling.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="AccessAdmin\quick-order\FabricSelling.aspx.designer.cs">
-      <DependentUpon>FabricSelling.aspx</DependentUpon>
-    </Compile>
     <Compile Include="AccessAdmin\quick-order\Order.aspx.cs">
       <DependentUpon>Order.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1258,6 +1250,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AccessAdmin\Sub_Admin\Css\" />
+    <Folder Include="API\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

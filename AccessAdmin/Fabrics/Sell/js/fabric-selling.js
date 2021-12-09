@@ -97,8 +97,8 @@ function initData() {
 
         //add new
         async addNewCustomer() {
-            const { Phone, CustomerName, Address, Cloth_For_ID = 1 } = this.customer.data;
-            const model = { Phone, CustomerName, Address, Cloth_For_ID }
+            const { Phone, CustomerName, Address, Description, Cloth_For_ID = 1 } = this.customer.data;
+            const model = { Phone, CustomerName, Address, Description, Cloth_For_ID }
 
             try {
                 const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`,
@@ -116,6 +116,8 @@ function initData() {
                 if (result.d.IsSuccess) {
                     this.customer.data = result.d.Data;
                     this.apiData.customerId = result.d.Data.CustomerID;
+                    this.customer.isNewCustomer = false;
+                    $("#addCustomerModal").modal("hide");
 
                     //save to local store
                     this.saveData();
