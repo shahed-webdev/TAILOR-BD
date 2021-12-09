@@ -853,6 +853,7 @@
     <Compile Include="AccessAdmin\quick-order\ViewModels\DressDllViewModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\DressMeasurementStyleViewModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\DressPriceDllModel.cs" />
+    <Compile Include="AccessAdmin\quick-order\ViewModels\FabricSellingModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\FabricViewModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\OrderEditModel.cs" />
     <Compile Include="AccessAdmin\quick-order\ViewModels\OrderPostModel.cs" />
