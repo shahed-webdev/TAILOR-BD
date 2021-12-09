@@ -4,404 +4,232 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web;
+using System.Web.Script.Services;
 using System.Web.Services;
 using System.Web.UI.WebControls;
+using TailorBD.AccessAdmin.quick_order.ViewModels;
 
 namespace TailorBD.AccessAdmin.Fabrics.Sell
 {
     public partial class Fabrics_Selling : System.Web.UI.Page
     {
-        private readonly SqlConnection _con = new SqlConnection(ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ToString());
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            var chargeTable = new DataTable();
-            if (IsPostBack) return;
-
-            chargeTable.Columns.AddRange(new DataColumn[5]
-            {
-                new DataColumn("FabricID"), new DataColumn("FabricCode"), new DataColumn("UnitPrice"),
-                new DataColumn("Quantity"), new DataColumn("TotalPrice")
-            });
-
-            ViewState["ChargeTeble"] = chargeTable;
-
-            var totalCustomer = new SqlCommand("SELECT [dbo].[CustomeSerialNumber](@InstitutionID)", _con);
-            totalCustomer.Parameters.AddWithValue("@InstitutionID", Request.Cookies["InstitutionID"]?.Value);
-
-            _con.Open();
-            CustomerIDLabel.Text = totalCustomer.ExecuteScalar().ToString();
-            _con.Close();
         }
-
-        protected void AccountDropDownList_DataBound(object sender, EventArgs e)
-        {
-            AccountDropDownList.Items.Insert(0, new ListItem("Without Account", ""));
-        }
-
-        /*Add To Cart Button*/
-        protected void BindGrid()
-        {
-            ChargeGridView.DataSource = ViewState["ChargeTeble"] as DataTable;
-            ChargeGridView.DataBind();
-
-            //FabricDropDownList.DataBind();
-            //foreach (GridViewRow row in ChargeGridView.Rows)
-            //{
-            //    Label FabricIDLabel = row.FindControl("FabricIDLabel") as Label;
-            //    FabricDropDownList.Items.Remove(FabricDropDownList.Items.FindByValue(FabricIDLabel.Text));
-            //}
-        }
-      
-        protected void RowDelete(object sender, EventArgs e)
-        {
-            GridViewRow row = (sender as LinkButton)?.NamingContainer as GridViewRow;
-
-            if (ViewState["ChargeTeble"] is DataTable chargeTable)
-            {
-                if (row != null) chargeTable.Rows.RemoveAt(row.RowIndex);
-                ViewState["ChargeTeble"] = chargeTable;
-            }
-
-            BindGrid();
-        }
-   
-        protected void AddToCartButton_Click(object sender, EventArgs e)
-        {
-            if (FabricIDHF.Value != string.Empty)
-            {
-                CheckBalanceLabel.Text = "";
-
-                double unitPrice = 0;
-                unitPrice = Convert.ToDouble(CSPCheckBox.Checked ? ChangeUPriceTextBox.Text : UPHF.Value);
-
-                var quantity = Convert.ToDouble(QuantityTextBox.Text);
-
-                if (ViewState["ChargeTeble"] is DataTable chargeTable)
-                {
-                    chargeTable.Rows.Add(FabricIDHF.Value, Fabric_CodeTextBox.Text, unitPrice, QuantityTextBox.Text, unitPrice * quantity);
-                    ViewState["ChargeTeble"] = chargeTable;
-                }
-
-                BindGrid();
-
-                FabricIDHF.Value = "";
-                Fabric_CodeTextBox.Text = string.Empty;
-                UPHF.Value = "";
-                QuantityTextBox.Text = string.Empty;
-
-                SelectedAccount();
-                CSPCheckBox.Checked = false;
-            }
-            else
-            {
-                Fabric_CodeTextBox.Text = string.Empty;
-                QuantityTextBox.Text = string.Empty;
-            }
-        }
-
-        /*Submit Button*/
-        protected void SelectedAccount()
-        {
-            var accountCmd = new SqlCommand("Select AccountID from Account where InstitutionID = @InstitutionID AND Default_Status = 'True' AND AccountBalance <> 0", _con);
-            accountCmd.Parameters.AddWithValue("@InstitutionID", Request.Cookies["InstitutionID"]?.Value);
-            
-            _con.Open();
-            var accountId = accountCmd.ExecuteScalar();
-            _con.Close();
-
-            if (accountId != null)
-                AccountDropDownList.SelectedValue = accountId.ToString();
-        }
-
-        protected void Fabric_SellingSQL_Inserted(object sender, SqlDataSourceStatusEventArgs e)
-        {
-            ViewState["FabricsSellingID"] = e.Command.Parameters["@FabricsSellingID"].Value.ToString();
-        }
-
-        protected void SubmitButton_Click(object sender, EventArgs e)
-        {
-            var allCheck = true;
-
-            foreach (GridViewRow row in ChargeGridView.Rows)
-            {
-                if (ChargeGridView.Rows.Count <= 0) continue;
-
-                var sellingQuantity = row.FindControl("QntLabel") as Label;
-                var fabricIdLabel = row.FindControl("FabricIDLabel") as Label;
-
-                using (var cmd = new SqlCommand())
-                {
-                    cmd.CommandText = "SELECT FabricID FROM Fabrics WHERE (InstitutionID = @InstitutionID) AND (StockFabricQuantity >= @SellingQuantity) AND (FabricID = @FabricID)";
-                    cmd.Parameters.AddWithValue("@FabricID", fabricIdLabel.Text);
-                    cmd.Parameters.AddWithValue("@InstitutionID", Request.Cookies["InstitutionID"].Value);
-                    cmd.Parameters.AddWithValue("@SellingQuantity", sellingQuantity.Text);
-
-                    cmd.Connection = _con;
-
-                    _con.Open();
-                    var checkStock = cmd.ExecuteScalar();
-                    _con.Close();
-
-                    if (checkStock != null) continue;
-
-                    allCheck = false;
-                    row.BackColor = System.Drawing.Color.Red;
-                }
-            }
-
-            if (!allCheck) return;
-
-
-            CheckBalanceLabel.Text = "";
-            Fabric_SellingSQL.Insert();
-
-            foreach (GridViewRow row in ChargeGridView.Rows)
-            {
-                if (ChargeGridView.Rows.Count <= 0) continue;
-
-                var fabricIdLabel = row.FindControl("FabricIDLabel") as Label;
-                var sellingQuantity = row.FindControl("QntLabel") as Label;
-                var sellingUpLabel = row.FindControl("Selling_UPLabel") as Label;
-
-                Fabric_Selling_ListSQl.InsertParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-                Fabric_Selling_ListSQl.InsertParameters["FabricID"].DefaultValue = fabricIdLabel.Text;
-                Fabric_Selling_ListSQl.InsertParameters["SellingQuantity"].DefaultValue = sellingQuantity.Text;
-                Fabric_Selling_ListSQl.InsertParameters["SellingUnitPrice"].DefaultValue = sellingUpLabel.Text;
-                Fabric_Selling_ListSQl.Insert();
-            }
-
-            Fabric_SellingSQL.UpdateParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-            Fabric_SellingSQL.Update();
-
-            Selling_PaymentRecord.InsertParameters["SellingPaidAmount"].DefaultValue = SubTotalHF.Value;
-            Selling_PaymentRecord.InsertParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-            Selling_PaymentRecord.Insert();
-            AccountDropDownList.DataBind();
-
-            if (ViewState["FabricsSellingID"].ToString() != "")
-                Response.Redirect("Print_Invoice.aspx?FabricsSellingID=" + ViewState["FabricsSellingID"].ToString());
-
-        }
-
-        /*New Customer Button*/
-        protected void CustomerSQL_Inserted(object sender, SqlDataSourceStatusEventArgs e)
-        {
-            ViewState["CustomerID"] = e.Command.Parameters["@CustomerID"].Value.ToString();
-        }
-
-        protected void NewCustomerButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var allCheck = true;
-
-                foreach (GridViewRow row in ChargeGridView.Rows)
-                {
-                    if (ChargeGridView.Rows.Count <= 0) continue;
-
-                    var sellingQuantity = row.FindControl("QntLabel") as Label;
-                    var fabricIdLabel = row.FindControl("FabricIDLabel") as Label;
-                    using (var cmd = new SqlCommand())
-                    {
-                        cmd.CommandText =
-                            "SELECT FabricID FROM Fabrics WHERE (InstitutionID = @InstitutionID) AND (StockFabricQuantity > @SellingQuantity) AND (FabricID = @FabricID)";
-                        cmd.Parameters.AddWithValue("@FabricID", fabricIdLabel.Text);
-                        cmd.Parameters.AddWithValue("@InstitutionID", Request.Cookies["InstitutionID"].Value);
-                        cmd.Parameters.AddWithValue("@SellingQuantity", sellingQuantity.Text);
-
-                        cmd.Connection = _con;
-
-                        _con.Open();
-                        var checkStock = cmd.ExecuteScalar();
-                        _con.Close();
-
-                        if (checkStock != null) continue;
-
-                        allCheck = false;
-                        row.BackColor = System.Drawing.Color.Red;
-                    }
-                }
-
-                if (!allCheck) return;
-
-                CustomerSQL.Insert();
-                InstitutionSQL.Update();
-
-                Fabric_SellingSQL.InsertParameters["CustomerID"].DefaultValue = ViewState["CustomerID"].ToString();
-                Fabric_SellingSQL.Insert();
-
-                foreach (GridViewRow row in ChargeGridView.Rows)
-                {
-                    if (ChargeGridView.Rows.Count <= 0) continue;
-
-                    var fabricIdLabel = row.FindControl("FabricIDLabel") as Label;
-                    var sellingQuantity = row.FindControl("QntLabel") as Label;
-                    var sellingUpLabel = row.FindControl("Selling_UPLabel") as Label;
-
-                    Fabric_Selling_ListSQl.InsertParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-                    Fabric_Selling_ListSQl.InsertParameters["FabricID"].DefaultValue = fabricIdLabel.Text;
-                    Fabric_Selling_ListSQl.InsertParameters["SellingQuantity"].DefaultValue = sellingQuantity.Text;
-                    Fabric_Selling_ListSQl.InsertParameters["SellingUnitPrice"].DefaultValue = sellingUpLabel.Text;
-                    Fabric_Selling_ListSQl.Insert();
-                }
-
-                Fabric_SellingSQL.UpdateParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-                Fabric_SellingSQL.Update();
-
-                Selling_PaymentRecord.InsertParameters["SellingPaidAmount"].DefaultValue = CustomerTA_TextBox.Text;
-                Selling_PaymentRecord.InsertParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-                Selling_PaymentRecord.Insert();
-
-
-                if (ViewState["FabricsSellingID"].ToString() != "")
-                {
-                    Response.Redirect("Print_Invoice.aspx?FabricsSellingID=" + ViewState["FabricsSellingID"].ToString());
-                }
-            }
-            catch
-            {
-                CustomerErlbl1.Text = "system error";
-            }
-        }
-
-
-        /*Old Customer Button*/
-        protected void OldCustomerButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var allCheck = true;
-
-                foreach (GridViewRow row in ChargeGridView.Rows)
-                {
-                    if (ChargeGridView.Rows.Count <= 0) continue;
-
-                    var sellingQuantity = row.FindControl("QntLabel") as Label;
-                    var fabricIdLabel = row.FindControl("FabricIDLabel") as Label;
-
-                    using (var cmd = new SqlCommand())
-                    {
-                        cmd.CommandText =
-                            "SELECT FabricID FROM Fabrics WHERE (InstitutionID = @InstitutionID) AND (StockFabricQuantity > @SellingQuantity) AND (FabricID = @FabricID)";
-                        cmd.Parameters.AddWithValue("@FabricID", fabricIdLabel.Text);
-                        cmd.Parameters.AddWithValue("@InstitutionID", Request.Cookies["InstitutionID"].Value);
-                        cmd.Parameters.AddWithValue("@SellingQuantity", sellingQuantity.Text);
-
-                        cmd.Connection = _con;
-
-                        _con.Open();
-                        var checkStock = cmd.ExecuteScalar();
-                        _con.Close();
-
-                        if (checkStock != null) continue;
-
-                        allCheck = false;
-                        row.BackColor = System.Drawing.Color.Red;
-                    }
-                }
-
-                if (!allCheck) return;
-
-                if (Customer_ID_HF.Value.Trim() != "")
-                {
-                    Fabric_SellingSQL.InsertParameters["CustomerID"].DefaultValue = Customer_ID_HF.Value;
-                    Fabric_SellingSQL.Insert();
-                    CustomerErlbl2.Text = "";
-
-                    foreach (GridViewRow row in ChargeGridView.Rows)
-                    {
-                        if (ChargeGridView.Rows.Count <= 0) continue;
-
-                        var fabricIdLabel = row.FindControl("FabricIDLabel") as Label;
-                        var sellingQuantity = row.FindControl("QntLabel") as Label;
-                        var sellingUpLabel = row.FindControl("Selling_UPLabel") as Label;
-
-                        Fabric_Selling_ListSQl.InsertParameters["FabricsSellingID"].DefaultValue =
-                            ViewState["FabricsSellingID"].ToString();
-                        Fabric_Selling_ListSQl.InsertParameters["FabricID"].DefaultValue = fabricIdLabel?.Text;
-                        Fabric_Selling_ListSQl.InsertParameters["SellingQuantity"].DefaultValue = sellingQuantity?.Text;
-                        Fabric_Selling_ListSQl.InsertParameters["SellingUnitPrice"].DefaultValue = sellingUpLabel?.Text;
-                        Fabric_Selling_ListSQl.Insert();
-                    }
-
-                    Fabric_SellingSQL.UpdateParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-                    Fabric_SellingSQL.Update();
-
-                    Selling_PaymentRecord.InsertParameters["SellingPaidAmount"].DefaultValue = Old_CustomerAmtTextBox.Text;
-                    Selling_PaymentRecord.InsertParameters["FabricsSellingID"].DefaultValue = ViewState["FabricsSellingID"].ToString();
-                    Selling_PaymentRecord.Insert();
-
-                    if (ViewState["FabricsSellingID"].ToString() != "")
-                    {
-                        Response.Redirect("Print_Invoice.aspx?FabricsSellingID=" + ViewState["FabricsSellingID"].ToString());
-                    }
-                }
-            }
-            catch
-            {
-                CustomerErlbl2.Text = "system error";
-            }
-        }
-
+        //find customer autocomplete
         [WebMethod]
-        public static string[] Fabric_Code(string prefix)
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<CustomerViewModel> FindCustomer(string prefix)
         {
-            var institutionId = HttpContext.Current.Request.Cookies["InstitutionID"];
-            var customers = new List<string>();
-            
+            var customers = new List<CustomerViewModel>();
             using (var conn = new SqlConnection())
             {
-                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorbdConnectionString"].ConnectionString;
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText = "SELECT top(3) Fabrics.FabricCode, Fabrics.FabricsName, Fabrics.SellingUnitPrice, Fabrics.StockFabricQuantity, Fabrics_Mesurement_Unit.UnitName, Fabrics.FabricID, Fabrics.InstitutionID FROM  Fabrics INNER JOIN Fabrics_Mesurement_Unit ON Fabrics.FabricMesurementUnitID = Fabrics_Mesurement_Unit.FabricMesurementUnitID WHERE (Fabrics.InstitutionID = @InstitutionID) AND (Fabrics.StockFabricQuantity <> 0) AND Fabrics.FabricCode like @FabricCode + '%'";
+                    cmd.CommandText = "select Top(3) CustomerID,Cloth_For_ID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND (Phone like @prefex + '%') or (CustomerName like @prefex + '%')";
+                    cmd.Parameters.AddWithValue("@prefex", prefix);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+
+                    cmd.Connection = conn;
+                    conn.Open();
+                    using (var sdr = cmd.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var dress = new CustomerViewModel
+                            {
+                                CustomerID = sdr["CustomerID"].ToString(),
+                                Cloth_For_ID = sdr["Cloth_For_ID"].ToString(),
+                                CustomerName = sdr["CustomerName"].ToString(),
+                                Phone = sdr["Phone"].ToString(),
+                                Address = sdr["Address"].ToString(),
+                            };
+                            customers.Add(dress);
+                        }
+                    }
+                    conn.Close();
+                }
+            }
+            return customers;
+        }
+
+
+        //add new customer
+        [WebMethod]
+        public static ResponseModel<CustomerViewModel> AddNewCustomer(CustomerViewModel model)
+        {
+            using (var con = new SqlConnection())
+            {
+                con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+
+                //Check customer exist 
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = "select * from Customer where InstitutionID = @InstitutionID AND CustomerName = @CustomerName AND Phone = @Phone";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                    cmd.Parameters.AddWithValue("@CustomerName", model.CustomerName.Trim());
+                    cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
+
+                    cmd.Connection = con;
+
+                    con.Open();
+                    var isCustomer = cmd.ExecuteScalar();
+                    con.Close();
+
+                    if (isCustomer != null)
+                    {
+                        return new ResponseModel<CustomerViewModel>(false, model.CustomerName + ". মোবাইল: " + model.Phone + " পূর্বে নিবন্ধিত, পুনরায় নিবন্ধন করা যাবে না");
+                    }
+                }
+
+                //insert customer and get customerId
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Customer (RegistrationID, InstitutionID, Cloth_For_ID, CustomerName, Phone, Address, Date, CustomerNumber) VALUES (@RegistrationID,@InstitutionID,@Cloth_For_ID,@CustomerName,@Phone,@Address, GETDATE(),(SELECT [dbo].[CustomeSerialNumber](@InstitutionID))); select IDENT_CURRENT('Customer')";
+                    cmd.Parameters.AddWithValue("@RegistrationID", HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                    cmd.Parameters.AddWithValue("@Cloth_For_ID", model.Cloth_For_ID);
+                    cmd.Parameters.AddWithValue("@CustomerName", model.CustomerName.Trim());
+                    cmd.Parameters.AddWithValue("@Phone", model.Phone.Trim());
+                    cmd.Parameters.AddWithValue("@Address", model.Address.Trim());
+                    cmd.Connection = con;
+
+                    con.Open();
+                    model.CustomerID = cmd.ExecuteScalar().ToString();
+                    con.Close();
+
+                }
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"UPDATE Institution SET TotalCustomer = [dbo].[CustomeSerialNumber](@InstitutionID) WHERE(InstitutionID = @InstitutionID)";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                    cmd.Connection = con;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                }
+            }
+            return new ResponseModel<CustomerViewModel>(true, "Customer added successfully", model);
+        }
+
+        //find fabrics autocomplete
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<FabricViewModel> FindFabrics(string prefix)
+        {
+            var fabrics = new List<FabricViewModel>();
+            using (var conn = new SqlConnection())
+            {
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.CommandText = @"SELECT top(3) Fabrics.FabricCode, Fabrics.FabricsName, Fabrics.SellingUnitPrice, Fabrics.StockFabricQuantity, Fabrics_Mesurement_Unit.UnitName, Fabrics.FabricID, Fabrics.InstitutionID FROM  Fabrics INNER JOIN Fabrics_Mesurement_Unit ON Fabrics.FabricMesurementUnitID = Fabrics_Mesurement_Unit.FabricMesurementUnitID WHERE (Fabrics.InstitutionID = @InstitutionID) AND (Fabrics.StockFabricQuantity <> 0) AND Fabrics.FabricCode like @FabricCode + '%'";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
                     cmd.Parameters.AddWithValue("@FabricCode", prefix);
-                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId?.Value);
                     cmd.Connection = conn;
                     conn.Open();
-                   
                     using (var sdr = cmd.ExecuteReader())
                     {
                         while (sdr.Read())
                         {
-                            customers.Add($"{sdr["FabricCode"]}||{sdr["FabricsName"]}||{Convert.ToString(sdr["SellingUnitPrice"])}||{Convert.ToString(sdr["StockFabricQuantity"])}||{sdr["UnitName"]}||{Convert.ToString(sdr["FabricID"])}");
+                            var fabric = new FabricViewModel
+                            {
+                                FabricId = Convert.ToInt32(sdr["FabricID"]),
+                                FabricCode = sdr["FabricCode"].ToString(),
+                                FabricsName = sdr["FabricsName"].ToString(),
+                                SellingUnitPrice = Convert.ToDouble(sdr["SellingUnitPrice"]),
+                                StockFabricQuantity = Convert.ToDouble(sdr["StockFabricQuantity"]),
+                                UnitName = sdr["UnitName"].ToString()
+                            };
+                            fabrics.Add(fabric);
                         }
                     }
                     conn.Close();
                 }
             }
-            return customers.ToArray();
+            return fabrics;
         }
 
+        //Account dropdown
         [WebMethod]
-        public static string[] Get_Customer(string prefix)
+        [ScriptMethod(UseHttpGet = true)]
+        public static List<AccountDllModel> AccountDlls()
         {
-            var institutionId = HttpContext.Current.Request.Cookies["InstitutionID"];
-            var customers = new List<string>();
-           
+            var accountList = new List<AccountDllModel>();
             using (var conn = new SqlConnection())
             {
-                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorbdConnectionString"].ConnectionString;
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText = "SELECT top(3) Phone, CustomerName, CustomerNumber, CustomerID FROM Customer WHERE InstitutionID = @InstitutionID AND Phone like @Phone + '%'";
-                    cmd.Parameters.AddWithValue("@Phone", prefix);
-                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId.Value);
+                    cmd.CommandText = @"SELECT  AccountID, AccountName, Default_Status FROM Account WHERE (InstitutionID = @InstitutionID) ORDER BY AccountName";
+                    cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+
                     cmd.Connection = conn;
-                    
                     conn.Open();
                     using (var sdr = cmd.ExecuteReader())
                     {
                         while (sdr.Read())
                         {
-                            customers.Add($"{sdr["Phone"]}||{sdr["CustomerName"]}||{Convert.ToString(sdr["CustomerNumber"])}||{Convert.ToString(sdr["CustomerID"])}");
+                            var dressPrice = new AccountDllModel
+                            {
+                                AccountId = Convert.ToInt32(sdr["AccountID"]),
+                                AccountName = sdr["AccountName"].ToString(),
+                                IsDefault = Convert.ToBoolean(sdr["Default_Status"])
+                            };
+                            accountList.Add(dressPrice);
                         }
                     }
                     conn.Close();
                 }
             }
-            return customers.ToArray();
+            return accountList;
+        }
+
+
+        //post order
+        [WebMethod]
+        public static ResponseModel<int> PostOrder(FabricSellingModel model)
+        {
+            try
+            {
+                var institutionId = Convert.ToInt32(HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
+                var registrationId = Convert.ToInt32(HttpContext.Current.Request.Cookies["RegistrationID"]?.Value);
+                var fabricsSellingId = 0;
+
+                //Insert order List
+                using (var con = new SqlConnection())
+                {
+                    con.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+                    using (var cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = @"SP_Fabrics_Sell";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Connection = con;
+
+                        cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                        cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
+
+                        cmd.Parameters.AddWithValue("@AccountID", model.AccountID);
+                        cmd.Parameters.AddWithValue("@CustomerID", model.CustomerID);
+                        cmd.Parameters.AddWithValue("@SellingPaidAmount", model.SellingPaidAmount);
+                        cmd.Parameters.AddWithValue("@SellingDiscountAmount", model.SellingDiscountAmount);
+                        cmd.Parameters.AddWithValue("@FabricList", model.FabricList);
+
+                        con.Open();
+                        fabricsSellingId = Convert.ToInt32(cmd.ExecuteScalar());
+                        con.Close();
+                    }
+                }
+
+                return new ResponseModel<int>(true, "Success", fabricsSellingId);
+            }
+            catch (Exception e)
+            {
+                return new ResponseModel<int>(false, e.Message);
+            }
         }
     }
 }

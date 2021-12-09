@@ -8,7 +8,7 @@ function getStore() {
 
 //api helpers methods
 const helpers = {
-    baseUrl: 'Order.aspx',
+    baseUrl: 'Fabrics_Selling.aspx',
     header: {
         headers: {
             'Accept': 'application/json',
@@ -22,7 +22,7 @@ const helpers = {
 function initData() {
     const {
         order = [],
-        customer = { customerId: '', ClothForId:'', isLoading: false, isNewCustomer: true, data: {} }
+        customer = { customerId: '', isLoading: false, isNewCustomer: true, data: {} }
     } = getStore();
 
     return {
@@ -68,7 +68,7 @@ function initData() {
 
                     this.customerTimerId = setTimeout(() => {
                             $.ajax({
-                                url: `Order.aspx/FindCustomer?prefix=${JSON.stringify(request)}`,
+                                url: `${helpers.baseUrl}/FindCustomer?prefix=${JSON.stringify(request)}`,
                                 contentType: "application/json; charset=utf-8",
                                 success: response => {
                                     result(response.d);
@@ -156,7 +156,7 @@ function initData() {
 
                     this.fabricTimerId = setTimeout(() => {
                             $.ajax({
-                                url: `Order.aspx/FindFabrics?prefix=${JSON.stringify(request)}`,
+                                url: `${helpers.baseUrl}/FindFabrics?prefix=${JSON.stringify(request)}`,
                                 contentType: "application/json; charset=utf-8",
                                 success: response => result(response.d),
                                 error: err => console.log(err)
@@ -228,6 +228,8 @@ function initData() {
         //calculate order total amount
         orderTotalAmount: 0,
         calculateTotal() {
+            if (!this.order.length) return 0;
+
             const total = this.order.map(item => item.Quantity * item.UnitPrice).reduce((prev, current) => prev + current)
             this.orderTotalAmount = total;
 
@@ -239,48 +241,54 @@ function initData() {
         async submitOrder(evt) {
             const { Discount, PaidAmount, AccountId } = this.orderPayment;
             const due = (this.orderTotalAmount - Discount) - PaidAmount;
+            const { customerId } = this.customer;
 
             if (due) {
-                if (!this.customer.customerId) {
+                if (!customerId) {
                     $("#addCustomerModal").modal("show");
                     return $.notify(`Add customer to selling due`, { position: "to center" });
                 }
             }
 
-          
             if (!this.order.length)
                 return $.notify(`No Fabric Added`, { position: "to center" });
 
-     
-            //customer info
-            const { CustomerId } = this.customer;
+            const fabricList = this.order.map(item => {
+                return {
+                    FabricID: item.FabricId,
+                    SellingQuantity: item.Quantity,
+                    SellingUnitPrice: item.UnitPrice
+                }
+            });
+
             const defaultAccount = this.paymentMethod.filter(item => item.IsDefault)[0];
 
             const model = {
-                CustomerId,
-                TotalAmount: this.calculateTotal(),
-                Discount,
-                PaidAmount,
-                AccountId: AccountId || defaultAccount ? defaultAccount.AccountId : 0,
-                FabricList: this.order
+                CustomerID: customerId,
+                SellingDiscountAmount: Discount,
+                SellingPaidAmount: PaidAmount,
+                AccountID: AccountId ? AccountId : defaultAccount ? defaultAccount.AccountId : 0,
+                FabricList: JSON.stringify(fabricList)
             }
+      
 
-            //try {
-            //    this.isSubmit = true;
-            //    const response = await fetch(`${helpers.baseUrl}/PostFabric`, {
-            //        method: "POST",
-            //        headers: helpers.header.headers,
-            //        body: JSON.stringify({ model })
-            //    });
+            try {
+                this.isSubmit = true;
+                const response = await fetch(`${helpers.baseUrl}/PostOrder`,
+                    {
+                        method: "POST",
+                        headers: helpers.header.headers,
+                        body: JSON.stringify({ model })
+                    });
 
-            //    const result = await response.json();
-            //    localStorage.removeItem("fabric-data")
-
-            //    location.href = `../Order/OrderDetailsForCustomer.aspx?OrderID=${result.d}`;
-            //} catch (e) {
-            //    $.notify(e.message, { position: "to center" });
-            //    this.isSubmit = false;
-            //}
+                const result = await response.json();
+                localStorage.removeItem("fabric-data")
+       
+                location.href = `Print_Invoice.aspx?FabricsSellingID=${result.d.Data}`;
+            } catch (e) {
+                $.notify(e.message, { position: "to center" });
+                this.isSubmit = false;
+            }
         }
     }
 }

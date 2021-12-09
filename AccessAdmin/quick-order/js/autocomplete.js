@@ -349,7 +349,7 @@
 
             this.$menu
                 .on('click', $.proxy(this.click, this))
-//                .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
+                .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
 //                .on('mouseleave', 'li', $.proxy(this.mouseleave, this))
                 .on('mousedown', $.proxy(this.mousedown, this));
         },

@@ -202,7 +202,7 @@
     <Content Include="AccessAdmin\Profile.aspx" />
     <Content Include="AccessAdmin\quick-order\FabricSelling.aspx" />
     <Content Include="AccessAdmin\quick-order\js\autocomplete.js" />
-    <Content Include="AccessAdmin\quick-order\js\fabric-selling.js" />
+    <Content Include="AccessAdmin\Fabrics\Sell\js\fabric-selling.js" />
     <Content Include="AccessAdmin\quick-order\js\update-order.js" />
     <Content Include="AccessAdmin\quick-order\js\quick-order.js" />
     <Content Include="AccessAdmin\quick-order\Order.aspx" />

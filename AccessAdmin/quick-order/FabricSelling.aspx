@@ -29,12 +29,11 @@
                         </label>
                         <input @keyup="findFabrics" id="findFabrics" placeholder="find fabric by code" x-model="fabricsPayment.FabricCode" type="text" class="form-control" autocomplete="off" required>
                     </div>
-               </form> 
+                </form> 
             </div>
         </div>
 
-       
-       
+
         <form @submit.prevent="submitOrder">
             <div x-show="order.length" class="row">
                 <div class="col-lg-8 col-xl-9 mb-3">
