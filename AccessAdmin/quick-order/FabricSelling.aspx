@@ -1,6 +1,18 @@
 ﻿<%@ Page Title="Selling Fabric" Language="C#" MasterPageFile="~/QuickOrder.Master" AutoEventWireup="true" CodeBehind="FabricSelling.aspx.cs" Inherits="TailorBD.AccessAdmin.quick_order.FabricSelling" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <script src="js/fabric-selling.js"></script>
+    <style>
+        .stock-position {
+            position: absolute;
+            position: absolute;
+            top: 0;
+            right: 15px;
+            background-color: #fff;
+            color: #000;
+            font-size: .8rem;
+            padding: 0 2px;
+        }
+    </style>
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="BasicForm" runat="server">
@@ -45,8 +57,11 @@
                                         <p x-text="item.FabricCode" class="font-weight-bold mb-1"></p>
                                         <small x-text="item.FabricsName"></small>
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center position-relative">
                                         <input @input="calculateTotal" @change="saveData" x-model.number="item.Quantity" class="form-control text-center" type="number" min="0.01" :max="item.StockFabricQuantity" step="0.01" @wheel="(e)=> e.preventDefault()" required>
+                                        <span class="stock-position">
+                                            stock: <span x-text="item.StockFabricQuantity - item.Quantity"></span>
+                                        </span>
                                     </td>
                                     <td class="text-center">
                                         <input @input="calculateTotal" @change="saveData" x-model.number="item.UnitPrice" class="form-control text-center" type="number" min="0.01" step="0.01" @wheel="(e)=> e.preventDefault()" required>
