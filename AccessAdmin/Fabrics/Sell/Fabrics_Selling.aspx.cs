@@ -213,7 +213,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell
                         cmd.Parameters.AddWithValue("@RegistrationID", registrationId);
 
                         cmd.Parameters.AddWithValue("@AccountID", model.AccountID);
-                        cmd.Parameters.AddWithValue("@CustomerID", model.CustomerID);
+                        cmd.Parameters.AddWithValue("@CustomerID", (object)model.CustomerID ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@SellingPaidAmount", model.SellingPaidAmount);
                         cmd.Parameters.AddWithValue("@SellingDiscountAmount", model.SellingDiscountAmount);
                         cmd.Parameters.AddWithValue("@FabricList", model.FabricList);
