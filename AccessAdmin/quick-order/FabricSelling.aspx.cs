@@ -45,7 +45,7 @@ namespace TailorBD.AccessAdmin.quick_order
 
 
                         cmd.Parameters.AddWithValue("@AccountID", model.AccountID);
-                        cmd.Parameters.AddWithValue("@CustomerID", model.CustomerID);
+                        cmd.Parameters.AddWithValue("@CustomerID", (object)model.CustomerID ?? DBNull.Value );
                         cmd.Parameters.AddWithValue("@PaymentSituation", model.PaymentSituation);
                         cmd.Parameters.AddWithValue("@SellingPaidAmount", model.SellingPaidAmount);
                         cmd.Parameters.AddWithValue("@SellingDiscountAmount", model.SellingDiscountAmount);
