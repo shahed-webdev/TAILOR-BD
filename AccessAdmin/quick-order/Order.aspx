@@ -9,14 +9,6 @@
     </style>  
 
     <script src="js/quick-order.js?v=1.0.0"></script>
-    
-    <script>
-        $(function() {
-            // Data Picker Initialization
-            $(".datepicker").pickadate({ format: "d mmmm, yyyy", min: new Date() });
-            $(".datepicker").removeAttr("readonly");
-        });
-    </script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
@@ -127,7 +119,13 @@
                       <tbody>
                         <template x-for="(payment, i) in item.payments" :key="i">
                             <tr>
-                                <td x-text="payment.For"></td>
+                                <td>
+                                    <p class="mb-0" x-text="payment.For"></p>
+                                    <span x-show="payment.StockFabricQuantity" class="text-primary">
+                                        Remaining Stock:
+                                        <span x-text="payment.StockFabricQuantity - payment.Quantity"></span>
+                                    </span>
+                                </td>
                                 <td>
                                     <input @change="saveData" @input="calculateTotal" x-model.number="payment.Quantity" min="1" :max="payment.StockFabricQuantity" step="0.01" type="number" class="form-control text-center" required>
                                 </td>

@@ -51,6 +51,9 @@ function initData() {
             this.customer.customerId = 0;
             this.customer.isNewCustomer = true;
 
+            //save to local store
+            this.saveData();
+
             $(`#${evt.target.id}`).typeahead({
                 minLength: 1,
                 displayText: item => {

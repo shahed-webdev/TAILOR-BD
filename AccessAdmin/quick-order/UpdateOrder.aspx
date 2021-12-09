@@ -105,7 +105,13 @@
                       <tbody>
                         <template x-for="(payment, i) in item.payments" :key="i">
                             <tr>
-                                <td x-text="payment.For"></td>
+                                <td>
+                                    <p class="mb-0" x-text="payment.For"></p>
+                                    <span x-show="payment.StockFabricQuantity" class="text-primary">
+                                        Remaining Stock:
+                                        <span x-text="payment.StockFabricQuantity - payment.Quantity"></span>
+                                    </span>
+                                </td>
                                 <td class="text-center" x-text="payment.Quantity"></td>
                                 <td class="text-right">
                                     ৳<span x-text="payment.UnitPrice"></span>

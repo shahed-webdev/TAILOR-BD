@@ -232,9 +232,12 @@ function initData() {
         customerTimerId: null,
         findCustomer(evt) {
             //reset if change text
+            this.customer.isNewCustomer = true;
             this.apiData.customerId = 0;
             this.apiData.clothForId = 0;
-            this.customer.isNewCustomer = true;
+
+            //save to local store
+            this.saveData();
 
             $(`#${evt.target.id}`).typeahead({
                 minLength: 1,
@@ -272,6 +275,7 @@ function initData() {
                     this.customer.isNewCustomer = false;
 
                     this.getDress();
+
                     //save to local store
                     this.saveData();
 
@@ -535,3 +539,9 @@ function initData() {
     }
 }
 
+
+$(function () {
+    // Data Picker Initialization
+    $(".datepicker").pickadate({ format: "d mmmm, yyyy", min: new Date() });
+    $(".datepicker").removeAttr("readonly");
+});

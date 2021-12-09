@@ -313,7 +313,7 @@ function initData() {
 
         //add fabrics
         addFabric(index) {
-            const { For, UnitPrice, Quantity, FabricID } = this.fabricsPayment;
+            const { For, UnitPrice, Quantity, StockFabricQuantity, FabricID } = this.fabricsPayment;
 
             if (!FabricID) return $.notify(`Add fabric`, { position: "to center" });
 
@@ -326,7 +326,7 @@ function initData() {
 
             if (isAdded) return $.notify(`${For} already added`, { position: "to center" });
 
-            orderPayment.payments.push({ OrderPaymentId:null, For: `Fabric Code: ${For}`, UnitPrice, Quantity, FabricID });
+            orderPayment.payments.push({ OrderPaymentId: null, For: `Fabric Code: ${For}`, UnitPrice, Quantity, StockFabricQuantity, FabricID });
 
             $.notify(`${For} added successfully`, { position: "to center", className: "success" });
 
