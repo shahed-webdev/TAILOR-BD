@@ -51,7 +51,7 @@ namespace TailorBD.AccessAdmin.quick_order
                 conn.ConnectionString = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
                 using (var cmd = new SqlCommand())
                 {
-                    cmd.CommandText = "select Top(3) CustomerID,Cloth_For_ID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND (Phone like @prefex + '%') or (CustomerName like @prefex + '%')";
+                    cmd.CommandText = "select Top(3) CustomerID,Cloth_For_ID, CustomerName, Phone, Address from Customer where InstitutionID = @InstitutionID AND ((Phone like @prefex + '%') or (CustomerName like @prefex + '%'))";
                     cmd.Parameters.AddWithValue("@prefex", prefix);
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"]?.Value);
 
