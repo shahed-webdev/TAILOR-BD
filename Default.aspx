@@ -1,174 +1,257 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Design.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="TailorBD.Default" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Index.aspx.cs" Inherits="TailorBD.Index" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <link href="CSS/Default.css" rel="stylesheet" />
-   <style type="text/css"></style>
-</asp:Content>
+<!DOCTYPE html>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Tailor BD - Online Tailor Shop Software</title>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.1/mdb.min.css" rel="stylesheet" />
+    <!-- custom -->
+    <link href="CSS/home-page.css?v=1.0.0" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark shadow-0">
+            <div class="container">
+                <h3 class="navbar-brand">Tailor BD.com</h3>
 
-   <div class="banner">
-      <div class="bannerBG"></div>
-      <ul id="slide">
-         <li>সা'আদ ফ্যাশন টেইলার্স এন্ড ফেব্রিক্স</li>
-         <li>কাজী'স টেইলার্স এন্ড ফেব্রিক্স</li>
-         <li>আদর্শ পাঞ্জাবী টেইলার্স(গুলিস্তান)</li>
-         <li>সানরাজ টেইলার্স</li>
-         <li>ম্যাপস এন্ড রুমা টেইলার্স এন্ড ফেব্রিক্স</li>
-         <li>মুসলিম টেইলার্স এন্ড ফেব্রিক্স</li>
-         <li>লিডস ফ্যাশন টেইলার্স এন্ড ফেব্রিক্স</li>
-         <li>আল জাদীদ পাঞ্জাবী টেইলার্স এন্ড ফেব্রিক্স</li>
-         <li>আদর্শ পাঞ্জাবী টেইলার্স(মালিবাগ)</li>
-         <li>জাসকো টেইলার্স এন্ড ফেব্রিক্স</li>
-      </ul>
-   </div>
+                <!-- Toggle button -->
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-mdb-toggle="collapse"
+                    data-mdb-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
 
-   <div class="tailorBD-info">
-      <div class="Title_Binder1">
-         <h3>TailorBD Info</h3>
-      </div>
+                <!-- Right elements -->
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav align-items-center ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Contact Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span class="facebook-button">
+                                    <i class="fab fa-facebook-f"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <form runat="server" style="display: inherit">
+                            <asp:LoginView runat="server">
+                                <AnonymousTemplate>
+                                    <li class="nav-item">
+                                        <a class="login-button" href="/Login.aspx">
+                                            <i class="far fa-user"></i>
+                                            Login
+                                        </a>
+                                    </li>
+                                </AnonymousTemplate>
+                                <LoggedInTemplate>
+                                    <li class="nav-item mx-2">
+                                        <a class="nav-link" href="/Profile_Redirect.aspx">
+                                            <asp:LoginName runat="server" />
+                                        </a>
+                                    </li>
+                                    <li class="nav-item d-flex align-items-center">
+                                        <i class="far fa-user"></i>
+                                        <asp:LoginStatus CssClass="nav-link" runat="server" LogoutPageUrl="~/Default.aspx" LogoutAction="Redirect" />
+                                    </li>
+                                </LoggedInTemplate>
+                            </asp:LoginView>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
-      <p>TailorBD.com is the ultimate solution of all kinds of Tailoring shops & Fabric Retailers or wholesalers. We have developed this software for fulfill the needs of ladies and gents tailoring shops and providing complete solution of fabric retailers & wholesalers point of sale & Business. Accounting Inventory Management Systems Integration is a complete software package for the tailoring shops & Fabric Retailers & wholesalers. TailorBD.com manages the customers, measurements, Dresses, Styles, payments, expenses, orders and deliveries which gives instant status report of works in processing by SMS.</p>
-      <p>As a Fabric Retailer or wholesaler your responsibilities may range from inventory control, breaking down fabric packages to individual items, inventory replenishment. We provides you with the ability to automate and manage your day-to-day tasks with one integrated system. TailorBD.com for Fabric Retailers offers a point of sale system to process your sales, control your inventory with reorder calculation routines, track inventory items to give your top selling products, manage your vendors, and provide a solution for customer management. With this platform we allow you to interact with your business through online. </p>
+        <div class="container mt-5">
+            <div class="row align-items-center">
+                <div class="col-lg-7 col-md-6">
+                    <div class="title-section mb-4 md-mb-0">
+                        <h1>Tailors & Fabrics Shop</h1>
+                        <h1>Management Service</h1>
+                        <p class="w-75">TailorBD.com is the ultimate software solution for all kinds of Tailoring shops & Fabric Retailers or wholesalers.</p>
+                    </div>
+                </div>
 
-   </div>
+                <div class="col-lg-5 col-md-6">
+                    <div class="hero-section">
+                        <img src="/CSS/icon/home-hero-img.svg" alt="tailor bd" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-   <div class="basic">
-      <section>
-         <div class="BS"></div>
-         <h3>Mission</h3>
-         <p>
-            Our target to provide the most cost-efficient software solution to the tailoring industry & help people enjoy an affordable solution.   
-         </p>
-      </section>
+    <main>
+        <section id="about-us" class="my-5">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2>Why Tailor BD ?</h2>
+                    <p class="w-50 mx-auto">Our customers tell us on a day to day basis that our online software is the friendliest and easiest to use survey software that they have ever used.</p>
+                </div>
 
-      <section>
-         <div class="OP"></div>
-         <h3>Vision </h3>
-         <p>
-            Become the No.1 in the market in our communities by offering the most inviting solution & have our product in every Tailoring shops & Fabric Retailers or wholesalers.
-         </p>
-      </section>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <i class="fas fa-mouse-pointer fa-4x"></i>
+                                <h5 class="card-title my-4">Easy to Use</h5>
+                                <p class="card-text">
+                                    Our highly efficient software very easily adjustable with your existing management process and it has been designed to give you one-click access to the basic settings which you're most likely to change without digging through a confusing series of menus. 
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <i class="fas fa-headset fa-4x"></i>
+                                <h5 class="card-title my-4">Customer Support</h5>
+                                <p class="card-text">You get 24-hour Customer Support, 6 days a week through phone, online chat, online meeting or email. Also, you can get assistance in 2 languages: English or Bengali. </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 text-center">
+                            <div class="card-body">
+                                <i class="far fa-handshake fa-4x"></i>
+                                <h5 class="card-title my-4">Flexible & Can Meet Your Requests</h5>
+                                <p class="card-text">We continuously work on making the software better as time progresses so chances are that your requests will end up in our software. If you have a custom request that you think only you’d use, our custom solutions group can work with you closely to have your dream become a reality.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      <section>
-         <div class="ED"></div>
-         <h3>Achievement</h3>
-         <p>
-            Offering our customers the best solution and service by exceeding their expectations. Striving for excellence and working to improve every day is the key of our achievement.
-         </p>
-      </section>
-   </div>
+        <section id="user-counter">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-store fa-2x"></i>
+                        <h5 class="font-weight-bold mb-0 mt-3">20+</h5>
+                        <p>Tailors</p>
+                    </div>
 
-   <div class="why-tailorBD">
-      <div class="why-tailorBD-info">
-         <div class="Title_Binder2">
-            <h3>Why TailorBD ?</h3>
-         </div>
-         <p>Many software companies like to think that their software is easy to use. In our case, it’s not about what we think; our customers tell us on a day to day basis that our online software is the friendliest and easiest to use survey software that they have ever used. We spend the bulk of our time figuring out how we can re-engineer our interfaces to make them more intuitive and simple to use. We’re used to seeing our customers shake their heads in utter surprise as to how much easier to use our simple interface is in comparison to other software that they have used in the past. Don’t take our word for it though, go ahead and Sign Up check out yourselves.</p>
-      </div>
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-users fa-2x"></i>
+                        <h5 class="font-weight-bold mb-0 mt-3">20000+</h5>
+                        <p>Happy Customers</p>
+                    </div>
 
-      <div class="customer">
-         <section>
-            <div class="CL"></div>
-            <h3>Easy to Use</h3>
-            <p>
-               Our highly efficient software very easily adjustable with your existing management process and it has been designed to give you one-click access to the basic settings which you're most likely to change without digging through a confusing series of menus.
-            </p>
-         </section>
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-ruler fa-2x"></i>
+                        <h5 class="font-weight-bold mb-0 mt-3">20000+</h5>
+                        <p>Order Completed</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-         <section>
-            <div class="MA"></div>
-            <h3>24-hour Customer Support</h3>
-            <p>
-               You get 24-hour Customer Support, 6 days a week through phone, online chat, online meeting or email. Also, you can get assistance in 2 languages: English or Bengali.
-            </p>
-         </section>
+        <section id="features">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2>SOFTWARE FEATURES</h2>
+                </div>
 
-         <section>
-            <div class="SS"></div>
-            <h3>Flexible & Can Meet Your Requests</h3>
-            <p>
-               We continuously work on making the software better as time progresses so chances are that your requests will end up in our software. If you have a custom request that you think only you’d use, our custom solutions group can work with you closely to have your dream become a reality.
-            </p>
-         </section>
-      </div>
-   </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="AccessAdmin/CSS/Ico/cover.jpg" alt="" />
+                    </div>
+                    <div class="col-md-8">
+                        <ul>
+                            <li>It is very easy to use, and no installation is required. Zero data loss  secure.</li>
+                            <li>Easy to excess, excess form anywhere (home, shop or office) and any device (PC, Laptop, Tab or Smartphone)</li>
+                            <li>Customers can be searched by their Registration number or name or phone number.</li>
+                            <li>Each customer’s measurement will be recorded automatically.</li>
+                            <li>While ordering the system will show the measurement of the customers and if not recorded earlier, can be added with a few clicks.</li>
+                            <li>Each ordered job will be available in a list to send cutter and tailor. Status of a tailoring job in hand will instantly be available.</li>
+                            <li>System will maintain the customers and accounts and payment record.</li>
+                            <li>System will maintain the customer’s account and will reflects previous outstanding, if any in new ordering receipt.</li>
+                            <li>Showing various dresses and styles to the customers during taking order.</li>
+                            <li>SMS Service with brand name (Completed work order, Delivery confirmation, Payment notification and providing any kind of Notice and greetings to Customers)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-   <div class="features">
-      <div class="Title_Binder3">
-         <h3>features</h3>
-      </div>
-      <ul>
-         <li>•	It is very easy to use, and no installation is required.</li>
-         <li>•	Zero data loss and 100 percent secure.</li>
-         <li>•	Easy to excess, excess form anywhere (home, shop or office) and any device (PC, Laptop, Tab or Smartphone)</li>
-         <li>•	Customers can be searched by their Registration number or name or phone number.</li>
-         <li>•	Each customer’s measurement will be recorded automatically.</li>
-         <li>•	While ordering the system will show the measurement of the customers and if not recorded earlier, can be added with a few clicks.</li>
-         <li>•	Each ordered job will be available in a list to send cutter and tailor. Status of a tailoring job in hand will instantly be available.</li>
-         <li>•	System will maintain the customers and accounts and payment record.</li>
-         <li>•	System will maintain the customer’s account and will reflects previous outstanding, if any in new ordering receipt.</li>
-         <li>•	Showing various dresses and styles to the customers during taking order.</li>
-         <li>•	SMS Service with brand name (Completed work order, Delivery confirmation, Payment notification and providing any kind of Notice and greetings to Customers)</li>
-      </ul>
-   </div>
+        <section id="contact">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2>CONTACT US</h2>
+                </div>
 
-   <div class="Contact">
-      <div class="Contact-Form">
-         <table>
-            <tr>
-               <td>Name<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="NameTextBox" ErrorMessage="*" ValidationGroup="1" CssClass="EroorStar"></asp:RequiredFieldValidator></td>
-               <td>Phone<asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="PhoneTextBox" ErrorMessage="*" ValidationGroup="1" CssClass="EroorStar"></asp:RequiredFieldValidator>
-                    &nbsp;<asp:RegularExpressionValidator ID="Rexv" runat="server" ControlToValidate="PhoneTextBox" CssClass="EroorStar" ErrorMessage="Incorrect number" ValidationExpression="(88)?((011)|(015)|(016)|(017)|(018)|(019)|(013)|(014))\d{8,8}" ValidationGroup="1" Display="Dynamic"></asp:RegularExpressionValidator>
-               </td>
-            </tr>
-            <tr>
-               <td>
-                  <asp:TextBox ID="NameTextBox" CssClass="texbox" runat="server"></asp:TextBox>
-                  
-                </td>
-               <td>
-                  <asp:TextBox ID="PhoneTextBox" CssClass="texbox" runat="server"></asp:TextBox>
-                </td>
-            </tr>
-            <tr>
-               <td colspan="2">Message  <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="MessageTextBox" ErrorMessage="*" ValidationGroup="1" CssClass="EroorStar"></asp:RequiredFieldValidator></td>
-            </tr>
-            <tr>
-               <td colspan="2">
-                  <asp:TextBox ID="MessageTextBox" CssClass="Multi_texbox" runat="server" TextMode="MultiLine"></asp:TextBox>
-               </td>
-            </tr>
-            <tr>
-               <td colspan="2">&nbsp;</td>
-            </tr>
-            <tr>
-               <td colspan="2">
-                  <asp:Button ID="SubmitButton" CssClass="Submit" runat="server" Text="Submit" OnClick="SubmitButton_Click" ValidationGroup="1" />
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <div class="card card-body p-0">
+                            <div class="map-container">
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.381111411498!2d90.39683401534037!3d23.769439393964767!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c7641aaaaaab%3A0x620f7558d4176ec7!2sLoops%20IT!5e0!3m2!1sen!2sbd!4v1639236855536!5m2!1sen!2sbd" frameborder="0" style="border: 0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
 
-                   <asp:SqlDataSource ID="Web_MsgSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" InsertCommand="INSERT INTO TBD.[Web_Msg] ([Name], [Phone], [Message]) VALUES (@Name, @Phone, @Message)" SelectCommand="SELECT * FROM TBD.[Web_Msg]">
-                       <InsertParameters>
-                           <asp:ControlParameter ControlID="NameTextBox" Name="Name" PropertyName="Text" Type="String" />
-                           <asp:ControlParameter ControlID="PhoneTextBox" Name="Phone" PropertyName="Text" Type="String" />
-                           <asp:ControlParameter ControlID="MessageTextBox" Name="Message" PropertyName="Text" Type="String" />
-                       </InsertParameters>
-                   </asp:SqlDataSource>
+                    <div class="col-md-5 contact-adddress p-5">
+                        <div class="d-flex">
+                            <i class="fas fa-map-pin fa-2x"></i>
+                            <div class="ms-4">
+                                <h5>Our Office Address</h5>
+                                <p>328, East Nakhal Para,Tejgaon, Dhaka-1215</p>
+                            </div>
+                        </div>
 
-               </td>
-            </tr>
-         </table>
+                        <div class="d-flex my-4">
+                            <i class="fas fa-envelope fa-2x"></i>
+                            <div class="ms-4">
+                                <h5>General Enquiries</h5>
+                                <p>info@loopsit.com</p>
+                            </div>
+                        </div>
 
-      </div>
-   </div>
+                        <div class="d-flex">
+                            <i class="fas fa-phone fa-2x"></i>
+                            <div class="ms-4">
+                                <h5>Call Us</h5>
+                                <p>+88 01739144141</p>
+                            </div>
+                        </div>
 
-   <script src="JS/TextSlide/Slide.js"></script>
-   <script type="text/javascript">
-      $(document).ready(function () {
-         $('#slide').list_ticker({
-            speed: 6000,
-            effect: 'slide'
-         });
-      })
-   </script>
-</asp:Content>
+                        <div class="d-flex mt-4">
+                            <i class="fas fa-clock fa-2x"></i>
+                            <div class="ms-4">
+                                <h5>Our Timing</h5>
+                                <p>Sat - Thu : 09:00 AM - 07:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <span>
+            Copyright © 2015-<%: DateTime.Now.Year %> Tailorbd.com All rights reserved
+        </span>
+    </footer>
+
+    <!-- MDB -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.1/mdb.min.js"></script>
+</body>
+</html>

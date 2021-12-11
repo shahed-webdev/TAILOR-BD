@@ -8,7 +8,7 @@
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
     </style>  
 
-    <script src="js/quick-order.js?v=1.0.0"></script>
+    <script src="js/quick-order.js?v=2.0.0"></script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">

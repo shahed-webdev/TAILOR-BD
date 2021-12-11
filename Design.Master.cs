@@ -15,8 +15,8 @@ namespace TailorBD
         }
         protected void LoginStatus1_LoggingOut(object sender, LoginCancelEventArgs e)
         {
-            string[] myCookies = Request.Cookies.AllKeys;
-            foreach (string cookie in myCookies)
+            var myCookies = Request.Cookies.AllKeys;
+            foreach (var cookie in myCookies)
             {
                 Response.Cookies[cookie].Expires = DateTime.Now;
             }

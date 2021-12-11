@@ -13,11 +13,5 @@ namespace TailorBD
         {
 
         }
-
-        protected void SubmitButton_Click(object sender, EventArgs e)
-        {
-            Web_MsgSQL.Insert();
-            ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('You Have Successfully Sent Message')", true);
-        }
     }
 }

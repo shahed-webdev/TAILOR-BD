@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="কাপড় বিক্রি করুন" Language="C#" MasterPageFile="~/QuickOrder.Master" AutoEventWireup="true" CodeBehind="Fabrics_Selling.aspx.cs" Inherits="TailorBD.AccessAdmin.Fabrics.Sell.Fabrics_Selling" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-    <script src="js/fabric-selling.js"></script>
+    <script src="js/fabric-selling.js?v=2.0.0"></script>
 
     <style>
         .stock-position {

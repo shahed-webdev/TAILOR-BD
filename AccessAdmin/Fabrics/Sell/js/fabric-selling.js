@@ -115,7 +115,7 @@ function initData() {
 
                 if (result.d.IsSuccess) {
                     this.customer.data = result.d.Data;
-                    this.apiData.customerId = result.d.Data.CustomerID;
+                    this.customer.customerId = result.d.Data.CustomerID;
                     this.customer.isNewCustomer = false;
                     $("#addCustomerModal").modal("hide");
 

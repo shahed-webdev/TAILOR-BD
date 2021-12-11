@@ -1,0 +1,48 @@
+﻿:root { --secondary-color: #68A6FF; --gradient-color: linear-gradient(180deg, rgba(67, 1, 255, 0.74) 0, #004DBC 100%); }
+
+body { background-color: #f1f7ff; }
+
+header { padding: 2rem 0; background: var(--gradient-color); color: #fff }
+
+.navbar-dark .navbar-nav .nav-link { color: #fff; }
+.navbar-brand { font-weight: bold; font-size: 2rem; margin: 0; }
+
+.facebook-button { border: 2px solid #fff; border-radius: 50%; height: 35px; width: 35px; display: flex; justify-content: center; align-items: center; }
+.login-button { border: 2px solid #fff; border-radius: 28px; color: #fff; padding: 8px 1.2rem; margin-left: 2rem; transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out; }
+.login-button:hover { color: #d7d7d7 }
+
+.title-section h1 { letter-spacing: 1px; font-size: 1.5rem; }
+.title-section p { letter-spacing: 1.5px; font-size: 1rem; font-weight: 400; margin-bottom: 0; line-height: 29px; }
+.hero-section img { width: 100% }
+
+#about-us i { color: var(--secondary-color) }
+
+#user-counter { margin: 5rem 0; padding: 6rem 0; background-color: #fff; }
+#user-counter i{color: var(--secondary-color)}
+
+#user-counter h5 { color: #226FE3 }
+#user-counter p { color: #5C5959; margin-top: 10px; }
+
+#features { margin: 5rem 0; padding: 6rem 0;}
+#features img{ width: 100%; border-radius: 5px; object-fit: cover; max-height: 500px}
+#features ul{ margin-left: 1rem; padding: 0}
+#features ul li { list-style: square; line-height: 2.3; }
+
+#contact { margin: 5rem 0; }
+#contact .map-container { height: 400px; position: relative; }
+#contact .map-container iframe { left: 0; top: 0; height: 100%; width: 100%; position: absolute; }
+
+#contact .contact-adddress i { color: var(--secondary-color) }
+#contact .contact-adddress h5 { font-size: 20px; font-weight: normal; color: #424242 }
+#contact .contact-adddress p { color: #616161 }
+
+
+footer { background-color: #226FE3; padding: 2rem;color: #ffffff; text-align: center }
+
+@media (min-width: 992px) {
+    .title-section h1 {
+        font-weight: 700;
+        letter-spacing: 1px;
+        font-size: 3rem;
+    }
+}

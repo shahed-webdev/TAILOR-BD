@@ -89,6 +89,7 @@
             <span>Copyright © 2015-<span id="CYear"></span> Tailorbd.com All rights reserved</span>
          </div>
       </footer>
+
    <script type="text/javascript">
        $(function () {
            $("#CYear").text((new Date).getFullYear());

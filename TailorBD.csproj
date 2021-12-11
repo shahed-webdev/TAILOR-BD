@@ -126,6 +126,7 @@
     <Content Include="AccessAdmin\Accounts\Others_Income.aspx" />
     <Content Include="AccessAdmin\CSS\CustomerDetails.css" />
     <Content Include="AccessAdmin\CSS\DeliveryComplete.css" />
+    <Content Include="AccessAdmin\CSS\Ico\cover.jpg" />
     <Content Include="AccessAdmin\CSS\Ico\Profile_Icon.png" />
     <Content Include="AccessAdmin\CSS\Profile.css" />
     <Content Include="AccessAdmin\CSS\TailorInfo.css" />
@@ -266,6 +267,8 @@
     <Content Include="CSS\basic-master.css" />
     <Content Include="CSS\Default.css" />
     <Content Include="CSS\DesignMaster.css" />
+    <Content Include="CSS\home-page.css" />
+    <Content Include="CSS\icon\home-hero-img.svg" />
     <Content Include="CSS\Image\Add_Expense.png" />
     <Content Include="CSS\Image\btn-close.png" />
     <Content Include="CSS\Image\CheckBox.png" />
@@ -366,8 +369,6 @@
     <Content Include="mdb\js\mdb-admin.min.js" />
     <Content Include="mdb\js\mdb-core.js" />
     <Content Include="Profile_Redirect.aspx" />
-    <Content Include="SqlServerTypes\x64\SqlServerSpatial110.dll" />
-    <Content Include="SqlServerTypes\x86\SqlServerSpatial110.dll" />
     <Content Include="UserGuide\Add_Measurements.aspx" />
     <Content Include="UserGuide\Add_Style.aspx" />
     <Content Include="UserGuide\Dress_Add.aspx" />
