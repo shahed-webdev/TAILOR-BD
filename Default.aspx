@@ -15,7 +15,7 @@
     <link href="CSS/home-page.css?v=1.0.0" rel="stylesheet" />
 </head>
 <body>
-    <header>
+    <header id="home">
         <nav class="navbar navbar-expand-lg navbar-dark shadow-0">
             <div class="container">
                 <h3 class="navbar-brand">Tailor BD.com</h3>
@@ -36,16 +36,19 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav align-items-center ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Home</a>
+                            <a class="nav-link" href="#home">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">About Us</a>
+                            <a class="nav-link scrollTo" href="#about-us">About Us</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Contact Us</a>
+                            <a class="nav-link scrollTo" href="#features">Features</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link scrollTo" href="#contact">Contact Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" target="_blank" href="https://www.facebook.com/Tailorbd">
                                 <span class="facebook-button">
                                     <i class="fab fa-facebook-f"></i>
                                 </span>
@@ -84,7 +87,7 @@
                 <div class="col-lg-7 col-md-6">
                     <div class="title-section mb-4 md-mb-0">
                         <h1>Tailors & Fabrics Shop</h1>
-                        <h1>Management Service</h1>
+                        <h1 class="mb-4">Management Service</h1>
                         <p class="w-75">TailorBD.com is the ultimate software solution for all kinds of Tailoring shops & Fabric Retailers or wholesalers.</p>
                     </div>
                 </div>
@@ -106,8 +109,8 @@
                     <p class="w-50 mx-auto">Our customers tell us on a day to day basis that our online software is the friendliest and easiest to use survey software that they have ever used.</p>
                 </div>
 
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <div class="col">
+                <div class="row g-4">
+                    <div class="col-md-4">
                         <div class="card h-100 text-center">
                             <div class="card-body">
                                 <i class="fas fa-mouse-pointer fa-4x"></i>
@@ -118,7 +121,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-4">
                         <div class="card h-100 text-center">
                             <div class="card-body">
                                 <i class="fas fa-headset fa-4x"></i>
@@ -127,7 +130,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-4">
                         <div class="card h-100 text-center">
                             <div class="card-body">
                                 <i class="far fa-handshake fa-4x"></i>
@@ -140,7 +143,7 @@
             </div>
         </section>
 
-        <section id="user-counter">
+        <%--<section id="user-counter">
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 text-center">
@@ -162,7 +165,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section>--%>
 
         <section id="features">
             <div class="container">
@@ -246,12 +249,21 @@
     </main>
 
     <footer>
-        <span>
-            Copyright © 2015-<%: DateTime.Now.Year %> Tailorbd.com All rights reserved
+        <span>Copyright © 2015-<%: DateTime.Now.Year %> Tailorbd.com All rights reserved
         </span>
     </footer>
 
     <!-- MDB -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.1/mdb.min.js"></script>
+
+    <script>
+        $(".scrollTo").on('click', function (e) {
+            e.preventDefault();
+            const target = $(this).attr('href');
+            $('html, body').animate({
+                scrollTop: ($(target).offset().top)
+            }, 2000);
+        });
+    </script>
 </body>
 </html>
