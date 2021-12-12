@@ -24,12 +24,12 @@
         <!--add fabric-->
         <div class="row align-items-center mb-4">
             <div class="col-sm-4 col-lg-5">
-                <form @submit.prevent="addFabric">
-                    <div class="form-group">
+                <form @submit.prevent="submitFabric">
+                    <div x-init="$refs.input.focus()" class="form-group">
                         <label>Fabric Code
                             <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity.toFixed(2)"></span></span>
                         </label>
-                        <input @keyup="findFabrics" id="findFabrics" placeholder="find fabric by code" x-model="fabricsPayment.FabricCode" type="text" class="form-control" autocomplete="off" required>
+                        <input @keyup="findFabrics" x-ref="input" id="findFabrics" placeholder="Find fabric by code" type="text" class="form-control" autocomplete="off" required>
                     </div>
                 </form> 
             </div>

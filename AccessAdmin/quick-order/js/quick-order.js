@@ -341,23 +341,13 @@ function initData() {
         },
 
         //find fabrics
-        fabricsPayment: {
-            For: '',
-            Quantity: '',
-            Unit_Price: '',
-            FabricID: '',
-            StockFabricQuantity: 0,
-            FabricsName: ''
-        },
+        fabricsPayment: { StockFabricQuantity: 0 },
 
         //de bounce 
         fabricTimerId : null,
         findFabrics(evt) {
-            this.fabricsPayment.FabricID = "";
-
             $(`#${evt.target.id}`).typeahead({
                 minLength: 1,
-                hint: true,
                 displayText: item => {
                     return `${item.FabricCode}, ${item.FabricsName}`;
                 },
@@ -379,26 +369,45 @@ function initData() {
                                 }
                             });
                         },
-                        700)
+                        500)
                 },
                 updater: item => {
-                    this.fabricsPayment.For = item.FabricCode;
-                    this.fabricsPayment.FabricID = item.FabricId;
-                    this.fabricsPayment.Unit_Price = item.SellingUnitPrice;
-                    this.fabricsPayment.StockFabricQuantity = item.StockFabricQuantity;
+                    const fabricsPayment = {
+                        For: item.FabricCode,
+                        FabricID: item.FabricId,
+                        Unit_Price: item.SellingUnitPrice,
+                        StockFabricQuantity: item.StockFabricQuantity
+                    }
 
-                    this.addFabric(this.selectedIndex);
-
+                    this.addFabric(this.selectedIndex, fabricsPayment);
+                
                     return item;
                 }
             });
         },
 
-        //add fabrics
-        addFabric(index) {
-            const { For, Unit_Price, FabricID, StockFabricQuantity } = this.fabricsPayment;
+        //submit fabrics
+        async submitFabric(evt,index) {
+            const response = await fetch(`${helpers.baseUrl}/GetFabric?code=${JSON.stringify(evt.target.findFabrics.value)}`, helpers.header);
+            const result = await response.json();
 
-            if (!FabricID) return $.notify(`Add fabric`, { position: "to center" });
+            if (!result.d.length) return $.notify(`Fabric not found`, { position: "to center" });
+
+            const item = result.d[0];
+            const fabricsPayment = {
+                FabricID: item.FabricId,
+                For: item.FabricCode,
+                Unit_Price: item.SellingUnitPrice,
+                StockFabricQuantity: item.StockFabricQuantity
+            }
+
+            this.addFabric(index,fabricsPayment);
+            evt.target.findFabrics.value = "";
+        },
+
+        //add fabrics
+        addFabric(index, fabricsPayment) {
+            const { For, Unit_Price, FabricID, StockFabricQuantity } = fabricsPayment;
 
             if (StockFabricQuantity < 1) return $.notify(`Fabric not in stock`, { position: "to center" });
 
@@ -419,7 +428,7 @@ function initData() {
             $.notify(`${For} added successfully`, { position: "to center", className: "success" });
 
             //reset form
-            this.fabricsPayment = { For: '', Quantity: '', Unit_Price: '', FabricID: '', StockFabricQuantity: 0 };
+            this.fabricsPayment.StockFabricQuantity= 0;
         },
 
 

@@ -8,7 +8,7 @@
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
     </style>  
 
-    <script src="js/quick-order.js?v=2.0.0"></script>
+    <script src="js/quick-order.js?v=2.1.0"></script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
@@ -305,7 +305,7 @@
                           </div>
                         </form>
                         
-                        <form @submit.prevent="() => addFabric(selectedIndex)">
+                        <form @submit.prevent="(e) => submitFabric(e,selectedIndex)">
                           <h5 class="font-weight-bold mt-4">Fabrics</h5>
                            <div class="mb-3">
                             <div class="form-group">
@@ -313,7 +313,7 @@
                                     Fabric Code
                                     <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity"></span></span>
                                 </label>
-                                <input @keyup="findFabrics" id="findFabrics" x-model="fabricsPayment.For" type="text" class="form-control" autocomplete="off" required>
+                                <input @keyup="findFabrics" id="findFabrics" type="text" class="form-control" autocomplete="off" required>
                             </div>
                            </div>
                         </form>

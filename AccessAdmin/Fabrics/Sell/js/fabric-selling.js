@@ -110,8 +110,7 @@ function initData() {
 
                 const result = await response.json();
 
-                $.notify(result.d.Message,
-                    { position: "to center", className: result.d.IsSuccess ? "success" : "error" });
+                $.notify(result.d.Message, { position: "to center", className: result.d.IsSuccess ? "success" : "error" });
 
                 if (result.d.IsSuccess) {
                     this.customer.data = result.d.Data;
@@ -130,23 +129,13 @@ function initData() {
 
 
         //find fabrics
-        fabricsPayment: {
-            FabricId: '',
-            FabricsName: '',
-            FabricCode: '',
-            Quantity: '',
-            UnitPrice: '',
-            StockFabricQuantity: 0
-        },
+        fabricsPayment: { StockFabricQuantity: 0 },
 
         //de bounce 
         fabricTimerId: null,
         findFabrics(evt) {
-            this.fabricsPayment.FabricId = "";
-
             $(`#${evt.target.id}`).typeahead({
                 minLength: 1,
-                hint: true,
                 displayText: item => {
                     return `${item.FabricCode}, ${item.FabricsName}`;
                 },
@@ -164,10 +153,10 @@ function initData() {
                                 error: err => console.log(err)
                             });
                         },
-                        700)
+                        500)
                 },
                 updater: item => {
-                    this.fabricsPayment = {
+                    const fabricsPayment = {
                         FabricId: item.FabricId,
                         FabricsName: item.FabricsName,
                         FabricCode: item.FabricCode,
@@ -175,18 +164,37 @@ function initData() {
                         StockFabricQuantity: item.StockFabricQuantity
                     }
 
-                    this.addFabric();
+                    this.fabricsPayment.StockFabricQuantity = item.StockFabricQuantity
+                    this.addFabric(fabricsPayment);
 
                     return item;
                 }
             });
         },
 
-        //add fabrics
-        addFabric() {
-            const { FabricId, UnitPrice, FabricCode, FabricsName, StockFabricQuantity } = this.fabricsPayment;
+        //submit fabrics
+        async submitFabric(evt) {
+            const response = await fetch(`${helpers.baseUrl}/GetFabric?code=${JSON.stringify(evt.target.findFabrics.value)}`, helpers.header);
+            const result = await response.json();
 
-            if (!FabricId) return $.notify(`Add fabric`, { position: "to center" });
+            if (!result.d.length) return $.notify(`Fabric not found`, { position: "to center" });
+
+            const item = result.d[0];
+            const fabricsPayment = {
+                FabricId: item.FabricId,
+                FabricsName: item.FabricsName,
+                FabricCode: item.FabricCode,
+                UnitPrice: item.SellingUnitPrice,
+                StockFabricQuantity: item.StockFabricQuantity
+            }
+
+            this.addFabric(fabricsPayment);
+            evt.target.findFabrics.value = "";
+        },
+
+        //add fabric to list
+        addFabric(fabricsPayment) {
+            const { FabricId, UnitPrice, FabricCode, FabricsName, StockFabricQuantity } = fabricsPayment;
 
             if (StockFabricQuantity < 1) return $.notify(`Fabric not in stock`, { position: "to center" });
 
@@ -199,12 +207,15 @@ function initData() {
 
             //save to local store
             this.saveData();
-            console.log(this.order)
+
             $.notify(`${FabricCode} added successfully`, { position: "to center", className: "success" });
 
             //reset form
-            this.fabricsPayment = { FabricCode: '', FabricsName:'', Quantity: 0, UnitPrice: 0, FabricId: '', StockFabricQuantity: 0 };
+            this.fabricsPayment = { StockFabricQuantity: 0 };
+
+            return true;
         },
+
 
         //remove fabric
         removeFabric(id) {
@@ -272,7 +283,6 @@ function initData() {
                 AccountID: AccountId ? AccountId : defaultAccount ? defaultAccount.AccountId : 0,
                 FabricList: JSON.stringify(fabricList)
             }
-      
 
             try {
                 this.isSubmit = true;
@@ -284,8 +294,9 @@ function initData() {
                     });
 
                 const result = await response.json();
+                if (!result.d.Data) return $.notify(`Fabric Not Added`, { position: "to center" });
+
                 localStorage.removeItem("fabric-data")
-       
                 location.href = `Print_Invoice.aspx?FabricsSellingID=${result.d.Data}`;
             } catch (e) {
                 $.notify(e.message, { position: "to center" });
