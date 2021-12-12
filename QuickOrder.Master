@@ -28,7 +28,7 @@
     <!-- Bootstrap tooltips -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
    <!-- autocomplete -->
-    <script src="/AccessAdmin/quick-order/js/autocomplete.js?v=1.0.0"></script>
+    <script src="/AccessAdmin/quick-order/js/autocomplete.js?v=1.1.0"></script>
     <!-- Bootstrap core JavaScript -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <!-- MDB core javaScript -->

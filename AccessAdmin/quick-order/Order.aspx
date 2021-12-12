@@ -8,7 +8,7 @@
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
     </style>  
 
-    <script src="js/quick-order.js?v=2.1.0"></script>
+    <script src="js/quick-order.js?v=2.1.1"></script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
@@ -313,7 +313,7 @@
                                     Fabric Code
                                     <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity"></span></span>
                                 </label>
-                                <input @keyup="findFabrics" id="findFabrics" type="text" class="form-control" autocomplete="off" required>
+                                <input id="findFabrics" type="text" class="form-control" placeholder="type code and press enter" autocomplete="off" required>
                             </div>
                            </div>
                         </form>

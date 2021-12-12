@@ -132,45 +132,45 @@ function initData() {
         fabricsPayment: { StockFabricQuantity: 0 },
 
         //de bounce 
-        fabricTimerId: null,
-        findFabrics(evt) {
-            $(`#${evt.target.id}`).typeahead({
-                minLength: 1,
-                displayText: item => {
-                    return `${item.FabricCode}, ${item.FabricsName}`;
-                },
-                afterSelect: function(item) {
-                    this.$element[0].value = item.FabricCode;
-                },
-                source: (request, result) => {
-                    clearTimeout(this.fabricTimerId);
+        //fabricTimerId: null,
+        //findFabrics(evt) {
+        //    $(`#${evt.target.id}`).typeahead({
+        //        minLength: 1,
+        //        displayText: item => {
+        //            return `${item.FabricCode}, ${item.FabricsName}`;
+        //        },
+        //        afterSelect: function(item) {
+        //            this.$element[0].value = item.FabricCode;
+        //        },
+        //        source: (request, result) => {
+        //            clearTimeout(this.fabricTimerId);
 
-                    this.fabricTimerId = setTimeout(() => {
-                            $.ajax({
-                                url: `${helpers.baseUrl}/FindFabrics?prefix=${JSON.stringify(request)}`,
-                                contentType: "application/json; charset=utf-8",
-                                success: response => result(response.d),
-                                error: err => console.log(err)
-                            });
-                        },
-                        500)
-                },
-                updater: item => {
-                    const fabricsPayment = {
-                        FabricId: item.FabricId,
-                        FabricsName: item.FabricsName,
-                        FabricCode: item.FabricCode,
-                        UnitPrice: item.SellingUnitPrice,
-                        StockFabricQuantity: item.StockFabricQuantity
-                    }
+        //            this.fabricTimerId = setTimeout(() => {
+        //                    $.ajax({
+        //                        url: `${helpers.baseUrl}/FindFabrics?prefix=${JSON.stringify(request)}`,
+        //                        contentType: "application/json; charset=utf-8",
+        //                        success: response => result(response.d),
+        //                        error: err => console.log(err)
+        //                    });
+        //                },
+        //                500)
+        //        },
+        //        updater: item => {
+        //            const fabricsPayment = {
+        //                FabricId: item.FabricId,
+        //                FabricsName: item.FabricsName,
+        //                FabricCode: item.FabricCode,
+        //                UnitPrice: item.SellingUnitPrice,
+        //                StockFabricQuantity: item.StockFabricQuantity
+        //            }
 
-                    this.fabricsPayment.StockFabricQuantity = item.StockFabricQuantity
-                    this.addFabric(fabricsPayment);
+        //            this.fabricsPayment.StockFabricQuantity = item.StockFabricQuantity
+        //            this.addFabric(fabricsPayment);
 
-                    return item;
-                }
-            });
-        },
+        //            return item;
+        //        }
+        //    });
+        //},
 
         //submit fabrics
         async submitFabric(evt) {

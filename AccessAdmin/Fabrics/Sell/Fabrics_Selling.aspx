@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="কাপড় বিক্রি করুন" Language="C#" MasterPageFile="~/QuickOrder.Master" AutoEventWireup="true" CodeBehind="Fabrics_Selling.aspx.cs" Inherits="TailorBD.AccessAdmin.Fabrics.Sell.Fabrics_Selling" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-    <script src="js/fabric-selling.js?v=2.0.0"></script>
+    <script src="js/fabric-selling.js?v=2.1.0"></script>
 
     <style>
         .stock-position {
@@ -29,7 +29,7 @@
                         <label>Fabric Code
                             <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity.toFixed(2)"></span></span>
                         </label>
-                        <input @keyup="findFabrics" x-ref="input" id="findFabrics" placeholder="Find fabric by code" type="text" class="form-control" autocomplete="off" required>
+                        <input placeholder="type code and press enter" x-ref="input" id="findFabrics" placeholder="Find fabric by code" type="text" class="form-control" autocomplete="off" required>
                     </div>
                 </form> 
             </div>
