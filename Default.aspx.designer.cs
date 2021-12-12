@@ -11,7 +11,7 @@ namespace TailorBD
 {
 
 
-    public partial class Index
+    public partial class Default
     {
     }
 }
