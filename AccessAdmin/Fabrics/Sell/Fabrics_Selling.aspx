@@ -29,7 +29,7 @@
                         <label>Fabric Code
                             <span x-show="fabricsPayment.StockFabricQuantity>0" class="text-success">Stock: <span x-text="fabricsPayment.StockFabricQuantity.toFixed(2)"></span></span>
                         </label>
-                        <input placeholder="type code and press enter" x-ref="input" id="findFabrics" placeholder="Find fabric by code" type="text" class="form-control" autocomplete="off" required>
+                        <input placeholder="type code and press enter" x-ref="input" id="findFabrics" type="text" class="form-control" autocomplete="off" required>
                     </div>
                 </form> 
             </div>
@@ -61,7 +61,7 @@
                                     <td class="text-center position-relative">
                                         <input @input="calculateTotal" @change="saveData" x-model.number="item.Quantity" class="form-control text-center" type="number" min="0.01" :max="item.StockFabricQuantity" step="0.01" @wheel="(e)=> e.preventDefault()" required>
                                         <span class="stock-position">
-                                            stock: <span x-text="item.StockFabricQuantity - item.Quantity"></span>
+                                            stock: <span x-text="(item.StockFabricQuantity - item.Quantity).toFixed(2)"></span>
                                         </span>
                                     </td>
                                     <td class="text-center">
