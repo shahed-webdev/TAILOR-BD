@@ -83,7 +83,7 @@
                       
                        <button type="button" class="btn btn-cyan btn-font py-1" @click="()=> onOpenMeasurementStyleModal(true,index)">Measurement</button>
                        <button type="button" class="btn btn-unique btn-font py-1 mx-2" @click="()=> onOpenMeasurementStyleModal(false,index)">Style</button>
-                       <button :disabled="isPaymentClick" type="button" class="btn btn-success btn-font py-1" @click="()=> onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
+                       <button :disabled="isPaymentClick" type="button" class="btn btn-success btn-font py-1" @click="() => onOpenPaymentModal(item.dress.dressId,index)">Payment</button>
                    </td>
                    <td class="text-center">
                        <input @change="saveData" x-model.number="item.quantity" class="form-control text-center" type="number" min="1" @wheel="(e)=> e.preventDefault()" required>
@@ -92,7 +92,7 @@
                        <input @change="saveData" x-model="item.orderDetails" type="text" class="form-control" placeholder="dress details">
                    </td>
                     <td>
-                        <a class="red-text ml-2" @click="()=>removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
+                        <a class="red-text ml-2" @click="() => removeDress(item.dress.dressId)"><i class="fas fa-times"></i></a>
                     </td>
                 </tr>
                   </template>
@@ -277,7 +277,7 @@
                       <template x-if="savedDressPayment.length">
                           <select @change="(e) => onChangeSavedPayment(e, selectedIndex)" class="form-control w-auto mr-3">
                               <option value="">[ Select Saved Payment ]</option>
-                              <template x-for="(item,i) in savedDressPayment" :key="i">
+                              <template x-for="(item, i) in savedDressPayment" :key="i">
                                   <option :value="item.Price" x-text="item.PriceFor"></option>
                               </template>
                           </select>

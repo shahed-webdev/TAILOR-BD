@@ -1,5 +1,5 @@
 ﻿
-//set local store
+//get local store
 function getStore() {
     const store = localStorage.getItem("order-data");
     return store ? JSON.parse(store) : {};
@@ -298,13 +298,14 @@ function initData() {
                     });
 
                 const result = await response.json();
+                const { IsSuccess, Message, Data } = result.d;
 
-                $.notify(result.d.Message,
-                    { position: "to center", className: result.d.IsSuccess ? "success" : "error" });
+                $.notify(Message, { position: "to center", className: IsSuccess ? "success" : "error" });
+               
 
-                if (result.d.IsSuccess) {
-                    this.customer.data = result.d.Data;
-                    this.apiData.customerId = result.d.Data.CustomerID;
+                if (result.d && IsSuccess) {
+                    this.customer.data = Data;
+                    this.apiData.customerId = Data.CustomerID ? Data.CustomerID : null;
                     this.customer.isNewCustomer = false;
                     $("#addCustomerModal").modal("hide");
 
