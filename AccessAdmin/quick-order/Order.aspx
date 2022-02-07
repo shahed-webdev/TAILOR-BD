@@ -8,7 +8,7 @@
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
     </style>  
 
-    <script src="js/quick-order.js?v=2.1.1"></script>
+    <script src="js/quick-order.js?v=2.1.2"></script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
@@ -130,7 +130,7 @@
                                     <input @change="saveData" @input="calculateTotal" x-model.number="payment.Quantity" min="1" :max="payment.StockFabricQuantity" step="0.01" type="number" class="form-control text-center" required>
                                 </td>
                                 <td class="text-right">
-                                    ৳<span x-text="payment.Unit_Price"></span>
+                                    <input @change="saveData" @input="calculateTotal" x-model.number="payment.Unit_Price" min="0" step="0.01" type="number" class="form-control text-center" required>
                                 </td>
                                 <td class="text-right">
                                     ৳<span x-text="payment.Unit_Price * payment.Quantity"></span>
