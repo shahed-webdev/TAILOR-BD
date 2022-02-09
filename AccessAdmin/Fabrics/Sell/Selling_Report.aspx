@@ -69,11 +69,7 @@ WHERE (InstitutionID = @InstitutionID) and SellingDate between ISNULL(@From_Date
          </div>
       </ItemTemplate>
    </asp:DataList>
-   <asp:SqlDataSource ID="SellingDetailsSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Fabrics.FabricID, Fabrics.FabricsName, Fabrics.FabricCode, SUM(Fabrics_Selling_List.SellingQuantity) AS Fabrics_Selling_Quantity, Fabrics_Mesurement_Unit.UnitName
-FROM Fabrics_Selling_List INNER JOIN Fabrics_Selling ON Fabrics_Selling_List.FabricsSellingID = Fabrics_Selling.FabricsSellingID INNER JOIN
-Fabrics ON Fabrics_Selling_List.FabricID = Fabrics.FabricID INNER JOIN Fabrics_Mesurement_Unit ON Fabrics.FabricMesurementUnitID = Fabrics_Mesurement_Unit.FabricMesurementUnitID
-WHERE (Fabrics_Selling_List.InstitutionID = @InstitutionID) AND (Fabrics_Selling.SellingDate BETWEEN ISNULL(@From_Date, '1-1-1000') AND ISNULL(@To_Date, '1-1-3000'))
-GROUP BY Fabrics.FabricCode, Fabrics_Mesurement_Unit.UnitName, Fabrics.FabricsName, Fabrics.FabricID ORDER BY SUM(Fabrics_Selling_List.SellingQuantity) DESC"
+   <asp:SqlDataSource ID="SellingDetailsSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT TT.FabricID, Fabrics.FabricsName, Fabrics.FabricCode, Fabrics_Mesurement_Unit.UnitName, TT.Fabrics_Selling_Quantity FROM Fabrics_Mesurement_Unit INNER JOIN Fabrics ON Fabrics_Mesurement_Unit.FabricMesurementUnitID = Fabrics.FabricMesurementUnitID INNER JOIN (SELECT FabricID, SUM(Fabrics_Selling_Quantity) AS Fabrics_Selling_Quantity FROM (SELECT FabricID, Unit AS Fabrics_Selling_Quantity, Date AS SellingDate FROM Order_Payment WHERE (NOT (FabricID IS NULL)) AND (InstitutionID = @InstitutionID) AND (Date BETWEEN ISNULL(@From_Date, '1-1-1000') AND ISNULL(@To_Date, '1-1-3000')) UNION ALL SELECT Fabrics_Selling_List.FabricID, Fabrics_Selling_List.SellingQuantity AS Fabrics_Selling_Quantity, Fabrics_Selling.SellingDate FROM Fabrics_Selling_List INNER JOIN Fabrics_Selling ON Fabrics_Selling_List.FabricsSellingID = Fabrics_Selling.FabricsSellingID WHERE (Fabrics_Selling_List.InstitutionID = @InstitutionID) AND (Fabrics_Selling.SellingDate BETWEEN ISNULL(@From_Date, '1-1-1000') AND ISNULL(@To_Date, '1-1-3000'))) AS T GROUP BY FabricID) AS TT ON Fabrics.FabricID = TT.FabricID ORDER BY TT.Fabrics_Selling_Quantity DESC"
       CancelSelectOnNullParameter="False">
       <SelectParameters>
          <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
