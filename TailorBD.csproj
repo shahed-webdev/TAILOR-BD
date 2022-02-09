@@ -1244,7 +1244,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AccessAdmin\Reports\OrderReport.rdlc" />
-    <EmbeddedResource Include="Access_Authority\Invoice\Report_Invoice.rdlc" />
+    <Content Include="Access_Authority\Invoice\Report_Invoice.rdlc" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
