@@ -298,7 +298,7 @@ function initData() {
                     });
 
                 const result = await response.json();
-                const { IsSuccess, Message, Data } = result.d;
+                const { IsSuccess, Message, Data } = result.d ||{};
 
                 $.notify(Message, { position: "to center", className: IsSuccess ? "success" : "error" });
                
