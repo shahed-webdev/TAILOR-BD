@@ -7,11 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TailorBD.AccessAdmin.Fabrics.Sell {
-    
-    
-    public partial class Selling_Report {
-        
+namespace TailorBD.AccessAdmin.Fabrics.Sell
+{
+
+
+    public partial class Selling_Report
+    {
+
         /// <summary>
         /// FromDateTextBox control.
         /// </summary>
@@ -20,7 +22,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox FromDateTextBox;
-        
+
         /// <summary>
         /// ToDateTextBox control.
         /// </summary>
@@ -29,7 +31,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox ToDateTextBox;
-        
+
         /// <summary>
         /// ShowButton control.
         /// </summary>
@@ -38,7 +40,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button ShowButton;
-        
+
         /// <summary>
         /// FormView1 control.
         /// </summary>
@@ -47,7 +49,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.FormView FormView1;
-        
+
         /// <summary>
         /// TotalPaidSQL control.
         /// </summary>
@@ -56,7 +58,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource TotalPaidSQL;
-        
+
         /// <summary>
         /// FormView2 control.
         /// </summary>
@@ -65,7 +67,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.FormView FormView2;
-        
+
         /// <summary>
         /// SellingPaidSQL control.
         /// </summary>
@@ -74,7 +76,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource SellingPaidSQL;
-        
+
         /// <summary>
         /// DataList1 control.
         /// </summary>
@@ -83,7 +85,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DataList DataList1;
-        
+
         /// <summary>
         /// SellingDetailsSQL control.
         /// </summary>
@@ -92,7 +94,25 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource SellingDetailsSQL;
-        
+
+        /// <summary>
+        /// OrderDataList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DataList OrderDataList;
+
+        /// <summary>
+        /// OrderSQL control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.SqlDataSource OrderSQL;
+
         /// <summary>
         /// FormView3 control.
         /// </summary>
@@ -101,7 +121,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.FormView FormView3;
-        
+
         /// <summary>
         /// ReturnAmountSQL control.
         /// </summary>
@@ -110,7 +130,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource ReturnAmountSQL;
-        
+
         /// <summary>
         /// DataList2 control.
         /// </summary>
@@ -119,7 +139,7 @@ namespace TailorBD.AccessAdmin.Fabrics.Sell {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DataList DataList2;
-        
+
         /// <summary>
         /// ReturnDetailsSQL control.
         /// </summary>
