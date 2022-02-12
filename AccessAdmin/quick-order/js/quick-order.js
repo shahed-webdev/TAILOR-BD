@@ -303,7 +303,7 @@ function initData() {
                 $.notify(Message, { position: "to center", className: IsSuccess ? "success" : "error" });
                
 
-                if (result.d && IsSuccess) {
+                if (result && IsSuccess) {
                     this.customer.data = Data;
                     this.apiData.customerId = Data.CustomerID ? Data.CustomerID : null;
                     this.customer.isNewCustomer = false;
@@ -313,7 +313,7 @@ function initData() {
                     this.saveData();
                 }
             } catch (e) {
-                console.log("customer added error");
+                console.log("customer add error");
                 $.notify(e.message, { position: "to center", className: 'error' });
             }
         },
