@@ -126,6 +126,7 @@ namespace TailorBD.AccessAdmin.quick_order
                     con.Close();
 
                 }
+
                 using (var cmd = new SqlCommand())
                 {
                     cmd.CommandText = @"UPDATE Institution SET TotalCustomer = [dbo].[CustomeSerialNumber](@InstitutionID) WHERE(InstitutionID = @InstitutionID)";
@@ -137,8 +138,10 @@ namespace TailorBD.AccessAdmin.quick_order
                     con.Close();
                 }
             }
+
             return new ResponseModel<CustomerViewModel>(true, "Customer added successfully", model);
         }
+
 
         //dress dropdown
         [WebMethod]
@@ -346,6 +349,7 @@ namespace TailorBD.AccessAdmin.quick_order
             }
             return fabrics;
         }
+
 
         //get fabrics by code
         [WebMethod]
@@ -876,7 +880,7 @@ namespace TailorBD.AccessAdmin.quick_order
         }
 
 
-        //DeleteOrder
+        //Delete Order
         [WebMethod]
         public static ResponseModel DeleteOrder(int orderId)
         {

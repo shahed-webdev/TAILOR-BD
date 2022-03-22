@@ -24,7 +24,7 @@ function initData() {
         apiData = { customerId: 0, clothForId: 0 },
         orderNumber = null,
         order = [],
-        customer = { isLoading: false, isNewCustomer: true, data: { } }
+        customer = { isLoading: false, isNewCustomer: true, data: {} }
     } = getStore();
 
     return {
@@ -289,7 +289,7 @@ function initData() {
             const { Phone, CustomerName, Address, Description, Cloth_For_ID = 1 } = this.customer.data;
             const model = { Phone, CustomerName, Address, Description, Cloth_For_ID }
 
-            try {
+            /*try {*/
                 const response = await fetch(`${helpers.baseUrl}/AddNewCustomer`,
                     {
                         method: "POST",
@@ -298,7 +298,7 @@ function initData() {
                     });
 
                 const result = await response.json();
-                const { IsSuccess, Message, Data } = result.d ||{};
+                const { IsSuccess, Message, Data } = result.d || {};
 
                 $.notify(Message, { position: "to center", className: IsSuccess ? "success" : "error" });
                
@@ -312,10 +312,10 @@ function initData() {
                     //save to local store
                     this.saveData();
                 }
-            } catch (e) {
-                console.log("customer add error");
-                $.notify(e.message, { position: "to center", className: 'error' });
-            }
+            //} catch (e) {
+            //    console.log(e);
+            //    $.notify("customer not added!", { position: "to center", className: 'error' });
+            //}
         },
 
         //set measurement
