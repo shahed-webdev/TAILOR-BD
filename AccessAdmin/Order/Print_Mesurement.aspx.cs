@@ -105,6 +105,20 @@ namespace TailorBD.AccessAdmin.Order
 
             return Print_Customer_Name;
         }
+        
+        
+        [WebMethod]
+        public static bool Customer_Address()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SELECT Print_Customer_Address FROM Institution WHERE (InstitutionID = @InstitutionID)", con);
+            cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+            con.Open();
+            bool Print_Customer_Address = Convert.ToBoolean(cmd.ExecuteScalar());
+            con.Close();
+
+            return Print_Customer_Address;
+        }
 
         [WebMethod]
         public static bool MasterCopy()
@@ -157,8 +171,6 @@ namespace TailorBD.AccessAdmin.Order
 
             return Print_TopSpace;
         }
-
-
 
         [WebMethod]
         [ScriptMethod]

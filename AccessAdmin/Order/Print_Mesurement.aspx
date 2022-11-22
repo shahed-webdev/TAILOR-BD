@@ -1,13 +1,15 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Basic.Master" AutoEventWireup="true" CodeBehind="Print_Mesurement.aspx.cs" Inherits="TailorBD.AccessAdmin.Order.Print_Mesurement" %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-    <link href="CSS/Print_Mesurement.css?v=1" rel="stylesheet" />
+    <link href="CSS/Print_Mesurement.css?v=1.0.0" rel="stylesheet" />
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
     <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server" />
     <h3>Print Mesurement</h3>
+
     <asp:LinkButton ID="A4PLinkButton" runat="server" OnClick="A4PLinkButton_Click">A4 Size Mesurement Print</asp:LinkButton>
 
     <table class="No_Print">
@@ -97,8 +99,11 @@
                             </tr>
                         </table>
 
-                        <div style="display: none" class="CuName">
-                            <asp:Label ID="CusNLabel2" runat="server" Text='<%# Bind("CustomerName") %>' />
+                        <div style="display: none" class="customer-name">
+                            <%# Eval("CustomerName") %>
+                        </div>
+                        <div style="display: none" class="customer-address">
+                            <%# Eval("Address") %>
                         </div>
 
                         <div class="MesureMentSt">
@@ -171,7 +176,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
     </div>
 
     <asp:SqlDataSource ID="NameOrderListSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-        SelectCommand="SELECT OrderList.OrderListID, Dress.Dress_Name, OrderList.DressQuantity, OrderList.OrderListAmount, OrderList.Details,[Order].OrderID, [Order].OrderDate, [Order].DeliveryDate, [Order].OrderSerialNumber, [Order].OrderAmount, OrderList.OrderList_SN, Customer.CustomerNumber, Customer.CustomerName, Customer.Phone, Institution.InstitutionName FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID INNER JOIN [Order] ON OrderList.OrderID = [Order].OrderID INNER JOIN Customer ON OrderList.CustomerID = Customer.CustomerID AND [Order].CustomerID = Customer.CustomerID INNER JOIN Institution ON OrderList.InstitutionID = Institution.InstitutionID WHERE (OrderList.OrderID = @OrderID) AND (OrderList.InstitutionID = @InstitutionID)">
+        SelectCommand="SELECT OrderList.OrderListID, Dress.Dress_Name, OrderList.DressQuantity, OrderList.OrderListAmount, OrderList.Details,[Order].OrderID, [Order].OrderDate, [Order].DeliveryDate, [Order].OrderSerialNumber, [Order].OrderAmount, OrderList.OrderList_SN, Customer.CustomerNumber, Customer.CustomerName,Customer.Address, Customer.Phone, Institution.InstitutionName FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID INNER JOIN [Order] ON OrderList.OrderID = [Order].OrderID INNER JOIN Customer ON OrderList.CustomerID = Customer.CustomerID AND [Order].CustomerID = Customer.CustomerID INNER JOIN Institution ON OrderList.InstitutionID = Institution.InstitutionID WHERE (OrderList.OrderID = @OrderID) AND (OrderList.InstitutionID = @InstitutionID)">
         <SelectParameters>
             <asp:QueryStringParameter Name="OrderID" QueryStringField="OrderID" Type="Int32" />
             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />
@@ -179,7 +184,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
     </asp:SqlDataSource>
 
     <br />
-    <asp:CheckBox ID="Noborder_CheckBox" CssClass="No_Print" runat="server" Text="Hide Border" /><br />
+    <asp:CheckBox ID="Noborder_CheckBox" ClientIDMode="Static" CssClass="No_Print" runat="server" Text="Hide Border" /><br />
     <input id="PrintButton" type="button" value="" class="print" onclick="PrintPage();" />
     <br />
     <a class="No_Print" href="Order.aspx">নতুন অর্ডার দিন</a>
@@ -225,6 +230,12 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                                     <td>কাস্টমারের নাম</td>
                                     <td>
                                         <asp:CheckBox ID="Print_Customer_NameCheckBox" runat="server" Checked='<%# Bind("Print_Customer_Name") %>' Text=" " />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>কাস্টমারের ঠিকানা</td>
+                                    <td>
+                                        <asp:CheckBox ID="Print_Customer_AddressCheckBox" runat="server" Checked='<%# Bind("Print_Customer_Address") %>' Text=" " />
                                     </td>
                                 </tr>
                                 <tr>
@@ -275,7 +286,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                             </table>
                         </EditItemTemplate>
                     </asp:FormView>
-                    <asp:SqlDataSource ID="Print_settingSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT InstitutionID, Print_Customer_Name, Print_MasterCopy, Print_WorkmanCopy, Print_ShopCopy, Print_TopSpace, Print_S_Category, Print_Measurement_Name, Print_ShopName, Print_Font_Size FROM Institution WHERE (InstitutionID = @InstitutionID)" UpdateCommand="UPDATE Institution SET Print_Font_Size = @Print_Font_Size, Print_ShopName = @Print_ShopName, Print_Customer_Name = @Print_Customer_Name, Print_MasterCopy = @Print_MasterCopy, Print_WorkmanCopy = @Print_WorkmanCopy, Print_ShopCopy = @Print_ShopCopy, Print_TopSpace = @Print_TopSpace, Print_S_Category = @Print_S_Category, Print_Measurement_Name = @Print_Measurement_Name WHERE (InstitutionID = @InstitutionID)">
+                    <asp:SqlDataSource ID="Print_settingSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT InstitutionID, Print_Customer_Name,Print_Customer_Address, Print_MasterCopy, Print_WorkmanCopy, Print_ShopCopy, Print_TopSpace, Print_S_Category, Print_Measurement_Name, Print_ShopName, Print_Font_Size FROM Institution WHERE (InstitutionID = @InstitutionID)" UpdateCommand="UPDATE Institution SET Print_Font_Size = @Print_Font_Size, Print_ShopName = @Print_ShopName, Print_Customer_Name = @Print_Customer_Name,Print_Customer_Address=@Print_Customer_Address, Print_MasterCopy = @Print_MasterCopy, Print_WorkmanCopy = @Print_WorkmanCopy, Print_ShopCopy = @Print_ShopCopy, Print_TopSpace = @Print_TopSpace, Print_S_Category = @Print_S_Category, Print_Measurement_Name = @Print_Measurement_Name WHERE (InstitutionID = @InstitutionID)">
                         <SelectParameters>
                             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" Type="Int32" />
                         </SelectParameters>
@@ -283,6 +294,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                             <asp:Parameter Name="Print_Font_Size" />
                             <asp:Parameter Name="Print_ShopName" />
                             <asp:Parameter Name="Print_Customer_Name" />
+                            <asp:Parameter Name="Print_Customer_Address" />
                             <asp:Parameter Name="Print_MasterCopy" />
                             <asp:Parameter Name="Print_WorkmanCopy" />
                             <asp:Parameter Name="Print_ShopCopy" />
@@ -295,6 +307,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                 </div>
             </ContentTemplate>
         </asp:UpdatePanel>
+
         <asp:HiddenField ID="IHiddenField" runat="server" Value="0" />
         <asp:ModalPopupExtender ID="IMpe" runat="server"
             TargetControlID="IHiddenField"
@@ -306,13 +319,10 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
     </div>
 
     <script src="../../JS/jq_Profile/jquery-ui-1.8.23.custom.min.js"></script>
+
     <script type="text/javascript">
         //Hide Mesurement Bordre
-        if ($('input[type=checkbox]').prop('checked')) {
-            $('.MesureMentSt tr td table').css('border', 'none');
-        }
-
-        $('input[type=checkbox]').on('change', function (e) {
+        $('#Noborder_CheckBox').on('change', function (e) {
             if ($(this).prop('checked')) {
                 $('.MesureMentSt tr td table').css('border', 'none');
             } else {
@@ -324,142 +334,158 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
 
         var pageUrl = '<%=ResolveUrl("Print_Mesurement.aspx")%>'
 
-      /**Print count**/
-      $(function () {
-          $("#PrintButton").bind("click", function () {
-              var OrderID = $("[id*=OrderID_HF]").val();;
-              $.ajax({
-                  type: "POST",
-                  url: pageUrl + '/UpdatePrint',
-                  data: '{OrderID: ' + OrderID + '}',
-                  contentType: "application/json; charset=utf-8",
-                  dataType: "json",
-                  success: function (response) { }
-              });
-              return false;
-          });
-      });
+        /**Print count**/
+        $(function () {
+            $("#PrintButton").bind("click", function () {
+                var OrderID = $("[id*=OrderID_HF]").val();;
+                $.ajax({
+                    type: "POST",
+                    url: pageUrl + '/UpdatePrint',
+                    data: '{OrderID: ' + OrderID + '}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) { }
+                });
+                return false;
+            });
+        });
 
-      function PrintPage() { window.print() }
+        function PrintPage() { window.print() }
 
-      $(function () {
-          $(".MesureMentSt table tr td:empty").css("display", "none"); //Hide empty td
-          $(".M_Size").css("font-size", $("[id*=FontSizeDropDownList]").val() + "px"); //Assign Saved Font Size
+        $(function () {
+            $(".MesureMentSt table tr td:empty").css("display", "none"); //Hide empty td
+            $(".M_Size").css("font-size", $("[id*=FontSizeDropDownList]").val() + "px"); //Assign Saved Font Size
 
-          //margin-top
-          $.ajax({
-              type: "POST",
-              url: pageUrl + '/TopSpace',
-              contentType: "application/json; charset=utf-8",
-              dataType: "json",
-              success: function (response) {
-                  $(".PrintMesure").css("margin-top", response.d + "px");
-              },
-              failure: function (response) {
-                  alert(response.d);
-              }
-          })
+            //margin-top
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/TopSpace',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    $(".PrintMesure").css("margin-top", response.d + "px");
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
 
-          //Measurement_Name
-          $.ajax({
-              type: "POST",
-              url: pageUrl + '/Measurement_Name',
-              contentType: "application/json; charset=utf-8",
-              dataType: "json",
-              success: function (response) {
-                  if (response.d) {
-                      $(".M_Type").show();
-                  }
-              },
-              failure: function (response) {
-                  alert(response.d);
-              }
-          })
+            //Measurement_Name
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/Measurement_Name',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        $(".M_Type").show();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
 
-          //ShopName
-          $.ajax({
-              type: "POST",
-              url: pageUrl + '/ShopName',
-              contentType: "application/json; charset=utf-8",
-              dataType: "json",
-              success: function (response) {
-                  if (response.d) {
-                      $(".InsName").show();
-                  }
-              },
-              failure: function (response) {
-                  alert(response.d);
-              }
-          })
+            //ShopName
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/ShopName',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        $(".InsName").show();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
 
-          //Customer_Name
-          $.ajax({
-              type: "POST",
-              url: pageUrl + '/Customer_Name',
-              contentType: "application/json; charset=utf-8",
-              dataType: "json",
-              success: function (response) {
-                  if (response.d) {
-                      $(".CuName").show();
-                  }
-              },
-              failure: function (response) {
-                  alert(response.d);
-              }
-          })
+            //Customer Name
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/Customer_Name',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        $(".customer-name").show();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
 
-          //MasterCopy
-          $.ajax({
-              type: "POST",
-              url: pageUrl + '/MasterCopy',
-              contentType: "application/json; charset=utf-8",
-              dataType: "json",
-              success: function (response) {
-                  if (response.d) {
-                      $(".MasterCopy").show();
-                  }
-              },
-              failure: function (response) {
-                  alert(response.d);
-              }
-          })
+            //Customer address
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/Customer_Address',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        $(".customer-address").show();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
 
-          //WorkerCopy
-          $.ajax({
-              type: "POST",
-              url: pageUrl + '/WorkerCopy',
-              contentType: "application/json; charset=utf-8",
-              dataType: "json",
-              success: function (response) {
-                  if (response.d) {
-                      $(".WorkerCopy").show();
-                  }
-              },
-              failure: function (response) {
-                  alert(response.d);
-              }
-          })
+            //MasterCopy
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/MasterCopy',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        $(".MasterCopy").show();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
 
-          //ShopCopy
-          $.ajax({
-              type: "POST",
-              url: pageUrl + '/ShopCopy',
-              contentType: "application/json; charset=utf-8",
-              dataType: "json",
-              success: function (response) {
-                  if (response.d) {
-                      $(".ShopCopy").show();
-                  }
-              },
-              failure: function (response) {
-                  alert(response.d);
-              }
-          })
-      });
+            //WorkerCopy
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/WorkerCopy',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        $(".WorkerCopy").show();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
 
-      $("[id*=FontSizeDropDownList]").change(function () {
-          $(".M_Size").css("font-size", $(this).val() + "px")
-      });
+            //ShopCopy
+            $.ajax({
+                type: "POST",
+                url: pageUrl + '/ShopCopy',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        $(".ShopCopy").show();
+                    }
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            })
+        });
+
+        $("[id*=FontSizeDropDownList]").change(function () {
+            $(".M_Size").css("font-size", $(this).val() + "px")
+        });
 
     </script>
 </asp:Content>

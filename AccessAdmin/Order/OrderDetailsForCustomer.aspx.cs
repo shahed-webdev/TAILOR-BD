@@ -48,6 +48,8 @@ namespace TailorBD.AccessAdmin.Order
                 }
             }
         }
+
+
         protected void All_And_Part_DropDownList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (All_And_Part_DropDownList.SelectedIndex == 0)
@@ -60,6 +62,7 @@ namespace TailorBD.AccessAdmin.Order
                 OrderGridViewWithName.PageSize = All_And_Part_DropDownList.SelectedIndex;
             }
         }
+
         protected void AddMoreDressButton_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/AccessAdmin/Order/Add_More_Dress_In_Order.aspx?" + "OrderID=" + Request.QueryString["OrderID"]);
@@ -93,6 +96,7 @@ namespace TailorBD.AccessAdmin.Order
                     cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
                     cmd.Parameters.AddWithValue("@OrderID", OrderID);
                     cmd.Connection = con;
+                    
                     con.Open();
                     cmd.ExecuteNonQuery();
                     con.Close();

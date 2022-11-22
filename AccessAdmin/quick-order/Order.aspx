@@ -347,10 +347,10 @@
                             <label for="address">Address</label>
                             <input type="text" id="address" x-model="customer.data.Address" class="form-control">
                         </div>
-                        <div class="form-group">
+                        <%--<div class="form-group">
                             <label>Description</label>
                             <input type="text" x-model="customer.data.Description" class="form-control">
-                        </div>
+                        </div>--%>
                         <div class="form-group">
                             <label>Gender</label>
                             <select x-model="customer.data.Cloth_For_ID" class="form-control" required>

@@ -121,7 +121,7 @@ input[type="radio"]:checked + label { -moz-user-select: none; background-image: 
 /***  popup***/
 .modalBackground { background-color: Black; filter: alpha(opacity=40); opacity: 0.4; }
 .modalPopup { background-color: #fff; border-radius: 5px; max-width:600px; overflow: auto; }
-.modalPopup .Htitle { background-color: #00b4aa; color: #fff; font-size: 15px; padding: 2px 0 6px; text-align: center; cursor: move; }
+.modalPopup .Htitle { background-color: #0c817a; color: #fff; font-size: 16px; padding: 13px; text-align: center; cursor: move; }
 .modalPopup .Pop_Contain { padding: 17px; }
 .modalPopup .Pop_Contain p { color: hsl(0,0%,0%); font-size: 15px; margin-bottom: 2px; }
 .modalPopup .Close { padding-bottom: 10px; padding-left: 3px; padding-right: 10px; padding-top: 3px; text-align: right; }
