@@ -241,7 +241,7 @@
                                     <%# Eval("CustomerName") %>
                                 </div>
                                 <div style="display: none" class="customer-address">
-                                    <%# Eval("Address") %>
+                                    <%# Eval("Phone") %>, <%# Eval("Address") %>
                                 </div>
 
                                 <div class="MesureMentSt">
@@ -314,7 +314,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
             </div>
 
             <asp:SqlDataSource ID="NameOrderListSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-                SelectCommand="SELECT OrderList.OrderListID, Dress.Dress_Name, OrderList.DressQuantity,[Order].OrderID, OrderList.OrderListAmount, OrderList.Details, [Order].OrderDate, [Order].DeliveryDate, [Order].OrderSerialNumber, [Order].OrderAmount, OrderList.OrderList_SN, Customer.CustomerNumber, Customer.CustomerName, Customer.Address, Customer.Phone, Institution.InstitutionName, Institution.Print_Font_Size FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID INNER JOIN [Order] ON OrderList.OrderID = [Order].OrderID INNER JOIN Customer ON OrderList.CustomerID = Customer.CustomerID AND [Order].CustomerID = Customer.CustomerID INNER JOIN Institution ON OrderList.InstitutionID = Institution.InstitutionID WHERE (OrderList.OrderID = @OrderID) AND (OrderList.InstitutionID = @InstitutionID)">
+                SelectCommand="SELECT OrderList.OrderListID, Dress.Dress_Name, OrderList.DressQuantity,[Order].OrderID, OrderList.OrderListAmount, OrderList.Details, [Order].OrderDate, [Order].DeliveryDate, [Order].OrderSerialNumber, [Order].OrderAmount, OrderList.OrderList_SN, Customer.CustomerNumber, Customer.CustomerName, Customer.Address,Customer.Phone, Customer.Phone, Institution.InstitutionName, Institution.Print_Font_Size FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID INNER JOIN [Order] ON OrderList.OrderID = [Order].OrderID INNER JOIN Customer ON OrderList.CustomerID = Customer.CustomerID AND [Order].CustomerID = Customer.CustomerID INNER JOIN Institution ON OrderList.InstitutionID = Institution.InstitutionID WHERE (OrderList.OrderID = @OrderID) AND (OrderList.InstitutionID = @InstitutionID)">
                 <SelectParameters>
                     <asp:QueryStringParameter Name="OrderID" QueryStringField="OrderID" Type="Int32" />
                     <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />

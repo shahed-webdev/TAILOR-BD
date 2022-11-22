@@ -103,7 +103,7 @@
                             <%# Eval("CustomerName") %>
                         </div>
                         <div style="display: none" class="customer-address">
-                            <%# Eval("Address") %>
+                             <%# Eval("Phone") %>, <%# Eval("Address") %>
                         </div>
 
                         <div class="MesureMentSt">

@@ -8,7 +8,7 @@
         #addStyle .modal-dialog, #addMeasurement .modal-dialog { max-width: 80% }
     </style>  
 
-    <script src="js/quick-order.js?varsion=3.1.2"></script>
+    <script src="js/quick-order.js?varsion=4.0.1"></script>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="BasicForm" runat="server">
@@ -27,7 +27,7 @@
             </template>
         </h3>
         
-        <!--dress dropdown-->
+        <!--dress dropdown and add cutomer btn-->
         <div class="row align-items-center mb-4">
             <div class="col-sm-7 col-lg-9" x-data="{ dressId: 0 }">
                <form @submit.prevent="()=>addToListDress(dressId)">
@@ -361,7 +361,7 @@
                         </div>
                         <div class="d-flex justify-content-center">
                             <template x-if="customer.isNewCustomer">
-                               <button type="submit" :disabled="customer.isLoading" class="btn btn-teal">Add Customer <i class="fa fa-paper-plane ml-1"></i></button>
+                               <button type="submit" class="btn btn-teal">Add Customer <i class="fa fa-paper-plane ml-1"></i></button>
                             </template>
                             <template x-if="!customer.isNewCustomer">
                               <div>
