@@ -1253,6 +1253,12 @@
     <Folder Include="AccessAdmin\Sub_Admin\Css\" />
     <Folder Include="API\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="SmsService\SmsService.csproj">
+      <Project>{f633fa99-3e5b-4911-a515-097a3b2a11c7}</Project>
+      <Name>SmsService</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
