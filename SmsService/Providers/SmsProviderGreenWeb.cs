@@ -11,7 +11,7 @@ namespace SmsService
     public class SmsProviderGreenWeb : ISmsProvider
     {
         private const string HostUrl = "https://api.greenweb.com.bd/";
-        private const string ApiKey = "90282142241680536544fbc249a90ed4235610f4e0b0f2d06531";
+        private const string ApiKey = "90282141541680536514c64f44771ad21951c8b207c2dcf341b0";
         public int GetSmsBalance()
         {
             // Create Url

@@ -10,8 +10,8 @@ namespace SmsService
     public class SmsProviderBanglaPhone : ISmsProvider
     {
         private const string HostUrl = "http://loopsitbd.powersms.net.bd/httpapi/";
-        private const string UserId = "nooraniboard";
-        private const string Password = "Sms**Nboard";
+        private const string UserId = "tailorbd";
+        private const string Password = "Tailorbd@SMS_345";
 
         public int GetSmsBalance()
         {
