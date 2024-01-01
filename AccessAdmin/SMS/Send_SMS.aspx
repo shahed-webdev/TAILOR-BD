@@ -70,7 +70,7 @@
                </tr>
             </table>
 
-            <asp:GridView ID="CustomerListGridView" runat="server" AutoGenerateColumns="False" CssClass="mGrid" DataKeyNames="CustomerID,Masking,SMS_Balance,Phone" DataSourceID="CustomerListSQL" AllowPaging="True" PageSize="30" AllowSorting="True">
+            <asp:GridView ID="CustomerListGridView" runat="server" AutoGenerateColumns="False" CssClass="mGrid" DataKeyNames="CustomerID,Masking,SMS_Balance,Phone" DataSourceID="CustomerListSQL" AllowPaging="True" PageSize="200" AllowSorting="True">
                <Columns>
 
                   <asp:TemplateField ShowHeader="False">
