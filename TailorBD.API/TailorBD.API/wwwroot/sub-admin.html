@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সাব অ্যাডমিন ম্যানেজমেন্ট - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Container (Auto-loads from component) -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container (Auto-loads from component) -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="lang-content" data-en="Sub Admin Management" data-bn="সাব অ্যাডমিন ম্যানেজমেন্ট">সাব অ্যাডমিন ম্যানেজমেন্ট</h1>
+                        <p class="lang-content" data-en="Create and manage sub admin accounts" data-bn="সাব অ্যাডমিন অ্যাকাউন্ট তৈরি ও পরিচালনা করুন">সাব অ্যাডমিন অ্যাকাউন্ট তৈরি ও পরিচালনা করুন</p>
+                    </div>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubAdminModal">
+                        <i class="fas fa-user-plus me-2"></i>
+                        <span class="lang-content" data-en="Add Sub Admin" data-bn="সাব অ্যাডমিন যোগ করুন">সাব অ্যাডমিন যোগ করুন</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sub Admins Table -->
+            <div class="table-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>
+                        <span class="lang-content" data-en="Sub Admin List" data-bn="সাব অ্যাডমিন তালিকা">সাব অ্যাডমিন তালিকা</span>
+                    </h3>
+                    <div class="input-group" style="max-width: 300px;">
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="Search sub admin...">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="subAdminsTable">
+                        <thead>
+                            <tr>
+                                <th class="lang-content" data-en="Name" data-bn="নাম">নাম</th>
+                                <th class="lang-content" data-en="Designation" data-bn="পদবি">পদবি</th>
+                                <th class="lang-content" data-en="Username" data-bn="ইউজারনেম">ইউজারনেম</th>
+                                <th class="lang-content" data-en="Email" data-bn="ইমেইল">ইমেইল</th>
+                                <th class="lang-content" data-en="Status" data-bn="স্টাটাস">স্টাটাস</th>
+                                <th class="lang-content" data-en="Lock/Unlock" data-bn="লক/আনলক">লক/আনলক</th>
+                                <th class="lang-content" data-en="Approve" data-bn="অনুমোদন">অনুমোদন</th>
+                                <th class="lang-content" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subAdminsTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    <span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Sub Admin Modal -->
+    <div class="modal fade" id="addSubAdminModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title lang-content" data-en="Add New Sub Admin" data-bn="নতুন সাব অ্যাডমিন যোগ করুন">নতুন সাব অ্যাডমিন যোগ করুন</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSubAdminForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label lang-content" data-en="Name" data-bn="নাম">নাম</label>
+                                <input type="text" class="form-control" id="subAdminName" 
+                                       placeholder="Enter name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label lang-content" data-en="Designation" data-bn="পদবি">পদবি</label>
+                                <input type="text" class="form-control" id="subAdminDesignation" 
+                                       placeholder="Enter designation" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label lang-content" data-en="Username" data-bn="ইউজারনেম">ইউজারনেম</label>
+                                <input type="text" class="form-control" id="subAdminUsername" 
+                                       placeholder="Minimum 8 characters" required minlength="8" maxlength="30">
+                                <small class="text-muted lang-content" data-en="Minimum 8 and Maximum 30 characters" data-bn="সর্বনিম্ন ৮ এবং সর্বোচ্চ ৩০ অক্ষর">সর্বনিম্ন ৮ এবং সর্বোচ্চ ৩০ অক্ষর</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label lang-content" data-en="Email" data-bn="ইমেইল">ইমেইল</label>
+                                <input type="email" class="form-control" id="subAdminEmail" 
+                                       placeholder="email@example.com" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label lang-content" data-en="Password" data-bn="পাসওয়ার্ড">পাসওয়ার্ড</label>
+                                <input type="password" class="form-control" id="subAdminPassword" 
+                                       placeholder="Minimum 8 characters" required minlength="8" maxlength="30">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label lang-content" data-en="Confirm Password" data-bn="পাসওয়ার্ড নিশ্চিত করুন">পাসওয়ার্ড নিশ্চিত করুন</label>
+                                <input type="password" class="form-control" id="subAdminConfirmPassword" 
+                                       placeholder="Re-enter password" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label lang-content" data-en="Security Question" data-bn="নিরাপত্তা প্রশ্ন">নিরাপত্তা প্রশ্ন</label>
+                                <select class="form-select" id="securityQuestion" required>
+                                    <option value="">Select your security question</option>
+                                    <option value="What is the first name of your favorite uncle?">What is the first name of your favorite uncle?</option>
+                                    <option value="What is your oldest child's nick name?">What is your oldest child's nick name?</option>
+                                    <option value="What is the first name of your oldest nephew?">What is the first name of your oldest nephew?</option>
+                                    <option value="What is the first name of your aunt?">What is the first name of your aunt?</option>
+                                    <option value="Where did you spend your honeymoon?">Where did you spend your honeymoon?</option>
+                                    <option value="What is your favorite game?">What is your favorite game?</option>
+                                    <option value="What is your favorite food?">What is your favorite food?</option>
+                                    <option value="In what city were you born?">In what city were you born?</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label lang-content" data-en="Security Answer" data-bn="নিরাপত্তা উত্তর">নিরাপত্তা উত্তর</label>
+                                <input type="text" class="form-control" id="securityAnswer" 
+                                       placeholder="Answer the question" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="createSubAdmin()">
+                        <i class="fas fa-save me-2"></i>
+                        <span class="lang-content" data-en="Create Sub Admin" data-bn="সাব অ্যাডমিন তৈরি করুন">সাব অ্যাডমিন তৈরি করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Container (Auto-loads from component) -->
+    <div id="app-modals"></div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js?v=2.1.5"></script>
+    
+    <!-- Sub Admin JS -->
+    <script src="/js/sub-admin.js?v=2.1.5"></script>
+</body>
+</html>

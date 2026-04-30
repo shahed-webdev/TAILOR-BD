@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কাস্টমার তালিকা - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .container { max-width: 100%; padding: 10px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin-bottom: 16px; }
+        h2 { color: #6c7ae0; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+
+        /* Search Panel */
+        .search-grid { display: grid; grid-template-columns: 120px 1fr 1fr auto; gap: 10px; align-items: end; }
+        .form-group label { display: block; font-size: 12px; font-weight: 500; color: #555; margin-bottom: 4px; }
+        .form-group input {
+            width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 5px;
+            font-size: 13px; font-family: inherit; box-sizing: border-box;
+        }
+        .form-group input:focus { outline: none; border-color: #6c7ae0; box-shadow: 0 0 0 2px rgba(108,122,224,0.12); }
+
+        /* Auto-suggest */
+        .customer-suggest-box {
+            display: none;
+            position: absolute;
+            z-index: 9999;
+            background: #fff;
+            border: 1px solid #d0d5f5;
+            border-radius: 6px;
+            box-shadow: 0 4px 16px rgba(108,122,224,0.15);
+            list-style: none;
+            margin: 0;
+            padding: 4px 0;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .customer-suggest-box li {
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #334155;
+        }
+        .customer-suggest-box li:hover,
+        .customer-suggest-box li.active {
+            background: #ede9ff;
+            color: #6c7ae0;
+        }
+
+        .btn-search {
+            padding: 8px 18px; background: #6c7ae0; color: white; border: none;
+            border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600;
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .btn-search:hover { background: #5a68c9; }
+
+        /* Summary row */
+        .summary-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .summary-text { font-size: 14px; font-weight: 600; color: #444; }
+        .total-due { background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 6px 14px; font-size: 14px; font-weight: 700; color: #856404; }
+        .btn-add { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-add:hover { background: #218838; color: white; }
+
+        /* Table */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #6c7ae0; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+        td { padding: 7px 8px; border-bottom: 1px solid #eee; vertical-align: middle; text-align: center; }
+        tr:hover { background: #f8f9fa; }
+        .customer-name-td { text-align: left; font-weight: 600; }
+        .customer-number { color: #888; font-size: 11px; margin-right: 4px; }
+        .due-badge { background: #f8d7da; color: #721c24; border-radius: 4px; padding: 2px 8px; font-weight: 700; font-size: 12px; }
+        .due-zero { color: #aaa; }
+
+        /* Sortable columns */
+        th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+        th.sortable:hover { background: #5a68c9; }
+        .sort-icon { font-size: 10px; opacity: 0.5; margin-left: 2px; }
+        th.sortable:hover .sort-icon { opacity: 1; }
+        .sort-icon.asc, .sort-icon.desc { opacity: 1; color: #ffd700; }
+
+        /* Action buttons */
+        .btn-details { padding: 4px 10px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-details:hover { background: #5a68c9; color: white; }
+        .btn-order { padding: 4px 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-order:hover { background: #138496; color: white; }
+        .btn-edit { padding: 4px 8px; background: #ffc107; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-edit:hover { background: #e0a800; }
+        .btn-delete { padding: 4px 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-delete:hover { background: #c82333; }
+
+        /* Customer photo */
+        .cust-photo-wrap { display: inline-block; position: relative; cursor: pointer; vertical-align: middle; }
+        .cust-photo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e3f8; display: block; }
+        .cust-photo-placeholder { width: 38px; height: 38px; border-radius: 50%; background: #e8eaf6; display: flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 16px; border: 2px dashed #c5cae9; }
+        .cust-photo-wrap:hover::after {
+            content: '\f030';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            background: rgba(108,122,224,0.55);
+            color: white; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Photo modal */
+        .photo-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; }
+        .photo-modal-overlay.show { display: flex; }
+        .photo-modal-box { background: white; border-radius: 10px; padding: 24px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+        .photo-modal-box h5 { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 14px; }
+        .photo-preview { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #e0e3f8; margin-bottom: 14px; }
+        .photo-preview-placeholder { width: 120px; height: 120px; border-radius: 50%; background: #e8eaf6; display: inline-flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 48px; border: 3px dashed #c5cae9; margin-bottom: 14px; }
+        .photo-file-input { display: none; }
+        .btn-choose-photo { display: inline-block; padding: 7px 18px; background: #e8eaf6; color: #5a68c9; border: 1px solid #c5cae9; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .btn-choose-photo:hover { background: #d1d5f5; }
+        .btn-save-photo { padding: 7px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-save-photo:hover { background: #218838; }
+        .btn-close-photo { padding: 7px 16px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .photo-modal-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+
+        /* Edit row */
+        .edit-input { width: 100%; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; font-family: inherit; box-sizing: border-box; }
+        .edit-input:focus { outline: none; border-color: #6c7ae0; }
+        .btn-save-row { padding: 4px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-cancel-row { padding: 4px 8px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+        /* Pagination */
+        .pagination-wrap { display: flex; justify-content: center; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+        .page-btn { padding: 5px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; color: #444; }
+        .page-btn:hover { background: #f0f0f0; }
+        .page-btn.active { background: #6c7ae0; color: white; border-color: #6c7ae0; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Loading / empty */
+        .loading { text-align: center; padding: 40px; color: #888; font-size: 14px; }
+        .empty-msg { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
+
+        /* Confirm Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: white; border-radius: 8px; padding: 24px; max-width: 380px; width: 90%; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        .modal-box .modal-icon { font-size: 44px; color: #dc3545; margin-bottom: 12px; }
+        .modal-box h5 { font-size: 16px; color: #333; margin-bottom: 8px; }
+        .modal-box p { font-size: 13px; color: #666; margin-bottom: 18px; }
+        .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
+        .btn-yes { padding: 8px 24px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn-no { padding: 8px 24px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+
+        @media(max-width:768px) {
+            #app-navbar { margin-left: 0; }
+            .main-content { margin-left: 0; }
+            .search-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="container">
+                <div class="card">
+                    <h2><i class="fas fa-users me-2"></i>
+                        <span data-en="All Customer List" data-bn="সকল কাস্টমার তালিকা">সকল কাস্টমার তালিকা</span>
+                    </h2>
+
+                    <!-- Search -->
+                    <div class="search-grid" style="margin-bottom:14px;">
+                        <div class="form-group">
+                            <label data-en="Customer No." data-bn="কাস্টমার নম্বর">কাস্টমার নম্বর</label>
+                            <input type="text" id="searchCustomerNo" inputmode="numeric" autocomplete="off"
+                                data-en-placeholder="Customer No." data-bn-placeholder="কাস্টমার নম্বর" placeholder="কাস্টমার নম্বর">
+                        </div>
+                        <div class="form-group">
+                            <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                            <input type="text" id="searchName" autocomplete="off"
+                                data-en-placeholder="Customer Name" data-bn-placeholder="কাস্টমারের নাম" placeholder="কাস্টমারের নাম">
+                        </div>
+                        <div class="form-group">
+                            <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                            <input type="text" id="searchMobile" autocomplete="off"
+                                data-en-placeholder="Mobile Number" data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নম্বর">
+                        </div>
+                        <div>
+                            <button class="btn-search" onclick="searchCustomers()">
+                                <i class="fas fa-search"></i>
+                                <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="summary-row">
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <span class="summary-text" id="summaryText"></span>
+                            <span class="total-due" id="totalDueText" style="display:none;"></span>
+                        </div>
+                        <a href="/add-customer.html" class="btn-add">
+                            <i class="fas fa-user-plus"></i>
+                            <span data-en="Add New Customer" data-bn="নতুন কাস্টমার যোগ করুন">নতুন কাস্টমার যোগ করুন</span>
+                        </a>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-wrapper">
+                        <div id="customerTableContainer">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                <span data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-wrap" id="paginationWrap"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Photo Upload Modal -->
+    <div class="photo-modal-overlay" id="photoModal">
+        <div class="photo-modal-box">
+            <h5><i class="fas fa-camera me-2"></i>ছবি আপলোড করুন</h5>
+            <div id="photoPreviewWrap">
+                <div class="photo-preview-placeholder" id="photoPlaceholder"><i class="fas fa-user"></i></div>
+                <img id="photoPreviewImg" class="photo-preview" src="" style="display:none;" alt="preview">
+            </div>
+            <br>
+            <label class="btn-choose-photo" for="photoFileInput"><i class="fas fa-folder-open me-1"></i>ছবি বেছে নিন</label>
+            <input type="file" id="photoFileInput" class="photo-file-input" accept="image/*">
+            <div class="photo-modal-btns">
+                <button class="btn-save-photo" id="btnSavePhoto" onclick="saveCustomerPhoto()"><i class="fas fa-save me-1"></i>সংরক্ষণ করুন</button>
+                <button class="btn-close-photo" onclick="closePhotoModal()">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h5 data-en="Confirm Delete" data-bn="মুছে ফেলার নিশ্চিতকরণ">মুছে ফেলার নিশ্চিতকরণ</h5>
+            <p data-en="Are you sure you want to delete this customer?" data-bn="আপনি কি এই কাস্টমার মুছে ফেলতে চান?">আপনি কি এই কাস্টমার মুছে ফেলতে চান?</p>
+            <div class="modal-btn-row">
+                <button class="btn-yes" onclick="confirmDeleteCustomer()" data-en="Yes, Delete" data-bn="হ্যাঁ, মুছুন">হ্যাঁ, মুছুন</button>
+                <button class="btn-no" onclick="closeDeleteModal()" data-en="Cancel" data-bn="বাতিল">বাতিল</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-modals"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script src="/js/customer-list.js?v=2.1.4"></script>
+</body>
+</html>

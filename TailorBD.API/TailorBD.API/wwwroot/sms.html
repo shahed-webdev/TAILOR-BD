@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Send SMS - TailorBD" data-bn="SMS পাঠান - TailorBD">SMS পাঠান - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px 200px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px 10px 200px;} }
+
+        /* -- Buttons -- */
+        .btn-pri    { padding:7px 16px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+        .btn-pri:hover { background:#5a68c9; }
+        .btn-gray   { padding:6px 14px; background:#f5f5f5; color:#555; border:1.5px solid #ddd; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
+        .btn-gray:hover { background:#eee; }
+        .btn-outline{ padding:6px 14px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
+        .btn-outline:hover { background:#f0f1fc; }
+
+        /* -- Card -- */
+        .card-box  { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08); overflow:hidden; margin-bottom:16px; }
+        .card-head { padding:13px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; background:#fafbff; }
+        .card-title{ font-weight:700; font-size:14px; color:#6c7ae0; }
+
+        /* -- Info bar -- */
+        .info-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:center; padding:11px 20px; background:#f0f2ff; border-bottom:1px solid #dde0f5; }
+        .bal-badge { background:#6c7ae0; color:#fff; border-radius:20px; padding:5px 18px; font-size:13px; font-weight:800; }
+
+        /* -- Search bar -- */
+        .search-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; padding:12px 20px; border-bottom:1px solid #f0f0f0; }
+        .f-group  { display:flex; flex-direction:column; }
+        .f-label  { font-size:11px; font-weight:700; color:#666; margin-bottom:3px; }
+        .f-ctrl   { padding:6px 11px; border:1.5px solid #ddd; border-radius:7px; font-size:13px; font-family:inherit; }
+        .f-ctrl:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 2px rgba(108,122,224,.12); }
+
+        /* -- Summary strip -- */
+        .summary-strip { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:8px 20px; background:#fffbf0; border-bottom:1px solid #f0f0f0; font-size:12px; }
+        .sel-badge { background:#e65100; color:#fff; border-radius:5px; padding:2px 10px; font-size:12px; font-weight:700; }
+        .sel-zero  { background:#ddd; color:#888; border-radius:5px; padding:2px 10px; font-size:12px; font-weight:700; }
+
+        /* -- Pager -- */
+        .pager-wrap { display:flex; gap:4px; flex-wrap:wrap; align-items:center; padding:8px 20px; border-bottom:1px solid #f0f0f0; background:#fafbff; }
+        .pager-wrap button { padding:4px 10px; border:1.5px solid #ddd; border-radius:5px; background:#fff; font-size:11px; cursor:pointer; font-family:inherit; font-weight:600; }
+        .pager-wrap button.active { background:#6c7ae0; color:#fff; border-color:#6c7ae0; }
+        .pager-wrap button:disabled { opacity:.35; cursor:not-allowed; }
+        .pager-info { font-size:11px; color:#888; margin-left:auto; }
+
+        /* -- Customer table -- */
+        .cust-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .cust-table thead th { background:#f4f5ff; padding:9px 14px; font-size:11px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap; }
+        .cust-table tbody td { padding:8px 14px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+        .cust-table tbody tr:hover { background:#f8f9ff; }
+        .cust-table tbody tr.row-checked { background:#eef0fc; }
+        .cust-table input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:#6c7ae0; }
+        .cust-num  { font-weight:700; color:#6c7ae0; }
+        .cust-name { font-weight:600; }
+
+        /* -- Spinner -- */
+        .spin-wrap { text-align:center; padding:28px; color:#aaa; }
+        .spin { width:26px; height:26px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .no-data { text-align:center; padding:28px; color:#bbb; font-size:13px; }
+
+        /* -- STICKY BOTTOM COMPOSE BAR -- */
+        #composeBar {
+            position: fixed;
+            bottom: 0;
+            left: 260px;
+            right: 0;
+            background: #fff;
+            border-top: 2px solid #6c7ae0;
+            box-shadow: 0 -4px 20px rgba(108,122,224,.18);
+            z-index: 999;
+            transition: left .3s ease;
+        }
+        @media(max-width:992px){ #composeBar{ left:0; } }
+
+        .compose-collapsed {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 30px;
+            cursor: pointer;
+            background: #f8f9ff;
+            flex-wrap: wrap;
+        }
+        .compose-collapsed:hover { background: #eef0fc; }
+
+        .compose-expanded {
+            padding: 14px 30px 16px 30px;
+            display: none;
+        }
+
+        .compose-toggle-icon { color:#6c7ae0; font-size:16px; }
+        .compose-hint { font-size:13px; font-weight:700; color:#6c7ae0; }
+        .compose-sel-info { font-size:12px; color:#e65100; font-weight:700; background:#fff3e0; border-radius:5px; padding:2px 10px; }
+        .compose-arrow { margin-left:auto; color:#6c7ae0; transition:transform .2s; }
+        .compose-arrow.open { transform:rotate(180deg); }
+
+        .msg-area { width:100%; padding:10px 13px; border:1.5px solid #ddd; border-radius:8px; font-size:13px; font-family:inherit; resize:none; height:80px; box-sizing:border-box; line-height:1.6; }
+        .msg-area:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 2px rgba(108,122,224,.12); }
+        .sms-meta { display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:#888; margin-top:5px; }
+        .sms-meta b { color:#333; }
+        .btn-send { padding:10px 28px; background:#28a745; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap; }
+        .btn-send:hover { background:#218838; }
+        .btn-send:disabled { background:#aaa; cursor:not-allowed; }
+        .err-msg { color:#dc3545; font-size:12px; font-weight:600; }
+    </style>
+</head>
+<body>
+<div id="app-navbar"></div>
+<div id="app-sidebar"></div>
+
+<main class="main-content" id="mainContent">
+<div class="dashboard-content">
+<div class="page-container">
+
+    <!-- Page title -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-weight:800;color:#6c7ae0;margin:0;">
+            <i class="fas fa-sms me-2"></i>
+            <span data-en="Send SMS" data-bn="SMS পাঠান">SMS পাঠান</span>
+        </h5>
+        <a href="/sms-history.html" class="btn-outline">
+            <i class="fas fa-history me-1"></i>
+            <span data-en="SMS History" data-bn="SMS ইতিহাস">SMS ইতিহাস</span>
+        </a>
+    </div>
+
+    <div class="card-box">
+
+        <!-- Balance -->
+        <div class="info-bar">
+            <span style="font-size:13px;color:#555;font-weight:600;" data-en="Available SMS:" data-bn="প্রাপ্য SMS:">প্রাপ্য SMS:</span>
+            <span class="bal-badge" id="smsBalanceChip"><i class="fas fa-spinner fa-spin"></i></span>
+        </div>
+
+        <!-- Search -->
+        <div class="search-bar">
+            <div class="f-group">
+                <label class="f-label" data-en="Customer No" data-bn="গ্রাহক নম্বর">গ্রাহক নম্বর</label>
+                <input type="number" id="searchCustNo" class="f-ctrl" style="width:130px;" placeholder="নম্বর"
+                    data-en-placeholder="No" data-bn-placeholder="নম্বর">
+            </div>
+            <div class="f-group">
+                <label class="f-label" data-en="Mobile No" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                <div style="position:relative;">
+                    <input type="text" id="searchPhone" class="f-ctrl" style="width:180px;padding-right:30px;"
+                        placeholder="01XXXXXXXXX"
+                        data-en-placeholder="01XXXXXXXXX"
+                        data-bn-placeholder="মোবাইল নম্বর">
+                    <span id="searchSpinner" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);display:none;">
+                        <i class="fas fa-spinner fa-spin" style="color:#6c7ae0;font-size:12px;"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="f-group">
+                <label class="f-label">&nbsp;</label>
+                <div class="d-flex gap-2">
+                    <button class="btn-pri" onclick="searchCustomers()">
+                        <i class="fas fa-search me-1"></i>
+                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                    </button>
+                    <button class="btn-gray" onclick="clearSearch()">
+                        <span data-en="Reset" data-bn="রিসেট">রিসেট</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary strip -->
+        <div class="summary-strip">
+            <span style="color:#888;" data-en="Total:" data-bn="মোট:">মোট:</span>
+            <span style="font-weight:700;color:#333;" id="custTotalCount">0</span>
+            <span style="color:#888;" data-en="customers" data-bn="গ্রাহক">গ্রাহক</span>
+            <span style="margin:0 4px;color:#ddd;">|</span>
+            <span id="selBadge" class="sel-zero">নির্বাচিত: 0</span>
+            <button class="btn-outline" onclick="selectPage()" style="padding:3px 12px;font-size:11px;">
+                <span data-en="Select Page" data-bn="পেইজ নির্বাচন">পেইজ নির্বাচন</span>
+            </button>
+            <button class="btn-gray" onclick="deselectAll()" style="padding:3px 12px;font-size:11px;">
+                <span data-en="Deselect All" data-bn="সব বাতিল">সব বাতিল</span>
+            </button>
+        </div>
+
+        <!-- Pager TOP -->
+        <div id="custPagerTop" class="pager-wrap"></div>
+
+        <!-- Table -->
+        <div id="custSpinner" class="spin-wrap"><div class="spin"></div></div>
+        <div id="custTableWrap" style="overflow-x:auto;display:none;">
+            <table class="cust-table">
+                <thead><tr>
+                    <th style="width:38px;text-align:center;">
+                        <input type="checkbox" id="chkAll" onchange="toggleAll(this)">
+                    </th>
+                    <th data-en="No" data-bn="না">না</th>
+                    <th data-en="Name" data-bn="নাম">নাম</th>
+                    <th data-en="Mobile" data-bn="মোবাইল">মোবাইল</th>
+                    <th data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
+                </tr></thead>
+                <tbody id="custBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Pager BOTTOM -->
+        <div id="custPagerBottom" class="pager-wrap" style="border-bottom:none;"></div>
+
+    </div>
+</div>
+</div>
+</main>
+
+<!-- -- STICKY COMPOSE BAR -- -->
+<div id="composeBar">
+
+    <!-- Collapsed header (click to expand) -->
+    <div class="compose-collapsed" id="composeHeader" onclick="toggleCompose()">
+        <i class="fas fa-pen compose-toggle-icon"></i>
+        <span class="compose-hint"
+            data-en="Write &amp; Send SMS"
+            data-bn="SMS লিখুন ও পাঠান">SMS লিখুন ও পাঠান</span>
+        <span class="compose-sel-info" id="composeSelInfo"
+            data-en="Selected: 0"
+            data-bn="নির্বাচিত: 0">নির্বাচিত: 0</span>
+        <span id="composeSmsInfo" style="font-size:11px;color:#888;"></span>
+        <i class="fas fa-chevron-up compose-arrow" id="composeArrow"></i>
+    </div>
+
+    <!-- Expanded compose area -->
+    <div class="compose-expanded" id="composeExpanded">
+        <div class="d-flex gap-3 align-items-start flex-wrap">
+            <div style="flex:1;min-width:240px;">
+                <textarea id="smsText" class="msg-area" oninput="updateCounter()"
+                    data-en-placeholder="Write your SMS message here..."
+                    data-bn-placeholder="এখানে SMS বার্তা লিখুন..." placeholder="এখানে SMS বার্তা লিখুন..."></textarea>
+                <div class="sms-meta">
+                    <span data-en="Length:" data-bn="দৈর্ঘ্য:">দৈর্ঘ্য:</span> <b id="cLen">0</b>
+                    &nbsp;|&nbsp;
+                    <span data-en="Per SMS:" data-bn="প্রতি SMS:">প্রতি SMS:</span> <b id="cSms">1</b>
+                    &nbsp;|&nbsp;
+                    <span data-en="Total to send:" data-bn="মোট পাঠানো হবে:">মোট পাঠানো হবে:</span>
+                    <b id="cTotal" style="color:#6c7ae0;">0</b> SMS
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding-top:2px;min-width:110px;">
+                <button class="btn-send" id="sendBtn" onclick="sendSms()">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    <span data-en="Send" data-bn="পাঠান">পাঠান</span>
+                </button>
+                <span class="err-msg" id="sendErrMsg" style="display:none;max-width:180px;"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="app-modals"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js?v=2.1.4"></script>
+<script src="/js/sms.js?v=2.1.4"></script>
+</body>
+</html>

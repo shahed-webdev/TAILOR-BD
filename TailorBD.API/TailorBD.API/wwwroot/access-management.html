@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সাব-অ্যাডমিন অ্যাক্সেস ম্যানেজমেন্ট - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    
+    <style>
+        .permission-tree {
+            margin-top: 20px;
+        }
+        
+        .module-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .module-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .module-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .module-header:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        
+        .module-header h5 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .module-header .module-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .module-body {
+            padding: 20px;
+            background: #f8f9fa;
+            display: none;
+        }
+        
+        .module-body.show {
+            display: block;
+        }
+        
+        .page-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .page-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .page-item.selected {
+            background: #e7f3ff;
+            border-color: #667eea;
+        }
+        
+        .page-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .page-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .permission-switch {
+            transform: scale(1.2);
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .template-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .template-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .template-full {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .template-manager {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .template-accountant {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .template-viewer {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="lang-content" data-en="Manage Sub Admin Access" data-bn="সাব-অ্যাডমিন অ্যাক্সেস ম্যানেজমেন্ট">সাব-অ্যাডমিন অ্যাক্সেস ম্যানেজমেন্ট</h1>
+                    <p class="lang-content" data-en="Control page access and permissions for sub admins" data-bn="সাব-অ্যাডমিনদের পেজ অ্যাক্সেস ও অনুমতি নিয়ন্ত্রণ করুন">সাব-অ্যাডমিনদের পেজ অ্যাক্সেস ও অনুমতি নিয়ন্ত্রণ করুন</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Left Side - Sub Admin Selection & Templates -->
+                <div class="col-lg-4 col-md-5">
+                    <!-- Sub Admin Selection -->
+                    <div class="stats-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-user-shield me-2"></i>
+                            <span class="lang-content" data-en="Select Sub Admin" data-bn="সাব-অ্যাডমিন নির্বাচন করুন">সাব-অ্যাডমিন নির্বাচন করুন</span>
+                        </h5>
+                        <select class="form-select mb-3" id="subAdminSelect">
+                            <option value="">-- Select Sub Admin --</option>
+                        </select>
+                        
+                        <div id="subAdminInfo" style="display: none;">
+                            <div class="stat-item">
+                                <span class="lang-content" data-en="Name" data-bn="নাম">নাম</span>
+                                <strong id="selectedName">-</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span class="lang-content" data-en="Username" data-bn="ইউজারনেম">ইউজারনেম</span>
+                                <strong id="selectedUsername">-</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span class="lang-content" data-en="Total Access" data-bn="মোট অ্যাক্সেস">মোট অ্যাক্সেস</span>
+                                <span class="badge bg-primary" id="totalAccessCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Permission Templates -->
+                    <div class="stats-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-layer-group me-2"></i>
+                            <span class="lang-content" data-en="Quick Templates" data-bn="দ্রুত টেমপ্লেট">দ্রুত টেমপ্লেট</span>
+                        </h5>
+                        <p class="text-muted small mb-3">Apply pre-defined permission sets</p>
+                        <div>
+                            <div class="template-badge template-full" onclick="applyTemplate('full')">
+                                <i class="fas fa-crown me-1"></i> Full Access
+                            </div>
+                            <div class="template-badge template-manager" onclick="applyTemplate('manager')">
+                                <i class="fas fa-briefcase me-1"></i> Manager
+                            </div>
+                            <div class="template-badge template-accountant" onclick="applyTemplate('accountant')">
+                                <i class="fas fa-calculator me-1"></i> Accountant
+                            </div>
+                            <div class="template-badge template-viewer" onclick="applyTemplate('viewer')">
+                                <i class="fas fa-eye me-1"></i> Viewer Only
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="stats-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-bolt me-2"></i>
+                            <span class="lang-content" data-en="Quick Actions" data-bn="দ্রুত কার্যক্রম">দ্রুত কার্যক্রম</span>
+                        </h5>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="selectAllPages()">
+                                <i class="fas fa-check-double me-2"></i>
+                                <span class="lang-content" data-en="Select All" data-bn="সব নির্বাচন করুন">সব নির্বাচন করুন</span>
+                            </button>
+                            <button class="btn btn-warning" onclick="deselectAllPages()">
+                                <i class="fas fa-times me-2"></i>
+                                <span class="lang-content" data-en="Deselect All" data-bn="সব বাতিল করুন">সব বাতিল করুন</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="savePermissions()">
+                                <i class="fas fa-save me-2"></i>
+                                <span class="lang-content" data-en="Save Changes" data-bn="পরিবর্তন সন্নিবেশ">পরিবর্তন সন্নিবেশ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side - Permissions Tree -->
+                <div class="col-lg-8 col-md-7">
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="searchPages" 
+                               placeholder="Search pages...">
+                    </div>
+
+                    <!-- Permissions Tree -->
+                    <div class="permission-tree" id="permissionsTree">
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-user-lock fa-3x mb-3"></i>
+                            <p class="lang-content" data-en="Select a sub admin to manage permissions" data-bn="অনুমতি পরিচালনা করতে একজন সাব-অ্যাডমিন নির্বাচন করুন">অনুমতি পরিচালনা করতে একজন সাব-অ্যাডমিন নির্বাচন করুন</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals Container -->
+    <div id="app-modals"></div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js?v=2.1.5"></script>
+    
+    <!-- Access Management JS -->
+    <script src="/js/access-management.js?v=2.1.5"></script>
+</body>
+</html>

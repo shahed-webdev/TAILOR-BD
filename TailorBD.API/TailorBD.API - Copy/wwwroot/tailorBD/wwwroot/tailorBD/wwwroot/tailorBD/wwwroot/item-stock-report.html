@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Stock Report - TailorBD" data-bn="স্টক রিপোর্ট - TailorBD">স্টক রিপোর্ট - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { width:100%; padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* KPI */
+        .kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:12px; margin-bottom:18px; }
+        .kpi-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 2px 10px rgba(0,0,0,.07); border-left:4px solid #6c7ae0; position:relative; overflow:hidden; }
+        .kpi-card.green  { border-color:#28a745; }
+        .kpi-card.red    { border-color:#dc3545; }
+        .kpi-card.orange { border-color:#fd7e14; }
+        .kpi-card.teal   { border-color:#20c997; }
+        .kpi-card.purple { border-color:#9b59b6; }
+        .kpi-val  { font-size:19px; font-weight:800; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .kpi-val.blue   { color:#6c7ae0; }
+        .kpi-val.green  { color:#28a745; }
+        .kpi-val.red    { color:#dc3545; }
+        .kpi-val.orange { color:#fd7e14; }
+        .kpi-val.teal   { color:#20c997; }
+        .kpi-val.purple { color:#9b59b6; }
+        .kpi-lbl  { font-size:11px; color:#888; margin-top:3px; }
+        .kpi-icon { position:absolute; right:12px; top:12px; font-size:22px; opacity:.12; }
+
+        /* Filter */
+        .filter-card { background:#fff; border-radius:10px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:16px; }
+        .f-label  { font-size:11.5px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control{ width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; font-family:inherit; }
+        .f-control:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+
+        /* Status filter tabs */
+        .status-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:0; }
+        .s-tab { padding:6px 14px; border-radius:20px; border:1.5px solid #ddd; background:#fff; color:#666; font-size:12.5px; font-weight:600; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; }
+        .s-tab.active-all    { background:#6c7ae0; border-color:#6c7ae0; color:#fff; }
+        .s-tab.active-in     { background:#28a745; border-color:#28a745; color:#fff; }
+        .s-tab.active-low    { background:#fd7e14; border-color:#fd7e14; color:#fff; }
+        .s-tab.active-out    { background:#dc3545; border-color:#dc3545; color:#fff; }
+        .s-tab .cnt { background:rgba(255,255,255,.3); border-radius:10px; padding:1px 7px; font-size:11px; }
+        .s-tab:not(.active-all):not(.active-in):not(.active-low):not(.active-out) .cnt { background:#f0f0f0; color:#666; }
+
+        /* Sort buttons */
+        .sort-btns { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+        .sort-btn { padding:5px 12px; border-radius:6px; border:1.5px solid #ddd; background:#fff; color:#666; font-size:11.5px; font-weight:600; cursor:pointer; transition:all .2s; }
+        .sort-btn.active { background:#6c7ae0; border-color:#6c7ae0; color:#fff; }
+        .sort-btn:hover:not(.active) { border-color:#6c7ae0; color:#6c7ae0; }
+
+        /* Table */
+        .table-card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); overflow:hidden; }
+        .tbl-head-row { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; flex-wrap:wrap; gap:8px; }
+        .tbl-title { font-size:13.5px; font-weight:700; color:#444; }
+        .tbl { width:100%; border-collapse:collapse; }
+        .tbl thead th { background:#f8f9ff; padding:10px 11px; font-size:11.5px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; text-align:center; white-space:nowrap; }
+        .tbl tbody tr { border-bottom:1px solid #f5f5f5; transition:background .15s; }
+        .tbl tbody tr:hover { background:#fafbff; }
+        .tbl tbody td { padding:9px 11px; font-size:12.5px; vertical-align:middle; text-align:center; }
+        .td-left { text-align:left !important; }
+
+        /* Stock status badges */
+        .badge-in  { background:#d4edda; color:#155724; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; white-space:nowrap; }
+        .badge-low { background:#fff3cd; color:#856404; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; white-space:nowrap; }
+        .badge-out { background:#f8d7da; color:#721c24; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; white-space:nowrap; }
+
+        /* Stock qty color */
+        .qty-in  { color:#28a745; font-weight:800; }
+        .qty-low { color:#fd7e14; font-weight:800; }
+        .qty-out { color:#dc3545; font-weight:800; }
+
+        /* Progress mini bar */
+        .mini-prog { background:#f0f0f0; border-radius:99px; height:5px; margin-top:3px; overflow:hidden; }
+        .mini-bar  { height:100%; border-radius:99px; transition:width .4s; }
+
+        /* Pagination */
+        .pag-wrap { display:flex; justify-content:center; align-items:center; gap:8px; padding:14px; }
+        .pag-btn  { padding:5px 14px; border:1.5px solid #6c7ae0; border-radius:6px; background:#fff; color:#6c7ae0; font-size:12.5px; font-weight:600; cursor:pointer; }
+        .pag-btn:hover:not(:disabled) { background:#6c7ae0; color:#fff; }
+        .pag-btn:disabled { opacity:.4; cursor:not-allowed; }
+        .pag-info { font-size:12.5px; color:#666; }
+
+        /* Spinner */
+        .spin-wrap { text-align:center; padding:40px; color:#aaa; }
+        .spin { width:28px; height:28px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* Export btn */
+        .btn-export { padding:7px 16px; background:#28a745; color:#fff; border:none; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+        .btn-export:hover { background:#218838; }
+        .btn-reset  { padding:7px 14px; background:#f0f0f0; color:#555; border:none; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; }
+        .btn-reset:hover { background:#e0e0e0; }
+
+        @media print {
+            #app-navbar,#app-sidebar,.filter-card,.no-print { display:none !important; }
+            .main-content { margin-left:0 !important; }
+            .page-container { padding:0 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <div id="app-modals"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-container">
+
+                <!-- Title -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                        <i class="fas fa-boxes me-2"></i>
+                        <span data-en="Item Stock Report" data-bn="আইটেম স্টক রিপোর্ট">আইটেম স্টক রিপোর্ট</span>
+                    </h5>
+                    <div class="d-flex gap-2 no-print">
+                        <button class="btn-export" onclick="exportCSV()">
+                            <i class="fas fa-file-csv"></i>
+                            <span data-en="Export CSV" data-bn="এক্সপোর্ট">এক্সপোর্ট</span>
+                        </button>
+                        <button class="btn-export" style="background:#6c7ae0;" onclick="window.print()">
+                            <i class="fas fa-print"></i>
+                            <span data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="kpi-grid" id="kpiGrid">
+                    <div class="spin-wrap" style="padding:20px;grid-column:1/-1;"><div class="spin"></div></div>
+                </div>
+
+                <!-- Filter Card -->
+                <div class="filter-card no-print">
+                    <div class="row g-2 align-items-end mb-3">
+                        <div class="col-md-4 col-sm-6">
+                            <label class="f-label"><span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></label>
+                            <input type="text" id="fSearch" class="f-control"
+                                data-en-placeholder="Code or item name..."
+                                data-bn-placeholder="কোড বা আইটেমের নাম..."
+                                placeholder="কোড বা আইটেমের নাম..."
+                                oninput="debouncedLoad()">
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <label class="f-label"><span data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</span></label>
+                            <select id="fCategory" class="f-control" onchange="loadList(1)">
+                                <option value=""><span data-en="All Categories" data-bn="সব ক্যাটাগরি">সব ক্যাটাগরি</span></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <label class="f-label"><span data-en="Brand" data-bn="ব্র্যান্ড">ব্র্যান্ড</span></label>
+                            <select id="fBrand" class="f-control" onchange="loadList(1)">
+                                <option value=""><span data-en="All Brands" data-bn="সব ব্র্যান্ড">সব ব্র্যান্ড</span></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <label class="f-label"><span data-en="Sort By" data-bn="সাজান">সাজান</span></label>
+                            <select id="fSort" class="f-control" onchange="loadList(1)">
+                                <option value="stock"   data-en="Stock (High→Low)"   data-bn="স্টক (বেশি→কম)">স্টক (বেশি→কম)</option>
+                                <option value="sold"    data-en="Most Sold"           data-bn="বেশি বিক্রি">বেশি বিক্রি</option>
+                                <option value="buying"  data-en="Buying Price"        data-bn="ক্রয় মূল্য">ক্রয় মূল্য</option>
+                                <option value="selling" data-en="Selling Price"       data-bn="বিক্রয় মূল্য">বিক্রয় মূল্য</option>
+                                <option value="name"    data-en="Name (A→Z)"          data-bn="নাম (A→Z)">নাম (A→Z)</option>
+                                <option value="code"    data-en="Code (A→Z)"          data-bn="কোড (A→Z)">কোড (A→Z)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-sm-6 d-flex gap-2">
+                            <button class="btn-reset" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>
+                                <span data-en="Reset" data-bn="রিসেট">রিসেট</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Tabs -->
+                    <div class="status-tabs" id="statusTabs">
+                        <button class="s-tab active-all" data-status="" onclick="setStatus(this,'')">
+                            <i class="fas fa-layer-group"></i>
+                            <span data-en="All" data-bn="সব">সব</span>
+                            <span class="cnt" id="cntAll">0</span>
+                        </button>
+                        <button class="s-tab" data-status="in" onclick="setStatus(this,'in')">
+                            <i class="fas fa-check-circle"></i>
+                            <span data-en="In Stock" data-bn="স্টকে আছে">স্টকে আছে</span>
+                            <span class="cnt" id="cntIn">0</span>
+                        </button>
+                        <button class="s-tab" data-status="low" onclick="setStatus(this,'low')">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span data-en="Low Stock" data-bn="কম স্টক">কম স্টক</span>
+                            <span class="cnt" id="cntLow">0</span>
+                        </button>
+                        <button class="s-tab" data-status="out" onclick="setStatus(this,'out')">
+                            <i class="fas fa-times-circle"></i>
+                            <span data-en="Out of Stock" data-bn="স্টক শেষ">স্টক শেষ</span>
+                            <span class="cnt" id="cntOut">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-card">
+                    <div class="tbl-head-row">
+                        <div class="tbl-title">
+                            <i class="fas fa-list me-1" style="color:#6c7ae0;"></i>
+                            <span id="resultCount" style="color:#6c7ae0;font-weight:800;">0</span>
+                            <span data-en="items" data-bn="টি আইটেম">টি আইটেম</span>
+                        </div>
+                        <div id="pageInfoTop" class="pag-info" style="font-size:12px;"></div>
+                    </div>
+
+                    <div id="spinWrap" class="spin-wrap"><div class="spin"></div></div>
+
+                    <div id="tableWrap" style="display:none;overflow-x:auto;">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th><span data-en="Code" data-bn="কোড">কোড</span></th>
+                                    <th><span data-en="Item Name" data-bn="আইটেম">আইটেম</span></th>
+                                    <th><span data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</span></th>
+                                    <th><span data-en="Buy Price" data-bn="ক্রয়">ক্রয়</span></th>
+                                    <th><span data-en="Sell Price" data-bn="বিক্রয়">বিক্রয়</span></th>
+                                    <th><span data-en="Bought" data-bn="মোট ক্রয়">মোট ক্রয়</span></th>
+                                    <th><span data-en="Sold" data-bn="মোট বিক্রয়">মোট বিক্রয়</span></th>
+                                    <th><span data-en="Damage" data-bn="ড্যামেজ">ড্যামেজ</span></th>
+                                    <th><span data-en="Return↑" data-bn="ফেরত↑">ফেরত↑</span></th>
+                                    <th><span data-en="Stock" data-bn="স্টক">স্টক</span></th>
+                                    <th><span data-en="Status" data-bn="অবস্থা">অবস্থা</span></th>
+                                    <th><span data-en="Stock Value" data-bn="স্টক মূল্য">স্টক মূল্য</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="stockBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="emptyWrap" class="spin-wrap" style="display:none;">
+                        <i class="fas fa-inbox fa-2x mb-2" style="display:block;color:#ddd;"></i>
+                        <span data-en="No items found" data-bn="কোনো আইটেম পাওয়া যায়নি">কোনো আইটেম পাওয়া যায়নি</span>
+                    </div>
+
+                    <div class="pag-wrap" id="pagWrap" style="display:none;">
+                        <button class="pag-btn" id="btnPrev" onclick="loadList(currentPage-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="pag-info" id="pagInfo"></span>
+                        <button class="pag-btn" id="btnNext" onclick="loadList(currentPage+1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js"></script>
+    <script src="/js/item-stock-report.js"></script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Income Expense Net - TailorBD" data-bn="আয়-ব্যয় নেট - TailorBD">আয়-ব্যয় নেট - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { width:100%; padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* -- Filter ------------------------------------------------------- */
+        .filter-card { background:#fff; border-radius:10px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:18px; }
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control{ width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; font-family:inherit; box-sizing:border-box; }
+        .f-control:focus{ outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-load { padding:8px 22px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .btn-load:hover{ background:#5a68c9; }
+        .btn-outline { padding:8px 16px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+        .btn-outline:hover{ background:#f0f1fc; }
+
+        /* -- Top 3 Cards --------------------------------------------------- */
+        .net-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:22px; }
+        @media(max-width:600px){ .net-cards{ grid-template-columns:1fr; } }
+        .net-card { border-radius:12px; padding:20px 22px; box-shadow:0 4px 16px rgba(0,0,0,.1); text-align:center; background:#fff; border-left:5px solid #6c7ae0; }
+        .net-card--profit { border-left-color:#28a745; background:linear-gradient(135deg,#f0fff4,#e8fdf0); }
+        .net-card--loss   { border-left-color:#dc3545; background:linear-gradient(135deg,#fff5f5,#ffeaea); }
+        .net-card-lbl { font-size:13px; color:#666; font-weight:600; margin-bottom:8px; }
+        .net-card-val { font-size:26px; font-weight:800; }
+        .net-card-val.income { color:#28a745; }
+        .net-card-val.expense{ color:#dc3545; }
+        .net-card-val.profit { color:#28a745; }
+        .net-card-val.loss   { color:#dc3545; }
+
+        /* -- Category Tables ----------------------------------------------- */
+        .cat-section { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); overflow:hidden; }
+        .cat-head { padding:13px 18px; font-size:14px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; }
+        .cat-head.green{ background:#28a745; }
+        .cat-head.red  { background:#dc3545; }
+        .net-tbl { width:100%; border-collapse:collapse; }
+        .net-tbl thead th { background:#f8f9ff; padding:9px 14px; font-size:12px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; text-align:left; }
+        .net-tbl thead th:last-child { text-align:right; }
+        .net-tbl tbody td { padding:9px 14px; font-size:13px; border-bottom:1px solid #f2f2f2; }
+        .net-tbl tfoot td { padding:10px 14px; font-size:13px; font-weight:700; background:#f0f1fc; border-top:2px solid #e0e3f7; }
+        .amt-cell { text-align:right; font-weight:600; }
+        .amt-cell.green { color:#28a745; }
+        .amt-cell.red   { color:#dc3545; }
+
+        /* -- Spinner ------------------------------------------------------- */
+        .spin-wrap { text-align:center; padding:50px; color:#aaa; }
+        .spin { width:32px; height:32px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin{ to{ transform:rotate(360deg); } }
+
+        /* -- Print --------------------------------------------------------- */
+        @media print {
+            #app-navbar, #app-sidebar, .filter-card, .no-print { display:none !important; }
+            .main-content{ margin-left:0 !important; }
+            .page-container{ padding:0 !important; }
+            .net-card, .cat-section { box-shadow:none; border:1px solid #ddd !important; break-inside:avoid; }
+            .net-cards { gap:8px; }
+            .print-header { display:block !important; }
+        }
+        /* -- Print Header (hidden on screen) ------------------------------ */
+        .print-header {
+            display: none;
+            text-align: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+        .print-header .ins-name  { font-size: 20px; font-weight: 800; margin: 0 0 4px; }
+        .print-header .ins-meta  { font-size: 13px; color: #444; margin: 2px 0; }
+        .print-header .rep-title { font-size: 15px; font-weight: 700; margin: 8px 0 2px; }
+        .print-header .rep-date  { font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-container">
+
+                <!-- -- Page Title -------------------------------------------- -->
+                <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                    <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        <span data-en="Income Expense Net" data-bn="আয়-ব্যয় নেট">আয়-ব্যয় নেট</span>
+                    </h5>
+                    <button class="btn-outline" onclick="window.print()">
+                        <i class="fas fa-print"></i>
+                        <span data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+                    </button>
+                </div>
+
+                <!-- -- Filter ------------------------------------------------ -->
+                <div class="filter-card no-print">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3 col-6">
+                            <label class="f-label">
+                                <span data-en="Date From" data-bn="তারিখ থেকে">তারিখ থেকে</span>
+                            </label>
+                            <input type="date" id="nFrom" class="f-control">
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label class="f-label">
+                                <span data-en="Date To" data-bn="তারিখ পর্যন্ত">তারিখ পর্যন্ত</span>
+                            </label>
+                            <input type="date" id="nTo" class="f-control">
+                        </div>
+                        <div class="col-md-6 col-12 d-flex gap-2 flex-wrap">
+                            <button class="btn-load" onclick="loadNet()">
+                                <i class="fas fa-sync-alt"></i>
+                                <span data-en="Load Report" data-bn="রিপোর্ট দেখুন">রিপোর্ট দেখুন</span>
+                            </button>
+                            <button class="btn-outline" onclick="netSetToday()">
+                                <i class="fas fa-calendar-day"></i>
+                                <span data-en="Today" data-bn="আজ">আজ</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="nDateLabel" style="font-size:12px;color:#888;margin-top:8px;"></div>
+                </div>
+
+                <!-- -- Spinner ----------------------------------------------- -->
+                <div id="nSpinner" class="spin-wrap"><div class="spin"></div></div>
+
+                <!-- -- Report Content ---------------------------------------- -->
+                <div id="nContent" style="display:none;">
+
+                    <!-- Print Header (visible only when printing) -->
+                    <div class="print-header" id="printHeader">
+                        <div class="ins-name" id="printInsName"></div>
+                        <div class="ins-meta" id="printInsPhone"></div>
+                        <div class="ins-meta" id="printInsAddress"></div>
+                        <div class="rep-title" data-en="Income Expense Net Report" data-bn="আয়-ব্যয় নেট রিপোর্ট">আয়-ব্যয় নেট রিপোর্ট</div>
+                        <div class="rep-date" id="printDateRange"></div>
+                    </div>
+
+                    <!-- Top 3 Cards -->
+                    <div class="net-cards">
+                        <div class="net-card" id="cardIncome" style="border-left-color:#28a745;">
+                            <div class="net-card-lbl" data-en="Total Income" data-bn="মোট আয়">মোট আয়</div>
+                            <div class="net-card-val income">৳0.00</div>
+                        </div>
+                        <div class="net-card" id="cardExpense" style="border-left-color:#dc3545;">
+                            <div class="net-card-lbl" data-en="Total Expenses" data-bn="মোট ব্যয়">মোট ব্যয়</div>
+                            <div class="net-card-val expense">৳0.00</div>
+                        </div>
+                        <div class="net-card net-card--profit" id="cardNet">
+                            <div class="net-card-lbl" data-en="Net Balance" data-bn="নেট ব্যালেন্স">নেট ব্যালেন্স</div>
+                            <div class="net-card-val profit">৳0.00</div>
+                        </div>
+                    </div>
+
+                    <!-- Category Tables (2 columns) -->
+                    <div class="row g-3">
+                        <!-- Income by Category -->
+                        <div class="col-md-6">
+                            <div class="cat-section">
+                                <div class="cat-head green">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span data-en="Income by Category" data-bn="ক্যাটাগরি অনুযায়ী আয়">ক্যাটাগরি অনুযায়ী আয়</span>
+                                </div>
+                                <div style="overflow-x:auto;">
+                                    <table class="net-tbl">
+                                        <thead>
+                                            <tr>
+                                                <th><span data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</span></th>
+                                                <th style="text-align:right;"><span data-en="Amount" data-bn="পরিমাণ">পরিমাণ</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="incomeCatBody"></tbody>
+                                        <tfoot><tr id="incomeCatFoot"></tr></tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expense by Category -->
+                        <div class="col-md-6">
+                            <div class="cat-section">
+                                <div class="cat-head red">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span data-en="Expense by Category" data-bn="ক্যাটাগরি অনুযায়ী ব্যয়">ক্যাটাগরি অনুযায়ী ব্যয়</span>
+                                </div>
+                                <div style="overflow-x:auto;">
+                                    <table class="net-tbl">
+                                        <thead>
+                                            <tr>
+                                                <th><span data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</span></th>
+                                                <th style="text-align:right;"><span data-en="Amount" data-bn="পরিমাণ">পরিমাণ</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="expenseCatBody"></tbody>
+                                        <tfoot><tr id="expenseCatFoot"></tr></tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- nContent -->
+
+                <!-- -- Print Header (appears only in print) ---------------------- -->
+                <div class="print-header" style="margin-top:30px">
+                    <div class="ins-name"> Made By Tailor BD</div>
+                    <div class="ins-meta">Phone: +8801794144141</div>
+                    <div class="rep-date" id="printDateRange"></div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script src="/js/income-expense-net.js?v=2.1.4"></script>
+</body>
+</html>

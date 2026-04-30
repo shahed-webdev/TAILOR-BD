@@ -1,0 +1,671 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignUp Institution - TailorBD</title>
+
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+
+    <!-- Auth utility — MUST be first script, runs synchronously before any guard -->
+    <script src="/js/auth.js"></script>
+    <!-- Shared sidebar + navbar component -->
+    <script src="/js/authority-layout.js" data-page="signup"></script>
+
+    <style>
+        /* Stepper */
+        .stepper {
+            display: flex; align-items: center; gap: 0;
+            margin-bottom: 28px; background: #fff;
+            border-radius: var(--radius); padding: 20px 28px;
+            box-shadow: var(--shadow);
+        }
+        .step {
+            display: flex; align-items: center; gap: 10px;
+            flex: 1; position: relative;
+        }
+        .step:not(:last-child)::after {
+            content: ''; position: absolute;
+            right: 0; top: 50%; transform: translateY(-50%);
+            width: calc(100% - 42px); height: 2px;
+            background: #e2e8f0; left: 42px; z-index: 0;
+        }
+        .step.completed:not(:last-child)::after { background: #6366f1; }
+        .step-num {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #e2e8f0; color: #94a3b8;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .9rem; flex-shrink: 0; z-index: 1;
+            transition: all .3s;
+        }
+        .step.active .step-num { background: var(--auth-grad); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,.4); }
+        .step.completed .step-num { background: #10b981; color: #fff; }
+        .step-label { font-size: .82rem; font-weight: 600; color: #94a3b8; transition: color .3s; }
+        .step.active .step-label, .step.completed .step-label { color: #1e293b; }
+
+        /* Form panels */
+        .form-panel { display: none; }
+        .form-panel.active { display: block; }
+
+        /* Page header */
+        .page-header {
+            background: var(--auth-grad); border-radius: var(--radius);
+            padding: 22px 28px; color: #fff;
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 8px 32px rgba(99,102,241,.3); margin-bottom: 22px;
+            position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content:''; position:absolute; width:200px; height:200px; border-radius:50%;
+            background:rgba(255,255,255,.07); top:-70px; right:-40px;
+        }
+        .page-header .ph-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0; z-index: 1;
+        }
+        .page-header .ph-text { z-index: 1; }
+        .page-header .ph-text h2 { font-size: 1.25rem; font-weight: 700; margin: 0 0 3px; }
+        .page-header .ph-text p { font-size: .84rem; opacity: .82; margin: 0; }
+
+        /* Form nav buttons */
+        .form-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 8px; padding-top: 16px; border-top: 2px solid #f1f5f9;
+        }
+        .btn-next {
+            background: var(--auth-grad); border: none; color: #fff;
+            border-radius: 10px; padding: 11px 28px;
+            font-weight: 600; font-size: .9rem; cursor: pointer;
+            transition: all .22s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(99,102,241,.38); }
+        .btn-next:disabled { opacity: .6; transform: none; box-shadow: none; cursor: not-allowed; }
+        .btn-back {
+            background: #f8fafc; border: 1.5px solid #e2e8f0; color: #64748b;
+            border-radius: 10px; padding: 11px 22px;
+            font-weight: 600; font-size: .9rem; cursor: pointer; transition: all .2s;
+        }
+        .btn-back:hover { background: #e2e8f0; }
+
+        /* Package cards */
+        .package-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 12px; }
+        .pkg-card {
+            border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px 14px;
+            cursor: pointer; transition: all .22s; text-align: center; position: relative;
+        }
+        .pkg-card:hover { border-color: #6366f1; background: #f5f3ff; }
+        .pkg-card.selected { border-color: #6366f1; background: #f5f3ff; box-shadow: 0 0 0 3px rgba(99,102,241,.18); }
+        .pkg-card .pkg-name { font-weight: 700; color: #1e293b; font-size: .9rem; margin-bottom: 4px; }
+        .pkg-card .pkg-interval {
+            display: inline-block; background: #ede9fe; color: #6366f1;
+            padding: 2px 10px; border-radius: 20px; font-size: .73rem; font-weight: 600;
+        }
+        .pkg-card .pkg-details { color: #64748b; font-size: .78rem; margin-top: 6px; }
+        .pkg-card .pkg-check {
+            position: absolute; top: 8px; right: 8px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #6366f1; color: #fff;
+            display: none; align-items: center; justify-content: center; font-size: .65rem;
+        }
+        .pkg-card.selected .pkg-check { display: flex; }
+
+        /* Input icon */
+        .input-icon-wrap { position: relative; }
+        .input-icon-wrap .form-control { padding-left: 38px; }
+        .input-icon-wrap .field-icon {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; font-size: .85rem; pointer-events: none;
+        }
+        .input-icon-wrap .toggle-pwd {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; cursor: pointer; background: none; border: none; font-size: .85rem;
+        }
+        .input-icon-wrap .toggle-pwd:hover { color: #6366f1; }
+
+        /* Password strength */
+        .pwd-strength { margin-top: 6px; }
+        .pwd-strength-bar { height: 4px; border-radius: 4px; background: #e2e8f0; overflow: hidden; margin-bottom: 3px; }
+        .pwd-strength-fill { height: 100%; border-radius: 4px; transition: width .3s, background .3s; width: 0%; }
+        .pwd-strength-text { font-size: .72rem; color: #94a3b8; }
+
+        /* Required star */
+        .required-star { color: #ef4444; }
+        .invalid-feedback { font-size: .78rem; color: #ef4444; margin-top: 3px; }
+
+        /* Success screen */
+        .success-screen { text-align: center; padding: 48px 24px; }
+        .success-icon {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: #fff; margin: 0 auto 20px;
+            box-shadow: 0 8px 24px rgba(16,185,129,.35);
+        }
+        .success-screen h3 { font-size: 1.4rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+        .success-screen p  { color: #64748b; font-size: .9rem; }
+        .success-info {
+            background: #f0fdf4; border: 1.5px solid #bbf7d0;
+            border-radius: 12px; padding: 16px; margin: 20px 0; text-align: left;
+        }
+        .success-info .si-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: .87rem; }
+        .success-info .si-row span:first-child { color: #64748b; }
+        .success-info .si-row span:last-child  { font-weight: 600; color: #1e293b; }
+
+        @media (max-width: 768px) {
+            .stepper { padding: 14px 16px; gap: 0; }
+            .step-label { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="auth-main">
+    <div class="auth-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="ph-icon"><i class="fas fa-building"></i></div>
+            <div class="ph-text">
+                <h2>নতুন ইনস্টিটিউশন নিবন্ধন করুন</h2>
+                <p>৩টি সহজ ধাপে একটি নতুন শপ/ইনস্টিটিউশন তৈরি করুন</p>
+            </div>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper" id="stepper">
+            <div class="step active" id="step-indicator-1">
+                <div class="step-num">1</div>
+                <div class="step-label">অ্যাকাউন্ট তথ্য</div>
+            </div>
+            <div class="step" id="step-indicator-2">
+                <div class="step-num">2</div>
+                <div class="step-label">ইনস্টিটিউশন তথ্য</div>
+            </div>
+            <div class="step" id="step-indicator-3">
+                <div class="step-num">3</div>
+                <div class="step-label">প্যাকেজ ও SMS</div>
+            </div>
+        </div>
+
+        <!-- ═══ STEP 1 — Account ═══ -->
+        <div class="form-panel active" id="panel-1">
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-user-lock"></i></div>
+                    লগইন অ্যাকাউন্ট তথ্য
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">ইউজার নেম <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-user field-icon"></i>
+                            <input type="text" id="userName" class="form-control"
+                                   placeholder="ইউজার নেম লিখুন" autocomplete="off">
+                        </div>
+                        <div class="invalid-feedback" id="err-userName"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ইমেইল</label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-envelope field-icon"></i>
+                            <input type="email" id="userEmail" class="form-control" placeholder="ইমেইল (ঐচ্ছিক)">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">পাসওয়ার্ড <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-lock field-icon"></i>
+                            <input type="password" id="password" class="form-control"
+                                   placeholder="পাসওয়ার্ড" oninput="checkStrength(this.value)">
+                            <button type="button" class="toggle-pwd" onclick="togglePwd('password',this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="pwd-strength">
+                            <div class="pwd-strength-bar"><div class="pwd-strength-fill" id="strengthFill"></div></div>
+                            <div class="pwd-strength-text" id="strengthText"></div>
+                        </div>
+                        <div class="invalid-feedback" id="err-password"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">পাসওয়ার্ড নিশ্চিত করুন <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-lock field-icon"></i>
+                            <input type="password" id="confirmPassword" class="form-control"
+                                   placeholder="আবার পাসওয়ার্ড লিখুন">
+                            <button type="button" class="toggle-pwd" onclick="togglePwd('confirmPassword',this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback" id="err-confirmPassword"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">নিরাপত্তা প্রশ্ন</label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-question-circle field-icon"></i>
+                            <input type="text" id="securityQuestion" class="form-control"
+                                   placeholder="যেমন: আপনার মায়ের নাম কি?">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">নিরাপত্তা উত্তর</label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-key field-icon"></i>
+                            <input type="text" id="securityAnswer" class="form-control"
+                                   placeholder="প্রশ্নের উত্তর">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-nav">
+                    <div></div>
+                    <button class="btn-next" onclick="goStep(2)">
+                        পরবর্তী ধাপ <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ STEP 2 — Institution ═══ -->
+        <div class="form-panel" id="panel-2">
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-store"></i></div>
+                    ইনস্টিটিউশন / শপ তথ্য
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">শপের নাম <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-store field-icon"></i>
+                            <input type="text" id="insName" class="form-control" placeholder="শপের নাম">
+                        </div>
+                        <div class="invalid-feedback" id="err-insName"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Dialog Title</label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-heading field-icon"></i>
+                            <input type="text" id="dialogTitle" class="form-control" placeholder="রিসিটে দেখাবে (ঐচ্ছিক)">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">প্রতিষ্ঠা সাল <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-calendar field-icon"></i>
+                            <input type="text" id="established" class="form-control" placeholder="যেমন: 2010">
+                        </div>
+                        <div class="invalid-feedback" id="err-established"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">স্টাফ সংখ্যা</label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-users field-icon"></i>
+                            <input type="number" id="staff" class="form-control" placeholder="কর্মীর সংখ্যা" min="0">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">ফোন নম্বর <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-phone field-icon"></i>
+                            <input type="tel" id="phone" class="form-control" placeholder="01XXXXXXXXX">
+                        </div>
+                        <div class="invalid-feedback" id="err-phone"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ইমেইল</label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-envelope field-icon"></i>
+                            <input type="email" id="insEmail" class="form-control" placeholder="শপের ইমেইল">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ওয়েবসাইট</label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-globe field-icon"></i>
+                            <input type="text" id="website" class="form-control" placeholder="https://example.com">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">ঠিকানা <span class="required-star">*</span></label>
+                        <textarea id="address" class="form-control" rows="2" placeholder="পূর্ণ ঠিকানা লিখুন"></textarea>
+                        <div class="invalid-feedback" id="err-address"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Signing Money (৳) <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-money-bill field-icon"></i>
+                            <input type="number" id="signingMoney" class="form-control"
+                                   placeholder="প্রথম পেমেন্ট" min="0" step="0.01">
+                        </div>
+                        <div class="invalid-feedback" id="err-signingMoney"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Renew Amount (৳) <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-redo field-icon"></i>
+                            <input type="number" id="renewAmount" class="form-control"
+                                   placeholder="নবায়ন ফি" min="0" step="0.01">
+                        </div>
+                        <div class="invalid-feedback" id="err-renewAmount"></div>
+                    </div>
+                </div>
+                <div class="form-nav">
+                    <button class="btn-back" onclick="goStep(1)">
+                        <i class="fas fa-arrow-left"></i> পূর্ববর্তী
+                    </button>
+                    <button class="btn-next" onclick="goStep(3)">
+                        পরবর্তী ধাপ <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ STEP 3 — Package & SMS ═══ -->
+        <div class="form-panel" id="panel-3">
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-box-open"></i></div>
+                    প্যাকেজ নির্বাচন করুন
+                </div>
+                <div class="package-grid" id="packageGrid">
+                    <div class="text-center text-muted py-3">
+                        <div class="spinner-border spinner-border-sm me-2"></div>প্যাকেজ লোড হচ্ছে...
+                    </div>
+                </div>
+                <div class="invalid-feedback d-block" id="err-package" style="display:none!important;"></div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-sms"></i></div>
+                    SMS সেটিং
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Masking Name <span class="required-star">*</span>
+                            <small class="text-muted ms-1">(৩-১১ অক্ষর, অক্ষর/সংখ্যা/ডট/স্পেস)</small>
+                        </label>
+                        <div class="input-icon-wrap">
+                            <i class="fas fa-tag field-icon"></i>
+                            <input type="text" id="masking" class="form-control"
+                                   placeholder="যেমন: TailorBD" maxlength="11"
+                                   oninput="validateMasking(this)">
+                        </div>
+                        <div class="invalid-feedback" id="err-masking"></div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="p-3 rounded-3" style="background:#f0fdf4;border:1.5px solid #bbf7d0;width:100%;">
+                            <div style="font-size:.78rem;color:#64748b;margin-bottom:4px;">প্রাথমিক SMS ব্যালেন্স</div>
+                            <div style="font-size:1.3rem;font-weight:700;color:#10b981;">
+                                <i class="fas fa-comments me-1"></i>10 SMS
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-nav">
+                    <button class="btn-back" onclick="goStep(2)">
+                        <i class="fas fa-arrow-left"></i> পূর্ববর্তী
+                    </button>
+                    <button class="btn-next" id="submitBtn" onclick="submitSignUp()">
+                        <i class="fas fa-paper-plane"></i> নিবন্ধন সম্পন্ন করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ SUCCESS ═══ -->
+        <div class="form-panel" id="panel-success">
+            <div class="section-card">
+                <div class="success-screen">
+                    <div class="success-icon"><i class="fas fa-check"></i></div>
+                    <h3>নিবন্ধন সফল হয়েছে!</h3>
+                    <p>নতুন ইনস্টিটিউশন সফলভাবে তৈরি করা হয়েছে।</p>
+                    <div class="success-info" id="successInfo"></div>
+                    <div class="d-flex gap-3 justify-content-center mt-4 flex-wrap">
+                        <a href="/authority-signup.html" class="btn-next text-decoration-none">
+                            <i class="fas fa-plus"></i> আরেকটি নিবন্ধন
+                        </a>
+                        <a href="/authority-profile.html" class="btn-back text-decoration-none">
+                            <i class="fas fa-list"></i> শপ তালিকা দেখুন
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<div id="toastWrap"></div>
+
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script>
+window.TailorAuth?.requireRole?.('Authority');
+
+let currentStep = 1;
+let selectedPackageId = null;
+let packages = [];
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+    const t = $(`<div class="toast-item ${type}">${msg}</div>`);
+    $('#toastWrap').append(t);
+    setTimeout(() => t.fadeOut(300, () => t.remove()), 3200);
+}
+
+// ─── Password ─────────────────────────────────────────────────────────────────
+function togglePwd(id, btn) {
+    const input = document.getElementById(id);
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    btn.querySelector('i').className = isPass ? 'fas fa-eye-slash' : 'fas fa-eye';
+}
+
+function checkStrength(val) {
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    if (!val) { fill.style.width = '0%'; text.textContent = ''; return; }
+    let score = 0;
+    if (val.length >= 6) score++;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+        { w: '20%', c: '#ef4444', t: 'খুব দুর্বল' },
+        { w: '40%', c: '#f97316', t: 'দুর্বল' },
+        { w: '60%', c: '#f59e0b', t: 'মাঝারি' },
+        { w: '80%', c: '#3b82f6', t: 'ভালো' },
+        { w: '100%', c: '#10b981', t: 'শক্তিশালী' }
+    ];
+    const l = levels[Math.min(score, 4)];
+    fill.style.width = l.w; fill.style.background = l.c;
+    text.textContent = l.t; text.style.color = l.c;
+}
+
+// ─── Masking validation ────────────────────────────────────────────────────────
+function validateMasking(input) {
+    const ok = /^[A-Za-z0-9. ]{3,11}$/.test(input.value.trim());
+    const err = document.getElementById('err-masking');
+    if (!ok && input.value.trim().length > 0) {
+        input.classList.add('is-invalid');
+        err.style.display = 'block';
+        err.textContent = '৩-১১ অক্ষর, শুধুমাত্র অক্ষর/সংখ্যা/ডট/স্পেস';
+    } else {
+        input.classList.remove('is-invalid');
+        err.style.display = 'none';
+    }
+}
+
+// ─── Step navigation ──────────────────────────────────────────────────────────
+function goStep(n) {
+    if (n > currentStep && !validateStep(currentStep)) return;
+    document.getElementById(`panel-${currentStep}`).classList.remove('active');
+    document.getElementById(`panel-${n}`).classList.add('active');
+    for (let i = 1; i <= 3; i++) {
+        const ind = document.getElementById(`step-indicator-${i}`);
+        ind.classList.remove('active', 'completed');
+        if (i < n)  ind.classList.add('completed');
+        if (i === n) ind.classList.add('active');
+        if (i < n) ind.querySelector('.step-num').innerHTML = '<i class="fas fa-check" style="font-size:.7rem"></i>';
+        else ind.querySelector('.step-num').textContent = i;
+    }
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Validation ───────────────────────────────────────────────────────────────
+function setErr(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+    const inputId = id.replace('err-', '');
+    document.getElementById(inputId)?.classList.toggle('is-invalid', !!msg);
+}
+function clearErr(id) { setErr(id, ''); }
+
+function validateStep(step) {
+    let ok = true;
+    if (step === 1) {
+        const un = val('userName'), pw = val('password'), cpw = val('confirmPassword');
+        clearErr('err-userName'); clearErr('err-password'); clearErr('err-confirmPassword');
+        if (!un) { setErr('err-userName', 'ইউজার নেম আবশ্যক'); ok = false; }
+        if (!pw) { setErr('err-password', 'পাসওয়ার্ড আবশ্যক'); ok = false; }
+        else if (pw.length < 6) { setErr('err-password', 'ন্যূনতম ৬ অক্ষর হতে হবে'); ok = false; }
+        if (pw !== cpw) { setErr('err-confirmPassword', 'পাসওয়ার্ড মিলছে না'); ok = false; }
+    }
+    if (step === 2) {
+        clearErr('err-insName'); clearErr('err-established'); clearErr('err-phone');
+        clearErr('err-address'); clearErr('err-signingMoney'); clearErr('err-renewAmount');
+        if (!val('insName'))     { setErr('err-insName', 'শপের নাম আবশ্যক'); ok = false; }
+        if (!val('established')) { setErr('err-established', 'প্রতিষ্ঠা সাল আবশ্যক'); ok = false; }
+        if (!val('phone'))       { setErr('err-phone', 'ফোন নম্বর আবশ্যক'); ok = false; }
+        if (!val('address'))     { setErr('err-address', 'ঠিকানা আবশ্যক'); ok = false; }
+        if (val('signingMoney') === '') { setErr('err-signingMoney', 'Signing Money আবশ্যক'); ok = false; }
+        if (val('renewAmount') === '')  { setErr('err-renewAmount', 'Renew Amount আবশ্যক'); ok = false; }
+    }
+    return ok;
+}
+
+function val(id) { return (document.getElementById(id)?.value ?? '').trim(); }
+
+// ─── Packages ─────────────────────────────────────────────────────────────────
+async function loadPackages() {
+    try {
+        const res = await fetch('/api/package');
+        const data = await res.json();
+        packages = data.data || [];
+        renderPackages();
+    } catch { toast('প্যাকেজ লোড ব্যর্থ', 'error'); }
+}
+
+function renderPackages() {
+    const grid = document.getElementById('packageGrid');
+    if (!packages.length) { grid.innerHTML = '<div class="text-muted">কোনো প্যাকেজ নেই</div>'; return; }
+    grid.innerHTML = packages.map(p => `
+        <div class="pkg-card" onclick="selectPackage(${p.packageID}, this)" data-id="${p.packageID}">
+            <div class="pkg-check"><i class="fas fa-check"></i></div>
+            <div class="pkg-name">${esc(p.packageName)}</div>
+            ${p.interval ? `<span class="pkg-interval"><i class="fas fa-clock me-1"></i>${esc(p.interval)}</span>` : ''}
+            ${p.details  ? `<div class="pkg-details">${esc(p.details)}</div>` : ''}
+        </div>`).join('');
+}
+
+function selectPackage(id, el) {
+    document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPackageId = id;
+    const err = document.getElementById('err-package');
+    err.style.setProperty('display', 'none', 'important');
+}
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+async function submitSignUp() {
+    const masking = val('masking');
+    clearErr('err-masking');
+    let ok = true;
+    if (!selectedPackageId) {
+        const err = document.getElementById('err-package');
+        err.textContent = 'একটি প্যাকেজ নির্বাচন করুন';
+        err.style.setProperty('display', 'block', 'important');
+        ok = false;
+    }
+    if (!masking) { setErr('err-masking', 'Masking আবশ্যক'); ok = false; }
+    else if (!/^[A-Za-z0-9. ]{3,11}$/.test(masking)) {
+        setErr('err-masking', '৩-১১ অক্ষর, অক্ষর/সংখ্যা/ডট/স্পেস'); ok = false;
+    }
+    if (!ok) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>নিবন্ধন হচ্ছে...';
+
+    const payload = {
+        userName: val('userName'), password: val('password'),
+        confirmPassword: val('confirmPassword'), email: val('userEmail'),
+        securityQuestion: val('securityQuestion'), securityAnswer: val('securityAnswer'),
+        institutionName: val('insName'), dialogTitle: val('dialogTitle'),
+        established: val('established'), staff: val('staff'),
+        phone: val('phone'), insEmail: val('insEmail'),
+        website: val('website'), address: val('address'),
+        signingMoney: parseFloat(val('signingMoney')) || 0,
+        renewAmount:  parseFloat(val('renewAmount'))  || 0,
+        packageID: selectedPackageId, masking: masking
+    };
+
+    try {
+        const res = await fetch('/api/institution/authority/signup', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            const pkg = packages.find(p => p.packageID === selectedPackageId);
+            document.getElementById('successInfo').innerHTML = `
+                <div class="si-row"><span>শপের নাম</span><span>${esc(val('insName'))}</span></div>
+                <div class="si-row"><span>ইউজার নেম</span><span>${esc(val('userName'))}</span></div>
+                <div class="si-row"><span>ফোন</span><span>${esc(val('phone'))}</span></div>
+                <div class="si-row"><span>প্যাকেজ</span><span>${esc(pkg?.packageName || '')}</span></div>
+                <div class="si-row"><span>Masking</span><span>${esc(masking)}</span></div>
+                <div class="si-row"><span>Institution ID</span><span>#${data.institutionId}</span></div>`;
+            document.getElementById('panel-3').classList.remove('active');
+            document.getElementById('panel-success').classList.add('active');
+            for (let i = 1; i <= 3; i++) {
+                const ind = document.getElementById(`step-indicator-${i}`);
+                ind.classList.remove('active'); ind.classList.add('completed');
+                ind.querySelector('.step-num').innerHTML = '<i class="fas fa-check" style="font-size:.7rem"></i>';
+            }
+        } else {
+            toast(data.message || 'নিবন্ধন ব্যর্থ হয়েছে', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> নিবন্ধন সম্পন্ন করুন';
+        }
+    } catch (e) {
+        toast('সার্ভার সমস্যা: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> নিবন্ধন সম্পন্ন করুন';
+    }
+}
+
+function esc(s) {
+    return String(s || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!TailorAuth.guard('Authority')) return;
+    TailorAuth.guardSubPage('signup');
+    loadPackages();
+});
+</script>
+</body>
+</html>

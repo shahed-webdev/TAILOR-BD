@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Due Invoices - TailorBD" data-bn="আরও রিচার্জ করুন - TailorBD">আরও রিচার্জ করুন - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <style>
+        .invoice-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(102,126,234,.10);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+            .invoice-card .card-title {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #334155;
+                margin-bottom: 18px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+                .invoice-card .card-title i {
+                    color: #ef4444;
+                }
+
+        .summary-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-radius: 10px;
+            padding: 14px 20px;
+            min-width: 160px;
+            flex: 1;
+        }
+
+            .summary-item.paid-bg {
+                background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            }
+
+            .summary-item label {
+                font-size: .78rem;
+                color: #64748b;
+                font-weight: 500;
+                display: block;
+                margin-bottom: 2px;
+            }
+
+            .summary-item .val {
+                font-size: 1.2rem;
+                font-weight: 800;
+                color: #dc2626;
+            }
+
+            .summary-item.paid-bg .val {
+                color: #16a34a;
+            }
+
+        .inv-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .inv-table thead th {
+                background: #f8fafc;
+                padding: 10px 12px;
+                font-size: .8rem;
+                font-weight: 600;
+                color: #475569;
+                border-bottom: 2px solid #e2e8f0;
+                white-space: nowrap;
+            }
+
+            .inv-table tbody tr {
+                border-bottom: 1px solid #f1f5f9;
+                transition: background .15s;
+            }
+
+                .inv-table tbody tr:hover {
+                    background: #f8fafc;
+                }
+
+            .inv-table tbody td {
+                padding: 10px 12px;
+                font-size: .85rem;
+                color: #334155;
+                vertical-align: middle;
+            }
+
+        .badge-due {
+            background: #fef2f2;
+            color: #dc2626;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: .75rem;
+        }
+
+        .badge-partial {
+            background: #fffbeb;
+            color: #d97706;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: .75rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #94a3b8;
+        }
+
+            .empty-state i {
+                font-size: 2.5rem;
+                margin-bottom: 12px;
+                display: block;
+                color: #cbd5e1;
+            }
+
+        .btn-detail {
+            background: #667eea;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: .78rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+            .btn-detail:hover {
+                background: #5a68c9;
+                color: #fff;
+            }
+
+        .detail-row td {
+            background: #f8fafc;
+            padding: 12px 20px !important;
+        }
+
+        .detail-section {
+            margin-bottom: 12px;
+        }
+
+        .detail-section-title {
+            font-size: .82rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .detail-section-title i {
+                font-size: .75rem;
+            }
+
+        .detail-table {
+            width: 100%;
+            margin: 0;
+            border-collapse: collapse;
+        }
+
+            .detail-table th {
+                padding: 5px 10px;
+                font-size: .75rem;
+                font-weight: 600;
+                color: #64748b;
+                border-bottom: 1px solid #e2e8f0;
+                text-align: left;
+            }
+
+            .detail-table td {
+                padding: 5px 10px;
+                font-size: .82rem;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            .detail-table .lbl {
+                color: #64748b;
+                font-weight: 500;
+                width: 120px;
+            }
+
+        .detail-total {
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .sk-row {
+            height: 44px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            animation: skPulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes skPulse {
+            0%,100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .4;
+            }
+        }
+
+        /* -- ShurjoPay Modal -- */
+        #spPayModal .modal-header {
+            background: linear-gradient(135deg, #6c7ae0, #5a68c9);
+            color: #fff;
+        }
+
+        #spPayModal .sp-invoice-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: .85rem;
+        }
+
+        #spPayModal .sp-total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0 4px;
+            font-weight: 700;
+            font-size: .95rem;
+            color: #6c7ae0;
+        }
+
+        .btn-pay-online {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 18px;
+            font-size: .85rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-pay-online:hover {
+                background: linear-gradient(135deg, #16a34a, #15803d);
+                color: #fff;
+            }
+
+        /* ShurjoPay modal */
+        .sp-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0,0,0,.55);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+            .sp-modal-overlay.active {
+                display: flex;
+            }
+
+        .sp-modal {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+            overflow: hidden;
+        }
+
+        .sp-modal-header {
+            background: linear-gradient(135deg, #667eea, #5a68c9);
+            padding: 16px 22px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .sp-modal-header h6 {
+                margin: 0;
+                font-weight: 700;
+                font-size: 1rem;
+            }
+
+        .sp-close {
+            background: rgba(255,255,255,.2);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sp-modal-body {
+            padding: 22px 24px;
+        }
+
+        .sp-amount-box {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+            .sp-amount-box .lbl {
+                font-size: .8rem;
+                color: #64748b;
+            }
+
+            .sp-amount-box .amt {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: #dc2626;
+            }
+
+        .sp-field {
+            margin-bottom: 14px;
+        }
+
+            .sp-field label {
+                font-size: .8rem;
+                font-weight: 600;
+                color: #475569;
+                margin-bottom: 4px;
+                display: block;
+            }
+
+            .sp-field input {
+                width: 100%;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 9px 12px;
+                font-size: .9rem;
+                outline: none;
+                transition: border-color .2s;
+            }
+
+                .sp-field input:focus {
+                    border-color: #667eea;
+                }
+
+        .btn-pay-now {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #5a68c9);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+            .btn-pay-now:hover {
+                opacity: .9;
+            }
+
+            .btn-pay-now:disabled {
+                opacity: .6;
+                cursor: not-allowed;
+            }
+
+        .sp-secure-note {
+            text-align: center;
+            margin-top: 12px;
+            font-size: .75rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-sidebar"></div>
+    <main class="main-content" id="mainContent">
+        <div id="app-navbar"></div>
+        <div class="dashboard-content">
+            <div class="invoice-card">
+                <div class="card-title">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span class="lang-content" data-en="Due Invoices" data-bn=" বকেয়া ইনভয়েস">বকেয়া ইনভয়েস</span>
+                </div>
+
+                <!-- Summary -->
+                <div class="summary-bar">
+                    <div class="summary-item">
+                        <label class="lang-content" data-en="Total Due Invoices" data-bn=" বকেয়া ইনভয়েস">বকেয়া ইনভয়েস</label>
+                        <span class="val" id="totalDueCount">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <label class="lang-content" data-en="Total Due Amount" data-bn="মোট বাকি পরিমাণ">মোট বাকি পরিমাণ</label>
+                        <span class="val" id="totalDueAmount">৳0</span>
+                    </div>
+                    <!--<div class="summary-item paid-bg">
+                        <label class="lang-content" data-en="Total Paid" data-bn="মোট পরিষোধ">মোট পরিষোধ</label>
+                        <span class="val" id="totalPaidAmount">?0</span>
+                    </div>-->
+                    <!-- Pay Online button -->
+                    <div style="display:flex;align-items:center;">
+                        <button id="btnPayAll" onclick="openPayModal()" style="
+                        background:linear-gradient(135deg,#667eea,#5a68c9);color:#fff;
+                        border:none;border-radius:10px;padding:12px 22px;
+                        font-size:.95rem;font-weight:700;cursor:pointer;
+                        display:flex;align-items:center;gap:8px;white-space:nowrap;">
+                            <i class="fas fa-credit-card"></i> অনলাইনে পরিশোধ করুন
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Skeleton -->
+                <div id="skeletonLoader">
+                    <div class="sk-row"></div><div class="sk-row"></div><div class="sk-row"></div>
+                </div>
+
+                <!-- Table -->
+                <div style="overflow-x:auto; display:none;" id="tableWrap">
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><span class="lang-content" data-en="Invoice For" data-bn="ইনভয়েসের বিষয়">ইনভয়েসের বিষয়</span></th>
+                                <th><span class="lang-content" data-en="Issue Date" data-bn="ইসুয়ের তারিখ">ইসুয়ের তারিখ</span></th>
+                                <th><span class="lang-content" data-en="End Date" data-bn="শেষ তারিখ">শেষ তারিখ</span></th>
+                                <th><span class="lang-content" data-en="Total" data-bn="মোট">মোট</span></th>
+                                <th><span class="lang-content" data-en="Discount" data-bn="ছাড়">ছাড়</span></th>
+                                <th><span class="lang-content" data-en="Paid" data-bn="পরিশোধ">পরিশোধ</span></th>
+                                <th><span class="lang-content" data-en="Due" data-bn="বাকি">বাকি</span></th>
+                                <th><span class="lang-content" data-en="Status" data-bn="স্টাটাস">স্টাটাস</span></th>
+                                <th><span class="lang-content" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</span></th>
+                                <th><span class="lang-content" data-en="Pay Online" data-bn="অনলাইন পেমেন্ট">অনলাইন পেমেন্ট</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-state" id="emptyState" style="display:none;">
+                    <i class="fas fa-check-circle"></i>
+                    <p class="lang-content" data-en="No due invoices found. All payments are up to date!" data-bn="কোনো বাকি ইনভয়েস নেই। সব পেমেন্ট আপডেট আছে!">কোনো বাকি ইনভয়েস নেই। সব পেমেন্ট আপডেট আছে!</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <!-- ShurjoPay Payment Modal -->
+    <div class="modal fade" id="spPayModal" tabindex="-1" aria-labelledby="spPayModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+                <div class="modal-header border-0 px-4 py-3">
+                    <h5 class="modal-title fw-bold" id="spPayModalLabel">
+                        <i class="fas fa-credit-card me-2"></i>অনলাইনে পরিশোধ
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4 pb-2">
+                    <p style="font-size:.83rem;color:#64748b;margin-bottom:10px;">বাকি পরিমাণ ShurjoPay-এর মাধ্যমে পরিশোধ করুন</p>
+                    <div id="spInvoiceList"></div>
+                    <div class="sp-total-row">
+                        <span>মোট বাকি:</span>
+        <span id="spTotalDisplay" style="color:#dc2626;">৳0</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="mb-3">
+                        <label class="form-label" style="font-size:.82rem;font-weight:600;">গ্রাহকের নাম <span class="text-danger">*</span></label>
+                        <input type="text" id="spCustomerName" class="form-control form-control-sm" placeholder="নাম দিন" maxlength="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="font-size:.82rem;font-weight:600;">ফোন নম্বর <span class="text-danger">*</span></label>
+                        <input type="tel" id="spCustomerPhone" class="form-control form-control-sm" placeholder="01XXXXXXXXX" maxlength="20">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" style="font-size:.82rem;font-weight:600;">Email (ঐচ্ছিক)</label>
+                        <input type="email" id="spCustomerEmail" class="form-control form-control-sm" placeholder="email@example.com" maxlength="100">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-3 pt-1 d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">বাতিল</button>
+                    <button type="button" class="btn-pay-online" id="spConfirmBtn">
+                        <i class="fas fa-lock"></i> অনলাইনে পরিশোধ করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ShurjoPay Payment Modal -->
+    <div class="sp-modal-overlay" id="spModalOverlay">
+        <div class="sp-modal">
+            <div class="sp-modal-header">
+                <h6><i class="fas fa-credit-card me-2"></i>অনলাইনে পরিশোধ</h6>
+                <button class="sp-close" onclick="closePayModal()">&times;</button>
+            </div>
+            <div class="sp-modal-body">
+                <div class="sp-amount-box">
+                    <div class="lbl">মোট পরিশোধযোগ্য বাকি</div>
+                    <div class="amt" id="spTotalAmt">৳0</div>
+                </div>
+                <div class="sp-field">
+                    <label><i class="fas fa-user me-1"></i> গ্রাহকের নাম</label>
+                    <input type="text" id="spName" placeholder="নাম দিন">
+                </div>
+                <div class="sp-field">
+                    <label><i class="fas fa-phone me-1"></i> ফোন নম্বর</label>
+                    <input type="tel" id="spPhone" placeholder="01XXXXXXXXX">
+                </div>
+                <div class="sp-field">
+                    <label><i class="fas fa-envelope me-1"></i> Email (ঐচ্ছিক)</label>
+                    <input type="email" id="spEmail" placeholder="email@example.com">
+                </div>
+                <button class="btn-pay-now" id="btnPayNow" onclick="startPayment()">
+                    <i class="fas fa-lock"></i> ShurjoPay দিয়ে পরিশোধ করুন
+                </button>
+                <div class="sp-secure-note">
+                    <i class="fas fa-shield-alt me-1"></i> SSL সুরক্ষিত &middot; bKash &middot; Nagad &middot; ভিসা &middot; মাস্টারকার্ড
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script>
+    var _allInvoiceIds = [];
+    var _totalDueAmt   = 0;
+
+    $(document).ready(function() {
+        var institutionId = sessionStorage.getItem('institutionId');
+        if (!institutionId) { window.location.href = '/login.html'; return; }
+
+        loadInvoices(institutionId, 'Due');
+    });
+
+    function loadInvoices(institutionId, status) {
+        $.ajax({
+            url: '/api/invoice/list?institutionId=' + institutionId + '&status=' + status + '&pageSize=100',
+            method: 'GET',
+            success: function(r) {
+                $('#skeletonLoader').hide();
+                if (r.success && r.data && r.data.length) {
+                    renderInvoices(r.data);
+                    $('#tableWrap').show();
+                } else {
+                    $('#emptyState').show();
+                }
+            },
+            error: function() {
+                $('#skeletonLoader').hide();
+                $('#emptyState').show();
+            }
+        });
+    }
+
+    function renderInvoices(invoices) {
+        var $body = $('#invoiceBody');
+        $body.empty();
+        _allInvoiceIds = [];
+
+        var totalDue = 0, totalPaid = 0, count = 0;
+        var fmt = function(n) { return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }); };
+        var fmtDate = function(d) {
+            if (!d) return '-';
+            var dt = new Date(d);
+            return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        };
+
+        invoices.forEach(function(inv, idx) {
+            var total = inv.totalAmount || 0;
+            var discount = inv.discount || 0;
+            var paid = inv.paidAmount || 0;
+            var due = total - discount - paid;
+            if (due < 0) due = 0;
+
+            totalDue += due;
+            totalPaid += paid;
+            count++;
+            _allInvoiceIds.push(inv.invoiceID);
+
+            var statusBadge = inv.paymentStatus === 'Due'
+                ? '<span class="badge-due">বাকি</span>'
+                : '<span class="badge-partial">আংশিক</span>';
+
+            var row = '<tr>' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td>' + (inv.invoice_For || '-') + '</td>' +
+                '<td>' + fmtDate(inv.issuDate) + '</td>' +
+                '<td>' + fmtDate(inv.endDate) + '</td>' +
+                '<td>৳' + fmt(total) + '</td>' +
+                '<td>৳' + fmt(discount) + '</td>' +
+                '<td>৳' + fmt(paid) + '</td>' +
+                '<td><strong style="color:#dc2626;">৳' + fmt(due) + '</strong></td>' +
+                '<td>' + statusBadge + '</td>' +
+                '<td><button class="btn-detail" onclick="toggleDetail(this,' + inv.invoiceID + ')"><i class="fas fa-eye me-1"></i>বিস্তারিত</button></td>' +
+                '</tr>';
+            $body.append(row);
+        });
+
+        $('#totalDueCount').text(count);
+        $('#totalDueAmount').text('৳' + fmt(totalDue));
+        $('#totalPaidAmount').text('৳' + fmt(totalPaid));
+        _totalDueAmt = totalDue;
+        if (totalDue > 0) {
+            $('#btnPayAll').show();
+        } else {
+            $('#btnPayAll').hide();
+        }
+    }
+
+    function openPayModal(overrideAmt) {
+        var amt = overrideAmt || _totalDueAmt;
+        var fmt = function(n) { return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }); };
+        $('#spTotalAmt').text('৳' + fmt(amt));
+
+        // pre-fill from session + profile
+        var name  = sessionStorage.getItem('institutionName') || '';
+        var phone = (window.currentProfile && window.currentProfile.phone) || '';
+        var email = (window.currentProfile && window.currentProfile.email) || '';
+        if (!$('#spName').val())  $('#spName').val(name);
+        if (!$('#spPhone').val()) $('#spPhone').val(phone);
+        if (!$('#spEmail').val()) $('#spEmail').val(email);
+
+        $('#spModalOverlay').addClass('active');
+    }
+
+    function closePayModal() {
+        $('#spModalOverlay').removeClass('active');
+    }
+
+    function startPayment() {
+        var institutionId = sessionStorage.getItem('institutionId');
+        var name  = $('#spName').val().trim();
+        var phone = $('#spPhone').val().trim();
+        var email = $('#spEmail').val().trim();
+
+        if (!phone) { alert('ফোন নম্বর দিন'); return; }
+
+        var $btn = $('#btnPayNow');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> প্রক্রিয়া হচ্ছে...');
+
+        $.ajax({
+            url: '/api/shurjopay/initiate',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                institutionId:   parseInt(institutionId),
+                invoiceIds:      _allInvoiceIds,
+                amount:          _totalDueAmt,
+                customerName:    name,
+                customerEmail:   email,
+                customerPhone:   phone,
+                customerAddress: 'Bangladesh'
+            }),
+            success: function(r) {
+                if (r.success && r.checkoutUrl) {
+                    window.location.href = r.checkoutUrl;
+                } else {
+                    alert('পেমেন্ট শুরু হয়নি: ' + (r.message || 'Unknown error'));
+                    $btn.prop('disabled', false).html('<i class="fas fa-lock me-2"></i> ShurjoPay দিয়ে পরিশোধ করুন');
+                }
+            },
+            error: function() {
+                alert('সার্ভার এররর, আবার চেষ্টা করুন');
+                $btn.prop('disabled', false).html('<i class="fas fa-lock me-2"></i> ShurjoPay দিয়ে পরিশোধ করুন');
+            }
+        });
+    }
+
+    // Close modal on overlay click
+    $('#spModalOverlay').on('click', function(e) {
+        if ($(e.target).is('#spModalOverlay')) closePayModal();
+    });
+
+    function toggleDetail(btn, invoiceId) {
+        var $tr = $(btn).closest('tr');
+        var $next = $tr.next('.detail-row');
+        if ($next.length) {
+            $next.remove();
+            return;
+        }
+
+        var fmt = function(n) { return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }); };
+        var fmtDate = function(d) {
+            if (!d) return '-';
+            var dt = new Date(d);
+            return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        };
+
+        $.ajax({
+            url: '/api/invoice/' + invoiceId + '/detail',
+            method: 'GET',
+            success: function(r) {
+                if (!r.success) return;
+
+                var html = '<tr class="detail-row"><td colspan="10"><div style="padding:4px 0;">';
+
+                // Invoice Lines section
+                if (r.lines && r.lines.length) {
+                    html += '<div class="detail-section">';
+                    html += '<div class="detail-section-title"><i class="fas fa-file-alt"></i> ইনভয়েসের বিবরণ</div>';
+                    html += '<table class="detail-table"><thead><tr><th>বিদবরণ</th><th>পরিমাণ</th></tr></thead><tbody>';
+                    r.lines.forEach(function(line) {
+                        html += '<tr><td>' + (line.details || '-') + '</td><td>৳' + fmt(line.amount) + '</td></tr>';
+                    });
+                    html += '</tbody></table></div>';
+                }
+
+                // Payment Records section
+                if (r.payments && r.payments.length) {
+                    var totalPaid = 0;
+                    html += '<div class="detail-section">';
+                    html += '<div class="detail-section-title"><i class="fas fa-money-bill-wave"></i> পেমেন্টের তথ্য</div>';
+                    html += '<table class="detail-table"><thead><tr><th>তারিখ</th><th>পরিমাণ</th><th>পদ্ধতি</th><th>গ্রহণকারী</th></tr></thead><tbody>';
+                    r.payments.forEach(function(pay) {
+                        totalPaid += (pay.amount || 0);
+                        html += '<tr>' +
+                            '<td>' + fmtDate(pay.paidDate) + '</td>' +
+                            '<td>৳' + fmt(pay.amount) + '</td>' +
+                            '<td>' + (pay.payment_Method || '-') + '</td>' +
+                            '<td>' + (pay.collected_By || '-') + '</td>' +
+                            '</tr>';
+                    });
+                    html += '<tr><td><strong>মোট পরিশোধ</strong></td><td class="detail-total">৳' + fmt(totalPaid) + '</td><td></td><td></td></tr>';
+                    html += '</tbody></table></div>';
+                }
+
+                if ((!r.lines || !r.lines.length) && (!r.payments || !r.payments.length)) {
+                    html += '<div style="color:#94a3b8; font-size:.82rem;">কোনো তথ্য পাওয়া যায়নি</div>';
+                }
+
+                html += '</div></td></tr>';
+                $tr.after(html);
+            },
+            error: function() {
+                var html = '<tr class="detail-row"><td colspan="10" style="color:#dc2626; font-size:.82rem;">সার্ভার এররর, তথ্য লোড হয়নি</td></tr>';
+                $tr.after(html);
+            }
+        });
+    }
+    </script>
+</body>
+</html>

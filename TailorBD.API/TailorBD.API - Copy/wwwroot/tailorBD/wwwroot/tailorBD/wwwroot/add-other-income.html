@@ -1,0 +1,844 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Other Income - TailorBD" data-bn="অন্যান্য আয় - TailorBD">অন্যান্য আয় - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left .3s ease; }
+        .page-container { padding: 16px 24px; }
+        @media (max-width: 992px) { #app-navbar { margin-left: 0; } .main-content { margin-left: 0; } .page-container { padding: 10px; } }
+
+        /* KPI chips */
+        .kpi-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+        .kpi-chip { background: #fff; border-radius: 10px; padding: 14px 18px; min-width: 150px;
+                    border-left: 4px solid #28a745; flex: 1; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+        .kpi-chip.red    { border-color: #e74c3c; }
+        .kpi-chip.green  { border-color: #28a745; }
+        .kpi-chip.orange { border-color: #fd7e14; }
+        .kpi-chip.purple { border-color: #9b59b6; }
+        .kpi-chip .cv { font-size: 18px; font-weight: 800; color: #333; }
+        .kpi-chip .cv.red    { color: #e74c3c; }
+        .kpi-chip .cv.green  { color: #28a745; }
+        .kpi-chip .cv.orange { color: #fd7e14; }
+        .kpi-chip .cv.purple { color: #9b59b6; }
+        .kpi-chip .cl { font-size: 11px; color: #888; margin-top: 3px; }
+
+        /* Card box */
+        .card-box { background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.07); padding: 20px; margin-bottom: 18px; }
+        .sec-title { font-size: 13px; font-weight: 700; color: #28a745; text-transform: uppercase;
+                     letter-spacing: .5px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+        /* Top categories */
+        .top-cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        .top-cat-card { background: #f0fff4; border: 1.5px solid #b2dfdb; border-radius: 8px; padding: 12px; }
+        .top-cat-card .rank  { font-size: 11px; color: #aaa; }
+        .top-cat-card .cname { font-size: 13px; font-weight: 700; color: #28a745; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .top-cat-card .camnt { font-size: 16px; font-weight: 800; color: #333; margin-top: 4px; }
+        .top-cat-card .ccnt  { font-size: 11px; color: #888; }
+
+        /* Filter strip */
+        .filter-strip { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 14px; }
+        .f-label  { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 3px; display: block; }
+        .f-control { padding: 8px 12px; border: 1.5px solid #ddd; border-radius: 7px; font-size: 13px;
+                     font-family: inherit; transition: border-color .2s; width: 100%; }
+        .f-control:focus { outline: none; border-color: #28a745; box-shadow: 0 0 0 3px rgba(40,167,69,.1); }
+
+        /* Buttons */
+        .btn-green3    { padding: 9px 22px; background: #28a745; color: #fff; border: none; border-radius: 7px;
+                         font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-green3:hover { background: #218838; }
+        .btn-outline2 { padding: 7px 14px; background: #fff; color: #28a745; border: 1.5px solid #28a745;
+                        border-radius: 7px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+                        display: inline-flex; align-items: center; gap: 5px; }
+        .btn-outline2:hover { background: #f0fff4; }
+        .btn-outline-gray { padding: 7px 14px; background: #fff; color: #6c757d; border: 1.5px solid #dee2e6;
+                            border-radius: 7px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+                            display: inline-flex; align-items: center; gap: 5px; }
+        .btn-outline-gray:hover { background: #f8f9fa; }
+        .btn-sm-edit { padding: 4px 9px; background: #fff8e1; color: #fd7e14; border: 1.5px solid #fdd; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .btn-sm-del  { padding: 4px 9px; background: #fff0f0; color: #e74c3c; border: 1.5px solid #f5c6c6; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .btn-sm-edit:hover { background: #fd7e14; color: #fff; }
+        .btn-sm-del:hover  { background: #e74c3c; color: #fff; }
+        .btn-sm-save { padding: 4px 9px; background: #e8f5e9; color: #28a745; border: 1.5px solid #c8e6c9; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .btn-sm-save:hover { background: #28a745; color: #fff; }
+        .btn-sm-cancel-edit { padding: 4px 9px; background: #f5f5f5; color: #888; border: 1.5px solid #ddd; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .btn-sm-cancel-edit:hover { background: #ddd; color: #555; }
+
+        /* Income records table */
+        .inc-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .inc-tbl thead th { background: #f0fff4; padding: 9px 12px; font-size: 12px; font-weight: 700;
+                            color: #555; border-bottom: 2px solid #b2dfdb; white-space: nowrap; }
+        .inc-tbl tbody td { padding: 9px 12px; border-bottom: 1px solid #f0f8f0; vertical-align: middle; }
+        .inc-tbl tbody tr:hover { background: #fafffe; }
+
+        /* Category management table */
+        .cat-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .cat-tbl thead th { background: #f0fff4; padding: 8px 12px; font-size: 12px; font-weight: 700;
+                            color: #555; border-bottom: 2px solid #b2dfdb; white-space: nowrap; }
+        .cat-tbl tbody td { padding: 8px 12px; border-bottom: 1px solid #f0f8f0; vertical-align: middle; }
+        .cat-tbl tbody tr:hover { background: #fafffe; }
+        .cat-name-cell { font-weight: 600; color: #333; }
+        .cat-edit-input { padding: 5px 9px; border: 1.5px solid #28a745; border-radius: 6px;
+                          font-size: 13px; font-family: inherit; width: 100%; outline: none;
+                          box-shadow: 0 0 0 3px rgba(40,167,69,.12); }
+
+        /* Pager */
+        .pager { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 12px; justify-content: center; }
+        .pager button { padding: 5px 12px; border: 1.5px solid #b2dfdb; background: #fff;
+                        border-radius: 6px; font-size: 12px; cursor: pointer; color: #28a745; }
+        .pager button.active { background: #28a745; color: #fff; border-color: #28a745; }
+        .pager button:hover:not(.active) { background: #f0fff4; }
+
+        /* Toast */
+        .toast-wrap { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast-item { padding: 10px 16px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600;
+                      box-shadow: 0 4px 16px rgba(0,0,0,.15); animation: slideIn .25s ease; min-width: 220px; }
+        .toast-item.success { background: #28a745; }
+        .toast-item.error   { background: #e74c3c; }
+        .toast-item.info    { background: #6c7ae0; }
+        @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Spinner */
+        .spin { width: 22px; height: 22px; border: 3px solid #c8e6c9; border-top-color: #28a745;
+                border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Modal headers */
+        .modal-header.green  { background: #28a745; color: #fff; border-radius: 10px 10px 0 0; }
+        .modal-header.orange { background: #fd7e14; color: #fff; border-radius: 10px 10px 0 0; }
+        .modal-header.blue   { background: #667eea; color: #fff; border-radius: 10px 10px 0 0; }
+        .modal-header.green .btn-close,
+        .modal-header.orange .btn-close,
+        .modal-header.blue .btn-close { filter: invert(1); }
+        .modal-title { font-size: 15px; font-weight: 700; }
+
+        /* Balance hint */
+        .balance-hint { font-size: 12px; padding: 6px 10px; border-radius: 6px; margin-top: 4px; display: none; }
+        .balance-hint.show { display: block; }
+        .balance-hint.ok   { background: #f0fff4; color: #28a745; }
+        .balance-hint.warn { background: #fff8f0; color: #fd7e14; }
+
+        /* Filter summary */
+        .filter-summary { background: #f0fff4; border-radius: 8px; padding: 8px 14px;
+                          margin-bottom: 12px; font-size: 13px; display: none; gap: 20px; flex-wrap: wrap; }
+
+        /* Category badge */
+        .cat-badge { background: #f0fff4; color: #28a745; border-radius: 4px; padding: 2px 8px;
+                     font-size: 12px; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <div class="toast-wrap" id="toastWrap"></div>
+    <div id="app-modals"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-container">
+
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h5 style="font-weight:700;color:#28a745;margin:0;">
+                        <i class="fas fa-hand-holding-usd me-2"></i>
+                        <span data-en="Other Income Management" data-bn="অন্যান্য আয় ব্যবস্থাপনা">অন্যান্য আয় ব্যবস্থাপনা</span>
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn-outline2" onclick="openCategoryModal()">
+                            <i class="fas fa-tags"></i>
+                            <span data-en="Manage Categories" data-bn="ধরণ পরিচালনা">ধরণ পরিচালনা</span>
+                        </button>
+                        <button class="btn-green3" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i>
+                            <span data-en="Add Income" data-bn="আয় যুক্ত করুন">আয় যুক্ত করুন</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI -->
+                <div class="kpi-row" id="kpiRow">
+                    <div class="kpi-chip">
+                        <div class="cv"><div class="spin" style="width:16px;height:16px;border-width:2px;"></div></div>
+                        <div class="cl">লোড হচ্ছে...</div>
+                    </div>
+                </div>
+
+                <!-- Top Categories -->
+                <div id="topSection" style="display:none;">
+                    <div class="card-box">
+                        <div class="sec-title">
+                            <i class="fas fa-chart-pie"></i>
+                            <span data-en="Top Income Categories" data-bn="শীর্ষ আয়ের ধরণ">শীর্ষ আয়ের ধরণ</span>
+                        </div>
+                        <div class="top-cat-grid" id="topCatGrid"></div>
+                    </div>
+                </div>
+
+                <!-- Records -->
+                <div class="card-box">
+                    <div class="filter-strip">
+                        <div>
+                            <label class="f-label" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                            <input type="date" id="filterFrom" class="f-control" style="width:150px;" onchange="loadRecords(1)">
+                        </div>
+                        <div>
+                            <label class="f-label" data-en="To Date" data-bn="শেষ তারিখ">শেষ তারিখ</label>
+                            <input type="date" id="filterTo" class="f-control" style="width:150px;" onchange="loadRecords(1)">
+                        </div>
+                        <div style="flex:1;min-width:160px;">
+                            <label class="f-label" data-en="Category" data-bn="আয়ের ধরণ">আয়ের ধরণ</label>
+                            <select id="filterCategory" class="f-control" onchange="loadRecords(1)">
+                                <option value="0">সকল ধরণ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="f-label">&nbsp;</label>
+                            <button class="btn-outline-gray" onclick="clearFilters()">
+                                <i class="fas fa-times"></i>
+                                <span data-en="Clear" data-bn="রিসেট">রিসেট</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filter-summary" id="filterSummary"></div>
+
+                    <div class="sec-title">
+                        <i class="fas fa-list"></i>
+                        <span data-en="Income Records" data-bn="আয়ের রেকর্ড">আয়ের রেকর্ড</span>
+                    </div>
+
+                    <div id="tblSpinner" style="text-align:center;padding:30px;">
+                        <div class="spin" style="margin:auto;display:block;"></div>
+                    </div>
+                    <div id="tblWrap" style="display:none;overflow-x:auto;">
+                        <table class="inc-tbl">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th data-en="Category" data-bn="ধরণ">ধরণ</th>
+                                    <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                    <th data-en="Amount (৳)" data-bn="পরিমাণ (৳)">পরিমাণ (৳)</th>
+                                    <th data-en="Account" data-bn="অ্যাকাউন্ট">অ্যাকাউন্ট</th>
+                                    <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                    <th data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incTbody"></tbody>
+                        </table>
+                        <div id="noRecMsg" style="display:none;text-align:center;color:#bbb;padding:30px;font-size:14px;">
+                            <i class="fas fa-inbox fa-2x mb-2" style="display:block;color:#b2dfdb;"></i>
+                            <span data-en="No income records found" data-bn="কোনো আয়ের রেকর্ড নেই">কোনো আয়ের রেকর্ড নেই</span>
+                        </div>
+                        <div class="pager" id="pagerWrap"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ADD INCOME MODAL -->
+    <div class="modal fade" id="addIncomeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 10px 40px rgba(0,0,0,.18);">
+                <div class="modal-header green">
+                    <h5 class="modal-title">
+                        <i class="fas fa-hand-holding-usd me-2"></i>
+                        <span data-en="Add Income" data-bn="আয় যুক্ত करें">আয় যুক্ত করুন</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="f-label mb-0">
+                                <span data-en="Income Category" data-bn="আয়ের ধরণ">আয়ের ধরণ</span>
+                                <span style="color:#e74c3c;">*</span>
+                            </label>
+                            <button type="button" class="btn-outline2" style="padding:3px 10px;font-size:11px;" onclick="openCategoryModal()">
+                                <i class="fas fa-plus"></i>
+                                <span data-en="New" data-bn="নতুন">নতুন</span>
+                            </button>
+                        </div>
+                        <select id="addCategory" class="f-control">
+                            <option value="0">-- ধরণ নির্বাচন করুন --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label">
+                            <span data-en="Amount (৳)" data-bn="পরিমাণ (৳)">পরিমাণ (৳)</span>
+                            <span style="color:#e74c3c;">*</span>
+                        </label>
+                        <input type="number" id="addAmount" class="f-control" min="1" step="0.01"
+                            placeholder="আয়ের পরিমাণ লিখুন"
+                            data-bn-placeholder="আয়ের পরিমাণ লিখুন"
+                            data-en-placeholder="Enter income amount">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label">
+                            <span data-en="Income Details (Optional)" data-bn="বিস্তারিত বিবরণ (ঐচ্ছিক)">বিস্তারিত বিবরণ (ঐচ্ছিক)</span>
+                        </label>
+                        <input type="text" id="addFor" class="f-control"
+                            placeholder="কি বাবদ আয় হলো"
+                            data-bn-placeholder="কি বাবদ আয় হলো"
+                            data-en-placeholder="What was it earned for?">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Account (Optional)" data-bn="অ্যাকাউন্ট (ঐচ্ছিক)">অ্যাকাউন্ট (ঐচ্ছিক)</label>
+                        <select id="addAccount" class="f-control" onchange="checkAccountInfo()">
+                            <option value="0">অ্যাকাউন্ট ছাড়া</option>
+                        </select>
+                        <div class="balance-hint" id="balanceHint"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Income Date" data-bn="আয়ের তারিখ">আয়ের তারিখ</label>
+                        <input type="date" id="addDate" class="f-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline-gray" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        <span data-en="Cancel" data-bn="বাতিল">বাতিল</span>
+                    </button>
+                    <button type="button" class="btn-green3" id="submitIncBtn" onclick="submitIncome()">
+                        <i class="fas fa-check"></i>
+                        <span data-en="Save Income" data-bn="আয় সংরক্ষণ করুন">আয় সংরক্ষণ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT INCOME MODAL -->
+    <div class="modal fade" id="editIncomeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="border-radius:10px;border:none;">
+                <div class="modal-header orange">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>
+                        <span data-en="Edit Income" data-bn="আয় সম্পাদনা">আয় সম্পাদনা</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" id="editIncId">
+                    <div class="mb-3">
+                        <label class="f-label">
+                            <span data-en="Amount (৳)" data-bn="পরিমাণ (৳)">পরিমাণ (৳)</span>
+                            <span style="color:#e74c3c;">*</span>
+                        </label>
+                        <input type="number" id="editAmount" class="f-control" min="1" step="0.01">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</label>
+                        <input type="text" id="editFor" class="f-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline-gray" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        <span data-en="Cancel" data-bn="বাতিল">বাতিল</span>
+                    </button>
+                    <button type="button" class="btn-green3" style="background:#fd7e14;" onclick="submitEdit()">
+                        <i class="fas fa-save"></i>
+                        <span data-en="Update" data-bn="আপডেট করুন">আপডেট করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CATEGORY MANAGEMENT MODAL -->
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content" style="border-radius:10px;border:none;">
+                <div class="modal-header blue">
+                    <h5 class="modal-title">
+                        <i class="fas fa-tags me-2"></i>
+                        <span data-en="Income Categories" data-bn="আয়ের ধরণ ব্যবস্থাপনা">আয়ের ধরণ ব্যবস্থাপনা</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Add new -->
+                    <div class="d-flex gap-2 mb-3">
+                        <input type="text" id="newCatName" class="f-control"
+                            placeholder="নতুন আয়ের ধরণের নাম"
+                            data-bn-placeholder="নতুন আয়ের ধরণের নাম"
+                            data-en-placeholder="New category name"
+                            onkeydown="if(event.key==='Enter') addCategory()">
+                        <button class="btn-green3" onclick="addCategory()" style="white-space:nowrap;">
+                            <i class="fas fa-plus"></i>
+                            <span data-en="Add" data-bn="যুক্ত করুন">যুক্ত করুন</span>
+                        </button>
+                    </div>
+                    <!-- Table list -->
+                    <div id="catListWrap" style="max-height:340px;overflow-y:auto;">
+                        <div style="text-align:center;padding:24px;">
+                            <div class="spin" style="margin:auto;display:block;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js"></script>
+    <script>
+    (function () {
+        var institutionId  = 0;
+        var registrationId = 0;
+        var currentPage    = 1;
+        var totalPages     = 1;
+        var allAccounts    = [];
+        var allCategories  = [];
+        var _initialized   = false;
+
+        /* ── helpers ── */
+        function getSession() {
+            institutionId  = parseInt(sessionStorage.getItem('institutionId')  || localStorage.getItem('session_institutionId')  || '0');
+            registrationId = parseInt(sessionStorage.getItem('registrationId') || localStorage.getItem('session_registrationId') || '0');
+        }
+        function getLang() {
+            return (window.currentLang || localStorage.getItem('preferredLanguage') || 'bn') === 'en' ? 'en' : 'bn';
+        }
+        function fmt(n) {
+            return parseFloat(n || 0).toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function esc(s) {
+            return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');
+        }
+        function applyLang() {
+            var lang = getLang();
+            $('[data-' + lang + '-placeholder]').each(function () {
+                $(this).attr('placeholder', $(this).data(lang + '-placeholder'));
+            });
+        }
+        function init() {
+            if (_initialized) return;
+            _initialized = true;
+            loadSummary();
+            loadCategories();
+            loadAccounts();
+            loadRecords(1);
+            applyLang();
+        }
+
+        /* ── DOM ready ── */
+        $(document).ready(function () {
+            $('#addDate').val(new Date().toISOString().split('T')[0]);
+
+            getSession();
+            if (institutionId) {
+                init();
+            } else if (window.appSessionReady) {
+                getSession();
+                init();
+            } else {
+                $(document).one('app-session-ready', function () {
+                    getSession();
+                    init();
+                });
+                var _retries = 0;
+                var _poll = setInterval(function () {
+                    _retries++;
+                    getSession();
+                    if (institutionId || window.appSessionReady) {
+                        clearInterval(_poll);
+                        getSession();
+                        init();
+                    } else if (_retries >= 20) {
+                        clearInterval(_poll);
+                    }
+                }, 250);
+            }
+
+            $(document).on('languageChanged', function () {
+                applyLang();
+                if (institutionId) { loadSummary(); loadRecords(currentPage); }
+            });
+        });
+
+        /* ── SUMMARY ── */
+        function loadSummary() {
+            getSession();
+            if (!institutionId) return;
+            $.get('/api/OtherIncome/summary?institutionId=' + institutionId, function (res) {
+                if (!res.success) return;
+                renderKPI(res.summary);
+                renderTopCategories(res.topCategories || []);
+                $('#topSection').show();
+            });
+        }
+
+        function renderKPI(s) {
+            var lang = getLang();
+            var L = {
+                total:     lang === 'en' ? 'Total Income'   : 'মোট আয়',
+                records:   lang === 'en' ? 'Total Records'  : 'মোট রেকর্ড',
+                thisMonth: lang === 'en' ? 'This Month'     : 'এই মাসে',
+                cats:      lang === 'en' ? 'Categories'     : 'আয়ের ধরণ'
+            };
+            $('#kpiRow').html(
+                chip('৳', fmt(s.TotalAmount),    L.total,     'green')  +
+                chip('',  s.TotalRecords,         L.records,   'orange') +
+                chip('৳', fmt(s.ThisMonthAmount), L.thisMonth, 'purple') +
+                chip('',  s.TotalCategories,      L.cats,      'red')
+            );
+        }
+
+        function chip(pre, val, lbl, cls) {
+            return '<div class="kpi-chip ' + cls + '"><div class="cv ' + cls + '">' + pre + val + '</div><div class="cl">' + lbl + '</div></div>';
+        }
+
+        function renderTopCategories(data) {
+            var lang = getLang();
+            if (!data.length) {
+                $('#topCatGrid').html('<p style="color:#bbb;font-size:13px;">' + (lang === 'en' ? 'No data' : 'কোনো ডেটা নেই') + '</p>');
+                return;
+            }
+            var h = '';
+            data.forEach(function (c, i) {
+                h += '<div class="top-cat-card">' +
+                    '<div class="rank">#' + (i + 1) + '</div>' +
+                    '<div class="cname">' + esc(c.CategoryName) + '</div>' +
+                    '<div class="camnt">৳' + fmt(c.TotalAmount) + '</div>' +
+                    '<div class="ccnt">' + c.RecordCount + ' ' + (lang === 'en' ? 'records' : 'টি রেকর্ড') + '</div>' +
+                    '</div>';
+            });
+            $('#topCatGrid').html(h);
+        }
+
+        /* ── CATEGORIES ── */
+        function loadCategories() {
+            getSession();
+            if (!institutionId) return;
+            $.get('/api/OtherIncome/categories?institutionId=' + institutionId, function (res) {
+                if (!res.success) return;
+                allCategories = res.data || [];
+                populateCategoryDropdowns();
+                renderCategoryList();
+            });
+        }
+
+        function populateCategoryDropdowns() {
+            var lang = getLang();
+            var addOpts    = '<option value="0">' + (lang === 'en' ? '-- Select Category --' : '-- ধরণ নির্বাচন করুন --') + '</option>';
+            var filterOpts = '<option value="0">' + (lang === 'en' ? 'All Categories' : 'সকল ধরণ') + '</option>';
+            allCategories.forEach(function (c) {
+                addOpts    += '<option value="' + c.Extra_IncomeCategoryID + '">' + esc(c.CategoryName) + '</option>';
+                filterOpts += '<option value="' + c.Extra_IncomeCategoryID + '">' + esc(c.CategoryName) + '</option>';
+            });
+            $('#addCategory').html(addOpts);
+            $('#filterCategory').html(filterOpts);
+        }
+
+        function renderCategoryList() {
+            var lang = getLang();
+            if (!allCategories.length) {
+                $('#catListWrap').html(
+                    '<p style="color:#bbb;font-size:13px;text-align:center;padding:20px;">' +
+                    (lang === 'en' ? 'No categories yet. Add one above.' : 'কোনো ধরণ নেই। উপরে যুক্ত করুন।') + '</p>');
+                return;
+            }
+            var editLbl   = lang === 'en' ? 'Edit'   : 'সম্পাদনা';
+            var deleteLbl = lang === 'en' ? 'Delete' : 'ডিলিট';
+            var h = '<table class="cat-tbl"><thead><tr>' +
+                '<th style="width:36px;">#</th>' +
+                '<th>' + (lang === 'en' ? 'Category Name' : 'ধরণের নাম') + '</th>' +
+                '<th style="text-align:center;width:110px;">' + (lang === 'en' ? 'Action' : 'অ্যাকশন') + '</th>' +
+                '</tr></thead><tbody>';
+            allCategories.forEach(function (c, i) {
+                h += '<tr id="catRow_' + c.Extra_IncomeCategoryID + '">' +
+                    '<td style="color:#aaa;font-size:12px;">' + (i + 1) + '</td>' +
+                    '<td class="cat-name-cell" id="catNameCell_' + c.Extra_IncomeCategoryID + '">' + esc(c.CategoryName) + '</td>' +
+                    '<td id="catActionCell_' + c.Extra_IncomeCategoryID + '" style="text-align:center;white-space:nowrap;">' +
+                        '<button class="btn-sm-edit me-1" onclick="editCategory(' + c.Extra_IncomeCategoryID + ',\'' + esc(c.CategoryName) + '\')" title="' + editLbl + '"><i class="fas fa-edit"></i></button>' +
+                        '<button class="btn-sm-del" onclick="deleteCategory(' + c.Extra_IncomeCategoryID + ')" title="' + deleteLbl + '"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
+                    '</tr>';
+            });
+            h += '</tbody></table>';
+            $('#catListWrap').html(h);
+        }
+
+        window.editCategory = function (id, currentName) {
+            var lang      = getLang();
+            var saveLbl   = lang === 'en' ? 'Save'   : 'সংরক্ষণ';
+            var cancelLbl = lang === 'en' ? 'Cancel' : 'বাতিল';
+            $('#catNameCell_' + id).html(
+                '<input type="text" class="cat-edit-input" id="catEditInput_' + id + '" value="' + esc(currentName) + '"' +
+                ' onkeydown="if(event.key===\'Enter\')submitCategoryEdit(' + id + ');if(event.key===\'Escape\')cancelCategoryEdit(' + id + ');">'
+            );
+            $('#catActionCell_' + id).html(
+                '<button class="btn-sm-save me-1" onclick="submitCategoryEdit(' + id + ')" title="' + saveLbl + '"><i class="fas fa-check"></i></button>' +
+                '<button class="btn-sm-cancel-edit" onclick="cancelCategoryEdit(' + id + ')" title="' + cancelLbl + '"><i class="fas fa-times"></i></button>'
+            );
+            setTimeout(function () { $('#catEditInput_' + id).focus().select(); }, 40);
+        };
+
+        window.cancelCategoryEdit = function (id) { loadCategories(); };
+
+        window.submitCategoryEdit = function (id) {
+            var name = $('#catEditInput_' + id).val().trim();
+            var lang = getLang();
+            if (!name) { showToast(lang === 'en' ? 'Enter category name' : 'ধরণের নাম লিখুন', 'error'); return; }
+            $.ajax({
+                url: '/api/OtherIncome/categories', type: 'PUT', contentType: 'application/json',
+                data: JSON.stringify({ Extra_IncomeCategoryID: id, CategoryName: name }),
+                success: function (res) {
+                    if (res.success) { showToast(lang === 'en' ? 'Category updated!' : 'ধরণ আপডেট হয়েছে!', 'success'); loadCategories(); }
+                    else { showToast(res.message, 'error'); }
+                },
+                error: function () { showToast('Server error', 'error'); }
+            });
+        };
+
+        window.addCategory = function () {
+            var name = $('#newCatName').val().trim();
+            var lang = getLang();
+            if (!name) { showToast(lang === 'en' ? 'Enter category name' : 'ধরণের নাম লিখুন', 'error'); return; }
+            getSession();
+            $.ajax({
+                url: '/api/OtherIncome/categories', type: 'POST', contentType: 'application/json',
+                data: JSON.stringify({ InstitutionID: institutionId, RegistrationID: registrationId, CategoryName: name }),
+                success: function (res) {
+                    if (res.success) { showToast(lang === 'en' ? 'Category added!' : 'ধরণ যুক্ত হয়েছে!', 'success'); $('#newCatName').val(''); loadCategories(); }
+                    else { showToast(res.message, 'error'); }
+                },
+                error: function () { showToast('Server error', 'error'); }
+            });
+        };
+
+        window.deleteCategory = function (id) {
+            var lang = getLang();
+            if (!confirm(lang === 'en' ? 'Delete this category?' : 'এই ধরণটি ডিলিট করবেন?')) return;
+            getSession();
+            $.ajax({
+                url: '/api/OtherIncome/categories/' + id + '?institutionId=' + institutionId, type: 'DELETE',
+                success: function (res) {
+                    if (res.success) { showToast(lang === 'en' ? 'Deleted!' : 'ডিলিট হয়েছে!', 'success'); loadCategories(); }
+                    else { showToast(res.message, 'error'); }
+                },
+                error: function () { showToast('Server error', 'error'); }
+            });
+        };
+
+        /* ── ACCOUNTS ── */
+        function loadAccounts() {
+            getSession();
+            if (!institutionId) return;
+            $.get('/api/OtherIncome/accounts?institutionId=' + institutionId, function (res) {
+                if (!res.success) return;
+                allAccounts = res.data || [];
+                var lang = getLang();
+                var opts = '<option value="0">' + (lang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া') + '</option>';
+                allAccounts.forEach(function (a) {
+                    opts += '<option value="' + a.AccountID + '" data-balance="' + a.AccountBalance + '">' +
+                            esc(a.AccountName) + ' (৳' + fmt(a.AccountBalance) + ')</option>';
+                });
+                $('#addAccount').html(opts);
+                var def = allAccounts.find(function (a) { return a.Default_Status; });
+                if (def) { $('#addAccount').val(def.AccountID); checkAccountInfo(); }
+            });
+        }
+
+        window.checkAccountInfo = function () {
+            var accId = parseInt($('#addAccount').val()) || 0;
+            var lang  = getLang();
+            var hint  = $('#balanceHint');
+            if (!accId) { hint.removeClass('show ok warn'); return; }
+            var bal = parseFloat($('#addAccount option[value="' + accId + '"]').data('balance') || 0);
+            hint.attr('class', 'balance-hint show ok')
+                .text((lang === 'en' ? 'Current Balance: ৳' : 'বর্তমান ব্যালেন্স: ৳') + fmt(bal));
+        };
+
+        /* ── RECORDS TABLE ── */
+        window.loadRecords = function (page) {
+            getSession();
+            if (!institutionId) return;
+            currentPage = page;
+            var from = $('#filterFrom').val();
+            var to   = $('#filterTo').val();
+            var cat  = $('#filterCategory').val() || '0';
+            var url  = '/api/OtherIncome/records?institutionId=' + institutionId + '&page=' + page + '&pageSize=30&categoryId=' + cat;
+            if (from) url += '&dateFrom=' + from;
+            if (to)   url += '&dateTo='   + to;
+            $('#tblSpinner').show(); $('#tblWrap').hide();
+            $.get(url, function (res) {
+                $('#tblSpinner').hide();
+                if (!res.success) return;
+                totalPages = res.totalPages || 1;
+                renderTable(res.data || []);
+                renderFilterSummary(res.summary, res.totalCount);
+                renderPager();
+                $('#tblWrap').show();
+            }).fail(function () { $('#tblSpinner').hide(); });
+        };
+
+        function renderTable(data) {
+            var lang = getLang();
+            var $b = $('#incTbody').empty();
+            if (!data.length) { $('#noRecMsg').show(); return; }
+            $('#noRecMsg').hide();
+            data.forEach(function (d, i) {
+                var forText = (d.Extra_IncomeFor || '').replace(/'/g, "\\'");
+                $b.append(
+                    '<tr>' +
+                    '<td style="color:#aaa;font-size:12px;">' + ((currentPage - 1) * 30 + i + 1) + '</td>' +
+                    '<td><span class="cat-badge">' + esc(d.CategoryName) + '</span></td>' +
+                    '<td style="font-size:12.5px;color:#555;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' +
+                        (d.Extra_IncomeFor ? esc(d.Extra_IncomeFor) : '<span style="color:#ccc;">—</span>') + '</td>' +
+                    '<td style="font-weight:800;color:#28a745;">৳' + fmt(d.Extra_IncomeAmount) + '</td>' +
+                    '<td style="font-size:12px;color:#888;">' + esc(d.AccountName) + '</td>' +
+                    '<td style="font-size:12px;color:#888;">' + (d.IncomeDate || '—') + '</td>' +
+                    '<td style="white-space:nowrap;">' +
+                        '<button class="btn-sm-edit me-1" onclick="openEditModal(' + d.Extra_IncomeID + ',' + d.Extra_IncomeAmount + ',\'' + forText + '\')" title="' + (lang === 'en' ? 'Edit' : 'সম্পাদনা') + '"><i class="fas fa-edit"></i></button>' +
+                        '<button class="btn-sm-del" onclick="deleteIncome(' + d.Extra_IncomeID + ')" title="' + (lang === 'en' ? 'Delete' : 'ডিলিট') + '"><i class="fas fa-trash"></i></button>' +
+                    '</td></tr>');
+            });
+        }
+
+        function renderFilterSummary(summary, count) {
+            if (!summary || !count) { $('#filterSummary').hide(); return; }
+            var lang = getLang();
+            $('#filterSummary').css('display', 'flex').html(
+                '<span><strong>' + count + '</strong> ' + (lang === 'en' ? 'records' : 'রেকর্ড') + '</span>' +
+                '<span>' + (lang === 'en' ? 'Total: ' : 'মোট: ') + '<strong style="color:#28a745;">৳' + fmt(summary.TotalAmount) + '</strong></span>'
+            );
+        }
+
+        function renderPager() {
+            var $p = $('#pagerWrap').empty();
+            if (totalPages <= 1) return;
+            for (var i = 1; i <= totalPages; i++) {
+                $p.append('<button class="' + (i === currentPage ? 'active' : '') + '" onclick="loadRecords(' + i + ')">' + i + '</button>');
+            }
+        }
+
+        window.clearFilters = function () {
+            $('#filterFrom,#filterTo').val('');
+            $('#filterCategory').val('0');
+            loadRecords(1);
+        };
+
+        /* ── ADD INCOME ── */
+        window.openAddModal = function () {
+            $('#addCategory').val('0');
+            $('#addAmount,#addFor').val('');
+            $('#addDate').val(new Date().toISOString().split('T')[0]);
+            $('#balanceHint').attr('class', 'balance-hint');
+            loadAccounts();
+            new bootstrap.Modal('#addIncomeModal').show();
+        };
+
+        window.submitIncome = function () {
+            getSession();
+            var lang   = getLang();
+            var catId  = parseInt($('#addCategory').val()) || 0;
+            var amount = parseFloat($('#addAmount').val()) || 0;
+            var accId  = parseInt($('#addAccount').val()) || 0;
+            if (!institutionId) { showToast(lang === 'en' ? 'Session not loaded, please wait' : 'সেশন লোড হয়নি, অপেক্ষা করুন', 'error'); return; }
+            if (!catId)  { showToast(lang === 'en' ? 'Select a category' : 'ধরণ নির্বাচন করুন', 'error'); return; }
+            if (!amount) { showToast(lang === 'en' ? 'Enter amount' : 'পরিমাণ লিখুন', 'error'); return; }
+            $('#submitIncBtn').prop('disabled', true);
+            $.ajax({
+                url: '/api/OtherIncome/add', type: 'POST', contentType: 'application/json',
+                data: JSON.stringify({
+                    InstitutionID:          institutionId,
+                    RegistrationID:         registrationId,
+                    Extra_IncomeCategoryID: catId,
+                    Extra_IncomeAmount:     amount,
+                    Extra_IncomeFor:        $('#addFor').val().trim(),
+                    AccountID:              accId > 0 ? accId : null,
+                    IncomeDate:             $('#addDate').val()
+                }),
+                success: function (res) {
+                    $('#submitIncBtn').prop('disabled', false);
+                    if (res.success) {
+                        bootstrap.Modal.getInstance('#addIncomeModal').hide();
+                        showToast(lang === 'en' ? 'Income saved!' : 'আয় সফলভাবে যুক্ত হয়েছে!', 'success');
+                        loadSummary(); loadRecords(currentPage); loadAccounts();
+                    } else { showToast(res.message, 'error'); }
+                },
+                error: function (xhr) {
+                    $('#submitIncBtn').prop('disabled', false);
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error';
+                    showToast(msg, 'error');
+                }
+            });
+        };
+
+        /* ── EDIT INCOME ── */
+        window.openEditModal = function (id, amount, forText) {
+            $('#editIncId').val(id);
+            $('#editAmount').val(amount);
+            $('#editFor').val(forText);
+            new bootstrap.Modal('#editIncomeModal').show();
+        };
+
+        window.submitEdit = function () {
+            getSession();
+            var lang   = getLang();
+            var id     = parseInt($('#editIncId').val()) || 0;
+            var amount = parseFloat($('#editAmount').val()) || 0;
+            if (!amount) { showToast(lang === 'en' ? 'Enter amount' : 'পরিমাণ লিখুন', 'error'); return; }
+            $.ajax({
+                url: '/api/OtherIncome/update', type: 'PUT', contentType: 'application/json',
+                data: JSON.stringify({ Extra_IncomeID: id, InstitutionID: institutionId, Extra_IncomeAmount: amount, Extra_IncomeFor: $('#editFor').val().trim() }),
+                success: function (res) {
+                    if (res.success) {
+                        bootstrap.Modal.getInstance('#editIncomeModal').hide();
+                        showToast(lang === 'en' ? 'Updated!' : 'আপডেট সফল হয়েছে!', 'success');
+                        loadSummary(); loadRecords(currentPage);
+                    } else { showToast(res.message, 'error'); }
+                },
+                error: function () { showToast('Server error', 'error'); }
+            });
+        };
+
+        /* ── DELETE INCOME ── */
+        window.deleteIncome = function (id) {
+            var lang = getLang();
+            if (!confirm(lang === 'en' ? 'Delete this income record?' : 'এই আয়ের রেকর্ড ডিলিট করবেন?')) return;
+            getSession();
+            $.ajax({
+                url: '/api/OtherIncome/' + id + '?institutionId=' + institutionId, type: 'DELETE',
+                success: function (res) {
+                    if (res.success) { showToast(lang === 'en' ? 'Deleted!' : 'ডিলিট হয়েছে!', 'success'); loadSummary(); loadRecords(currentPage); loadAccounts(); }
+                    else { showToast(res.message, 'error'); }
+                },
+                error: function () { showToast('Server error', 'error'); }
+            });
+        };
+
+        /* ── CATEGORY MODAL ── */
+        window.openCategoryModal = function () {
+            var addModal = bootstrap.Modal.getInstance('#addIncomeModal');
+            if (addModal) addModal.hide();
+            loadCategories();
+            new bootstrap.Modal('#categoryModal').show();
+        };
+
+        /* ── TOAST ── */
+        window.showToast = function (msg, type) {
+            var t = document.createElement('div');
+            t.className = 'toast-item ' + (type || 'info');
+            t.textContent = msg;
+            document.getElementById('toastWrap').appendChild(t);
+            setTimeout(function () { t.style.opacity = 0; setTimeout(function () { t.remove(); }, 300); }, 3500);
+        };
+
+    })();
+    </script>
+</body>
+</html>

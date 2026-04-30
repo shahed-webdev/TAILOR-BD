@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Account Log - TailorBD" data-bn="অ্যাকাউন্ট লগ - TailorBD">অ্যাকাউন্ট লগ - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* Filter */
+        .filter-card { background:#fff; border-radius:10px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:18px; }
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control{ width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; font-family:inherit; }
+        .f-control:focus{ outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-load { padding:8px 20px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-load:hover{ background:#5a68c9; }
+        .btn-outline{ padding:8px 14px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-outline:hover{ background:#f0f1fc; }
+
+        /* Summary Cards */
+        .sum-cards { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:18px; }
+        @media(max-width:900px){ .sum-cards{ grid-template-columns:repeat(3,1fr); } }
+        @media(max-width:500px){ .sum-cards{ grid-template-columns:repeat(2,1fr); } }
+        .sum-card { background:#fff; border-radius:10px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); text-align:center; border-top:4px solid #6c7ae0; }
+        .sum-card.in   { border-top-color:#28a745; }
+        .sum-card.out  { border-top-color:#dc3545; }
+        .sum-card.net  { border-top-color:#17a2b8; }
+        .sum-card.bal  { border-top-color:#fd7e14; }
+        .sum-lbl { font-size:11px; font-weight:600; color:#888; text-transform:uppercase; margin-bottom:6px; }
+        .sum-val { font-size:22px; font-weight:800; }
+        .sum-val.in  { color:#28a745; }
+        .sum-val.out { color:#dc3545; }
+        .sum-val.net-pos { color:#17a2b8; }
+        .sum-val.net-neg { color:#dc3545; }
+        .sum-val.bal { color:#fd7e14; }
+
+        /* Table */
+        .tbl-card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); overflow:hidden; }
+        .tbl-head { padding:12px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; }
+        .tbl-title { font-weight:700; font-size:14px; color:#444; }
+        .log-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .log-table thead th { background:#f8f9ff; padding:9px 12px; font-size:12px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap; }
+        .log-table tbody td { padding:8px 12px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+        .log-table tbody tr:hover { background:#fafbff; }
+        .badge-in  { background:#e8fdf0; color:#28a745; border-radius:5px; padding:2px 8px; font-size:11px; font-weight:700; }
+        .badge-out { background:#fff5f5; color:#dc3545; border-radius:5px; padding:2px 8px; font-size:11px; font-weight:700; }
+        .amt-in  { color:#28a745; font-weight:700; }
+        .amt-out { color:#dc3545; font-weight:700; }
+        .text-muted-sm { color:#aaa; font-size:11px; }
+
+        /* Pagination */
+        .pager { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+        .pager button { padding:5px 11px; border:1px solid #ddd; border-radius:6px; background:#fff; font-size:12px; cursor:pointer; }
+        .pager button.active { background:#6c7ae0; color:#fff; border-color:#6c7ae0; }
+        .pager button:disabled { opacity:.4; cursor:not-allowed; }
+        .pager-info { font-size:12px; color:#888; margin-left:auto; }
+
+        /* Spinner */
+        .spin-wrap { text-align:center; padding:40px; color:#aaa; }
+        .spin { width:30px; height:30px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin{ to{transform:rotate(360deg);} }
+
+        /* Print */
+        @media print {
+            #app-navbar, #app-sidebar, .filter-card, .no-print { display:none !important; }
+            .main-content { margin-left:0 !important; }
+            .page-container { padding:0 !important; }
+            .tbl-card, .sum-card { box-shadow:none; border:1px solid #ddd !important; }
+            .print-header { display:block !important; }
+        }
+        .print-header {
+            display:none; text-align:center; margin-bottom:14px;
+            padding-bottom:10px; border-bottom:2px solid #333;
+        }
+        .print-header .ins-name { font-size:20px; font-weight:800; }
+        .print-header .ins-meta { font-size:12px; color:#444; margin:2px 0; }
+        .print-header .rep-title{ font-size:15px; font-weight:700; margin:8px 0 2px; }
+        .print-header .rep-date { font-size:12px; color:#666; }
+    </style>
+</head>
+<body>
+<div id="app-navbar"></div>
+<div id="app-sidebar"></div>
+
+<main class="main-content" id="mainContent">
+    <div class="dashboard-content">
+        <div class="page-container">
+
+            <!-- Title -->
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                    <i class="fas fa-book me-2"></i>
+                    <span data-en="Account Log" data-bn="অ্যাকাউন্ট লগ">অ্যাকাউন্ট লগ</span>
+                </h5>
+                <button class="btn-outline" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    <span data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+                </button>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-card no-print">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3 col-6">
+                        <label class="f-label" data-en="Account" data-bn="হিসাব">হিসাব</label>
+                        <select id="accountSelect" class="f-control">
+                            <option value="" data-en="All Accounts" data-bn="সব অ্যাকাউন্ট">সব অ্যাকাউন্ট</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date From" data-bn="তারিখ থেকে">তারিখ থেকে</label>
+                        <input type="date" id="dateFrom" class="f-control">
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date To" data-bn="তারিখ পর্যন্ত">তারিখ পর্যন্ত</label>
+                        <input type="date" id="dateTo" class="f-control">
+                    </div>
+                    <div class="col-md-5 col-6 d-flex gap-2 flex-wrap align-items-end">
+                        <button class="btn-load" onclick="loadLog()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            <span data-en="Load" data-bn="লোড">লোড</span>
+                        </button>
+                        <button class="btn-outline" onclick="setToday()">
+                            <i class="fas fa-calendar-day me-1"></i>
+                            <span data-en="Today" data-bn="আজ">আজ</span>
+                        </button>
+                        <button class="btn-outline" onclick="clearFilter()">
+                            <i class="fas fa-times me-1"></i>
+                            <span data-en="All Time" data-bn="সব সময়">সব সময়</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="dateLabel" style="font-size:12px;color:#888;margin-top:6px;"></div>
+            </div>
+
+            <!-- Print Header -->
+            <div class="print-header" id="printHeader">
+                <div class="ins-name" id="printInsName"></div>
+                <div class="ins-meta" id="printInsPhone"></div>
+                <div class="ins-meta" id="printInsAddress"></div>
+                <div class="rep-title" data-en="Account Log Report" data-bn="অ্যাকাউন্ট লগ রিপোর্ট">অ্যাকাউন্ট লগ রিপোর্ট</div>
+                <div class="rep-date" id="printDateRange"></div>
+            </div>
+
+            <!-- Spinner -->
+            <div id="spinner" class="spin-wrap"><div class="spin"></div></div>
+
+            <!-- Content -->
+            <div id="content" style="display:none;">
+
+                <!-- Summary Cards -->
+                <div class="sum-cards mb-3">
+                    <div class="sum-card bal">
+                        <div class="sum-lbl" data-en="Opening Balance" data-bn="প্রারম্ভিক ব্যালেন্স">প্রারম্ভিক ব্যালেন্স</div>
+                        <div class="sum-val bal" id="sOpeningBalance">৳0.00</div>
+                    </div>
+                    <div class="sum-card in">
+                        <div class="sum-lbl" data-en="Cash In" data-bn="ক্যাশ ইন">ক্যাশ ইন</div>
+                        <div class="sum-val in" id="sCashIn">৳0.00</div>
+                    </div>
+                    <div class="sum-card out">
+                        <div class="sum-lbl" data-en="Cash Out" data-bn="ক্যাশ আউট">ক্যাশ আউট</div>
+                        <div class="sum-val out" id="sCashOut">৳0.00</div>
+                    </div>
+                    <div class="sum-card net">
+                        <div class="sum-lbl" data-en="Net" data-bn="নিট">নিট</div>
+                        <div class="sum-val net-pos" id="sNet">৳0.00</div>
+                    </div>
+                    <div class="sum-card" style="border-top-color:#6c7ae0;">
+                        <div class="sum-lbl" data-en="Closing Balance" data-bn="সমাপনী ব্যালেন্স">সমাপনী ব্যালেন্স</div>
+                        <div class="sum-val" style="color:#6c7ae0;" id="sBalance">৳0.00</div>
+                    </div>
+                </div>
+
+                <!-- Log Table -->
+                <div class="tbl-card">
+                    <div class="tbl-head no-print">
+                        <span class="tbl-title">
+                            <i class="fas fa-list me-1"></i>
+                            <span data-en="Transaction Details" data-bn="লেনদেন বিবরণ">লেনদেন বিবরণ</span>
+                        </span>
+                        <span id="totalCount" style="font-size:12px;color:#888;"></span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="log-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th data-en="Type" data-bn="ধরন">ধরন</th>
+                                    <th data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
+                                    <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                    <th data-en="Account" data-bn="একাউন্ট">একাউন্ট</th>
+                                    <th data-en="Amount" data-bn="পরিমাণ">পরিমাণ</th>
+                                    <th data-en="Balance" data-bn="ব্যালেন্স">ব্যালেন্স</th>
+                                    <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                    <th data-en="By" data-bn="যিনি করেছেন">যিনি করেছেন</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logBody"></tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="px-3 pb-3 no-print" id="pagerWrap"></div>
+                </div>
+
+            </div><!-- content -->
+
+        </div>
+    </div>
+</main>
+
+<div id="app-modals"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js?v=2.1.5"></script>
+<script src="/js/account-log.js?v=2.1.5"></script>
+</body>
+</html>

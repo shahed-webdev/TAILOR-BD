@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Transaction Log - TailorBD" data-bn="লেনদেন লগ - TailorBD">লেনদেন লগ - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* Filter */
+        .filter-card { background:#fff; border-radius:10px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:18px; }
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control{ width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; font-family:inherit; }
+        .f-control:focus{ outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-load   { padding:8px 20px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-load:hover { background:#5a68c9; }
+        .btn-outline{ padding:8px 14px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-outline:hover { background:#f0f1fc; }
+
+        /* Summary cards */
+        .sum-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+        @media(max-width:900px){ .sum-grid{ grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:480px){ .sum-grid{ grid-template-columns:1fr 1fr; } }
+        .s-card { background:#fff; border-radius:10px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); text-align:center; border-top:4px solid #6c7ae0; }
+        .s-card.in  { border-top-color:#28a745; }
+        .s-card.out { border-top-color:#dc3545; }
+        .s-card.net { border-top-color:#17a2b8; }
+        .s-card.adj { border-top-color:#fd7e14; }
+        .s-lbl { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:6px; }
+        .s-val { font-size:20px; font-weight:800; }
+        .s-val.green  { color:#28a745; }
+        .s-val.red    { color:#dc3545; }
+        .s-val.teal   { color:#17a2b8; }
+        .s-val.orange { color:#fd7e14; }
+        .s-sub { font-size:11px; color:#aaa; margin-top:4px; }
+
+        /* Two-column layout */
+        .log-cols { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+        @media(max-width:768px){ .log-cols{ grid-template-columns:1fr; } }
+
+        /* Section card */
+        .sec-card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); overflow:hidden; margin-bottom:16px; }
+        .sec-head { padding:11px 16px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; }
+        .sec-head.in-head  { background:#f0fdf4; color:#28a745; border-bottom:2px solid #d1fae5; }
+        .sec-head.out-head { background:#fff5f5; color:#dc3545; border-bottom:2px solid #ffd5d5; }
+        .sec-head.adj-in-head  { background:#fff8e1; color:#e67e00; border-bottom:2px solid #ffe5a0; }
+        .sec-head.adj-out-head { background:#f3f0ff; color:#6f42c1; border-bottom:2px solid #ddd5ff; }
+        .sec-head .cat-total { font-size:14px; font-weight:800; }
+        .sec-body { padding:0; }
+
+        /* Category chips */
+        .cat-bar { display:flex; flex-wrap:wrap; gap:8px; padding:10px 14px; border-bottom:1px solid #f0f0f0; }
+        .cat-chip { padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:2px solid transparent; transition:all .15s; }
+        .cat-chip.in-chip   { background:#e8fdf0; color:#28a745; }
+        .cat-chip.out-chip  { background:#fff5f5; color:#dc3545; }
+        .cat-chip.adj-chip  { background:#fff8e1; color:#e67e00; }
+        .cat-chip.padj-chip { background:#f3f0ff; color:#6f42c1; }
+        .cat-chip.active, .cat-chip:hover { border-color:currentColor; background:#fff; }
+
+        /* Table */
+        .r-table { width:100%; border-collapse:collapse; font-size:12px; }
+        .r-table thead th { background:#f8f9ff; padding:7px 10px; font-size:11px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap; }
+        .r-table tbody td { padding:6px 10px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+        .r-table tbody tr:hover { background:#fafbff; }
+        .amt-in  { color:#28a745; font-weight:700; }
+        .amt-out { color:#dc3545; font-weight:700; }
+        .amt-adj { color:#fd7e14; font-weight:700; }
+        .t-muted { color:#aaa; font-size:11px; }
+
+        /* Pager */
+        .pager { display:flex; gap:5px; align-items:center; flex-wrap:wrap; padding:10px 14px; }
+        .pager button { padding:4px 10px; border:1px solid #ddd; border-radius:5px; background:#fff; font-size:11px; cursor:pointer; }
+        .pager button.active { background:#6c7ae0; color:#fff; border-color:#6c7ae0; }
+        .pager button:disabled { opacity:.4; cursor:not-allowed; }
+        .pager-info { font-size:11px; color:#888; margin-left:auto; }
+
+        /* Spinner */
+        .spin-wrap { text-align:center; padding:20px; color:#aaa; }
+        .spin { width:24px; height:24px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+
+        /* Collapse icon */
+        .collapse-icon { transition:transform .2s; }
+        .collapsed .collapse-icon { transform:rotate(-90deg); }
+
+        /* Print */
+        @media print {
+            #app-navbar,#app-sidebar,.filter-card,.no-print { display:none !important; }
+            .main-content { margin-left:0 !important; }
+            .log-cols { grid-template-columns:1fr; }
+            .sec-card { box-shadow:none; border:1px solid #ddd; page-break-inside:avoid; }
+            .print-header { display:block !important; }
+        }
+        .print-header { display:none; text-align:center; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #333; }
+        .print-header .ins-name  { font-size:20px; font-weight:800; }
+        .print-header .ins-meta  { font-size:12px; color:#444; margin:2px 0; }
+        .print-header .rep-title { font-size:15px; font-weight:700; margin:8px 0 2px; }
+    </style>
+</head>
+<body>
+<div id="app-navbar"></div>
+<div id="app-sidebar"></div>
+
+<main class="main-content" id="mainContent">
+    <div class="dashboard-content">
+        <div class="page-container">
+
+            <!-- Title -->
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                    <i class="fas fa-exchange-alt me-2"></i>
+                    <span data-en="Transaction Log" data-bn="লেনদেন লগ">লেনদেন লগ</span>
+                </h5>
+                <button class="btn-outline" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    <span data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+                </button>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-card no-print">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date From" data-bn="তারিখ থেকে">তারিখ থেকে</label>
+                        <input type="date" id="dateFrom" class="f-control">
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date To" data-bn="তারিখ পর্যন্ত">তারিখ পর্যন্ত</label>
+                        <input type="date" id="dateTo" class="f-control">
+                    </div>
+                    <div class="col-md-8 d-flex gap-2 flex-wrap align-items-end">
+                        <button class="btn-load" onclick="loadAll()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            <span data-en="Load" data-bn="লোড">লোড</span>
+                        </button>
+                        <button class="btn-outline" onclick="setToday()">
+                            <i class="fas fa-calendar-day me-1"></i>
+                            <span data-en="Today" data-bn="আজ">আজ</span>
+                        </button>
+                        <button class="btn-outline" onclick="setMonth()">
+                            <i class="fas fa-calendar me-1"></i>
+                            <span data-en="This Month" data-bn="এই মাস">এই মাস</span>
+                        </button>
+                        <button class="btn-outline" onclick="clearDates()">
+                            <i class="fas fa-times me-1"></i>
+                            <span data-en="All Time" data-bn="সব সময়">সব সময়</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="dateLabel" style="font-size:12px;color:#888;margin-top:6px;"></div>
+            </div>
+
+            <!-- Print Header -->
+            <div class="print-header">
+                <div class="ins-name" id="printInsName"></div>
+                <div class="ins-meta" id="printInsPhone"></div>
+                <div class="ins-meta" id="printInsAddress"></div>
+                <div class="rep-title" data-en="Transaction Log" data-bn="লেনদেন লগ">লেনদেন লগ</div>
+                <div class="t-muted" id="printDateRange"></div>
+            </div>
+
+            <!-- Spinner -->
+            <div id="mainSpinner" class="spin-wrap"><div class="spin"></div></div>
+
+            <!-- Content -->
+            <div id="content" style="display:none;">
+
+                <!-- Summary Cards -->
+                <div class="sum-grid">
+                    <div class="s-card in">
+                        <div class="s-lbl" data-en="Total Cash In" data-bn="মোট জমা">মোট জমা</div>
+                        <div class="s-val green" id="sTotalIn">৳0.00</div>
+                        <div class="s-sub" id="sNormalIn"></div>
+                    </div>
+                    <div class="s-card out">
+                        <div class="s-lbl" data-en="Total Cash Out" data-bn="মোট খরচ">মোট খরচ</div>
+                        <div class="s-val red" id="sTotalOut">৳0.00</div>
+                        <div class="s-sub" id="sNormalOut"></div>
+                    </div>
+                    <div class="s-card net">
+                        <div class="s-lbl" data-en="Net Amount" data-bn="মোট">মোট</div>
+                        <div class="s-val teal" id="sNet">৳0.00</div>
+                    </div>
+                    <div class="s-card adj">
+                        <div class="s-lbl" data-en="Adjustment" data-bn="সমন্বয়">সমন্বয়</div>
+                        <div class="s-sub" style="font-size:12px;">
+                            <span style="color:#28a745;">In Adj: </span><b id="sAdjIn">৳0</b><br>
+                            <span style="color:#dc3545;">Out Adj: </span><b id="sAdjOut">৳0</b>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Column Layout -->
+                <div class="log-cols">
+
+                    <!-- LEFT: Cash In -->
+                    <div>
+                        <!-- Cash In Normal -->
+                        <div class="sec-card" id="secInNormal">
+                            <div class="sec-head in-head" onclick="toggleSection('inNormal')">
+                                <span><i class="fas fa-arrow-down me-2"></i>
+                                    <span data-en="Cash In" data-bn="নগদ জমা">নগদ জমা</span>
+                                </span>
+                                <span class="cat-total green" id="totalInNormal">৳0.00</span>
+                                <i class="fas fa-chevron-down collapse-icon ms-2"></i>
+                            </div>
+                            <div class="sec-body" id="bodyInNormal">
+                                <div class="cat-bar" id="catsInNormal"></div>
+                                <div id="spinInNormal" class="spin-wrap"><div class="spin"></div></div>
+                                <div id="tableInNormal">
+                                    <div style="overflow-x:auto;"><table class="r-table">
+                                        <thead><tr>
+                                            <th>SN</th>
+                                            <th data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
+                                            <th data-en="Situation" data-bn="অবস্থা">অবস্থা</th>
+                                            <th data-en="Amount" data-bn="পরিমাণ">পরিমাণ</th>
+                                            <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                            <th data-en="Account" data-bn="হিসাব">হিসাব</th>
+                                            <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                            <th data-en="By" data-bn="যিনি করেছেন">যিনি করেছেন</th>
+                                        </tr></thead>
+                                        <tbody id="rowsInNormal"></tbody>
+                                    </table></div>
+                                    <div id="pagerInNormal" class="pager"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cash In Adjustment -->
+                        <div class="sec-card" id="secInAdj">
+                            <div class="sec-head adj-in-head" onclick="toggleSection('inAdj')">
+                                <span><i class="fas fa-arrow-down me-2"></i>
+                                    <span data-en="Cash In (Adjustment)" data-bn="নগদ জমা (সমন্বয়)">নগদ জমা (সমন্বয়)</span>
+                                </span>
+                                <span class="cat-total orange" id="totalInAdj">৳0.00</span>
+                                <i class="fas fa-chevron-down collapse-icon ms-2"></i>
+                            </div>
+                            <div class="sec-body" id="bodyInAdj" style="display:none;">
+                                <div class="cat-bar" id="catsInAdj"></div>
+                                <div id="spinInAdj" class="spin-wrap" style="display:none;"><div class="spin"></div></div>
+                                <div id="tableInAdj">
+                                    <div style="overflow-x:auto;"><table class="r-table">
+                                        <thead><tr>
+                                            <th>SN</th>
+                                            <th data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
+                                            <th data-en="Situation" data-bn="অবস্থা">অবস্থা</th>
+                                            <th data-en="Amount" data-bn="পরিমাণ">পরিমাণ</th>
+                                            <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                            <th data-en="Account" data-bn="হিসাব">হিসাব</th>
+                                            <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                            <th data-en="By" data-bn="যিনি করেছেন">যিনি করেছেন</th>
+                                        </tr></thead>
+                                        <tbody id="rowsInAdj"></tbody>
+                                    </table></div>
+                                    <div id="pagerInAdj" class="pager"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Cash Out -->
+                    <div>
+                        <!-- Cash Out Normal -->
+                        <div class="sec-card" id="secOutNormal">
+                            <div class="sec-head out-head" onclick="toggleSection('outNormal')">
+                                <span><i class="fas fa-arrow-up me-2"></i>
+                                    <span data-en="Cash Out" data-bn="নগদ খরচ">নগদ খরচ</span>
+                                </span>
+                                <span class="cat-total red" id="totalOutNormal">৳0.00</span>
+                                <i class="fas fa-chevron-down collapse-icon ms-2"></i>
+                            </div>
+                            <div class="sec-body" id="bodyOutNormal">
+                                <div class="cat-bar" id="catsOutNormal"></div>
+                                <div id="spinOutNormal" class="spin-wrap"><div class="spin"></div></div>
+                                <div id="tableOutNormal">
+                                    <div style="overflow-x:auto;"><table class="r-table">
+                                        <thead><tr>
+                                            <th>SN</th>
+                                            <th data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
+                                            <th data-en="Situation" data-bn="অবস্থা">অবস্থা</th>
+                                            <th data-en="Amount" data-bn="পরিমাণ">পরিমাণ</th>
+                                            <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                            <th data-en="Account" data-bn="হিসাব">হিসাব</th>
+                                            <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                            <th data-en="By" data-bn="যিনি করেছেন">যিনি করেছেন</th>
+                                        </tr></thead>
+                                        <tbody id="rowsOutNormal"></tbody>
+                                    </table></div>
+                                    <div id="pagerOutNormal" class="pager"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cash Out Adjustment -->
+                        <div class="sec-card" id="secOutAdj">
+                            <div class="sec-head adj-out-head" onclick="toggleSection('outAdj')">
+                                <span><i class="fas fa-arrow-up me-2"></i>
+                                    <span data-en="Cash Out (Adjustment)" data-bn="নগদ খরচ (সমন্বয়)">নগদ খরচ (সমন্বয়)</span>
+                                </span>
+                                <span class="cat-total" style="color:#6f42c1;" id="totalOutAdj">৳0.00</span>
+                                <i class="fas fa-chevron-down collapse-icon ms-2"></i>
+                            </div>
+                            <div class="sec-body" id="bodyOutAdj" style="display:none;">
+                                <div class="cat-bar" id="catsOutAdj"></div>
+                                <div id="spinOutAdj" class="spin-wrap" style="display:none;"><div class="spin"></div></div>
+                                <div id="tableOutAdj">
+                                    <div style="overflow-x:auto;"><table class="r-table">
+                                        <thead><tr>
+                                            <th>SN</th>
+                                            <th data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
+                                            <th data-en="Situation" data-bn="অবস্থা">অবস্থা</th>
+                                            <th data-en="Amount" data-bn="পরিমাণ">পরিমাণ</th>
+                                            <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                            <th data-en="Account" data-bn="হিসাব">হিসাব</th>
+                                            <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                            <th data-en="By" data-bn="যিনি করেছেন">যিনি করেছেন</th>
+                                        </tr></thead>
+                                        <tbody id="rowsOutAdj"></tbody>
+                                    </table></div>
+                                    <div id="pagerOutAdj" class="pager"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- log-cols -->
+            </div><!-- content -->
+        </div>
+    </div>
+</main>
+
+<div id="app-modals"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js?v=2.1.5"></script>
+<script src="/js/transaction-log.js?v=2.1.5"></script>
+</body>
+</html>

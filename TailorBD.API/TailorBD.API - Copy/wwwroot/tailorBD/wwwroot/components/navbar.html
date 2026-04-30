@@ -1,0 +1,32 @@
+﻿<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-left">
+        <i class="fas fa-bars menu-toggle" id="menuToggle"></i>
+        <div class="institution-info" id="institutionInfo" style="display: none;">
+            <img src="" alt="Logo" class="institution-logo" id="institutionLogo" />
+            <div class="institution-details">
+                <h3 class="institution-name" id="institutionName">প্রতিষ্ঠানের নাম</h3>
+            </div>
+        </div>
+        <h2 id="pageTitle">Dashboard</h2>
+    </div>
+    <div class="navbar-right">
+        <!-- Dashboard Back Button -->
+        <a id="dashboardBackBtn" href="#" class="dashboard-back-btn" title="ড্যাশবোর্ডে যান" style="display:none;">
+            <i class="fas fa-th-large"></i>
+            <span class="lang-content" data-en="Dashboard" data-bn="ড্যাশবোর্ড">ড্যাশবোর্ড</span>
+        </a>
+        <button class="lang-btn" id="langToggle">
+            <i class="fas fa-language me-2"></i>
+            <span class="lang-content" data-en="বাংলা" data-bn="English">বাংলা</span>
+        </button>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <span id="username">Admin</span>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="লগআউট">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="lang-content" data-en="Logout" data-bn="লগআউট">লগআউট</span>
+        </button>
+    </div>
+</nav>

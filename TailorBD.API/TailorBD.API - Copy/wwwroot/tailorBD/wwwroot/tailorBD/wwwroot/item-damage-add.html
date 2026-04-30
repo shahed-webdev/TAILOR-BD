@@ -1,0 +1,492 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Fabric Damage - TailorBD" data-bn="কাপড় ক্ষতি - TailorBD">কাপড় ক্ষতি - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+        .card-box { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); padding:20px; margin-bottom:18px; }
+        .sec-title { font-size:13px; font-weight:700; color:#e74c3c; text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .kpi-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+        .kpi-chip { background:#f4f5ff; border-radius:10px; padding:12px 18px; min-width:150px; border-left:4px solid #6c7ae0; flex:1; }
+        .kpi-chip.red    { border-color:#e74c3c; background:#fff5f5; }
+        .kpi-chip.orange { border-color:#fd7e14; background:#fff8f0; }
+        .kpi-chip.green  { border-color:#28a745; background:#f0fff4; }
+        .kpi-chip.purple { border-color:#9b59b6; background:#fdf3ff; }
+        .kpi-chip .cv { font-size:18px; font-weight:800; }
+        .kpi-chip .cv.red    { color:#e74c3c; }
+        .kpi-chip .cv.orange { color:#fd7e14; }
+        .kpi-chip .cv.blue   { color:#6c7ae0; }
+        .kpi-chip .cv.green  { color:#28a745; }
+        .kpi-chip .cv.purple { color:#9b59b6; }
+        .kpi-chip .cl { font-size:11px; color:#888; margin-top:3px; }
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:13px; font-family:inherit; transition:border-color .2s; width:100%; }
+        .f-control:focus { outline:none; border-color:#e74c3c; box-shadow:0 0 0 3px rgba(231,76,60,.1); }
+        .f-control.is-err { border-color:#e74c3c; background:#fff8f8; }
+        .btn-danger3  { padding:9px 22px; background:#e74c3c; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .btn-danger3:hover { background:#c0392b; }
+        .btn-outline2 { padding:7px 14px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+        .btn-outline2:hover { background:#f0f1fc; }
+        .btn-sm-del { padding:5px 10px; background:#fff0f0; color:#e74c3c; border:1.5px solid #f5c6c6; border-radius:6px; font-size:12px; cursor:pointer; }
+        .btn-sm-del:hover { background:#e74c3c; color:#fff; }
+        .fab-search-wrap { position:relative; }
+        .fab-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1.5px solid #ddd; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.12); z-index:999; max-height:260px; overflow-y:auto; display:none; }
+        .fab-dropdown.show { display:block; }
+        .fab-item { padding:10px 14px; cursor:pointer; border-bottom:1px solid #f5f5f5; display:flex; justify-content:space-between; align-items:center; }
+        .fab-item:hover { background:#f8f9ff; }
+        .fab-item .fcode { font-weight:700; font-size:13px; color:#333; }
+        .fab-item .fname { font-size:12px; color:#888; }
+        .fab-item .fstock { font-size:12px; font-weight:700; color:#28a745; background:#f0fff4; padding:2px 8px; border-radius:99px; }
+        .fab-item .fstock.low { color:#fd7e14; background:#fff8f0; }
+        .fab-selected { background:#f8f9ff; border:1.5px solid #6c7ae0; border-radius:8px; padding:12px 14px; display:none; margin-top:6px; }
+        .fab-selected.show { display:block; }
+        .fab-sel-name { font-weight:700; font-size:14px; color:#333; }
+        .fab-sel-meta { font-size:12px; color:#888; margin-top:2px; }
+        .stock-bar-wrap { background:#f0f0f0; border-radius:99px; height:5px; overflow:hidden; margin-top:4px; }
+        .stock-bar { height:100%; border-radius:99px; background:#28a745; transition:width .4s; }
+        .stock-bar.low { background:#fd7e14; }
+        .stock-bar.critical { background:#e74c3c; }
+        .remain-hint { font-size:12px; padding:6px 10px; border-radius:6px; margin-top:4px; display:none; }
+        .remain-hint.show { display:block; }
+        .remain-hint.ok   { background:#f0fff4; color:#28a745; }
+        .remain-hint.warn { background:#fff8f0; color:#fd7e14; }
+        .remain-hint.err  { background:#fff0f0; color:#e74c3c; }
+        .dmg-tbl { width:100%; border-collapse:collapse; font-size:13px; }
+        .dmg-tbl thead th { background:#fff5f5; padding:9px 12px; font-size:12px; font-weight:700; color:#555; border-bottom:2px solid #f5c6c6; white-space:nowrap; }
+        .dmg-tbl tbody td { padding:9px 12px; border-bottom:1px solid #f9f0f0; vertical-align:middle; }
+        .dmg-tbl tbody tr:hover { background:#fffafa; }
+        .top-fab-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
+        .top-fab-card { background:#fff; border:1.5px solid #f5c6c6; border-radius:8px; padding:12px; }
+        .top-fab-card .rank { font-size:11px; color:#aaa; }
+        .top-fab-card .code { font-size:14px; font-weight:800; color:#e74c3c; }
+        .top-fab-card .name { font-size:12px; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .top-fab-card .qty  { font-size:16px; font-weight:800; color:#333; margin-top:4px; }
+        .top-fab-card .price{ font-size:12px; color:#e74c3c; margin-top:2px; }
+        .toast-wrap { position:fixed; top:18px; right:18px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+        .toast-item { padding:10px 16px; border-radius:8px; color:#fff; font-size:13px; font-weight:600; box-shadow:0 4px 16px rgba(0,0,0,.15); animation:slideIn .25s ease; min-width:220px; }
+        .toast-item.success { background:#28a745; }
+        .toast-item.error   { background:#e74c3c; }
+        .toast-item.info    { background:#6c7ae0; }
+        @keyframes slideIn { from{transform:translateX(40px);opacity:0} to{transform:translateX(0);opacity:1} }
+        .spin { width:22px; height:22px; border:3px solid #fdd; border-top-color:#e74c3c; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; vertical-align:middle; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+        .modal-header.red { background:#e74c3c; color:#fff; border-radius:10px 10px 0 0; }
+        .modal-header.red .btn-close { filter:invert(1); }
+        .modal-title { font-size:15px; font-weight:700; }
+        .pager { display:flex; gap:4px; flex-wrap:wrap; margin-top:12px; justify-content:center; }
+        .pager button { padding:5px 12px; border:1.5px solid #f5c6c6; background:#fff; border-radius:6px; font-size:12px; cursor:pointer; color:#e74c3c; }
+        .pager button.active { background:#e74c3c; color:#fff; border-color:#e74c3c; }
+        .pager button:hover:not(.active) { background:#fff5f5; }
+        .filter-strip { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:14px; }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <div class="toast-wrap" id="toastWrap"></div>
+    <div id="app-modals"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-container">
+
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 style="font-weight:700;color:#e74c3c;margin:0;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span data-en="Fabric Damage Management" data-bn="কাপড় ক্ষতি ব্যবস্থাপনা">কাপড় ক্ষতি ব্যবস্থাপনা</span>
+                    </h5>
+                    <button class="btn-danger3" onclick="openAddModal()">
+                        <i class="fas fa-plus"></i>
+                        <span data-en="Record Damage" data-bn="ক্ষতি যোগ করুন">ক্ষতি যোগ করুন</span>
+                    </button>
+                </div>
+
+                <!-- KPI -->
+                <div class="kpi-row" id="kpiRow">
+                    <div class="kpi-chip red">
+                        <div class="cv red"><div class="spin" style="width:16px;height:16px;border-width:2px;"></div></div>
+                        <div class="cl">লোড হচ্ছে...</div>
+                    </div>
+                </div>
+
+                <!-- Top section -->
+                <div class="row g-3 mb-3" id="topSection" style="display:none;">
+                    <div class="col-lg-7">
+                        <div class="card-box">
+                            <div class="sec-title">
+                                <i class="fas fa-chart-bar"></i>
+                                <span data-en="Most Damaged Fabrics" data-bn="সবচেয়ে বেশি ক্ষতিগ্রস্ত কাপড়">সবচেয়ে বেশি ক্ষতিগ্রস্ত কাপড়</span>
+                            </div>
+                            <div class="top-fab-grid" id="topFabGrid"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card-box" style="border-left:4px solid #e74c3c;">
+                            <div class="sec-title">
+                                <i class="fas fa-info-circle"></i>
+                                <span data-en="Quick Info" data-bn="দ্রুত তথ্য">দ্রুত তথ্য</span>
+                            </div>
+                            <div id="quickInfoArea"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Records Table -->
+                <div class="card-box">
+                    <div class="filter-strip">
+                        <div>
+                            <label class="f-label" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                            <input type="date" id="filterFrom" class="f-control" style="width:160px;" onchange="loadRecords(1)">
+                        </div>
+                        <div>
+                            <label class="f-label" data-en="To Date" data-bn="শেষ তারিখ">শেষ তারিখ</label>
+                            <input type="date" id="filterTo" class="f-control" style="width:160px;" onchange="loadRecords(1)">
+                        </div>
+                        <div style="flex:1;min-width:160px;">
+                            <label class="f-label" data-en="Search Fabric" data-bn="কাপড় খুঁজুন">কাপড় খুঁজুন</label>
+                            <div style="position:relative;">
+                                <i class="fas fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#ccc;font-size:13px;"></i>
+                                <input type="text" id="filterFabric" class="f-control" style="padding-left:32px;"
+                                    data-bn-placeholder="কোড বা নামে খুঁজুন"
+                                    data-en-placeholder="Search by code or name"
+                                    placeholder="কোড বা নামে খুঁজুন"
+                                    oninput="debounceSearch()">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="f-label">&nbsp;</label>
+                            <button class="btn-outline2" onclick="clearFilters()">
+                                <i class="fas fa-times"></i>
+                                <span data-en="Clear" data-bn="রিসেট">রিসেট</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="filterSummary" style="display:none;background:#fff5f5;border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:13px;gap:20px;flex-wrap:wrap;"></div>
+
+                    <div class="sec-title">
+                        <i class="fas fa-list"></i>
+                        <span data-en="Damage Records" data-bn="ক্ষতির রেকর্ড">ক্ষতির রেকর্ড</span>
+                    </div>
+
+                    <div id="tblSpinner" style="text-align:center;padding:30px;">
+                        <div class="spin" style="margin:auto;display:block;"></div>
+                    </div>
+                    <div id="tblWrap" style="display:none;overflow-x:auto;">
+                        <table class="dmg-tbl">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th data-en="Code" data-bn="কোড">কোড</th>
+                                    <th data-en="Fabric Name" data-bn="কাপড়ের নাম">কাপড়ের নাম</th>
+                                    <th data-en="Unit" data-bn="ইউনিট">ইউনিট</th>
+                                    <th data-en="Damage Qty" data-bn="ক্ষতির পরিমাণ">ক্ষতির পরিমাণ</th>
+                                    <th data-en="Price (&#2547;)" data-bn="মূল্য (&#2547;)">মূল্য (&#2547;)</th>
+                                    <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                    <th data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dmgTbody"></tbody>
+                        </table>
+                        <div id="noRecMsg" style="display:none;text-align:center;color:#bbb;padding:30px;font-size:14px;">
+                            <i class="fas fa-check-circle fa-2x mb-2" style="display:block;color:#28a745;"></i>
+                            <span data-en="No damage records found" data-bn="কোনো ক্ষতির রেকর্ড নেই">কোনো ক্ষতির রেকর্ড নেই</span>
+                        </div>
+                        <div class="pager" id="pagerWrap"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ADD DAMAGE MODAL -->
+    <div class="modal fade" id="addDamageModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 10px 40px rgba(0,0,0,.18);">
+                <div class="modal-header red">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span data-en="Record Fabric Damage" data-bn="কাপড়ের ক্ষতির রেকর্ড যোগ করুন">কাপড়ের ক্ষতির রেকর্ড যোগ করুন</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+
+                    <!-- Fabric Picker -->
+                    <div class="mb-3">
+                        <label class="f-label">
+                            <span data-en="Select Fabric" data-bn="কাপড় সিলেক্ট করুন">কাপড় সিলেক্ট করুন</span>
+                            <span style="color:#e74c3c;">*</span>
+                        </label>
+                        <div class="fab-search-wrap">
+                            <input type="text" id="fabSearchInput" class="f-control"
+                                data-bn-placeholder="কোড বা নামে খুঁজুন"
+                                data-en-placeholder="Search by code or name"
+                                placeholder="কোড বা নামে খুঁজুন"
+                                oninput="searchFabrics()" autocomplete="off">
+                            <div class="fab-dropdown" id="fabDropdown"></div>
+                        </div>
+                        <div class="fab-selected" id="fabSelected">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fab-sel-name" id="selFabName">—</div>
+                                    <div class="fab-sel-meta" id="selFabMeta">—</div>
+                                </div>
+                                <button type="button" onclick="clearFabric()" style="background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;line-height:1;">&#x2715;</button>
+                            </div>
+                            <div class="mt-2">
+                                <div style="font-size:11px;color:#888;margin-bottom:3px;">
+                                    <span data-en="Current Stock" data-bn="বর্তমান স্টক">বর্তমান স্টক</span>:
+                                    <strong id="selFabStock">0</strong>
+                                    <span id="selFabUnit">—</span>
+                                </div>
+                                <div class="stock-bar-wrap">
+                                    <div class="stock-bar" id="stockBar" style="width:100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="mb-3">
+                        <label class="f-label">
+                            <span data-en="Damage Quantity" data-bn="ক্ষতির পরিমাণ">ক্ষতির পরিমাণ</span>
+                            <span style="color:#e74c3c;">*</span>
+                            <span id="unitLabel" style="color:#6c7ae0;font-weight:700;"></span>
+                        </label>
+                        <input type="number" id="dmgQty" class="f-control" min="0.01" step="0.01"
+                            data-bn-placeholder="পরিমাণ লিখুন"
+                            data-en-placeholder="Enter quantity"
+                            placeholder="পরিমাণ লিখুন"
+                            oninput="onQtyChange()">
+                        <div class="remain-hint" id="remainHint"></div>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Total Damage Price (&#2547;)" data-bn="মোট ক্ষতির মূল্য (&#2547;)">মোট ক্ষতির মূল্য (&#2547;)</label>
+                        <input type="number" id="dmgPrice" class="f-control" min="0" step="0.01"
+                            data-bn-placeholder="মূল্য লিখুন (ঐচ্ছিক)"
+                            data-en-placeholder="Enter price (optional)"
+                            placeholder="মূল্য লিখুন (ঐচ্ছিক)"
+                            oninput="calcUnitPrice()">
+                        <div id="unitPriceHint" style="font-size:11px;color:#888;margin-top:3px;"></div>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Damage Date" data-bn="ক্ষতির তারিখ">ক্ষতির তারিখ</label>
+                        <input type="date" id="dmgDate" class="f-control">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline2" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        <span data-en="Cancel" data-bn="বাতিল">বাতিল</span>
+                    </button>
+                    <button type="button" class="btn-danger3" id="submitDmgBtn" onclick="submitDamage()">
+                        <i class="fas fa-check"></i>
+                        <span data-en="Save Record" data-bn="রেকর্ড সংরক্ষণ করুন">রেকর্ড সংরক্ষণ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js"></script>
+    <script>
+    (function () {
+        var institutionId  = 0;
+        var registrationId = 0;
+        var currentPage    = 1;
+        var totalPages     = 1;
+        var searchTimer    = null;
+        var selectedFabric = null;
+
+        function getSession() {
+            institutionId  = parseInt(sessionStorage.getItem('institutionId')  || localStorage.getItem('session_institutionId')  || '0');
+            registrationId = parseInt(sessionStorage.getItem('registrationId') || localStorage.getItem('session_registrationId') || '0');
+        }
+
+        function getLang() {
+            return (window.currentLang || localStorage.getItem('preferredLanguage') || 'bn') === 'en' ? 'en' : 'bn';
+        }
+
+        function fmt(n) {
+            return parseFloat(n || 0).toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function esc(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        $(document).ready(function () {
+            $(document).one('app-session-ready institution-loaded institutionLoaded', function () {
+                getSession(); init();
+            });
+            setTimeout(function () { getSession(); if (institutionId) init(); }, 1500);
+
+            $('#dmgDate').val(new Date().toISOString().split('T')[0]);
+
+            $(document).on('languageChanged', function () {
+                applyLang();
+                if (institutionId) { loadSummary(); loadRecords(currentPage); }
+            });
+
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.fab-search-wrap').length) {
+                    $('#fabDropdown').removeClass('show');
+                }
+            });
+        });
+
+        function applyLang() {
+            var lang = getLang();
+            $('[data-' + lang + '-placeholder]').each(function () {
+                $(this).attr('placeholder', $(this).data(lang + '-placeholder'));
+            });
+        }
+
+        function init() {
+            loadSummary();
+            loadRecords(1);
+            applyLang();
+        }
+
+        /* ── SUMMARY ── */
+        function loadSummary() {
+            getSession();
+            if (!institutionId) return;
+            $.get('/api/ItemPurchase/damage-summary?institutionId=' + institutionId, function (res) {
+                if (!res.success) return;
+                renderKPI(res.summary);
+                renderTopFabrics(res.topFabrics || []);
+                renderQuickInfo(res.summary);
+                $('#topSection').show();
+            });
+        }
+
+        function renderKPI(s) {
+            var lang = getLang();
+            var L = {
+                total:      lang === 'en' ? 'Total Records'      : '\u09ae\u09cb\u099f \u09b0\u09c7\u0995\u09b0\u09cd\u09a1',
+                totalQty:   lang === 'en' ? 'Total Damage Qty'   : '\u09ae\u09cb\u099f \u0995\u09cd\u09b7\u09a4\u09bf\u09b0 \u09aa\u09b0\u09bf\u09ae\u09be\u09a3',
+                totalPrice: lang === 'en' ? 'Total Damage Price'  : '\u09ae\u09cb\u099f \u0995\u09cd\u09b7\u09a4\u09bf\u09b0 \u09ae\u09c2\u09b2\u09cd\u09af',
+                fabrics:    lang === 'en' ? 'Affected Fabrics'   : '\u0995\u09cd\u09b7\u09a4\u09bf\u0997\u09cd\u09b0\u09b8\u09cd\u09a4 \u0995\u09be\u09bp\u09dc',
+                thisMonth:  lang === 'en' ? 'This Month'         : '\u098f\u0987 \u09ae\u09be\u09b8\u09c7'
+            };
+            $('#kpiRow').html(
+                chip('', s.TotalRecords,         L.total,      'red',    'red') +
+                chip('', fmt(s.TotalQty),        L.totalQty,   'orange', 'orange') +
+                chip('&#2547;', fmt(s.TotalPrice),     L.totalPrice, 'red',    'red') +
+                chip('', s.TotalFabrics,         L.fabrics,    'purple', 'purple') +
+                chip('&#2547;', fmt(s.ThisMonthPrice), L.thisMonth,  'orange', 'orange')
+            );
+        }
+
+        function chip(pre, val, lbl, cls, cardCls) {
+            return '<div class="kpi-chip ' + (cardCls || '') + '"><div class="cv ' + cls + '">' + pre + val + '</div><div class="cl">' + lbl + '</div></div>';
+        }
+
+        function renderTopFabrics(data) {
+            var lang = getLang();
+            if (!data.length) {
+                $('#topFabGrid').html('<p style="color:#bbb;font-size:13px;">' + (lang === 'en' ? 'No data' : '\u0995\u09cb\u09a8\u09cb \u09a1\u09c7\u099f\u09be \u09a8\u09c7\u0987') + '</p>');
+                return;
+            }
+            var h = '';
+            data.forEach(function (f, i) {
+                h += '<div class="top-fab-card">' +
+                    '<div class="rank">#' + (i + 1) + '</div>' +
+                    '<div class="code">' + esc(f.FabricCode) + '</div>' +
+                    '<div class="name">' + esc(f.FabricName) + '</div>' +
+                    '<div class="qty">' + fmt(f.TotalQty) + ' <small style="font-size:11px;color:#aaa;">' + esc(f.UnitName || '') + '</small></div>' +
+                    '<div class="price">&#2547;' + fmt(f.TotalPrice) + '</div>' +
+                    '<div style="font-size:11px;color:#888;margin-top:4px;">' + (lang === 'en' ? 'Stock: ' : '\u09b8\u09cd\u099f\u0995: ') + fmt(f.CurrentStock) + '</div>' +
+                    '</div>';
+            });
+            $('#topFabGrid').html(h);
+        }
+
+        function renderQuickInfo(s) {
+            var lang = getLang();
+            var avgPrice = s.TotalRecords > 0 ? (s.TotalPrice / s.TotalRecords) : 0;
+            var avgQty   = s.TotalRecords > 0 ? (s.TotalQty   / s.TotalRecords) : 0;
+            $('#quickInfoArea').html(
+                infoRow(lang === 'en' ? 'Avg Price/Record' : '\u0997\u09dc \u09ae\u09c2\u09b2\u09cd\u09af/\u09b0\u09c7\u0995\u09b0\u09cd\u09a1',  '&#2547;' + fmt(avgPrice)) +
+                infoRow(lang === 'en' ? 'Avg Qty/Record'   : '\u0997\u09dc \u09aa\u09b0\u09bf\u09ae\u09be\u09a3/\u09b0\u09c7\u0995\u09b0\u09cd\u09a1', fmt(avgQty)) +
+                infoRow(lang === 'en' ? 'Total Affected'   : '\u09ae\u09cb\u099f \u0995\u09cd\u09b7\u09a4\u09bf\u0997\u09cd\u09b0\u09b8\u09cd\u09a4',  s.TotalFabrics + ' ' + (lang === 'en' ? 'fabrics' : '\u09a7\u09b0\u09a8\u09c7\u09b0 \u0995\u09be\u09bp\u09dc')) +
+                infoRow(lang === 'en' ? 'This Month Loss'  : '\u098f\u0987 \u09b8\u09c7\u09ae\u09be\u09ac\u09bc \u0995\u09cd\u09b7\u09a4\u09bf',    '&#2547;' + fmt(s.ThisMonthPrice))
+            );
+        }
+
+        function infoRow(lbl, val) {
+            return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f5f5;font-size:13px;">' +
+                '<span style="color:#888;">' + lbl + '</span><strong style="color:#333;">' + val + '</strong></div>';
+        }
+
+        /* ── RECORDS TABLE ── */
+        window.loadRecords = function (page) {
+            getSession();
+            if (!institutionId) return;
+            currentPage = page;
+            var from   = $('#filterFrom').val();
+            var to     = $('#filterTo').val();
+            var fabric = $('#filterFabric').val().trim();
+            var url = '/api/ItemPurchase/damage-records?institutionId=' + institutionId + '&page=' + page + '&pageSize=30';
+            if (from)   url += '&dateFrom=' + from;
+            if (to)     url += '&dateTo='   + to;
+            if (fabric) url += '&fabricCode=' + encodeURIComponent(fabric);
+            $('#tblSpinner').show(); $('#tblWrap').hide();
+            $.get(url, function (res) {
+                $('#tblSpinner').hide();
+                if (!res.success) return;
+                totalPages = res.totalPages || 1;
+                renderTable(res.data || []);
+                renderFilterSummary(res.summary, res.totalCount);
+                renderPager();
+                $('#tblWrap').show();
+            }).fail(function () { $('#tblSpinner').hide(); });
+        };
+
+        function renderTable(data) {
+            var lang = getLang();
+            var $b = $('#dmgTbody').empty();
+            if (!data.length) { $('#noRecMsg').show(); return; }
+            $('#noRecMsg').hide();
+            data.forEach(function (d, i) {
+                $b.append(
+                    '<tr>' +
+                    '<td style="color:#aaa;font-size:12px;">' + ((currentPage - 1) * 30 + i + 1) + '</td>' +
+                    '<td><span style="font-weight:700;color:#e74c3c;">' + esc(d.FabricCode) + '</span></td>' +
+                    '<td style="font-size:12.5px;color:#333;">' + esc(d.FabricName) + '</td>' +
+                    '<td style="font-size:12px;color:#888;">' + esc(d.UnitName || '—') + '</td>' +
+                    '<td style="font-weight:700;color:#e74c3c;">' + fmt(d.DamageQuantity) + '</td>' +
+                    '<td style="font-weight:700;color:#fd7e14;">' + (d.DamagePrice > 0 ? '&#2547;' + fmt(d.DamagePrice) : '<span style="color:#ccc;">—</span>') + '</td>' +
+                    '<td style="font-size:12px;color:#888;">' + (d.DamageDate || '—') + '</td>' +
+                    '<td><button class="btn-sm-del" onclick="deleteDamage(' + d.DamageID + ')" title="' + (lang === 'en' ? 'Delete' : '\u09a1\u09bf\u09b2\u09bf\u099f') + '"><i class="fas fa-trash"></i></button></td>' +
+                    '</tr>');
+            });
+        }
+
+        function renderFilterSummary(summary, count) {
+            if (!summary || !count) { $('#filterSummary').hide(); return; }
+            var lang = getLang();
+            $('#filterSummary').css('display', 'flex').html(
+                '<span><strong>' + count + '</strong> ' + (lang === 'en' ? 'records' : '\u09b0\u09c7\u0995\u09b0\u09cd\u09a1') + '</span>' +
+                '<span>' + (lang === 'en' ? 'Total Qty: ' : '\u09ae\u09cb\u099f \u09aa\u09b0\u09bf\u09xm1ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿyyyyÿÿññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññÑññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññÑññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññÑñññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññÑñññññññññññññññññññññññññññññññññññññññññññññÑñññññññññññññঞঝঞঝঞঝঞঝঞঝঞঝঞঝঞঝঞঝঞঝঞঝঙঞঝঞঝঞঝঞঝঞঝঞঝঞঝ

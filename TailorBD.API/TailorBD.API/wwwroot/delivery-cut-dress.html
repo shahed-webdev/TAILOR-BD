@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ডেলিভারিকৃত পোশাক - TailorBD</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .container { max-width: 100%; margin: 0 auto; padding: 10px; background: #f5f7fa; min-height: 100vh; }
+        .content { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-bottom: 15px; font-size: 22px; font-weight: 600; }
+
+        .search-mode-group { margin-bottom: 15px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .search-mode-group label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; font-size: 14px; }
+        .search-mode-group input[type=radio] { accent-color: #6c7ae0; width: 16px; height: 16px; cursor: pointer; }
+
+        .search-section { margin-bottom: 20px; }
+        .search-panel { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+        .search-grid-date { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 13px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 7px 10px; border: 1px solid #ddd;
+            border-radius: 4px; font-size: 13px; font-family: inherit;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #6c7ae0; box-shadow: 0 0 0 2px rgba(108,122,224,0.15); }
+        .btn-search {
+            padding: 8px 20px; background: #6c7ae0; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .btn-search:hover { background: #5a68c9; }
+
+        .stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .stat-card { color: white; padding: 15px 20px; border-radius: 8px; }
+        .stat-card.green { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+        .stat-card.red { background: linear-gradient(135deg, #f5515f 0%, #a1051d 100%); }
+        .stat-value { font-size: 26px; font-weight: 700; margin-bottom: 3px; }
+        .stat-label { font-size: 13px; opacity: 0.9; }
+
+        .table-wrapper { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #6c7ae0; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+        td { padding: 7px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; }
+        tr:hover { background-color: #f8f9fa; }
+        td.center { text-align: center; }
+        td.number { text-align: right; }
+        .order-no { font-weight: 700; font-size: 14px; }
+        .customer-name { font-weight: 600; }
+        .customer-number { color: #888; font-size: 12px; }
+        .due-amount { color: #dc3545; font-weight: 600; }
+        .due-zero { color: #28a745; }
+
+        .btn-print {
+            width: 30px; height: 30px; background: #17a2b8; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 13px;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-print:hover { background: #138496; }
+
+        .loading, .empty-message, .error-message { text-align: center; padding: 40px; color: #666; font-size: 14px; }
+        .error-message { color: #dc3545; }
+
+        .pagination-wrapper { display: flex; justify-content: center; gap: 5px; margin-top: 20px; flex-wrap: wrap; }
+        .pagination-wrapper button {
+            padding: 5px 12px; border: 1px solid #ddd; background: white;
+            cursor: pointer; border-radius: 3px; font-size: 13px;
+        }
+        .pagination-wrapper button.active { background: #6c7ae0; color: white; border-color: #6c7ae0; }
+        .pagination-wrapper button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        @media (max-width: 768px) {
+            #app-navbar { margin-left: 0; }
+            .main-content { margin-left: 0; }
+            .search-grid, .search-grid-date { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="container">
+                <div class="content">
+                    <h2><i class="fas fa-tshirt me-2" style="color:#6c7ae0;"></i>
+                        <span class="lang-content" data-en="Delivered Cut Dress" data-bn="ডেলিভারিকৃত পোশাক">ডেলিভারিকৃত পোশাক</span>
+                    </h2>
+                    <p style="color:#666; font-size:14px; margin-bottom:15px;">
+                        <span class="lang-content" data-en="Orders that have been delivered with dress details" data-bn="পোশাকের বিবরণ সহ ডেলিভারি করা অর্ডারগুলি">পোশাকের বিবরণ সহ ডেলিভারি করা অর্ডারগুলি</span>
+                    </p>
+
+                    <!-- Stats -->
+                    <div class="stats-cards">
+                        <div class="stat-card green">
+                            <div class="stat-value" id="totalDelivered">0</div>
+                            <div class="stat-label" data-en="Total Delivered" data-bn="মোট ডেলিভারি">মোট ডেলিভারি</div>
+                        </div>
+                        <div class="stat-card red">
+                            <div class="stat-value" id="totalDue">৳0.00</div>
+                            <div class="stat-label" data-en="Total Due" data-bn="মোট বাকি">মোট বাকি</div>
+                        </div>
+                    </div>
+
+                    <!-- Search Mode -->
+                    <div class="search-mode-group">
+                        <label>
+                            <input type="radio" name="searchMode" value="orderNo" checked>
+                            <span data-en="Order No. And Mobile No." data-bn="অর্ডার নম্বর ও মোবাইল নম্বর">অর্ডার নম্বর ও মোবাইল নম্বর</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="searchMode" value="date">
+                            <span data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
+                        </label>
+                    </div>
+
+                    <!-- Search by Order No -->
+                    <div class="search-section" id="searchByOrderNo">
+                        <div class="search-panel">
+                            <div class="search-grid">
+                                <div class="form-group">
+                                    <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                    <input type="text" id="mobileNo" placeholder="মোবাইল নম্বর">
+                                </div>
+                                <div class="form-group">
+                                    <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                                    <input type="text" id="customerName" placeholder="কাস্টমারের নাম">
+                                </div>
+                                <div class="form-group">
+                                    <label data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</label>
+                                    <textarea id="orderNo" placeholder="যেমন: 10,20,30"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                                    <textarea id="address" placeholder="ঠিকানা"></textarea>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <i class="fas fa-search"></i> <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search by Date -->
+                    <div class="search-section" id="searchByDate" style="display:none;">
+                        <div class="search-panel">
+                            <div class="search-grid-date">
+                                <div class="form-group">
+                                    <label data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                                    <input type="date" id="startDate">
+                                </div>
+                                <div class="form-group">
+                                    <label data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
+                                    <input type="date" id="endDate">
+                                </div>
+                                <div>
+                                    <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <i class="fas fa-search"></i> <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-wrapper">
+                        <div id="ordersTableContainer">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                <span data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pagination-wrapper" id="paginationContainer"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script src="/js/delivery-cut-dress.js?v=2.1.4"></script>
+</body>
+</html>

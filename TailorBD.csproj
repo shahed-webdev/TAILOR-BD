@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -253,6 +253,8 @@
     <Content Include="Access_Authority\Profile.aspx" />
     <Content Include="Access_Authority\See_Marketing_Report.aspx" />
     <Content Include="Access_Authority\SignUp_Institution.aspx" />
+    <Content Include="cleanup-duplicate-dresses.sql" />
+    <Content Include="cleanup-specific-order.sql" />
     <Content Include="CssGridview\Cmd_Ico\Arrow_down.png" />
     <Content Include="CssGridview\Cmd_Ico\Arrow_up.png" />
     <Content Include="CssGridview\Cmd_Ico\Cmd_Ico.png" />
@@ -364,6 +366,7 @@
     <Content Include="libs\Newtonsoft.Json.dll" />
     <Content Include="libs\Owin.dll" />
     <Content Include="Login.aspx" />
+    <Content Include="manual-cleanup-steps.sql" />
     <Content Include="mdb\css\mdb-admin.min.css" />
     <Content Include="mdb\css\mdb-core.css" />
     <Content Include="mdb\js\mdb-admin.min.js" />
@@ -1252,6 +1255,7 @@
   <ItemGroup>
     <Folder Include="AccessAdmin\Sub_Admin\Css\" />
     <Folder Include="API\" />
+    <Folder Include="TailorBD.API\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="SmsService\SmsService.csproj">

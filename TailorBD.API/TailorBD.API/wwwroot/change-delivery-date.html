@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ডেলিভারি তারিখ পরিবর্তন - TailorBD</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .container { max-width: 100%; margin: 0 auto; padding: 10px; background: #f5f7fa; min-height: 100vh; }
+        .content { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-bottom: 15px; font-size: 22px; font-weight: 600; }
+
+        /* Search Mode Radio */
+        .search-mode-group { margin-bottom: 15px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .search-mode-group label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; font-size: 14px; }
+        .search-mode-group input[type=radio] { accent-color: #6c7ae0; width: 16px; height: 16px; cursor: pointer; }
+        .radio-order { color: #dc3545; }
+        .radio-date { color: #28a745; }
+
+        /* Search Panels */
+        .search-section { margin-bottom: 20px; }
+        .search-panel { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+        .search-grid-date { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 13px; }
+        .form-group input { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .form-group input:focus { outline: none; border-color: #6c7ae0; box-shadow: 0 0 0 2px rgba(108,122,224,0.15); }
+
+        .btn-search {
+            padding: 8px 20px; background: #6c7ae0; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .btn-search:hover { background: #5a68c9; }
+
+        /* Legend */
+        .legend-group { display: flex; gap: 15px; margin-bottom: 12px; font-size: 13px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 3px; }
+        .legend-today { background: #28a745; }
+        .legend-overdue { background: #dc3545; }
+
+        /* Table */
+        .table-wrapper { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #6c7ae0; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+        td { padding: 7px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; text-align: center; }
+        tr:hover { background-color: #f8f9fa; }
+        tr.today-row { background: #d4edda !important; }
+        tr.overdue-row { background: #f8d7da !important; }
+        tr.today-row:hover { background: #c3e6cb !important; }
+        tr.overdue-row:hover { background: #f5c6cb !important; }
+        .order-no { font-weight: 700; font-size: 14px; }
+        .customer-name { font-weight: 600; text-align: left; }
+        .customer-number { color: #888; font-size: 12px; }
+
+        /* Nested dress table */
+        .dress-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .dress-table th { background: #e8eaf6; color: #333; padding: 4px 6px; font-size: 11px; }
+        .dress-table td { padding: 3px 6px; border: 1px solid #e0e0e0; }
+
+        /* Change date panel */
+        .change-date-panel { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin-top: 20px; display: none; }
+        .change-date-panel h5 { color: #856404; margin-bottom: 12px; font-size: 15px; font-weight: 600; }
+        .change-date-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .btn-change { padding: 8px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-change:hover { background: #218838; }
+
+        /* Checkbox */
+        input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: #6c7ae0; }
+
+        /* Loading/Empty */
+        .loading, .empty-message, .error-message { text-align: center; padding: 40px; color: #666; font-size: 14px; }
+        .error-message { color: #dc3545; }
+
+        /* Summary */
+        .summary-text { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 10px; }
+
+        /* SMS toggle */
+        .sms-label { font-size: 12px; color: #6c7ae0; }
+
+        /* Autocomplete */
+        .autocomplete-wrapper { position: relative; }
+        .autocomplete-list {
+            position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;
+            background: white; border: 1px solid #ddd; border-top: none;
+            border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .autocomplete-list div { padding: 8px 10px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+        .autocomplete-list div:hover, .autocomplete-list div.active { background: #f0f4ff; color: #6c7ae0; }
+
+        /* Success/Error message */
+        .alert-msg { padding: 10px 15px; border-radius: 4px; font-size: 14px; margin-top: 10px; display: none; }
+        .alert-success-msg { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error-msg { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        @media (max-width: 768px) {
+            #app-navbar { margin-left: 0; }
+            .main-content { margin-left: 0; }
+            .search-grid, .search-grid-date { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="container">
+                <div class="content">
+                    <h2 data-en="Change Delivery Date" data-bn="ডেলিভারি তারিখ পরিবর্তন">ডেলিভারি তারিখ পরিবর্তন</h2>
+
+                    <!-- Search Mode Toggle -->
+                    <div class="search-mode-group">
+                        <label class="radio-order">
+                            <input type="radio" name="searchMode" value="orderNo" checked>
+                            <span data-en="Order No. And Mobile No." data-bn="অর্ডার নম্বর ও মোবাইল নম্বর">অর্ডার নম্বর ও মোবাইল নম্বর</span>
+                        </label>
+                        <label class="radio-date">
+                            <input type="radio" name="searchMode" value="date">
+                            <span data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
+                        </label>
+                    </div>
+
+                    <!-- Search by Order No / Mobile -->
+                    <div class="search-section" id="searchByOrderNo">
+                        <div class="search-panel">
+                            <div class="search-grid">
+                                <div class="form-group autocomplete-wrapper">
+                                    <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                    <input type="text" id="mobileNo" autocomplete="off"
+                                        data-en-placeholder="Mobile Number"
+                                        data-bn-placeholder="মোবাইল নম্বর" placeholder="আরেকটি যোগ করুন">
+                                    <div class="autocomplete-list" id="mobileNoSuggestions" style="display:none;"></div>
+                                </div>
+                                <div class="form-group autocomplete-wrapper">
+                                    <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                                    <input type="text" id="customerName" autocomplete="off"
+                                        data-en-placeholder="Customer Name"
+                                        data-bn-placeholder="কাস্টমারের নাম" placeholder="?প্রতিষ্ঠার বছর">
+                                    <div class="autocomplete-list" id="customerNameSuggestions" style="display:none;"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</label>
+                                    <input type="text" id="orderNo"
+                                        data-en-placeholder="Order Number"
+                                        data-bn-placeholder="অর্ডার নম্বর" placeholder="আরেকটি যোগ করুন">
+                                </div>
+                                <div class="form-group">
+                                    <label data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                                    <input type="text" id="address"
+                                        data-en-placeholder="Address"
+                                        data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা">
+                                </div>
+                                <div>
+                                    <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <i class="fas fa-search"></i>
+                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search by Delivery Date -->
+                    <div class="search-section" id="searchByDate" style="display:none;">
+                        <div class="search-panel">
+                            <div class="search-grid-date">
+                                <div class="form-group">
+                                    <label data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                                    <input type="date" id="startDate">
+                                </div>
+                                <div class="form-group">
+                                    <label data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
+                                    <input type="date" id="endDate">
+                                </div>
+                                <div>
+                                    <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <i class="fas fa-search"></i>
+                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="legend-group">
+                        <div class="legend-item">
+                            <div class="legend-dot legend-today"></div>
+                            <span data-en="Today's Date Delivery" data-bn="আজকের ডেলিভারি">আজকের ডেলিভারি</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot legend-overdue"></div>
+                            <span data-en="Date Over Delivery" data-bn="মেয়াদ উত্তীর্ণ ডেলিভারি">মেয়াদ উত্তীর্ণ ডেলিভারি</span>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="summary-text" id="summaryText"></div>
+
+                    <!-- Orders Table -->
+                    <div class="table-wrapper">
+                        <div id="ordersTableContainer">
+                            <div class="loading">
+                                <span data-en="Loading orders..." data-bn="অর্ডার লোড হচ্ছে...">অর্ডার লোড হচ্ছে...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change Date Panel -->
+                    <div class="change-date-panel" id="changeDatePanel">
+                        <h5><i class="fas fa-calendar-alt me-2"></i>
+                            <span data-en="Change Selected Orders Delivery Date" data-bn="নির্বাচিত অর্ডারের ডেলিভারি তারিখ পরিবর্তন">নির্বাচিত অর্ডারের ডেলিভারি তারিখ পরিবর্তন</span>
+                        </h5>
+                        <div class="change-date-row">
+                            <div class="form-group" style="margin:0;">
+                                <label data-en="New Delivery Date" data-bn="নতুন ডেলিভারি তারিখ">নতুন ডেলিভারি তারিখ</label>
+                                <input type="date" id="newDeliveryDate" style="width:200px;">
+                            </div>
+                            <button type="button" class="btn-change" onclick="changeDeliveryDate()">
+                                <i class="fas fa-check me-1"></i>
+                                <span data-en="Change Date" data-bn="তারিখ পরিবর্তন">তারিখ পরিবর্তন</span>
+                            </button>
+                            <div id="changeMsg" class="alert-msg"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script src="/js/change-delivery-date.js?v=2.1.4"></script>
+</body>
+</html>

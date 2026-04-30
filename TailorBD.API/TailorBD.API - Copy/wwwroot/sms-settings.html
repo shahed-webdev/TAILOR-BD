@@ -1,0 +1,411 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS সেটিংস - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .main-content { margin-left: 260px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        @media (max-width: 768px) { #app-navbar, .main-content { margin-left: 0; } }
+
+        .settings-container { padding: 20px; max-width: 960px; }
+        .card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; margin-bottom: 24px; }
+        .card-header { background: #6c7ae0; color: white; border-radius: 8px 8px 0 0 !important; padding: 14px 20px; font-weight: 600; }
+
+        .template-item { border: 1px solid #e0e0e0; border-radius: 6px; padding: 14px; margin-bottom: 10px; background: #fafafa; transition: box-shadow 0.2s; }
+        .template-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .template-name { font-weight: 600; color: #333; font-size: 14px; }
+        .template-text { color: #555; font-size: 13px; margin-top: 6px; padding: 8px; background: #f0f4ff; border-radius: 4px; border-left: 3px solid #6c7ae0; }
+
+        .btn-add { background: #6c7ae0; color: white; border: none; padding: 6px 16px; border-radius: 5px; font-size: 13px; cursor: pointer; }
+        .btn-add:hover { background: #5a68c9; color: white; }
+        .btn-edit { background: #17a2b8; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+        .btn-edit:hover { background: #138496; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+        .btn-delete:hover { background: #c82333; }
+
+        .placeholder-hint { font-size: 12px; color: #888; }
+        .placeholder-hint code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; color: #e83e8c; }
+
+        .default-msg-box { border-radius: 6px; padding: 14px; margin-bottom: 16px; }
+        .default-msg-box .label { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+        .default-msg-box .msg { font-size: 13px; color: #555; font-style: italic; }
+
+        .empty-msg { text-align: center; color: #999; padding: 30px; font-size: 14px; }
+        .error-msg { text-align: center; color: #dc3545; padding: 20px; font-size: 14px; }
+
+        .modal-header { background: #6c7ae0; color: white; }
+        .modal-header .btn-close { filter: invert(1); }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="app-navbar"></div>
+
+    <!-- Sidebar -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="settings-container">
+                <h2 style="color:#2c3e50; font-size:1.4rem; font-weight:600; margin-bottom:20px;">
+                    <i class="fas fa-cog me-2" style="color:#6c7ae0;"></i> SMS সেটিংস ও টেমপ্লেট
+                </h2>
+
+                <!-- Default message info boxes -->
+                <div class="default-msg-box" style="background:#fff8e1; border:1px solid #ffe082;">
+                    <div class="label" style="color:#f57f17;"><i class="fas fa-info-circle me-1"></i> ডিফল্ট মেসেজ (কাজ সম্পূর্ণ হলে)</div>
+                    <div class="msg">প্রিয় গ্রাহক, আপনার অর্ডারকৃত <em>[পোষাকের নাম ও পরিমান]</em> তৈরি হয়েছে। অর্ডার নং <em>[অর্ডার নং]</em>। <em>[প্রতিষ্ঠানের নাম]</em></div>
+                    <div style="margin-top:6px; font-size:12px; color:#888;"><i class="fas fa-lightbulb me-1"></i> কোনো টেমপ্লেট না থাকলে এই ডিফল্ট মেসেজ যাবে।</div>
+                </div>
+
+                <div class="default-msg-box" style="background:#fff3e0; border:1px solid #ffcc80;">
+                    <div class="label" style="color:#e65100;"><i class="fas fa-info-circle me-1"></i> ডিফল্ট মেসেজ (ডেলিভারির জন্য প্রস্তুত হলে)</div>
+                    <div class="msg">Dear Sir, Your Dress <em>[dress items]</em> is Ready to Deliver. Order No. <em>[order no]</em>. <em>[institution name]</em></div>
+                    <div style="margin-top:6px; font-size:12px; color:#888;"><i class="fas fa-lightbulb me-1"></i> কোনো টেমপ্লেট না থাকলে এই ডিফল্ট ইংরেজি মেসেজ যাবে (পুরানো Delivery.aspx-এর মতো)।</div>
+                </div>
+
+                <div class="default-msg-box" style="background:#e8f5e9; border:1px solid #a5d6a7;">
+                    <div class="label" style="color:#2e7d32;"><i class="fas fa-info-circle me-1"></i> ডিফল্ট মেসেজ (ডেলিভারি তারিখ পরিবর্তন হলে)</div>
+                    <div class="msg">সম্মানিত গ্রাহক, আপনার অর্ডার কৃত <em>[পোষাকের নাম]</em> এর ডেলিভারির তারিখ পরিবর্তন হয়েছে। নতুন তারিখ: <em>[নতুন তারিখ]</em>। আপনার বিশ্বস্ত: <em>[প্রতিষ্ঠানের নাম]</em></div>
+                    <div style="margin-top:6px; font-size:12px; color:#888;"><i class="fas fa-lightbulb me-1"></i> কোনো টেমপ্লেট না থাকলে এই ডিফল্ট মেসেজ যাবে।</div>
+                </div>
+
+                <!-- Completed Work Templates -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-check-circle me-2"></i> কাজ সম্পূর্ণ হলে (Completed Work) টেমপ্লেট</span>
+                        <button class="btn-add" onclick="openAddModal('CompletedWork')"><i class="fas fa-plus me-1"></i> নতুন টেমপ্লেট</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="placeholder-hint mb-3">
+                            <strong>প্লেসহোল্ডার:</strong>
+                            <code>{items}</code> = পোষাকের নাম ও পরিমান,
+                            <code>{orderNo}</code> = অর্ডার নং,
+                            <code>{institutionName}</code> = প্রতিষ্ঠানের নাম
+                        </div>
+                        <div id="completedWorkTemplates"><div class="empty-msg"><i class="fas fa-spinner fa-spin me-1"></i> লোড হচ্ছে...</div></div>
+                    </div>
+                </div>
+
+                <!-- Ready For Delivery Templates -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center" style="background:#e65100;">
+                        <span><i class="fas fa-truck me-2"></i> ডেলিভারির জন্য প্রস্তুত (Ready For Delivery) টেমপ্লেট</span>
+                        <button class="btn-add" onclick="openAddModal('ReadyForDelivery')"><i class="fas fa-plus me-1"></i> নতুন টেমপ্লেট</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="placeholder-hint mb-3">
+                            <strong>প্লেসহোল্ডার:</strong>
+                            <code>{items}</code> = পোষাকের নাম ও পরিমান,
+                            <code>{orderNo}</code> = অর্ডার নং,
+                            <code>{institutionName}</code> = প্রতিষ্ঠানের নাম
+                        </div>
+                        <div id="readyForDeliveryTemplates"><div class="empty-msg"><i class="fas fa-spinner fa-spin me-1"></i> লোড হচ্ছে...</div></div>
+                    </div>
+                </div>
+
+                <!-- Delivery Date Change Templates -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-alt me-2"></i> ডেলিভারি তারিখ পরিবর্তন (Delivery Date Change) টেমপ্লেট</span>
+                        <button class="btn-add" onclick="openAddModal('DeliveryDateChange')"><i class="fas fa-plus me-1"></i> নতুন টেমপ্লেট</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="placeholder-hint mb-3">
+                            <strong>প্লেসহোল্ডার:</strong>
+                            <code>{items}</code> = পোষাকের নাম ও পরিমান,
+                            <code>{newDate}</code> = পরিবর্তিত তারিখ,
+                            <code>{orderNo}</code> = অর্ডার নং,
+                            <code>{institutionName}</code> = প্রতিষ্ঠানের নাম
+                        </div>
+                        <div id="deliveryDateChangeTemplates"><div class="empty-msg"><i class="fas fa-spinner fa-spin me-1"></i> লোড হচ্ছে...</div></div>
+                    </div>
+                </div>
+
+                <!-- Other Templates -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-file-alt me-2"></i> অন্যান্য SMS টেমপ্লেট</span>
+                        <button class="btn-add" onclick="openAddModal('Other')"><i class="fas fa-plus me-1"></i> নতুন টেমপ্লেট</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="otherTemplates"><div class="empty-msg"><i class="fas fa-spinner fa-spin me-1"></i> লোড হচ্ছে...</div></div>
+                    </div>
+                </div>
+
+            </div><!-- /.settings-container -->
+        </div>
+    </main>
+
+    <!-- Modals Container (for shared modals from app-components) -->
+    <div id="app-modals"></div>
+
+    <!-- Add / Edit Template Modal -->
+    <div class="modal fade" id="templateModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="templateModalTitle">টেমপ্লেট যোগ করুন</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editTemplateId" value="0">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">টেমপ্লেটের নাম <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="templateName" placeholder="যেমন: ডেলিভারি রেডি মেসেজ">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">মেসেজ টেক্সট <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="templateText" rows="5" placeholder="মেসেজ লিখুন..."></textarea>
+                        <div class="placeholder-hint mt-1" id="placeholderHint">
+                            প্লেসহোল্ডার: <code>{items}</code> <code>{orderNo}</code> <code>{institutionName}</code>
+                        </div>
+                        <div id="smsCountInfo" style="font-size:12px; color:#6c7ae0; margin-top:4px;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">টেমপ্লেট কিসের জন্য</label>
+                        <select class="form-select" id="templateForSelect" onchange="onTemplateForChange()">
+                            <option value="CompletedWork">কাজ সম্পূর্ণ হলে (Completed Work)</option>
+                            <option value="ReadyForDelivery">ডেলিভারির জন্য প্রস্তুত (Ready For Delivery)</option>
+                            <option value="DeliveryDateChange">ডেলিভারি তারিখ পরিবর্তন (Delivery Date Change)</option>
+                            <option value="Other">অন্যান্য</option>
+                        </select>
+                    </div>
+                    <div id="previewBox" style="display:none; font-size:13px; color:#444; background:#f8f9fa; padding:10px; border-radius:6px; margin-top:8px;">
+                        <strong>প্রিভিউ:</strong><br><span id="previewText"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">বাতিল</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="saveTemplate()">সংরক্ষণ করুন</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Components (loads sidebar, navbar, modals) -->
+    <script src="/js/app-components.js"></script>
+
+    <script>
+        let currentInstitutionId = null;
+        let currentRegistrationId = null;
+        let templateModal = null;
+
+        // Wait for app-components to finish loading sidebar/session, then init
+        $(document).ready(function () {
+            // app-components.js restores session before DOMContentLoaded
+            currentInstitutionId  = parseInt(sessionStorage.getItem('institutionId'));
+            currentRegistrationId = parseInt(sessionStorage.getItem('registrationId'));
+
+            if (!currentInstitutionId || !currentRegistrationId) {
+                // Try waiting a moment for session restore
+                setTimeout(function () {
+                    currentInstitutionId  = parseInt(sessionStorage.getItem('institutionId'));
+                    currentRegistrationId = parseInt(sessionStorage.getItem('registrationId'));
+                    if (!currentInstitutionId || !currentRegistrationId) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    initPage();
+                }, 300);
+                return;
+            }
+
+            initPage();
+        });
+
+        function initPage() {
+            templateModal = new bootstrap.Modal(document.getElementById('templateModal'));
+
+            // SMS char counter & preview
+            document.getElementById('templateText').addEventListener('input', function () {
+                updateSmsCount();
+                updatePreview();
+            });
+
+            loadTemplates('CompletedWork',    'completedWorkTemplates');
+            loadTemplates('ReadyForDelivery', 'readyForDeliveryTemplates');
+            loadTemplates('DeliveryDateChange','deliveryDateChangeTemplates');
+            loadTemplates('Other',            'otherTemplates');
+        }
+
+        // ── Load templates for a given category ───────────────────────────────
+        async function loadTemplates(templateFor, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '<div class="empty-msg"><i class="fas fa-spinner fa-spin me-1"></i> লোড হচ্ছে...</div>';
+            try {
+                const res    = await fetch(`/api/Sms/templates?institutionId=${currentInstitutionId}&templateFor=${templateFor}`);
+                const result = await res.json();
+
+                if (!result.success || !result.data || result.data.length === 0) {
+                    container.innerHTML = '<div class="empty-msg"><i class="fas fa-inbox me-2"></i>কোনো টেমপ্লেট নেই</div>';
+                    return;
+                }
+
+                container.innerHTML = result.data.map(t => {
+                    const id   = t.sMS_TemplateID   || t.SMS_TemplateID   || t.id;
+                    const name = t.templateName      || t.TemplateName     || '';
+                    const text = t.templateText      || t.TemplateText     || '';
+                    const tfor = t.templateFor       || t.TemplateFor      || templateFor;
+                    return `
+                        <div class="template-item" id="tpl-${id}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="template-name">${escHtml(name)}</div>
+                                    <div class="template-text">${escHtml(text)}</div>
+                                </div>
+                                <div class="ms-3 d-flex gap-1">
+                                    <button class="btn-edit" onclick='editTemplate(${JSON.stringify({id, name, text, tfor})})'>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-delete" onclick="deleteTemplate(${id},'${templateFor}','${containerId}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                }).join('');
+            } catch (e) {
+                container.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-circle me-1"></i>লোড করতে সমস্যা হয়েছে</div>';
+            }
+        }
+
+        // ── Open modal for adding ──────────────────────────────────────────────
+        function openAddModal(templateFor) {
+            document.getElementById('editTemplateId').value = '0';
+            document.getElementById('templateName').value   = '';
+            document.getElementById('templateText').value   = '';
+            document.getElementById('templateForSelect').value = templateFor;
+            document.getElementById('previewBox').style.display = 'none';
+            document.getElementById('smsCountInfo').textContent = '';
+            document.getElementById('templateModalTitle').textContent = 'নতুন টেমপ্লেট যোগ করুন';
+            onTemplateForChange();
+            templateModal.show();
+        }
+
+        // ── Open modal for editing ─────────────────────────────────────────────
+        function editTemplate(t) {
+            document.getElementById('editTemplateId').value      = t.id;
+            document.getElementById('templateName').value        = t.name;
+            document.getElementById('templateText').value        = t.text;
+            document.getElementById('templateForSelect').value   = t.tfor;
+            document.getElementById('templateModalTitle').textContent = 'টেমপ্লেট সম্পাদনা করুন';
+            onTemplateForChange();
+            updateSmsCount();
+            updatePreview();
+            templateModal.show();
+        }
+
+        // ── Save (add or update) ───────────────────────────────────────────────
+        async function saveTemplate() {
+            const id   = parseInt(document.getElementById('editTemplateId').value);
+            const name = document.getElementById('templateName').value.trim();
+            const text = document.getElementById('templateText').value.trim();
+            const tfor = document.getElementById('templateForSelect').value;
+
+            if (!name || !text) { alert('টেমপ্লেটের নাম ও মেসেজ আবশ্যক'); return; }
+
+            const body = {
+                institutionId:  currentInstitutionId,
+                registrationId: currentRegistrationId,
+                templateName:   name,
+                templateText:   text,
+                templateFor:    tfor
+            };
+
+            try {
+                const res = id > 0
+                    ? await fetch(`/api/Sms/templates/${id}`, { method: 'PUT',  headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) })
+                    : await fetch('/api/Sms/templates',        { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+
+                const result = await res.json();
+                if (result.success) {
+                    templateModal.hide();
+                    reloadAllTemplates();
+                } else {
+                    alert('সংরক্ষণ করতে সমস্যা: ' + (result.message || ''));
+                }
+            } catch (e) {
+                alert('সংরক্ষণ করতে সমস্যা হয়েছে');
+            }
+        }
+
+        // ── Delete ─────────────────────────────────────────────────────────────
+        async function deleteTemplate(id, templateFor, containerId) {
+            if (!confirm('এই টেমপ্লেটটি মুছে দিতে চান?')) return;
+            try {
+                const res    = await fetch(`/api/Sms/templates/${id}?institutionId=${currentInstitutionId}`, { method: 'DELETE' });
+                const result = await res.json();
+                if (result.success) {
+                    loadTemplates(templateFor, containerId);
+                } else {
+                    alert('মুছতে সমস্যা: ' + (result.message || ''));
+                }
+            } catch (e) {
+                alert('মুছতে সমস্যা হয়েছে');
+            }
+        }
+
+        function reloadAllTemplates() {
+            loadTemplates('CompletedWork',     'completedWorkTemplates');
+            loadTemplates('ReadyForDelivery',  'readyForDeliveryTemplates');
+            loadTemplates('DeliveryDateChange','deliveryDateChangeTemplates');
+            loadTemplates('Other',             'otherTemplates');
+        }
+
+        // ── Placeholder hint update ────────────────────────────────────────────
+        function onTemplateForChange() {
+            const tfor = document.getElementById('templateForSelect').value;
+            const hint = document.getElementById('placeholderHint');
+            if (tfor === 'DeliveryDateChange') {
+                hint.innerHTML = 'প্লেসহোল্ডার: <code>{items}</code> <code>{newDate}</code> <code>{orderNo}</code> <code>{institutionName}</code>';
+            } else {
+                hint.innerHTML = 'প্লেসহোল্ডার: <code>{items}</code> <code>{orderNo}</code> <code>{institutionName}</code>';
+            }
+            updatePreview();
+        }
+
+        // ── SMS char counter ───────────────────────────────────────────────────
+        function updateSmsCount() {
+            const text = document.getElementById('templateText').value;
+            const info = document.getElementById('smsCountInfo');
+            if (!text) { info.textContent = ''; return; }
+            const isUnicode = [...text].some(c => c.charCodeAt(0) > 0xFF);
+            const perSms    = isUnicode ? 70 : 160;
+            const smsCount  = Math.max(1, Math.ceil(text.length / perSms));
+            info.textContent = `অক্ষর: ${text.length} | SMS: ${smsCount} টি (${isUnicode ? 'বাংলা/Unicode' : 'English'})`;
+        }
+
+        // ── Preview ────────────────────────────────────────────────────────────
+        function updatePreview() {
+            const text = document.getElementById('templateText').value;
+            const box  = document.getElementById('previewBox');
+            if (!text) { box.style.display = 'none'; return; }
+            const preview = text
+                .replace(/\{items\}/g,           '২ টি শার্ট, ১ টি প্যান্ট')
+                .replace(/\{orderNo\}/g,          '১২৫')
+                .replace(/\{institutionName\}/g,  'আপনার টেইলর শপ')
+                .replace(/\{newDate\}/g,          '১ মার্চ ২০২৫');
+            document.getElementById('previewText').textContent = preview;
+            box.style.display = 'block';
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+    </script>
+</body>
+</html>

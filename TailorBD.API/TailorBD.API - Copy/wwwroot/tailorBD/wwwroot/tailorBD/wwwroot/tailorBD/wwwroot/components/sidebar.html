@@ -1,0 +1,254 @@
+﻿<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <img src="/images/logo.png" alt="TailorBD" style="height:36px;width:auto;max-width:160px;object-fit:contain;">
+    </div>
+
+    <!-- Profile Section -->
+    <div class="sidebar-profile">
+        <div class="profile-image-wrapper">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=667eea&color=fff&size=120&bold=true" 
+                 alt="Profile" class="profile-image" id="sidebarProfileImage">
+        </div>
+        <div class="profile-info">
+            <h4 id="sidebarUsername">ADMIN USER</h4>
+            <div id="userRoleBadge" style="display: none; margin-bottom: 8px;">
+                <span class="badge bg-warning text-dark">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    <span class="lang-content" data-en="Limited Access" data-bn="সীমিত অ্যাক্সেস">Limited Access</span>
+                </span>
+            </div>
+            <div class="profile-dropdown">
+                <button class="profile-dropdown-toggle" id="profileDropdownToggle">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#updateInfoModal">
+                        <i class="fas fa-user-edit"></i>
+                        <span class="lang-content" data-en="Update Info" data-bn="ইনফো আপডেট">Update Info</span>
+                    </a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                        <i class="fas fa-key"></i>
+                        <span class="lang-content" data-en="Change Password" data-bn="পাসওয়ার্ড পরিবর্তন">Change Password</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="sidebar-menu">
+
+        <!-- ড্যাশবোর্ড -->
+        <li id="dashboardMenu">
+            <a href="/dashboard.html" id="dashboardLink">
+                <i class="fas fa-home"></i>
+                <span class="lang-content" data-en="Dashboard" data-bn="ড্যাশবোর্ড">Dashboard</span>
+            </a>
+        </li>
+
+        <!-- কুইক অর্ডার -->
+        <li>
+            <a href="/quick-order.html">
+                <i class="fas fa-bolt"></i>
+                <span class="lang-content" data-en="Quick Order" data-bn="কুইক অর্ডার">Quick Order</span>
+            </a>
+        </li>
+
+        <!-- বেসিক সেটিং -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-tshirt"></i>
+                <span class="lang-content" data-en="Basic Setting" data-bn="বেসিক সেটিং">Basic Setting</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="/tailor-info.html"><span class="lang-content" data-en="Tailor Shop Info" data-bn="প্রতিষ্ঠানের তথ্য">Tailor Shop Info</span></a></li>
+                <li><a href="/dress-add.html"><span class="lang-content" data-en="Add Dress & Measurement" data-bn="পোষাক ও মাপ যুক্ত করুন">Add Dress & Measurement</span></a></li>
+                <li><a href="/print-settings.html"><span class="lang-content" data-en="Map Print Setting" data-bn="মাপ প্রিন্ট সেটিং">Map Print Setting</span></a></li>
+                <li><a href="/sub-admin.html"><span class="lang-content" data-en="SignUp Sub Admin" data-bn="সাব এডমিন তৈরী করুন">SignUp Sub Admin</span></a></li>
+                <li><a href="/access-management.html"><span class="lang-content" data-en="Sub Admin Page Access" data-bn="সাব-অ্যাডমিন প্রবেশাধিকার নিয়ন্ত্রণ">Sub Admin Page Access</span></a></li>
+            </ul>
+        </li>
+
+        <!--অর্ডার -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="lang-content" data-en="Order" data-bn="অর্ডার">Order</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="/new-order.html"><span class="lang-content" data-en="New Order" data-bn="নতুন অর্ডার">New Order</span></a></li>
+                <li><a href="/order-list.html"><span class="lang-content" data-en="Order List" data-bn="অর্ডার তালিকা">Order List</span></a></li>
+                <li><a href="/incomplete-works.html"><span class="lang-content" data-en="Complete Order Works" data-bn="অর্ডারের কাজ সম্পূর্ণ করুন">Complete Order Works</span></a></li>
+                <li><a href="/change-delivery-date.html"><span class="lang-content" data-en="Change Delivery Date" data-bn="ডেলিভারি তারিখ পরিবর্তন করুন">Change Delivery Date</span></a></li>
+                <li><a href="/delete-order.html"><span class="lang-content" data-en="Permanently Delete Order" data-bn="স্থায়ীভাবে অর্ডার ডিলেট করুন">Permanently Delete Order</span></a></li>
+            </ul>
+        </li>
+
+        <!-- ডেলিভরি -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-shipping-fast"></i>
+                <span class="lang-content" data-en="Delivery" data-bn="ডেলিভারি">Delivery</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="/delivery-give.html"><span class="lang-content" data-en="Delivery Give" data-bn="ডেলিভারি দিন">Delivery Give</span></a></li>
+                <li><a href="/delivered-orders.html"><span class="lang-content" data-en="Delivered Orders" data-bn="ডেলিভারিকৃত অর্ডার">Delivered Orders</span></a></li>
+                <li><a href="/delivery-day.html"><span class="lang-content" data-en="Delivery Day" data-bn="ডেলিভারির তারিখ">Delivery Day</span></a></li>
+                <li><a href="/delivery-cut-dress.html"><span class="lang-content" data-en="Delivery Cut Dress" data-bn="ডেলিভারিকৃত পোশাক">Delivery Cut Dress</span></a></li>
+            </ul>
+        </li>
+
+        <!-- কাস্টমার -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-users"></i>
+                <span class="lang-content" data-en="Customer" data-bn="কাস্টমার">Customer</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="/add-customer.html"><span class="lang-content" data-en="Add New Customer" data-bn="কাস্টমার যুক্ত করুন">Add New Customer</span></a></li>
+                <li><a href="/customer-list.html"><span class="lang-content" data-en="Customer List" data-bn="কাস্টমারের তালিকা">Customer List</span></a></li>
+            </ul>
+        </li>
+
+        <!-- আইটেম ব্যবস্থাপনা -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-store"></i>
+                <span class="lang-content" data-en="Item Management" data-bn="আইটেম ব্যবস্থাপনা">Item Management</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+
+                <!-- বেসিক সেটিং -->
+                <li class="menu-item-has-children">
+                    <a href="#" class="menu-toggle">
+                        <i class="fas fa-cog me-1"></i>
+                        <span class="lang-content" data-en="Basic Setting" data-bn="বেসিক সেটিং">Basic Setting</span>
+                        <i class="fas fa-chevron-down arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/item-measurement-unit.html"><span class="lang-content" data-en="Measurement Unit" data-bn="মেজারমেন্ট ইউনিট">Measurement Unit</span></a></li>
+                        <li><a href="/item-brand.html"><span class="lang-content" data-en="Add Brand" data-bn="ব্র্যান্ড যুক্ত করুন">Add Brand</span></a></li>
+                        <li><a href="/item-category.html"><span class="lang-content" data-en="Category" data-bn="ক্যাটাগরি">Category</span></a></li>
+                        <li><a href="/item-add.html"><span class="lang-content" data-en="Add Item" data-bn="আইটেম যুক্ত করুন">Add Item</span></a></li>
+                    </ul>
+                </li>
+
+                <!-- আইটেম ক্রয় -->
+                <li class="menu-item-has-children">
+                    <a href="#" class="menu-toggle">
+                        <i class="fas fa-shopping-bag me-1"></i>
+                        <span class="lang-content" data-en="Item Purchase" data-bn="আইটেম ক্রয়">Item Purchase</span>
+                        <i class="fas fa-chevron-down arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/item-purchase.html"><span class="lang-content" data-en="Purchase Item" data-bn="আইটেম ক্রয় করুন">আইটেম ক্রয় করুন</span></a></li>
+                        <li><a href="/item-purchase-record.html"><span class="lang-content" data-en="View Records" data-bn="রেকর্ড দেখুন">রেকর্ড দেখুন</span></a></li>
+                        <li><a href="/item-purchase-return.html"><span class="lang-content" data-en="Return" data-bn="ফেরত দিন">ফেরত দিন</span></a></li>
+                        <li><a href="/item-purchase-report.html"><span class="lang-content" data-en="Report" data-bn="রিপোর্ট">রিপোর্ট</span></a></li>
+                    </ul>
+                </li>
+
+                <!-- আইটেম বিক্রি -->
+                <li class="menu-item-has-children">
+                    <a href="#" class="menu-toggle">
+                        <i class="fas fa-tags me-1"></i>
+                        <span class="lang-content" data-en="Item Sales" data-bn="আইটেম বিক্রি">Item Sales</span>
+                        <i class="fas fa-chevron-down arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/item-stock-report.html"><span class="lang-content" data-en="Stock Report" data-bn="স্টক রিপোর্ট">Stock Report</span></a></li>
+                        <li><a href="/item-sell.html"><span class="lang-content" data-en="Sell Item" data-bn="আইটেম বিক্রি করুন">Sell Item</span></a></li>
+                        <li><a href="/item-sell-record.html"><span class="lang-content" data-en="View Records" data-bn="রেকর্ড দেখুন">View Records</span></a></li>
+                        <li><a href="/item-sell-return.html"><span class="lang-content" data-en="Return" data-bn="ফেরত দিন">Return</span></a></li>
+                        <li><a href="/item-sell-report.html"><span class="lang-content" data-en="Report" data-bn="রিপোর্ট">Report</span></a></li>
+                    </ul>
+                </li>
+
+                <!-- সাপ্লায়ার -->
+                <li>
+                    <a href="/item-supplier-add.html">
+                        <i class="fas fa-user-tie me-1"></i>
+                        <span class="lang-content" data-en="Supplier" data-bn="সাপ্লায়ার">Supplier</span>
+                    </a>
+                </li>
+
+                <!-- ড্যামেজ -->
+                <li>
+                    <a href="/item-damage-add.html">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <span class="lang-content" data-en="Damage" data-bn="ড্যামেজ">Damage</span>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        <!-- হিসাব -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-calculator"></i>
+                <span class="lang-content" data-en="Accounts" data-bn="হিসাব-নিকাশ">Accounts</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li class="menu-item-has-children">
+                    <a href="#" class="menu-toggle">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        <span class="lang-content" data-en="Reports" data-bn="রিপোর্ট">Reports</span>
+                        <i class="fas fa-chevron-down arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/order-delivery-report.html"><span class="lang-content" data-en="Order & Delivery Report" data-bn="অর্ডার ও ডেলিভারি রিপোর্ট">Order & Delivery Report</span></a></li>
+                        <li><a href="/income-expense-report.html"><span class="lang-content" data-en="Income & Expense Report" data-bn="আয় ও ব্যয়ের রিপোর্ট">Income & Expense Report</span></a></li>
+                        <li><a href="/income-expense-net.html"><span class="lang-content" data-en="Income Expense Net" data-bn="ইনকাম এক্সপেন্স নেট">Income Expense Net</span></a></li>
+                        <li><a href="/account-log.html"><span class="lang-content" data-en="Account Log" data-bn="একাউন্ট লগ">Account Log</span></a></li>
+                        <li><a href="/income-due-expense.html"><span class="lang-content" data-en="Income, Due & Expense" data-bn="জমা, বাকি ও খরচ দেখুন">Income, Due & Expense</span></a></li>
+                        <li><a href="/transaction-log.html"><span class="lang-content" data-en="Transaction Log" data-bn="লেনদেন লগ">Transaction Log</span></a></li>
+                    </ul>
+                </li>
+                <li><a href="/add-expense.html"><span class="lang-content" data-en="Add Expense" data-bn="খরচ যুক্ত করুন">Add Expense</span></a></li>
+                <li><a href="/add-other-income.html"><span class="lang-content" data-en="Add Other Income" data-bn="অন্যান্য আয় যোগ করুন">Add Other Income</span></a></li>
+                <li><a href="/account-management.html"><span class="lang-content" data-en="Account Management" data-bn="একাউন্ট ম্যানেজমেন্ট">Account Management</span></a></li>
+                <li><a href="/employee.html"><span class="lang-content" data-en="Employee Accounts" data-bn="কর্মচারীর হিসাব">কর্মচারীর হিসাব</span></a></li>
+            </ul>
+        </li>
+
+        <!-- ইনভয়েস -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-file-invoice"></i>
+                <span class="lang-content" data-en="Invoice" data-bn="ইনভয়েস">ইনভয়েস</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="/due-invoice.html"><span class="lang-content" data-en="Due Invoice" data-bn="ডিউ ইনভয়েস">ডিউ ইনভয়েস</span></a></li>
+                <li><a href="/paid-invoice.html"><span class="lang-content" data-en="Paid Invoice" data-bn="পেইড ইনভয়েস">পেইড ইনভয়েস</span></a></li>
+            </ul>
+        </li>
+
+        <!-- মেসেজ -->
+        <li class="menu-item-has-children">
+            <a href="#" class="menu-toggle">
+                <i class="fas fa-sms"></i>
+                <span class="lang-content" data-en="Message" data-bn="মেসেজ">Message</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="/sms.html"><span class="lang-content" data-en="Send SMS" data-bn="এসএমএস পাঠান">Send SMS</span></a></li>
+                <li><a href="/sms-history.html"><span class="lang-content" data-en="SMS History" data-bn="এসএমএস ইতিহাস">SMS History</span></a></li>
+                <li><a href="/contact-list.html"><span class="lang-content" data-en="Phone contact list" data-bn="ফোন কন্টাক্ট লিস্ট">Phone contact list</span></a></li>
+                <li><a href="/sms-recharge.html"><span class="lang-content" data-en="Recharge" data-bn="রিচার্জ">Recharge</span></a></li>
+                <li><a href="/sms-settings.html"><span class="lang-content" data-en="SMS Settings" data-bn="SMS সেটিংস">SMS Settings</span></a></li>
+            </ul>
+        </li>
+
+    </ul>
+</aside>

@@ -1,0 +1,381 @@
+﻿{
+  "info": {
+    "name": "TailorBD API",
+    "description": "Complete API collection for TailorBD Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Customer By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/1?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "1"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Customer By Phone",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/by-phone/01712345678?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "by-phone", "01712345678"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationID\": 1,\n  \"institutionID\": 1,\n  \"customerNumber\": \"C001\",\n  \"customerName\": \"জন ডো\",\n  \"phone\": \"01712345678\",\n  \"address\": \"ঢাকা, বাংলাদেশ\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers"]
+            }
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerID\": 1,\n  \"registrationID\": 1,\n  \"institutionID\": 1,\n  \"customerNumber\": \"C001\",\n  \"customerName\": \"জন ডো আপডেটেড\",\n  \"phone\": \"01712345678\",\n  \"address\": \"ঢাকা, বাংলাদেশ\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/1?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "1"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{orderId}?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{orderId}"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Orders By Customer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/by-customer/1?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "by-customer", "1"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Orders By Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/by-date?institutionId=1&startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "by-date"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institutionID\": 1,\n  \"registrationID\": 1,\n  \"customerID\": 1,\n  \"deliveryDate\": \"2024-06-01\",\n  \"totalAmount\": 2500.00,\n  \"paidAmount\": 1000.00,\n  \"orderDetails\": \"Shirt and Pant\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderID\": \"{orderId}\",\n  \"institutionID\": 1,\n  \"registrationID\": 1,\n  \"customerID\": 1,\n  \"deliveryDate\": \"2024-06-15\",\n  \"totalAmount\": 3000.00,\n  \"paidAmount\": 2000.00,\n  \"orderDetails\": \"Shirt, Pant and Blazer\",\n  \"deliveryStatus\": \"In Progress\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{orderId}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{orderId}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{orderId}?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{orderId}"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dresses",
+      "item": [
+        {
+          "name": "Get All Dresses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dresses?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dresses"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Dress By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dresses/1?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dresses", "1"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Dress",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institutionID\": 1,\n  \"registrationID\": 1,\n  \"dressName\": \"শার্ট\",\n  \"price\": 500.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dresses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dresses"]
+            }
+          }
+        },
+        {
+          "name": "Update Dress",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dressID\": 1,\n  \"institutionID\": 1,\n  \"registrationID\": 1,\n  \"dressName\": \"প্রিমিয়াম শার্ট\",\n  \"price\": 750.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dresses/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dresses", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Dress",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dresses/1?institutionId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dresses", "1"],
+              "query": [
+                {
+                  "key": "institutionId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7000",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,586 @@
+﻿/* ============================================================
+   quick-order.css  — TailorBD Quick Order Page
+   ============================================================ */
+
+/* ── Page Header ─────────────────────────────────────────── */
+.page-header h4 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #1e293b;
+}
+                            
+/* ── Order-Number badge ──────────────────────────────────── */
+.order-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+}
+
+/* ── Header action buttons ───────────────────────────────── */
+#getOrderNumberBtn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 9px 18px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+#getOrderNumberBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+}
+
+.btn-customer {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 9px 18px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+}
+.btn-customer:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(16,185,129,0.4);
+    color: #fff;
+}
+
+/* ── Customer Info Bar ───────────────────────────────────── */
+.customer-info-bar {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #6366f1;
+    border-radius: 12px;
+    padding: 12px 18px;
+    gap: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+.customer-info-bar .customer-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.customer-info-bar .customer-name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.customer-info-bar .customer-phone {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Add Dress Card ──────────────────────────────────────── */
+.add-dress-card {
+    background: #fff;
+    border: 2px dashed #c7d2fe;
+    border-radius: 16px;
+    padding: 20px 24px;
+    transition: border-color 0.2s;
+}
+.add-dress-card:hover {
+    border-color: #6366f1;
+}
+
+.add-dress-card .form-select {
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.add-dress-card .form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+.btn-add-dress {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 10px 22px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(30,41,59,0.25);
+}
+.btn-add-dress:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(30,41,59,0.35);
+    color: #fff;
+}
+
+/* ── Dress List Table ────────────────────────────────────── */
+.dress-list-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.dress-list-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 14px 20px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dress-list-card .table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.dress-list-card .table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.dress-list-card .table tbody tr:hover {
+    background: #fafbff;
+}
+
+.dress-number-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dress-name-text {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+}
+
+/* ── Dress Action Buttons ────────────────────────────────── */
+.btn-measurement {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    transition: all 0.2s;
+}
+.btn-measurement:hover { transform: translateY(-1px); filter: brightness(1.1); color: #fff; }
+
+.btn-style {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    transition: all 0.2s;
+}
+.btn-style:hover { transform: translateY(-1px); filter: brightness(1.1); color: #fff; }
+
+.btn-payment-open {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    transition: all 0.2s;
+}
+.btn-payment-open:hover { transform: translateY(-1px); filter: brightness(1.1); color: #fff; }
+
+.qty-input {
+    width: 75px !important;
+    margin: auto;
+    text-align: center;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    padding: 6px 8px;
+    font-weight: 600;
+    transition: border-color 0.2s;
+}
+.qty-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    outline: none;
+}
+
+.details-input {
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    padding: 7px 12px;
+    font-size: 0.85rem;
+    transition: border-color 0.2s;
+}
+.details-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    outline: none;
+}
+
+.btn-remove-dress {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.btn-remove-dress:hover {
+    background: #dc2626;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* ── Payment per-dress cards ─────────────────────────────── */
+.payment-card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.payment-card .card-header {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-bottom: 1px solid #bbf7d0;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.payment-card .card-header .dress-label {
+    font-weight: 700;
+    color: #065f46;
+    font-size: 0.9rem;
+}
+
+.payment-card .card-header .payment-count {
+    background: #10b981;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 2px 8px;
+}
+
+.payment-card .table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.payment-card .table td {
+    padding: 10px 14px;
+    vertical-align: middle;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.payment-for-label {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.stock-info {
+    font-size: 0.75rem;
+    color: #3b82f6;
+    font-weight: 500;
+}
+
+.payment-unit-input,
+.payment-price-input {
+    border-radius: 7px;
+    border: 1.5px solid #e2e8f0;
+    text-align: right;
+    font-size: 0.85rem;
+    padding: 5px 8px;
+    transition: border-color 0.2s;
+}
+.payment-unit-input { text-align: center; width: 80px; }
+.payment-price-input { width: 110px; }
+
+.payment-unit-input:focus,
+.payment-price-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    outline: none;
+}
+
+.line-total {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.btn-remove-payment {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.btn-remove-payment:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+/* ── Order Summary Panel ─────────────────────────────────── */
+.summary-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.12);
+    overflow: hidden;
+}
+
+.summary-card .card-header {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 16px 22px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.summary-card .card-body {
+    background: #fafbff;
+    padding: 22px;
+}
+
+.summary-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+    border: 1px solid #e0e7ff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+}
+
+.summary-total-row .label {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.summary-total-row .value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #4f46e5;
+}
+
+.summary-input-row {
+    margin-bottom: 14px;
+}
+
+.summary-input-row label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+}
+
+.summary-input-row .form-control,
+.summary-input-row .form-select {
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    padding: 9px 14px;
+    font-size: 0.9rem;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.summary-input-row .form-control:focus,
+.summary-input-row .form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+.summary-due-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+}
+
+.summary-due-row .label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.summary-due-row .value {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #dc2626;
+}
+
+.btn-submit-order {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 13px;
+    width: 100%;
+    transition: all 0.25s;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.35);
+    letter-spacing: 0.3px;
+}
+
+.btn-submit-order:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99,102,241,0.45);
+    color: #fff;
+}
+
+.btn-submit-order:disabled {
+    opacity: 0.7;
+    transform: none;
+}
+
+/* ── Autocomplete ────────────────────────────────────────── */
+.autocomplete-wrapper {
+    position: relative;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    z-index: 1060;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.autocomplete-dropdown .dropdown-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.autocomplete-dropdown .dropdown-item:last-child { border-bottom: none; }
+
+.autocomplete-dropdown .dropdown-item:hover {
+    background: #f0f4ff;
+    color: #4f46e5;
+}
+
+/* ── Empty-state placeholder ─────────────────────────────── */
+.empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+    color: #c7d2fe;
+}
+
+.empty-state p {
+    font-size: 0.9rem;
+}
+
+/* ── Modal refinements ───────────────────────────────────── */
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    overflow: hidden;
+}
+
+.bg-teal {
+    background: linear-gradient(135deg, #009688, #00796b) !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .add-dress-card { padding: 14px 16px; }
+    .dress-list-card .table th,
+    .dress-list-card .table td { padding: 10px 12px; }
+    .summary-card .card-body { padding: 16px; }
+    .summary-total-row .value { font-size: 1.15rem; }
+}

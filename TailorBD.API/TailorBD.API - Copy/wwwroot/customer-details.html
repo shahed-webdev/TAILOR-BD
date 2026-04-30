@@ -1,0 +1,279 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কাস্টমারের বিস্তারিত - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .container { max-width: 100%; padding: 10px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 16px; }
+        h2 { color: #6c7ae0; margin-bottom: 14px; font-size: 20px; font-weight: 700; }
+
+        /* Profile */
+        .profile-section { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+        .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: #6c7ae0; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 700; flex-shrink: 0; }
+        .profile-info ul { list-style: none; padding: 0; margin: 0; }
+        .profile-info ul li { font-size: 14px; color: #444; margin-bottom: 3px; }
+        .profile-info ul li strong { color: #222; font-size: 15px; }
+        .quick-links { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .quick-links a { font-size: 13px; color: #6c7ae0; text-decoration: none; font-weight: 500; }
+        .quick-links a:hover { text-decoration: underline; }
+        .quick-links span { color: #ccc; }
+
+        /* Tabs */
+        .tabs-nav { display: flex; gap: 4px; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 9px 18px; border: none; background: none; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: #666; border-bottom: 2px solid transparent;
+            margin-bottom: -2px; transition: all 0.2s; white-space: nowrap;
+        }
+        .tab-btn.active { color: #6c7ae0; border-bottom-color: #6c7ae0; font-weight: 700; }
+        .tab-btn:hover { color: #6c7ae0; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Dress select */
+        .dress-select-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+        .dress-select-row select { flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; font-family: inherit; }
+        .dress-select-row select:focus { outline: none; border-color: #6c7ae0; }
+        .dress-select-row select option.has-measurement { font-weight: 700; color: #28a745; }
+        .dress-legend { font-size: 12px; color: #888; margin-bottom: 14px; }
+        .dress-legend span { color: #28a745; font-weight: 700; }
+
+        /* Measurement groups */
+        .measurement-section { display: flex; gap: 16px; flex-wrap: wrap; }
+        .measurement-group { background: #f8f9fa; border-radius: 6px; padding: 14px; min-width: 180px; }
+        .measurement-group h6 { color: #6c7ae0; font-weight: 700; font-size: 13px; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .measurement-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+        .measurement-item label { font-size: 13px; color: #555; white-space: nowrap; }
+        .measurement-item input { width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; text-align: center; font-family: inherit; }
+        .measurement-item input:focus { outline: none; border-color: #6c7ae0; }
+
+        /* Style section */
+        .style-section { margin-top: 18px; }
+        .style-category { margin-bottom: 16px; }
+        .style-category h6 { color: #555; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .style-items { display: flex; gap: 10px; flex-wrap: wrap; }
+        .style-item { border: 2px solid #ddd; border-radius: 6px; padding: 8px 12px; cursor: pointer; transition: all 0.2s; }
+        .style-item.checked { border-color: #6c7ae0; background: #f0f2ff; }
+        .style-item label { cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .style-item input[type=checkbox] { accent-color: #6c7ae0; width: 14px; height: 14px; }
+        .style-measure { margin-top: 5px; }
+        .style-measure input { width: 100%; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; }
+
+        /* Details textarea */
+        .details-box { margin-top: 16px; }
+        .details-box label { font-size: 13px; color: #555; font-weight: 500; margin-bottom: 5px; display: block; }
+        .details-box textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; min-height: 70px; resize: vertical; }
+
+        /* Buttons */
+        .btn-save {
+            padding: 9px 24px; background: #6c7ae0; color: white; border: none;
+            border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+        }
+        .btn-save:hover { background: #5a68c9; }
+        .btn-save:disabled { background: #aaa; cursor: not-allowed; }
+        .btn-print { padding: 9px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600; margin-top: 14px; margin-left: 8px; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-print:hover { background: #218838; }
+
+        /* Table */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #6c7ae0; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+        td { padding: 7px 8px; border-bottom: 1px solid #e0e0e0; text-align: center; vertical-align: middle; }
+        tr:hover { background: #f8f9fa; }
+        tfoot td { background: #f0f2ff; font-weight: 700; }
+
+        /* Due input */
+        .due-input { width: 90px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center; font-family: inherit; }
+        .due-input:focus { outline: none; border-color: #6c7ae0; }
+        .due-input.error-input { border-color: #dc3545; }
+
+        /* Alert */
+        .alert-msg { padding: 10px 14px; border-radius: 5px; font-size: 13px; margin-top: 10px; display: none; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Loading */
+        .loading { text-align: center; padding: 30px; color: #888; font-size: 14px; }
+        .empty-msg { text-align: center; padding: 20px; color: #aaa; font-size: 13px; }
+
+        /* Account select */
+        .account-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        .account-row select { padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; }
+        .btn-collect { padding: 9px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-collect:hover { background: #218838; }
+        .btn-collect:disabled { background: #aaa; cursor: not-allowed; }
+
+        /* Collect Panel */
+        .collect-panel { margin-top: 16px; background: #f8f9fe; border: 1px solid #e0e4ff; border-radius: 8px; padding: 16px 20px; }
+        .collect-summary { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+        .collect-total-box { text-align: center; }
+        .collect-label { display: block; font-size: 12px; color: #888; font-weight: 500; margin-bottom: 4px; }
+        .collect-total-val { font-size: 22px; font-weight: 800; color: #dc3545; }
+        .collect-arrow { font-size: 20px; color: #ccc; padding-bottom: 4px; }
+        .collect-input-group { display: flex; flex-direction: column; }
+        .collect-input {
+            width: 160px; padding: 9px 12px; border: 2px solid #6c7ae0; border-radius: 6px;
+            font-size: 16px; font-weight: 700; text-align: center; color: #333; font-family: inherit;
+            outline: none;
+        }
+        .collect-input:focus { border-color: #5a68c9; box-shadow: 0 0 0 3px rgba(108,122,224,0.15); }
+        .collect-input.error-input { border-color: #dc3545; }
+        #accountSelect { padding: 9px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: inherit; min-width: 160px; }
+        .collect-hint { font-size: 12px; color: #888; margin-top: 10px; }
+
+        /* Due table - remove old per-row inputs */
+        .due-paid-col { color: #28a745; font-weight: 600; }
+
+        /* Collect Panel hidden state */
+        .collect-panel-hidden { display: none; }
+
+        @media(max-width:768px) {
+            #app-navbar { margin-left: 0; }
+            .main-content { margin-left: 0; }
+            .measurement-section { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="container">
+
+                <!-- Customer Profile -->
+                <div class="card">
+                    <h2><i class="fas fa-user me-2"></i>
+                        <span data-en="Customer Details" data-bn="কাস্টমারের বিস্তারিত বিবরণ">কাস্টমারের বিস্তারিত বিবরণ</span>
+                    </h2>
+                    <div class="profile-section" id="profileSection">
+                        <div class="loading">লোড হচ্ছে...</div>
+                    </div>
+                    <div class="quick-links">
+                        <a href="/add-customer.html"><i class="fas fa-user-plus me-1"></i>
+                            <span data-en="Add New Customer" data-bn="নতুন কাস্টমার যুক্ত করুন">নতুন কাস্টমার যুক্ত করুন</span>
+                        </a>
+                        <span>|</span>
+                        <a href="#"><i class="fas fa-list me-1"></i>
+                            <span data-en="Customer List" data-bn="কাস্টমার লিস্ট">কাস্টমার লিস্ট</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Тabs -->
+                <div class="card">
+                    <div class="tabs-nav" id="tabsNav">
+                        <button type="button" class="tab-btn active" data-tab="measurements" data-en="Customer Measurement" data-bn="কাস্টমারের মাপ">কাস্টমারের মাপ</button>
+                        <button type="button" class="tab-btn" data-tab="due" id="tabDue" data-en="Collect Due" data-bn="বাকি টাকা সংগ্রহ করুন">বাকি টাকা সংগ্রহ করুন</button>
+                        <button type="button" class="tab-btn" data-tab="payrecords" id="tabPayRecords" data-en="Payment Records" data-bn="পেইড রেকর্ড">পেইড রেকর্ড</button>
+                        <button type="button" class="tab-btn" data-tab="pending" id="tabPending" data-en="Pending Orders" data-bn="সদ্য অর্ডারকৃত পোষাক">সদ্য অর্ডারকৃত পোষাক</button>
+                        <button type="button" class="tab-btn" data-tab="delivered" id="tabDelivered" data-en="Delivered Orders" data-bn="এ যাবত বানানো পোষাক">এ যাবত বানানো পোষাক</button>
+                    </div>
+
+                    <!-- Measurements Tab -->
+                    <div class="tab-panel active" id="tab-measurements">
+                        <div class="dress-select-row">
+                            <select id="dressSelect">
+                                <option value="0" data-en="Select dress to add measurement" data-bn="মাপ যুক্ত করার জন্য পোষাক নির্বাচন করুন">মাপ যুক্ত করার জন্য পোষাক নির্বাচন করুন</option>
+                            </select>
+                        </div>
+                        <div class="dress-legend"><span>✔</span> চিহ্নিত পোষাকতে আগে থেকে মাপ সেভ আছে</div>
+                        <div id="measurementArea"><div class="empty-msg">পোষাক নির্বাচন করুন</div></div>
+                        <div id="measureSaveMsg" class="alert-msg"></div>
+                    </div>
+
+                    <!-- Due Tab -->
+                    <div class="tab-panel" id="tab-due">
+                        <div class="table-wrapper">
+                            <div id="dueTableContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                        <div class="collect-panel collect-panel-hidden" id="accountRow">
+                            <div class="collect-summary">
+                                <div class="collect-total-box">
+                                    <span class="collect-label" data-en="Total Due" data-bn="মোট বাকি">মোট বাকি</span>
+                                    <span class="collect-total-val" id="totalDueDisplay">0.00 /-</span>
+                                </div>
+                                <div class="collect-arrow"><i class="fas fa-arrow-right"></i></div>
+                                <div class="collect-input-group">
+                                    <label class="collect-label" data-en="How much paying?" data-bn="কত টাকা দিচ্ছেন?">কত টাকা দিচ্ছেন?</label>
+                                    <input type="number" id="collectAmountInput" class="collect-input" placeholder="0" min="0" inputmode="numeric">
+                                </div>
+                                <div class="collect-input-group">
+                                    <label class="collect-label" data-en="Discount" data-bn="ডিসকাউন্ট">ডিসকাউন্ট</label>
+                                    <input type="number" id="collectDiscountInput" class="collect-input" style="width:110px;border-color:#f59e0b;" placeholder="0" min="0" inputmode="numeric">
+                                </div>
+                                <div class="collect-input-group">
+                                    <label class="collect-label" data-en="Account" data-bn="একাউন্ট">একাউন্ট</label>
+                                    <select id="accountSelect">
+                                        <option value="">Without Account</option>
+                                    </select>
+                                </div>
+                                <button class="btn-collect" onclick="collectDue()">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                    <span data-en="Collect Due" data-bn="বাকি টাকা সংগ্রহ করুন">বাকি টাকা সংগ্রহ করুন</span>
+                                </button>
+                            </div>
+                            <div class="collect-hint">
+                                <i class="fas fa-info-circle me-1" style="color:#6c7ae0;"></i>
+                                <span data-en="Payment will be applied to orders from top to bottom" data-bn="টাকা উপর থেকে পর্যায়ক্রমে অর্ডারে প্রযোগ হবে">টাকা উপর থেকে পর্যায়ক্রমে অর্ডারে প্রযোগ হবে</span>
+                            </div>
+                        </div>
+                        <div id="dueMsg" class="alert-msg"></div>
+                    </div>
+
+                    <!-- Payment Records Tab -->
+                    <div class="tab-panel" id="tab-payrecords">
+                        <div class="table-wrapper">
+                            <div id="payRecordsContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Orders Tab -->
+                    <div class="tab-panel" id="tab-pending">
+                        <div class="table-wrapper">
+                            <div id="pendingOrdersContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Delivered Orders Tab -->
+                    <div class="tab-panel" id="tab-delivered">
+                        <div class="table-wrapper">
+                            <div id="deliveredOrdersContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <div id="app-modals"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tab switching — inline pure JS, no dependency on jQuery or other scripts
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+            e.preventDefault();
+            var tab = btn.getAttribute('data-tab');
+            document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+            var panel = document.getElementById('tab-' + tab);
+            if (panel) panel.classList.add('active');
+        });
+    </script>
+    <script src="/js/app-components.js"></script>
+    <script src="/js/customer-details.js"></script>
+</body>
+</html>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Reports - TailorBD</title>
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+    <script src="/js/auth.js?v=2.1.4"></script>
+    <script src="/js/authority-layout.js?v=2.1.4" data-page="marketing"></script>
+    <style>
+        :root {
+            --green-grad:  linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --orange-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            --red-grad:    linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --blue-grad:   linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        /* Page header */
+        .page-header {
+            background: var(--auth-grad); border-radius: var(--radius);
+            padding: 22px 28px; color: #fff;
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 8px 32px rgba(99,102,241,.3); margin-bottom: 22px;
+            position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content:''; position:absolute; width:200px; height:200px; border-radius:50%;
+            background:rgba(255,255,255,.07); top:-70px; right:-40px;
+        }
+        .ph-icon { width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;z-index:1; }
+        .ph-text { z-index:1;flex:1; }
+        .ph-text h2 { font-size:1.25rem;font-weight:700;margin:0 0 3px; }
+        .ph-text p  { font-size:.84rem;opacity:.82;margin:0; }
+
+        /* Stat cards */
+        .stat-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:22px; }
+        .stat-card { background:#fff;border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px; }
+        .sc-icon { width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0; }
+        .sc-val { font-size:1.35rem;font-weight:800;color:#1e293b;line-height:1; }
+        .sc-lbl { font-size:.72rem;color:#94a3b8;font-weight:600;margin-top:2px; }
+
+        /* Tabs */
+        .tab-nav { display:flex;gap:4px;border-bottom:2px solid #e2e8f0;margin-bottom:20px; }
+        .tab-btn { background:none;border:none;padding:10px 18px;font-size:.87rem;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .2s;border-radius:8px 8px 0 0; }
+        .tab-btn:hover { color:#6366f1;background:#f5f3ff; }
+        .tab-btn.active { color:#6366f1;border-bottom-color:#6366f1; }
+        .tab-panel { display:none; }
+        .tab-panel.active { display:block; }
+
+        /* Form card */
+        .form-card { background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 28px;margin-bottom:20px; }
+        .form-card .fc-title { font-size:1rem;font-weight:700;color:#1e293b;margin-bottom:18px;display:flex;align-items:center;gap:8px; }
+        .form-label-custom { font-size:.82rem;font-weight:600;color:#475569;margin-bottom:4px; }
+
+        /* Filter bar */
+        .filter-bar { background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center; }
+        .filter-bar input, .filter-bar select { border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 12px;font-size:.86rem;outline:none;background:#fff; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color:#6366f1; }
+
+        /* Table */
+        .table thead th { background:#f8fafc;color:#64748b;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e2e8f0;padding:10px 12px;white-space:nowrap; }
+        .table tbody td { padding:11px 12px;vertical-align:middle;border-color:#f1f5f9;font-size:.84rem; }
+        .table tbody tr:hover { background:#fafbff; }
+
+        /* Possibility badges */
+        .pos-very-high { background:#d1fae5;color:#065f46;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700; }
+        .pos-high       { background:#dbeafe;color:#1e40af;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700; }
+        .pos-average    { background:#fef3c7;color:#92400e;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700; }
+        .pos-low        { background:#fff7ed;color:#c2410c;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700; }
+        .pos-no         { background:#fee2e2;color:#991b1b;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700; }
+
+        /* Buttons */
+        .btn-act { display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:none;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .16s; }
+        .btn-edit    { background:#ede9fe;color:#6366f1;border:1px solid #c4b5fd; }
+        .btn-edit:hover    { background:#6366f1;color:#fff; }
+        .btn-delete  { background:#fee2e2;color:#991b1b;border:1px solid #fecaca; }
+        .btn-delete:hover  { background:#ef4444;color:#fff; }
+        .btn-sms     { background:#d1fae5;color:#065f46;border:1px solid #a7f3d0; }
+        .btn-sms:hover     { background:#10b981;color:#fff; }
+
+        /* Toast */
+        #toastWrap { position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
+        .toast-item { padding:12px 18px;border-radius:10px;font-size:.85rem;color:#fff;min-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.15);animation:slideIn .3s ease; }
+        .toast-item.success { background:#10b981; }
+        .toast-item.error   { background:#ef4444; }
+        .toast-item.info    { background:#3b82f6; }
+        @keyframes slideIn { from{transform:translateX(60px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+        /* SMS section */
+        .sms-area { background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-top:16px; }
+        .selected-count { background:#ede9fe;color:#6366f1;padding:3px 12px;border-radius:20px;font-size:.78rem;font-weight:700; }
+    </style>
+</head>
+<body>
+<div class="auth-main">
+    <div class="auth-content">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div class="ph-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="ph-text">
+                <h2>Marketing Reports</h2>
+                <p>মার্কেটিং ভিজিট রিপোর্ট দেখুন, যোগ করুন ও SMS পাঠান</p>
+            </div>
+            <div style="z-index:1;margin-left:auto;">
+                <button class="btn-act" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.35);padding:7px 16px;font-size:.82rem;" onclick="loadReports()">
+                    <i class="fas fa-sync-alt" id="refreshIcon"></i> রিফ্রেশ
+                </button>
+            </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-grid" id="statGrid">
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--auth-grad);"><i class="fas fa-store"></i></div>
+                <div><div class="sc-val" id="statTotal">...</div><div class="sc-lbl">মোট ভিজিট</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-star"></i></div>
+                <div><div class="sc-val" id="statVeryHigh">�</div><div class="sc-lbl">Very High</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--blue-grad);"><i class="fas fa-thumbs-up"></i></div>
+                <div><div class="sc-val" id="statHigh">�</div><div class="sc-lbl">High</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-minus-circle"></i></div>
+                <div><div class="sc-val" id="statAvg">�</div><div class="sc-lbl">Average</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-times-circle"></i></div>
+                <div><div class="sc-val" id="statNo">�</div><div class="sc-lbl">No / Low</div></div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('tab-list',this)"><i class="fas fa-list me-1"></i>রিপোর্ট তালিকা</button>
+            <button class="tab-btn" onclick="switchTab('tab-add',this)"><i class="fas fa-plus-circle me-1"></i>নতুন রিপোর্ট</button>
+            <button class="tab-btn" onclick="switchTab('tab-sms',this)"><i class="fas fa-sms me-1"></i>SMS পাঠান</button>
+        </div>
+
+        <!-- -- TAB 1 � Report List -- -->
+        <div class="tab-panel active" id="tab-list">
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="প্রতিষ্ঠান / মোট / এলাকা খুঁজুন..." oninput="applyFilters()" style="flex:1;min-width:200px;">
+                <select id="filterPossibility" onchange="applyFilters()">
+                    <option value="">সব Possibility</option>
+                    <option>Very High</option>
+                    <option>High</option>
+                    <option>Average</option>
+                    <option>Low</option>
+                    <option>No</option>
+                </select>
+                <select id="filterArea" onchange="applyFilters()">
+                    <option value="">সব এলাকা</option>
+                </select>
+                <span style="font-size:.82rem;color:#64748b;margin-left:auto;" id="resultInfo"></span>
+            </div>
+
+            <div class="form-card" style="padding:0;overflow:hidden;">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:36px;"></th>
+                                <th>প্রতিষ্ঠান</th>
+                                <th>যোগাযোগ</th>
+                                <th>মোট</th>
+                                <th>এলাকা / মার্কেট</th>
+                                <th>Possibility</th>
+                                <th>Visited Date</th>
+                                <th>Deal Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTbody">
+                            <tr><td colspan="9" class="text-center py-4"><div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- -- TAB 2 � Add Report -- -->
+        <div class="tab-panel" id="tab-add">
+            <div class="form-card">
+                <div class="fc-title"><i class="fas fa-plus-circle" style="color:#6366f1;"></i> নতুন মার্কেটিং রিপোর্ট যোগ করুন</div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label-custom">প্রতিষ্ঠানের নাম <span class="text-danger">*</span></label>
+                        <input type="text" id="fInstitutionName" class="form-control" placeholder="যেমন: ABC Tailors">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">যোগাযোগকারী ব্যক্তি <span class="text-danger">*</span></label>
+                        <input type="text" id="fContactPerson" class="form-control" placeholder="নাম">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">মোট <span class="text-danger">*</span></label>
+                        <input type="text" id="fPhone" class="form-control" placeholder="01XXXXXXXXX">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">শহর <span class="text-danger">*</span></label>
+                        <input type="text" id="fCity" class="form-control" placeholder="ঢাকা">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">এলাকা <span class="text-danger">*</span></label>
+                        <input type="text" id="fArea" class="form-control" placeholder="মিরপুর">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">পোস্ট কোড</label>
+                        <input type="text" id="fPostCode" class="form-control" placeholder="1216">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">মার্কেটের নাম <span class="text-danger">*</span></label>
+                        <input type="text" id="fMarketName" class="form-control" placeholder="মার্কেটের নাম">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">দোকান নং <span class="text-danger">*</span></label>
+                        <input type="text" id="fShopNo" class="form-control" placeholder="দোকান নং">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">ভিজিটকারী</label>
+                        <input type="text" id="fVisitedBy" class="form-control" placeholder="নাম">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">ভিজিটের তারিখ <span class="text-danger">*</span></label>
+                        <input type="date" id="fVisitingDate" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">Deal Price (৳)</label>
+                        <input type="number" id="fDealPrice" class="form-control" placeholder="0" min="0">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">Possibility <span class="text-danger">*</span></label>
+                        <select id="fPossibility" class="form-select">
+                            <option value="">[ নির্বাচন করুন ]</option>
+                            <option>Very High</option>
+                            <option>High</option>
+                            <option>Average</option>
+                            <option>Low</option>
+                            <option>No</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label-custom">Feedback / মন্তব্য</label>
+                        <textarea id="fFeedback" class="form-control" rows="3" placeholder="ভিজিটের বিস্তারিত মন্তব্য লিখুন..."></textarea>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                        <button class="btn btn-light border px-4" onclick="resetForm()"><i class="fas fa-undo me-1"></i>রিসেট</button>
+                        <button class="btn btn-primary px-4 fw-bold" id="submitBtn" onclick="submitReport()">
+                            <i class="fas fa-paper-plane me-1"></i>জমা দিন
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- -- TAB 3 � SMS -- -->
+        <div class="tab-panel" id="tab-sms">
+            <div class="filter-bar">
+                <select id="smsFilterPossibility" onchange="loadSMSList()">
+                    <option value="">সব Possibility</option>
+                    <option>Very High</option>
+                    <option>High</option>
+                    <option>Average</option>
+                    <option>Low</option>
+                    <option>No</option>
+                </select>
+                <select id="smsFilterArea" onchange="loadSMSList()">
+                    <option value="">সব এলাকা</option>
+                </select>
+                <button class="btn-act btn-sms" onclick="selectAllSMS(true)"><i class="fas fa-check-square me-1"></i>সব নির্বাচন</button>
+                <button class="btn-act" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;" onclick="selectAllSMS(false)"><i class="fas fa-square me-1"></i>বাতিল</button>
+                <span class="selected-count" id="selectedCount">০ নির্বাচিত</span>
+            </div>
+
+            <div class="form-card" style="padding:0;overflow:hidden;margin-bottom:16px;">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:36px;"><input type="checkbox" id="smsSelectAll" onchange="selectAllSMS(this.checked)" style="accent-color:#6366f1;"></th>
+                                <th>প্রতিষ্ঠান</th>
+                                <th>যোগাযোগ</th>
+                                <th>মোট</th>
+                                <th>এলাকা</th>
+                                <th>Possibility</th>
+                            </tr>
+                        </thead>
+                        <tbody id="smsTbody">
+                            <tr><td colspan="6" class="text-center py-4 text-muted">SMS তালিকা লোড হচ্ছে...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sms-area">
+                <label class="form-label-custom mb-2"><i class="fas fa-comment-dots me-1"></i>বার্তার টেক্সট <span class="text-danger">*</span></label>
+                <textarea id="smsText" class="form-control mb-3" rows="4" placeholder="এখানে বার্তাটি লিখুন..."></textarea>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div style="font-size:.82rem;color:#64748b;" id="smsCharCount">০ অক্ষর</div>
+                    <button class="btn btn-success px-4 fw-bold" onclick="sendSMS()">
+                        <i class="fas fa-paper-plane me-1"></i>SMS পাঠান
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- auth-content -->
+</div><!-- auth-main -->
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2" style="color:#6366f1;"></i>রিপোর্ট সম্পাদনা</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="row g-3">
+                    <div class="col-md-4"><label class="form-label-custom">প্রতিষ্ঠান <span class="text-danger">*</span></label><input type="text" id="eInstitutionName" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label-custom">যোগাযোগ <span class="text-danger">*</span></label><input type="text" id="eContactPerson" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label-custom">মোট <span class="text-danger">*</span></label><input type="text" id="ePhone" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">শহর</label><input type="text" id="eCity" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">এলাকা</label><input type="text" id="eArea" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">পোস্ট কোড</label><input type="text" id="ePostCode" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">মার্কেট</label><input type="text" id="eMarketName" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">দোকান নং</label><input type="text" id="eShopNo" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">ভিজিটকারী</label><input type="text" id="eVisitedBy" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">তারিখ</label><input type="date" id="eVisitingDate" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label-custom">Deal Price</label><input type="number" id="eDealPrice" class="form-control" min="0"></div>
+                    <div class="col-md-4"><label class="form-label-custom">Possibility</label>
+                        <select id="ePossibility" class="form-select">
+                            <option>Very High</option><option>High</option><option>Average</option><option>Low</option><option>No</option>
+                        </select>
+                    </div>
+                    <div class="col-12"><label class="form-label-custom">Feedback / মন্তব্য</label><textarea id="eFeedback" class="form-control" rows="2"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">বাতিল</button>
+                <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="saveEdit()"><i class="fas fa-check me-1"></i>সেভ করুন</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastWrap"></div>
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script>
+// -- State ---------------------------------------------------------------------
+let allReports   = [];
+let smsReports   = [];
+let selectedSMS  = new Set();
+
+// -- Helpers -------------------------------------------------------------------
+function esc(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function fmt(d) {
+    if (!d) return '�';
+    const dt = d instanceof Date ? d : new Date(d);
+    return isNaN(dt) ? '�' : dt.toLocaleDateString('bn-BD', {day:'numeric',month:'short',year:'numeric'});
+}
+function posBadge(p) {
+    const map = {'Very High':'pos-very-high','High':'pos-high','Average':'pos-average','Low':'pos-low','No':'pos-no'};
+    const cls = map[p] || 'pos-average';
+    return `<span class="${cls}">${esc(p||'�')}</span>`;
+}
+function toast(msg, type='info') {
+    const t = $(`<div class="toast-item ${type}">${esc(msg)}</div>`);
+    $('#toastWrap').append(t);
+    setTimeout(()=>t.fadeOut(300,()=>t.remove()), 3500);
+}
+function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'tab-sms') loadSMSList();
+}
+
+// -- Load Reports --------------------------------------------------------------
+async function loadReports() {
+    document.getElementById('refreshIcon').classList.add('fa-spin');
+    try {
+        const res  = await fetch('/api/marketing/reports');
+        const data = await res.json();
+        allReports = data.data || [];
+        updateStats();
+        populateAreaFilters();
+        applyFilters();
+    } catch(e) { toast('রিপোর্ট লোড ব্যর্থ: ' + e.message, 'error'); }
+    document.getElementById('refreshIcon').classList.remove('fa-spin');
+}
+
+function updateStats() {
+    document.getElementById('statTotal').textContent   = allReports.length;
+    document.getElementById('statVeryHigh').textContent= allReports.filter(r=>r.possibility==='Very High').length;
+    document.getElementById('statHigh').textContent    = allReports.filter(r=>r.possibility==='High').length;
+    document.getElementById('statAvg').textContent     = allReports.filter(r=>r.possibility==='Average').length;
+    document.getElementById('statNo').textContent      = allReports.filter(r=>r.possibility==='Low'||r.possibility==='No').length;
+}
+
+function populateAreaFilters() {
+    const areas = [...new Set(allReports.map(r=>r.area).filter(Boolean))].sort();
+    ['filterArea','smsFilterArea'].forEach(id => {
+        const sel = document.getElementById(id);
+        const cur = sel.value;
+        sel.innerHTML = '<option value="">সব এলাকা</option>' +
+            areas.map(a=>`<option${a===cur?' selected':''}>${esc(a)}</option>`).join('');
+    });
+}
+
+function applyFilters() {
+    const q   = (document.getElementById('searchInput').value||'').toLowerCase();
+    const pos = document.getElementById('filterPossibility').value;
+    const area= document.getElementById('filterArea').value;
+
+    const filtered = allReports.filter(r => {
+        const matchQ   = !q || (r.institutionName||'').toLowerCase().includes(q) ||
+                             (r.phone||'').includes(q) || (r.area||'').toLowerCase().includes(q);
+        const matchPos = !pos  || r.possibility === pos;
+        const matchArea= !area || r.area === area;
+        return matchQ && matchPos && matchArea;
+    });
+
+    document.getElementById('resultInfo').innerHTML = `<strong>${filtered.length}</strong> রিপোর্ট`;
+    renderReports(filtered);
+}
+
+function renderReports(list) {
+    const tbody = document.getElementById('reportTbody');
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">কোনো রিপোর্ট পাওয়া যায়নি</td></tr>';
+        return;
+    }
+    tbody.innerHTML = list.map((r,i) => `
+        <tr>
+            <td style="color:#94a3b8;font-size:.75rem;">${i+1}</td>
+            <td>
+                <div style="font-weight:700;color:#1e293b;">${esc(r.institutionName)}</div>
+                <div style="font-size:.73rem;color:#94a3b8;">${esc(r.city||'')}${r.postCode?' � '+esc(r.postCode):''}</div>
+            </td>
+            <td>
+                <div>${esc(r.contactPersonName||'�')}</div>
+                ${r.visitedBy?`<div style="font-size:.72rem;color:#94a3b8;">by ${esc(r.visitedBy)}</div>`:''}
+            </td>
+            <td>${esc(r.phone||'�')}</td>
+            <td>
+                <div style="font-weight:600;">${esc(r.area||'�')}</div>
+                <div style="font-size:.72rem;color:#94a3b8;">${esc(r.marketName||'')}${r.shopNo?' #'+esc(r.shopNo):''}</div>
+            </td>
+            <td>${posBadge(r.possibility)}</td>
+            <td style="font-size:.8rem;">${fmt(r.visitingDate)}</td>
+            <td style="font-weight:600;color:${r.dealPrice>0?'#10b981':'#94a3b8'};">${r.dealPrice>0?'?'+r.dealPrice:'�'}</td>
+            <td>
+                <button class="btn-act btn-edit me-1" onclick="openEdit(${r.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn-act btn-delete" onclick="deleteReport(${r.id})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`).join('');
+}
+
+// -- Submit Report -------------------------------------------------------------
+async function submitReport() {
+    const payload = {
+        institutionName:   document.getElementById('fInstitutionName').value.trim(),
+        contactPersonName: document.getElementById('fContactPerson').value.trim(),
+        phone:             document.getElementById('fPhone').value.trim(),
+        city:              document.getElementById('fCity').value.trim(),
+        area:              document.getElementById('fArea').value.trim(),
+        postCode:          document.getElementById('fPostCode').value.trim(),
+        marketName:        document.getElementById('fMarketName').value.trim(),
+        shopNo:            document.getElementById('fShopNo').value.trim(),
+        visitedBy:         document.getElementById('fVisitedBy').value.trim(),
+        visitingDate:      document.getElementById('fVisitingDate').value || null,
+        dealPrice:         parseFloat(document.getElementById('fDealPrice').value)||0,
+        possibility:       document.getElementById('fPossibility').value,
+        feedback:          document.getElementById('fFeedback').value.trim()
+    };
+
+    if (!payload.institutionName) { toast('প্রতিষ্ঠানের নাম দিন', 'error'); return; }
+    if (!payload.contactPersonName) { toast('যোগাযোগকারীর নাম দিন', 'error'); return; }
+    if (!payload.phone) { toast('মোট নম্বর দিন', 'error'); return; }
+    if (!payload.city) { toast('শহর দিন', 'error'); return; }
+    if (!payload.area) { toast('এলাকা দিন', 'error'); return; }
+    if (!payload.marketName) { toast('মার্কেটের নাম দিন', 'error'); return; }
+    if (!payload.shopNo) { toast('দোকান নম্বর দিন', 'error'); return; }
+    if (!payload.possibility) { toast('Possibility নির্বাচন করুন', 'error'); return; }
+    if (!payload.visitingDate) { toast('তারিখ দিন', 'error'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>জমা হচ্ছে...';
+    try {
+        const res  = await fetch('/api/marketing/reports', {
+            method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            toast('রিপোর্ট সফলভাবে যোগ হয়েছে', 'success');
+            resetForm();
+            loadReports();
+            switchTab('tab-list', document.querySelectorAll('.tab-btn')[0]);
+        } else { toast(data.message||'সমস্যা হয়েছে', 'error'); }
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>জমা দিন';
+}
+
+function resetForm() {
+    ['fInstitutionName','fContactPerson','fPhone','fCity','fArea','fPostCode',
+     'fMarketName','fShopNo','fVisitedBy','fFeedback','fDealPrice'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    document.getElementById('fPossibility').value = '';
+    document.getElementById('fVisitingDate').value = new Date().toISOString().split('T')[0];
+}
+
+// -- Edit ---------------------------------------------------------------------
+function openEdit(id) {
+    const r = allReports.find(x=>x.id===id);
+    if (!r) return;
+    document.getElementById('editId').value          = r.id;
+    document.getElementById('eInstitutionName').value= r.institutionName||'';
+    document.getElementById('eContactPerson').value  = r.contactPersonName||'';
+    document.getElementById('ePhone').value          = r.phone||'';
+    document.getElementById('eCity').value           = r.city||'';
+    document.getElementById('eArea').value           = r.area||'';
+    document.getElementById('ePostCode').value       = r.postCode||'';
+    document.getElementById('eMarketName').value     = r.marketName||'';
+    document.getElementById('eShopNo').value         = r.shopNo||'';
+    document.getElementById('eVisitedBy').value      = r.visitedBy||'';
+    document.getElementById('eVisitingDate').value   = r.visitingDate ? r.visitingDate.split('T')[0] : '';
+    document.getElementById('eDealPrice').value      = r.dealPrice||0;
+    document.getElementById('ePossibility').value    = r.possibility||'Average';
+    document.getElementById('eFeedback').value       = r.feedback||'';
+    new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+
+async function saveEdit() {
+    const id = document.getElementById('editId').value;
+    const payload = {
+        institutionName:   document.getElementById('eInstitutionName').value.trim(),
+        contactPersonName: document.getElementById('eContactPerson').value.trim(),
+        phone:             document.getElementById('ePhone').value.trim(),
+        city:              document.getElementById('eCity').value.trim(),
+        area:              document.getElementById('eArea').value.trim(),
+        postCode:          document.getElementById('ePostCode').value.trim(),
+        marketName:        document.getElementById('eMarketName').value.trim(),
+        shopNo:            document.getElementById('eShopNo').value.trim(),
+        visitedBy:         document.getElementById('eVisitedBy').value.trim(),
+        visitingDate:      document.getElementById('eVisitingDate').value || null,
+        dealPrice:         parseFloat(document.getElementById('eDealPrice').value)||0,
+        possibility:       document.getElementById('ePossibility').value,
+        feedback:          document.getElementById('eFeedback').value.trim()
+    };
+    try {
+        const res  = await fetch('/api/marketing/reports/' + id, {
+            method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            toast('আপডেট হয়েছে', 'success');
+            loadReports();
+        } else { toast(data.message||'সমস্যা হয়েছে', 'error'); }
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+}
+
+// -- Delete --------------------------------------------------------------------
+async function deleteReport(id) {
+    if (!confirm('এই রিপোর্টটি মুছে ফেলবেন?')) return;
+    try {
+        const res  = await fetch('/api/marketing/reports/' + id, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) { toast('রিপোর্ট মুছে ফেলা হয়েছে', 'success'); loadReports(); }
+        else { toast(data.message||'সমস্যা হয়েছে', 'error'); }
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+}
+
+// -- SMS Tab -------------------------------------------------------------------
+function loadSMSList() {
+    const pos  = document.getElementById('smsFilterPossibility').value;
+    const area = document.getElementById('smsFilterArea').value;
+    smsReports = allReports.filter(r =>
+        (!pos  || r.possibility === pos) &&
+        (!area || r.area === area)
+    );
+    selectedSMS.clear();
+    renderSMSList();
+}
+
+function renderSMSList() {
+    const tbody = document.getElementById('smsTbody');
+    if (!smsReports.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">কোনো রেকর্ড নেই</td></tr>';
+        return;
+    }
+    tbody.innerHTML = smsReports.map(r => `
+        <tr>
+            <td><input type="checkbox" class="sms-chk" data-id="${r.id}" style="accent-color:#6366f1;"
+                ${selectedSMS.has(r.id)?'checked':''} onchange="toggleSMSSelect(${r.id},this.checked)"></td>
+            <td style="font-weight:600;">${esc(r.institutionName)}</td>
+            <td>${esc(r.contactPersonName||'�')}</td>
+            <td><a href="tel:${esc(r.phone)}">${esc(r.phone||'�')}</a></td>
+            <td>${esc(r.area||'�')}</td>
+            <td>${posBadge(r.possibility)}</td>
+        </tr>`).join('');
+    updateSelectedCount();
+}
+
+function toggleSMSSelect(id, checked) {
+    checked ? selectedSMS.add(id) : selectedSMS.delete(id);
+    updateSelectedCount();
+}
+
+function selectAllSMS(checked) {
+    document.querySelectorAll('.sms-chk').forEach(cb => {
+        cb.checked = checked;
+        const id = parseInt(cb.dataset.id);
+        checked ? selectedSMS.add(id) : selectedSMS.delete(id);
+    });
+    const headerCb = document.getElementById('smsSelectAll');
+    if (headerCb) headerCb.checked = checked;
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    document.getElementById('selectedCount').textContent = selectedSMS.size + ' নির্বাচিত';
+}
+
+async function sendSMS() {
+    const msg = document.getElementById('smsText').value.trim();
+    if (!msg) { toast('বার্তা লিখুন', 'error'); return; }
+    if (!selectedSMS.size) { toast('অন্তত একজন প্রাপক নির্বাচন করুন', 'error'); return; }
+
+    const phones = smsReports
+        .filter(r => selectedSMS.has(r.id))
+        .map(r => r.phone)
+        .filter(Boolean);
+
+    if (!confirm(`${phones.length} জনকে SMS পাঠাবেন?`)) return;
+
+    try {
+        const res  = await fetch('/api/marketing/send-sms', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ phones, message: msg })
+        });
+        const data = await res.json();
+        if (data.success) {
+            toast(`✓ ${data.sent} টি SMS সফলভাবে পাঠানো হয়েছে`, 'success');
+            document.getElementById('smsText').value = '';
+            selectedSMS.clear();
+            renderSMSList();
+        } else { toast(data.message||'SMS পাঠাতে সমস্যা হয়েছে', 'error'); }
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+}
+
+// -- Init ----------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+    if (!TailorAuth.guard('Authority')) return;
+    TailorAuth.guardSubPage('marketing');
+    loadReports();
+    document.getElementById('fVisitingDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('smsText').addEventListener('input', function () {
+        document.getElementById('smsCharCount').textContent = this.value.length + ' অক্ষর';
+    });
+});
+</script>
+</body>
+</html>

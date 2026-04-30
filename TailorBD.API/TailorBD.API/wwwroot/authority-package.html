@@ -1,0 +1,708 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Package - TailorBD</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Auth utility - MUST be first script, runs synchronously before any guard -->
+    <script src="/js/auth.js?v=2.1.4"></script>
+    <!-- Shared sidebar + navbar component -->
+    <script src="/js/authority-layout.js?v=2.1.4" data-page="package"></script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --auth-primary:   #0f172a;
+            --auth-secondary: #1e293b;
+            --auth-accent:    #6366f1;
+            --auth-accent2:   #8b5cf6;
+            --auth-grad:      linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --sidebar-w:      260px;
+            --navbar-h:       64px;
+            --radius:         14px;
+            --shadow:         0 4px 20px rgba(0,0,0,.08);
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ---------- SIDEBAR ---------- */
+        .auth-sidebar {
+            width: var(--sidebar-w);
+            background: var(--auth-primary);
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform .3s ease;
+        }
+        .auth-sidebar::-webkit-scrollbar { width: 4px; }
+        .auth-sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .sidebar-brand {
+            padding: 20px 20px 16px;
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            flex-shrink: 0;
+        }
+        .sidebar-brand .brand-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--auth-grad);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.1rem;
+        }
+        .sidebar-brand h3 { color: #fff; font-size: 1.1rem; font-weight: 700; margin: 0; }
+        .sidebar-brand small { color: #94a3b8; font-size: .7rem; display: block; }
+
+        .auth-user-strip {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .auth-user-strip img {
+            width: 46px; height: 46px; border-radius: 50%;
+            object-fit: cover; border: 2px solid rgba(255,255,255,.2); flex-shrink: 0;
+        }
+        .auth-user-strip .user-meta h4 { color: #f1f5f9; font-size: .88rem; font-weight: 600; margin: 0; }
+        .auth-user-strip .user-meta span { color: #6366f1; font-size: .72rem; font-weight: 500; }
+
+        .nav-section { padding: 14px 12px 4px; }
+        .nav-section-title {
+            color: #64748b; font-size: .68rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.2px;
+            padding: 0 8px; margin-bottom: 6px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 11px;
+            padding: 10px 12px; border-radius: 10px;
+            color: #94a3b8; text-decoration: none;
+            font-size: .86rem; font-weight: 500;
+            transition: all .2s; margin-bottom: 2px; cursor: pointer;
+        }
+        .nav-item:hover { background: rgba(99,102,241,.15); color: #c7d2fe; }
+        .nav-item.active { background: var(--auth-grad); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,.35); }
+        .nav-item i { width: 18px; text-align: center; font-size: .9rem; }
+
+        /* ---------- MAIN ---------- */
+        .auth-main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+        .auth-navbar {
+            height: var(--navbar-h); background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; padding: 0 24px;
+            position: sticky; top: 0; z-index: 900;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05); gap: 12px;
+        }
+        .navbar-toggle {
+            background: none; border: none; color: #64748b;
+            font-size: 1.1rem; cursor: pointer; padding: 6px;
+            border-radius: 8px; display: none;
+        }
+        .navbar-toggle:hover { background: #f1f5f9; }
+        .navbar-title { font-size: 1rem; font-weight: 700; color: #1e293b; margin-right: auto; }
+        .navbar-right { display: flex; align-items: center; gap: 10px; }
+
+        .btn-navbar {
+            display: flex; align-items: center; gap: 7px;
+            padding: 8px 16px; border-radius: 50px;
+            font-size: .84rem; font-weight: 600; border: none; cursor: pointer; transition: all .22s;
+        }
+        .btn-navbar-outline { background: #f8fafc; border: 1.5px solid #e2e8f0; color: #475569; }
+        .btn-navbar-outline:hover { background: #e2e8f0; }
+        .btn-navbar-danger {
+            background: linear-gradient(135deg,#ef4444 0%,#dc2626 100%);
+            color: #fff; box-shadow: 0 2px 8px rgba(239,68,68,.3);
+        }
+        .btn-navbar-danger:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239,68,68,.4); }
+
+        /* ---------- CONTENT ---------- */
+        .auth-content { padding: 28px; flex: 1; }
+
+        /* Page header */
+        .page-header {
+            background: var(--auth-grad);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            color: #fff;
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 8px 32px rgba(99,102,241,.3);
+            margin-bottom: 24px;
+            position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content:''; position:absolute;
+            width:200px; height:200px; border-radius:50%;
+            background:rgba(255,255,255,.07);
+            top:-70px; right:-40px;
+        }
+        .page-header .ph-icon {
+            width: 56px; height: 56px; border-radius: 14px;
+            background: rgba(255,255,255,.18);
+            border: 1.5px solid rgba(255,255,255,.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0; z-index: 1;
+        }
+        .page-header .ph-text { z-index: 1; }
+        .page-header .ph-text h2 { font-size: 1.35rem; font-weight: 700; margin: 0 0 3px; }
+        .page-header .ph-text p { font-size: .85rem; opacity: .82; margin: 0; }
+
+        /* Section cards */
+        .section-card {
+            background: #fff; border-radius: var(--radius);
+            box-shadow: var(--shadow); padding: 22px 22px 18px; margin-bottom: 22px;
+        }
+        .section-title {
+            font-size: .95rem; font-weight: 700; color: #1e293b;
+            margin-bottom: 18px; padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title .st-icon {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--auth-grad);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: .78rem; flex-shrink: 0;
+        }
+
+        /* Form */
+        .form-label { font-weight: 600; font-size: .83rem; color: #475569; }
+        .form-control, .form-select {
+            border-radius: 10px; border: 1.5px solid #e2e8f0;
+            font-size: .88rem; padding: 10px 13px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.14);
+            outline: none;
+        }
+        .form-control.is-invalid { border-color: #ef4444; }
+        .invalid-feedback { font-size: .78rem; }
+
+        .btn-add {
+            background: var(--auth-grad); border: none; color: #fff;
+            border-radius: 10px; padding: 11px 28px;
+            font-weight: 600; font-size: .9rem; cursor: pointer;
+            transition: all .22s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(99,102,241,.38); }
+        .btn-add:disabled { opacity: .6; transform: none; box-shadow: none; cursor: not-allowed; }
+
+        .btn-cancel {
+            background: #f8fafc; border: 1.5px solid #e2e8f0; color: #64748b;
+            border-radius: 10px; padding: 11px 22px;
+            font-weight: 600; font-size: .9rem; cursor: pointer; transition: all .2s;
+        }
+        .btn-cancel:hover { background: #e2e8f0; }
+
+        /* Table */
+        .table-responsive { border-radius: 10px; overflow: hidden; }
+        .table { margin-bottom: 0; font-size: .86rem; }
+        .table thead th {
+            background: #f8fafc; color: #64748b;
+            font-size: .75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .5px;
+            border-bottom: 2px solid #e2e8f0; padding: 12px 14px;
+        }
+        .table tbody td { padding: 13px 14px; vertical-align: middle; border-color: #f1f5f9; }
+        .table tbody tr:hover { background: #fafbff; }
+
+        /* Package name badge */
+        .pkg-name {
+            font-weight: 600; color: #1e293b; font-size: .88rem;
+        }
+        .pkg-interval {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #ede9fe; color: #6366f1;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: .76rem; font-weight: 600;
+        }
+        .pkg-details {
+            color: #64748b; font-size: .82rem;
+            max-width: 300px;
+        }
+
+        /* Action buttons */
+        .btn-action {
+            border: none; border-radius: 8px; padding: 6px 12px;
+            font-size: .78rem; font-weight: 600; cursor: pointer;
+            transition: all .18s; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .btn-edit {
+            background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe;
+        }
+        .btn-edit:hover { background: #3b82f6; color: #fff; }
+        .btn-delete {
+            background: #fef2f2; color: #ef4444; border: 1px solid #fecaca;
+        }
+        .btn-delete:hover { background: #ef4444; color: #fff; }
+
+        /* Inline edit row */
+        .edit-row { background: #f8f9ff !important; }
+        .edit-row input, .edit-row textarea {
+            border-radius: 8px; border: 1.5px solid #c7d2fe;
+            font-size: .84rem; padding: 6px 10px; width: 100%;
+        }
+        .edit-row input:focus, .edit-row textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99,102,241,.12);
+            outline: none;
+        }
+        .btn-save {
+            background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0;
+        }
+        .btn-save:hover { background: #16a34a; color: #fff; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center; padding: 48px 24px; color: #94a3b8;
+        }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: .4; }
+        .empty-state p { font-size: .9rem; }
+
+        /* Sidebar overlay (mobile) */
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.5); z-index: 999;
+        }
+
+        /* Toast */
+        #toastWrap {
+            position: fixed; bottom: 24px; right: 24px;
+            z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast-item {
+            padding: 12px 18px; border-radius: 10px;
+            font-size: .85rem; color: #fff; min-width: 220px;
+            box-shadow: 0 4px 14px rgba(0,0,0,.15);
+            animation: slideIn .3s ease;
+        }
+        .toast-item.success { background: #10b981; }
+        .toast-item.error   { background: #ef4444; }
+        .toast-item.info    { background: #3b82f6; }
+        @keyframes slideIn { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .auth-sidebar { transform: translateX(-100%); }
+            .auth-sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; }
+            .auth-main { margin-left: 0; }
+            .navbar-toggle { display: flex !important; }
+            .auth-content { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ---------- MAIN ---------- -->
+<div class="auth-main">
+
+    <!-- CONTENT -->
+    <div class="auth-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="ph-icon"><i class="fas fa-box-open"></i></div>
+            <div class="ph-text">
+                <h2>প্যাকেজ তৈরি করুন</h2>
+                <p>নতুন প্যাকেজ যোগ করুন এবং বিদ্যমান প্যাকেজসমূহ পরিচালনা করুন</p>
+            </div>
+        </div>
+
+        <!-- Add Package Form -->
+        <div class="section-card">
+            <div class="section-title">
+                <div class="st-icon"><i class="fas fa-plus"></i></div>
+            নতুন প্যাকেজ যোগ করুন
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">প্যাকেজের নাম <span class="text-danger">*</span></label>
+                    <input type="text" id="pkgName" class="form-control"
+                           placeholder="যেমন: Basic, Standard, Premium">
+                    <div class="invalid-feedback">প্যাকেজের নাম লিখুন</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">মেয়াদ (Interval) <span class="text-danger">*</span></label>
+                    <input type="text" id="pkgInterval" class="form-control"
+                           placeholder="যেমন: 1 Year, 6 Month">
+                    <div class="invalid-feedback">মেয়াদ লিখুন</div>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">বিবরণ (Details)</label>
+                    <textarea id="pkgDetails" class="form-control" rows="1"
+                              placeholder="বিস্তারিত বিবরণ লিখুন..."></textarea>
+                </div>
+                <div class="col-12 d-flex gap-2 mt-1">
+                    <button class="btn-add" id="addBtn" onclick="addPackage()">
+                        <i class="fas fa-plus-circle"></i> প্যাকেজ যোগ করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Package List -->
+        <div class="section-card">
+            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="section-title mb-0" style="border:none;padding:0;">
+                    <div class="st-icon"><i class="fas fa-list"></i></div>
+                    প্যাকেজ তালিকা
+                    <span class="badge bg-secondary ms-2 fw-normal" id="pkgCount">0</span>
+                </div>
+                <!-- Search -->
+                <div class="input-group" style="max-width:240px;">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted" style="font-size:.8rem;"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
+                           placeholder="নাম বা মেয়াদ খুঁজুন..." oninput="filterTable()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" id="pkgTable">
+                    <thead>
+                        <tr>
+                            <th style="width:42px;">#</th>
+                            <th>প্যাকেজের নাম</th>
+                            <th style="width:160px;">মেয়াদ</th>
+                            <th>বিবরণ</th>
+                            <th style="width:130px;">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pkgTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-2 pt-2 border-top" style="font-size:.82rem;color:#64748b;">
+                <i class="fas fa-box-open me-1 text-primary"></i>
+                মোট প্যাকেজ: <strong id="summTotal">0</strong>
+            </div>
+        </div>
+
+    </div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-body text-center p-4">
+                <div style="width:56px;height:56px;background:#fef2f2;border-radius:50%;
+                            display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                    <i class="fas fa-trash-alt" style="color:#ef4444;font-size:1.3rem;"></i>
+                </div>
+                <h5 style="font-weight:700;margin-bottom:6px;">মুছবেন নিশ্চিত?</h5>
+                <p class="text-muted small mb-0" id="deleteModalMsg">এই প্যাকেজটি স্থায়ীভাবে মুছে ফেলা হবে</p>
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2 justify-content-center">
+                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">বাতিল</button>
+                <button class="btn btn-danger px-4 rounded-pill" id="confirmDeleteBtn">মুছুন</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastWrap"></div>
+
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    let allPackages = [];
+    let pendingDeleteId = null;
+
+    // -- Init ------------------------------------------------------------------
+    $(document).ready(function () {
+        // Restore session from localStorage mirror, then guard Authority-only
+        if (!TailorAuth.guard('Authority')) return;
+        TailorAuth.guardSubPage('package');
+
+        // Set sidebar name/avatar
+        const name = TailorAuth.get('name') || 'Authority';
+        $('#sidebarName').text(name);
+        $('#sidebarAvatar').attr('src',
+            'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) +
+            '&background=6366f1&color=fff&size=100&bold=true');
+
+        loadPackages();
+
+        // Delete confirm button
+        $('#confirmDeleteBtn').on('click', function () {
+            if (pendingDeleteId !== null) {
+                deletePackage(pendingDeleteId);
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+            }
+        });
+    });
+
+    // -- Load all packages -----------------------------------------------------
+    function loadPackages() {
+        $('#pkgTableBody').html(
+            '<tr><td colspan="5" class="text-center py-4 text-muted">' +
+            '<div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</td></tr>');
+
+        $.get('/api/package', function (res) {
+            if (!res.success) { toast('ডেটা লোড ব্যর্থ', 'error'); return; }
+            allPackages = res.data || [];
+            renderTable(allPackages);
+        }).fail(function () {
+            toast('সংযোগ ব্যর্থ', 'error');
+            $('#pkgTableBody').html(
+                '<tr><td colspan="5" class="text-center text-danger py-3">' +
+                '<i class="fas fa-exclamation-triangle me-2"></i>ডেটা লোড ব্যর্থ হয়েছে</td></tr>');
+        });
+    }
+
+    // -- Render table ----------------------------------------------------------
+    function renderTable(list) {
+        const $body = $('#pkgTableBody').empty();
+        $('#pkgCount').text(list.length);
+        $('#summTotal').text(list.length);
+
+        if (!list.length) {
+            $body.html(
+                '<tr><td colspan="5">' +
+                '<div class="empty-state">' +
+                '<i class="fas fa-box-open"></i>' +
+                '<p>কোনো প্যাকেজ পাওয়া যায়নি। উপরের ফর্ম থেকে নতুন প্যাকেজ যোগ করুন।</p>' +
+                '</div></td></tr>');
+            return;
+        }
+
+        list.forEach(function (p, i) {
+            $body.append(
+                '<tr id="row-' + p.packageID + '">' +
+                '<td style="color:#94a3b8;">' + (i + 1) + '</td>' +
+                '<td><span class="pkg-name">' + esc(p.packageName) + '</span></td>' +
+                '<td>' +
+                  '<span class="pkg-interval"><i class="fas fa-clock me-1"></i>' +
+                  esc(p.interval || '-') + '</span>' +
+                '</td>' +
+                '<td><span class="pkg-details">' + esc(p.details || '-') + '</span></td>' +
+                '<td>' +
+                  '<div class="d-flex gap-1">' +
+                    '<button class="btn-action btn-edit" onclick="startEdit(' + p.packageID + ')" title="সম্পাদনা">' +
+                      '<i class="fas fa-edit"></i> Edit' +
+                    '</button>' +
+                    '<button class="btn-action btn-delete" onclick="askDelete(' + p.packageID + ',\'' + esc(p.packageName) + '\')" title="মুছুন">' +
+                      '<i class="fas fa-trash-alt"></i>' +
+                    '</button>' +
+                  '</div>' +
+                '</td>' +
+                '</tr>'
+            );
+        });
+    }
+
+    // -- Filter ----------------------------------------------------------------
+    window.filterTable = function () {
+        const q = ($('#searchInput').val() || '').toLowerCase().trim();
+        if (!q) { renderTable(allPackages); return; }
+        const filtered = allPackages.filter(function (p) {
+            return (p.packageName || '').toLowerCase().includes(q) ||
+                   (p.interval || '').toLowerCase().includes(q) ||
+                   (p.details || '').toLowerCase().includes(q);
+        });
+        renderTable(filtered);
+    };
+
+    // -- Add package -----------------------------------------------------------
+    window.addPackage = function () {
+        const name     = $('#pkgName').val().trim();
+        const interval = $('#pkgInterval').val().trim();
+        const details  = $('#pkgDetails').val().trim();
+
+        // Validation
+        let valid = true;
+        if (!name) {
+            $('#pkgName').addClass('is-invalid');
+            valid = false;
+        } else {
+            $('#pkgName').removeClass('is-invalid');
+        }
+        if (!interval) {
+            $('#pkgInterval').addClass('is-invalid');
+            valid = false;
+        } else {
+            $('#pkgInterval').removeClass('is-invalid');
+        }
+        if (!valid) return;
+
+        const $btn = $('#addBtn').prop('disabled', true);
+        $btn.html('<div class="spinner-border spinner-border-sm me-2"></div>যোগ হচ্ছে...');
+
+        $.ajax({
+            url: '/api/package', method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ packageName: name, interval: interval, details: details }),
+            success: function (res) {
+                $btn.prop('disabled', false).html('<i class="fas fa-plus-circle"></i> প্যাকেজ যোগ করুন');
+                if (!res.success) { toast(res.message || 'যোগ ব্যর্থ', 'error'); return; }
+                toast('প্যাকেজ সফলভাবে যোগ হয়েছে!', 'success');
+                $('#pkgName, #pkgInterval, #pkgDetails').val('');
+                $('#pkgName, #pkgInterval').removeClass('is-invalid');
+                loadPackages();
+            },
+            error: function (xhr) {
+                $btn.prop('disabled', false).html('<i class="fas fa-plus-circle"></i> প্যাকেজ যোগ করুন');
+                const msg = xhr.responseJSON?.message || 'যোগ করতে ব্যর্থ';
+                toast(msg, 'error');
+            }
+        });
+    };
+
+    // -- Inline Edit -----------------------------------------------------------
+    window.startEdit = function (id) {
+        const pkg = allPackages.find(function (p) { return p.packageID === id; });
+        if (!pkg) return;
+
+        // Cancel any other open edit
+        cancelAllEdits();
+
+        const $row = $('#row-' + id);
+        $row.addClass('edit-row').html(
+            '<td style="color:#94a3b8;">' +
+              $row.find('td:first').text() +
+            '</td>' +
+            '<td><input type="text" id="edit-name-' + id + '" value="' + esc(pkg.packageName) + '"></td>' +
+            '<td><input type="text" id="edit-interval-' + id + '" value="' + esc(pkg.interval || '') + '"></td>' +
+            '<td><textarea id="edit-details-' + id + '" rows="2">' + esc(pkg.details || '') + '</textarea></td>' +
+            '<td>' +
+              '<div class="d-flex gap-1 flex-wrap">' +
+                '<button class="btn-action btn-save" onclick="saveEdit(' + id + ')" title="সেভ করুন">' +
+                  '<i class="fas fa-check"></i> Save' +
+                '</button>' +
+                '<button class="btn-action btn-cancel" onclick="cancelEdit(' + id + ')" title="বাতিল">' +
+                  '<i class="fas fa-times"></i>' +
+                '</button>' +
+              '</div>' +
+            '</td>'
+        );
+        $('#edit-name-' + id).trigger('focus');
+    };
+
+    window.saveEdit = function (id) {
+        const name     = $('#edit-name-' + id).val().trim();
+        const interval = $('#edit-interval-' + id).val().trim();
+        const details  = $('#edit-details-' + id).val().trim();
+
+        if (!name || !interval) {
+            toast('নাম ও মেয়াদ আবশ্যক', 'error');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/package/' + id, method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ packageName: name, interval: interval, details: details }),
+            success: function (res) {
+                if (!res.success) { toast(res.message || 'আপডেট ব্যর্থ', 'error'); return; }
+                toast('প্যাকেজ সফলভাবে আপডেট হয়েছে', 'success');
+                loadPackages();
+            },
+            error: function (xhr) {
+                toast(xhr.responseJSON?.message || 'আপডেট ব্যর্থ হয়েছে', 'error');
+            }
+        });
+    };
+
+    window.cancelEdit = function () { cancelAllEdits(); };
+
+    function cancelAllEdits() {
+        // Rebuild rows from allPackages data for any open edit rows
+        $('.edit-row').each(function () {
+            var rowId = $(this).attr('id').replace('row-', '');
+            var pkg = allPackages.find(function (p) { return p.packageID == rowId; });
+            if (!pkg) return;
+            var idx = allPackages.indexOf(pkg) + 1;
+            $(this).removeClass('edit-row').html(
+                '<td style="color:#94a3b8;">' + idx + '</td>' +
+                '<td><span class="pkg-name">' + esc(pkg.packageName) + '</span></td>' +
+                '<td><span class="pkg-interval"><i class="fas fa-clock me-1"></i>' + esc(pkg.interval || '-') + '</span></td>' +
+                '<td><span class="pkg-details">' + esc(pkg.details || '-') + '</span></td>' +
+                '<td>' +
+                  '<div class="d-flex gap-1">' +
+                    '<button class="btn-action btn-edit" onclick="startEdit(' + pkg.packageID + ')" title="সম্পাদনা">' +
+                      '<i class="fas fa-edit"></i> Edit' +
+                    '</button>' +
+                    '<button class="btn-action btn-delete" onclick="askDelete(' + pkg.packageID + ',\'' + esc(pkg.packageName) + '\')" title="মুছুন">' +
+                      '<i class="fas fa-trash-alt"></i>' +
+                    '</button>' +
+                  '</div>' +
+                '</td>' +
+                '</tr>'
+            );
+        });
+    }
+
+    // -- Delete ----------------------------------------------------------------
+    window.askDelete = function (id, name) {
+        pendingDeleteId = id;
+        $('#deleteModalMsg').text('"' + name + '" প্যাকেজটি স্থায়ীভাবে মুছে ফেলা হবে');
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    };
+
+    function deletePackage(id) {
+        $.ajax({
+            url: '/api/package/' + id, method: 'DELETE',
+            success: function (res) {
+                if (!res.success) { toast(res.message || 'মুছতে ব্যর্থ', 'error'); return; }
+                toast('প্যাকেজ মুছে ফেলা হয়েছে', 'success');
+                allPackages = allPackages.filter(function (p) { return p.packageID !== id; });
+                renderTable(allPackages);
+            },
+            error: function (xhr) {
+                toast(xhr.responseJSON?.message || 'আপডেট ব্যর্থ হয়েছে', 'error');
+            }
+        });
+    }
+
+    // -- Enter key on form -----------------------------------------------------
+    $('#pkgName, #pkgInterval').on('keypress', function (e) {
+        if (e.which === 13) addPackage();
+    });
+
+    // -- Helpers ---------------------------------------------------------------
+    function esc(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+    function toast(msg, type) {
+        const $t = $('<div class="toast-item ' + (type || 'info') + '">' + msg + '</div>');
+        $('#toastWrap').append($t);
+        setTimeout(function () { $t.fadeOut(300, function () { $t.remove(); }); }, 3200);
+    }
+
+})();
+</script>
+</body>
+</html>

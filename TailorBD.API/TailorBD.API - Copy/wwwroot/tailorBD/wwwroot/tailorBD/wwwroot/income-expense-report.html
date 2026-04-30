@@ -1,0 +1,409 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Income & Expense Report - TailorBD" data-bn="আয় ও ব্যয়ের রিপোর্ট - TailorBD">আয় ও ব্যয়ের রিপোর্ট - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { width:100%; padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* ── Filter ────────────────────────────────────────────────────── */
+        .filter-card { background:#fff; border-radius:10px; padding:16px 20px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:18px; }
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control{ width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; font-family:inherit; box-sizing:border-box; }
+        .f-control:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-load    { padding:8px 22px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .btn-load:hover  { background:#5a68c9; }
+        .btn-outline { padding:8px 16px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+        .btn-outline:hover { background:#f0f1fc; }
+
+        /* ── KPI Cards ──────────────────────────────────────────────────── */
+        .kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:14px; margin-bottom:20px; }
+        .kpi-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 2px 10px rgba(0,0,0,.07); border-left:4px solid #6c7ae0; position:relative; overflow:hidden; }
+        .kpi-card.green  { border-color:#28a745; }
+        .kpi-card.red    { border-color:#dc3545; }
+        .kpi-card.orange { border-color:#fd7e14; }
+        .kpi-card.teal   { border-color:#20c997; }
+        .kpi-card.purple { border-color:#9b59b6; }
+        .kpi-card.dark   { border-color:#343a40; }
+        .kpi-val  { font-size:19px; font-weight:800; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .kpi-val.blue   { color:#6c7ae0; }
+        .kpi-val.green  { color:#28a745; }
+        .kpi-val.red    { color:#dc3545; }
+        .kpi-val.orange { color:#fd7e14; }
+        .kpi-val.teal   { color:#20c997; }
+        .kpi-val.purple { color:#9b59b6; }
+        .kpi-val.dark   { color:#343a40; }
+        .kpi-lbl  { font-size:11.5px; color:#888; margin-top:3px; }
+        .kpi-icon { font-size:32px; position:absolute; right:12px; top:50%; transform:translateY(-50%); opacity:.08; }
+
+        /* ── Section Cards ──────────────────────────────────────────────── */
+        .sec-card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:20px; overflow:hidden; }
+        .sec-head { padding:13px 18px; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; color:#fff; }
+        .sec-head.blue   { background:#6c7ae0; }
+        .sec-head.green  { background:#28a745; }
+        .sec-head.orange { background:#fd7e14; }
+        .sec-head.red    { background:#dc3545; }
+        .sec-head.teal   { background:#20c997; }
+        .sec-head.purple { background:#9b59b6; }
+        .sec-head.dark   { background:#343a40; }
+        .sec-body { padding:16px 18px; }
+
+        /* ── Tabs ────────────────────────────────────────────────────────── */
+        .rep-tabs { display:flex; gap:4px; padding:12px 18px 0; background:#fff; border-bottom:2px solid #e9ecef; }
+        .rep-tab  { padding:8px 18px; font-size:13px; font-weight:600; color:#888; border:none; background:none; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; border-radius:6px 6px 0 0; }
+        .rep-tab.active { color:#6c7ae0; border-color:#6c7ae0; background:#f0f1fc; }
+        .rep-tab:hover  { color:#6c7ae0; background:#f8f9ff; }
+        .tab-panel { display:none; }
+        .tab-panel.active { display:block; }
+
+        /* ── Tables ──────────────────────────────────────────────────────── */
+        .rep-tbl { width:100%; border-collapse:collapse; }
+        .rep-tbl thead th { background:#f8f9ff; padding:9px 11px; font-size:12px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; text-align:center; white-space:nowrap; }
+        .rep-tbl tbody tr:hover { background:#fafbff; }
+        .rep-tbl tbody td { padding:8px 11px; font-size:13px; border-bottom:1px solid #f2f2f2; text-align:center; vertical-align:middle; }
+        .rep-tbl tfoot td { padding:9px 11px; font-size:12px; font-weight:700; background:#f0f1fc; border-top:2px solid #e0e3f7; }
+
+        /* ── Progress Bar ────────────────────────────────────────────────── */
+        .prog-wrap { background:#f0f0f0; border-radius:99px; height:6px; overflow:hidden; }
+        .prog-bar  { height:100%; border-radius:99px; transition:width .5s; }
+
+        /* ── Bar Chart ────────────────────────────────────────────────────── */
+        .trend-chart { padding:4px 0 0; }
+        .trend-grid  { display:grid; grid-template-columns:repeat(12,1fr); gap:3px; align-items:end; height:180px; }
+        .trend-col   { display:flex; flex-direction:column; align-items:center; height:100%; }
+        .trend-col:hover .trend-bar-in, .trend-col:hover .trend-bar-ex { filter:brightness(1.15); }
+        .trend-bar-wrap { flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center; gap:1px; padding:0 1px; }
+        .trend-bar-in, .trend-bar-ex { width:48%; border-radius:3px 3px 0 0; transition:height .4s ease; min-height:2px; }
+        .trend-bar-in { background:#28a745; }
+        .trend-bar-ex { background:#dc3545; }
+        .trend-mon { font-size:9px; color:#777; text-align:center; margin-top:4px; line-height:1.3; }
+        .chart-legend { display:flex; gap:16px; font-size:12px; color:#666; padding:6px 0 0; }
+        .legend-dot { width:10px; height:10px; border-radius:2px; display:inline-block; margin-right:4px; }
+
+        /* ── Net Balance Banner ────────────────────────────────────────────── */
+        .net-banner { border-radius:10px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .net-banner.profit { background:linear-gradient(135deg,#28a745,#20c997); }
+        .net-banner.loss   { background:linear-gradient(135deg,#dc3545,#e74c3c); }
+        .net-banner .net-label { color:rgba(255,255,255,.85); font-size:13px; }
+        .net-banner .net-value { color:#fff; font-size:28px; font-weight:800; }
+        .net-banner .net-icon  { font-size:48px; color:rgba(255,255,255,.2); }
+
+        /* ── Account Box ────────────────────────────────────────────────────── */
+        .acc-box { border:1px solid #e9ecef; border-radius:8px; padding:14px; margin-bottom:12px; }
+        .acc-name { font-size:14px; font-weight:700; color:#333; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+        .acc-row  { display:flex; justify-content:space-between; font-size:13px; padding:5px 0; border-bottom:1px solid #f2f2f2; }
+        .acc-row:last-child { border-bottom:none; }
+        .acc-row .lbl { color:#666; }
+        .acc-row .val { font-weight:600; }
+        .acc-row.in-row .val  { color:#28a745; }
+        .acc-row.ex-row .val  { color:#dc3545; }
+        .acc-row.bal-row .val { font-weight:800; font-size:14px; }
+
+        /* ── Category Pills ─────────────────────────────────────────────────── */
+        .cat-grid { display:flex; flex-direction:column; gap:8px; }
+        .cat-row  { display:flex; align-items:center; gap:10px; }
+        .cat-name { flex:1; font-size:13px; color:#444; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .cat-amt  { font-size:13px; font-weight:700; white-space:nowrap; }
+        .cat-cnt  { font-size:11px; color:#999; white-space:nowrap; }
+
+        /* ── Spinner ────────────────────────────────────────────────────────── */
+        .spin-wrap { text-align:center; padding:50px; color:#aaa; }
+        .spin { width:32px; height:32px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ── Print ──────────────────────────────────────────────────────────── */
+        @media print {
+            #app-navbar, #app-sidebar, .filter-card, .no-print, .rep-tabs { display:none !important; }
+            .main-content { margin-left:0 !important; }
+            .page-container { padding:0 !important; }
+            .kpi-card, .sec-card, .net-banner, .acc-box { break-inside:avoid; box-shadow:none; border:1px solid #ddd !important; }
+            .tab-panel { display:block !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-container">
+
+                <!-- ── Page Title ─────────────────────────────────────────────── -->
+                <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                    <h5 style="font-weight:700; color:#6c7ae0; margin:0;">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        <span data-en="Income & Expense Report" data-bn="আয় ও ব্যয়ের রিপোর্ট">আয় ও ব্যয়ের রিপোর্ট</span>
+                    </h5>
+                    <button class="btn-outline" onclick="window.print()">
+                        <i class="fas fa-print"></i>
+                        <span data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+                    </button>
+                </div>
+
+                <!-- ── Filter ─────────────────────────────────────────────────── -->
+                <div class="filter-card no-print">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3 col-6">
+                            <label class="f-label"><span data-en="Date From" data-bn="তারিখ থেকে">তারিখ থেকে</span></label>
+                            <input type="date" id="fFrom" class="f-control">
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <label class="f-label"><span data-en="Date To" data-bn="তারিখ পর্যন্ত">তারিখ পর্যন্ত</span></label>
+                            <input type="date" id="fTo" class="f-control">
+                        </div>
+                        <div class="col-md-6 col-12 d-flex gap-2 flex-wrap">
+                            <button class="btn-load" onclick="loadReport()">
+                                <i class="fas fa-sync-alt"></i>
+                                <span data-en="Load Report" data-bn="রিপোর্ট দেখুন">রিপোর্ট দেখুন</span>
+                            </button>
+                            <button class="btn-outline" onclick="setToday()">
+                                <i class="fas fa-calendar-day"></i>
+                                <span data-en="Today" data-bn="আজ">আজ</span>
+                            </button>
+                            <button class="btn-outline" onclick="setThisMonth()">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span data-en="This Month" data-bn="এই মাস">এই মাস</span>
+                            </button>
+                            <button class="btn-outline" onclick="clearDates()">
+                                <i class="fas fa-undo"></i>
+                                <span data-en="All Time" data-bn="সর্বকাল">সর্বকাল</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dateRangeLabel" style="font-size:12px; color:#888; margin-top:8px;"></div>
+                </div>
+
+                <!-- ── Spinner ─────────────────────────────────────────────────── -->
+                <div id="spinWrap" class="spin-wrap"><div class="spin"></div></div>
+
+                <!-- ── Report Content ──────────────────────────────────────────── -->
+                <div id="reportContent" style="display:none;">
+
+                    <!-- Net Balance Banner -->
+                    <div id="netBanner" class="net-banner profit">
+                        <div>
+                            <div class="net-label" id="netLabel" data-en="Net Balance (Income − Expense)" data-bn="নিট ব্যালেন্স (আয় − ব্যয়)">নিট ব্যালেন্স (আয় − ব্যয়)</div>
+                            <div class="net-value" id="netValue">৳0.00</div>
+                        </div>
+                        <i class="fas fa-balance-scale net-icon"></i>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid" id="kpiGrid"></div>
+
+                    <!-- ── Tabs ────────────────────────────────────────────────── -->
+                    <div class="sec-card">
+                        <div class="rep-tabs">
+                            <button class="rep-tab active" onclick="switchTab('tabSummary', this)" data-en="Summary" data-bn="সারসংক্ষেপ">সারসংক্ষেপ</button>
+                            <button class="rep-tab" onclick="switchTab('tabIncome', this)" data-en="Income Details" data-bn="আয়ের বিবরণ">আয়ের বিবরণ</button>
+                            <button class="rep-tab" onclick="switchTab('tabExpense', this)" data-en="Expense Details" data-bn="ব্যয়ের বিবরণ">ব্যয়ের বিবরণ</button>
+                            <button class="rep-tab" onclick="switchTab('tabAccounts', this)" data-en="Accounts" data-bn="একাউন্ট">একাউন্ট</button>
+                        </div>
+
+                        <!-- Tab: Summary -->
+                        <div id="tabSummary" class="tab-panel active sec-body">
+                            <div class="row g-3">
+                                <!-- Monthly Trend Chart -->
+                                <div class="col-12">
+                                    <div style="font-size:13px; font-weight:700; color:#555; margin-bottom:8px;">
+                                        <i class="fas fa-chart-bar me-1" style="color:#6c7ae0;"></i>
+                                        <span data-en="Monthly Income vs Expense (Last 12 Months)" data-bn="মাসিক আয় বনাম ব্যয় (শেষ ১২ মাস)">মাসিক আয় বনাম ব্যয় (শেষ ১২ মাস)</span>
+                                    </div>
+                                    <div class="chart-legend">
+                                        <span><span class="legend-dot" style="background:#28a745;"></span><span data-en="Income" data-bn="আয়">আয়</span></span>
+                                        <span><span class="legend-dot" style="background:#dc3545;"></span><span data-en="Expense" data-bn="ব্যয়">ব্যয়</span></span>
+                                    </div>
+                                    <div id="trendChart" class="trend-chart"></div>
+                                </div>
+
+                                <!-- Income Summary -->
+                                <div class="col-md-6">
+                                    <div style="background:#f0fff4; border-radius:8px; padding:14px; border-left:4px solid #28a745;">
+                                        <div style="font-size:13px; font-weight:700; color:#28a745; margin-bottom:10px;">
+                                            <i class="fas fa-arrow-down me-1"></i>
+                                            <span data-en="Income Summary" data-bn="আয়ের সারসংক্ষেপ">আয়ের সারসংক্ষেপ</span>
+                                        </div>
+                                        <div id="incomeSummaryBox"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Expense Summary -->
+                                <div class="col-md-6">
+                                    <div style="background:#fff5f5; border-radius:8px; padding:14px; border-left:4px solid #dc3545;">
+                                        <div style="font-size:13px; font-weight:700; color:#dc3545; margin-bottom:10px;">
+                                            <i class="fas fa-arrow-up me-1"></i>
+                                            <span data-en="Expense Summary" data-bn="ব্যয়ের সারসংক্ষেপ">ব্যয়ের সারসংক্ষেপ</span>
+                                        </div>
+                                        <div id="expenseSummaryBox"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Due Summary -->
+                                <div class="col-md-6">
+                                    <div style="background:#fff8f0; border-radius:8px; padding:14px; border-left:4px solid #fd7e14;">
+                                        <div style="font-size:13px; font-weight:700; color:#fd7e14; margin-bottom:10px;">
+                                            <i class="fas fa-clock me-1"></i>
+                                            <span data-en="Due / Receivable Summary" data-bn="বাকি / প্রাপ্য সারসংক্ষেপ">বাকি / প্রাপ্য সারসংক্ষেপ</span>
+                                        </div>
+                                        <div id="dueSummaryBox"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Order Summary -->
+                                <div class="col-md-6">
+                                    <div style="background:#f0f1fc; border-radius:8px; padding:14px; border-left:4px solid #6c7ae0;">
+                                        <div style="font-size:13px; font-weight:700; color:#6c7ae0; margin-bottom:10px;">
+                                            <i class="fas fa-shopping-cart me-1"></i>
+                                            <span data-en="Order Summary" data-bn="অর্ডার সারসংক্ষেপ">অর্ডার সারসংক্ষেপ</span>
+                                        </div>
+                                        <div id="orderSummaryBox"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Income Details -->
+                        <div id="tabIncome" class="tab-panel sec-body">
+                            <div class="row g-3">
+                                <!-- Tailoring Breakdown -->
+                                <div class="col-md-5">
+                                    <div style="font-size:13px; font-weight:700; color:#28a745; margin-bottom:8px;">
+                                        <i class="fas fa-cut me-1"></i>
+                                        <span data-en="Tailoring Payment Breakdown" data-bn="সেলাইয়ের পেমেন্ট ভাঙ্গন">সেলাইয়ের পেমেন্ট ভাঙ্গন</span>
+                                    </div>
+                                    <div id="tailoringBreakdownBox" class="cat-grid"></div>
+                                    <!-- Other Income Breakdown -->
+                                    <div style="font-size:13px; font-weight:700; color:#20c997; margin-top:18px; margin-bottom:8px;">
+                                        <i class="fas fa-plus-circle me-1"></i>
+                                        <span data-en="Other Income Breakdown" data-bn="অন্যান্য আয়ের ভাঙ্গন">অন্যান্য আয়ের ভাঙ্গন</span>
+                                    </div>
+                                    <div id="otherIncomeBreakdownBox" class="cat-grid"></div>
+                                </div>
+                                <!-- Tailoring Records Table -->
+                                <div class="col-md-7">
+                                    <div style="font-size:13px; font-weight:700; color:#28a745; margin-bottom:8px;">
+                                        <i class="fas fa-list me-1"></i>
+                                        <span data-en="Tailoring Payment Records" data-bn="সেলাইয়ের পেমেন্ট রেকর্ড">সেলাইয়ের পেমেন্ট রেকর্ড</span>
+                                        <span id="tailoringRecordCount" style="font-size:11px; color:#999; font-weight:400;"></span>
+                                    </div>
+                                    <div style="overflow-x:auto; max-height:320px; overflow-y:auto;">
+                                        <table class="rep-tbl">
+                                            <thead>
+                                                <tr>
+                                                    <th><span data-en="Date" data-bn="তারিখ">তারিখ</span></th>
+                                                    <th><span data-en="Order No." data-bn="অর্ডার নং">অর্ডার নং</span></th>
+                                                    <th><span data-en="Amount" data-bn="পরিমান">পরিমান</span></th>
+                                                    <th><span data-en="Status" data-bn="স্ট্যাটাস">স্ট্যাটাস</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tailoringRecordsBody"></tbody>
+                                            <tfoot><tr><td colspan="2" style="text-align:right;" data-en="Total" data-bn="মোট">মোট</td><td id="tailoringTotal" style="text-align:right;"></td><td></td></tr></tfoot>
+                                        </table>
+                                    </div>
+                                    <!-- Other Income Records -->
+                                    <div style="font-size:13px; font-weight:700; color:#20c997; margin-top:18px; margin-bottom:8px;">
+                                        <i class="fas fa-list me-1"></i>
+                                        <span data-en="Other Income Records" data-bn="অন্যান্য আয়ের রেকর্ড">অন্যান্য আয়ের রেকর্ড</span>
+                                        <span id="otherIncomeRecordCount" style="font-size:11px; color:#999; font-weight:400;"></span>
+                                    </div>
+                                    <div style="overflow-x:auto; max-height:260px; overflow-y:auto;">
+                                        <table class="rep-tbl">
+                                            <thead>
+                                                <tr>
+                                                    <th><span data-en="Date" data-bn="তারিখ">তারিখ</span></th>
+                                                    <th><span data-en="Category" data-bn="ধরণ">ধরণ</span></th>
+                                                    <th><span data-en="Description" data-bn="বিবরণ">বিবরণ</span></th>
+                                                    <th><span data-en="Amount" data-bn="পরিমান">পরিমান</span></th>
+                                                    <th><span data-en="Account" data-bn="একাউন্ট">একাউন্ট</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="otherIncomeRecordsBody"></tbody>
+                                            <tfoot><tr><td colspan="3" style="text-align:right;" data-en="Total" data-bn="মোট">মোট</td><td id="otherIncomeTotal" style="text-align:right;"></td><td></td></tr></tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Expense Details -->
+                        <div id="tabExpense" class="tab-panel sec-body">
+                            <div class="row g-3">
+                                <!-- Expense by Category -->
+                                <div class="col-md-4">
+                                    <div style="font-size:13px; font-weight:700; color:#dc3545; margin-bottom:8px;">
+                                        <i class="fas fa-tags me-1"></i>
+                                        <span data-en="Expense by Category" data-bn="ক্যাটাগরি অনুযায়ী ব্যয়">ক্যাটাগরি অনুযায়ী ব্যয়</span>
+                                    </div>
+                                    <div id="expenseByCategoryBox" class="cat-grid"></div>
+                                </div>
+                                <!-- Expense Records -->
+                                <div class="col-md-8">
+                                    <div style="font-size:13px; font-weight:700; color:#dc3545; margin-bottom:8px;">
+                                        <i class="fas fa-list me-1"></i>
+                                        <span data-en="Expense Records" data-bn="ব্যয়ের রেকর্ড">ব্যয়ের রেকর্ড</span>
+                                        <span id="expenseRecordCount" style="font-size:11px; color:#999; font-weight:400;"></span>
+                                    </div>
+                                    <div style="overflow-x:auto; max-height:420px; overflow-y:auto;">
+                                        <table class="rep-tbl">
+                                            <thead>
+                                                <tr>
+                                                    <th><span data-en="Date" data-bn="তারিখ">তারিখ</span></th>
+                                                    <th><span data-en="Category" data-bn="ধরণ">ধরণ</span></th>
+                                                    <th><span data-en="Description" data-bn="বিবরণ">বিবরণ</span></th>
+                                                    <th><span data-en="Amount" data-bn="পরিমান">পরিমান</span></th>
+                                                    <th><span data-en="Account" data-bn="একাউন্ট">একাউন্ট</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="expenseRecordsBody"></tbody>
+                                            <tfoot><tr><td colspan="3" style="text-align:right;" data-en="Total" data-bn="মোট">মোট</td><td id="expenseTotal" style="text-align:right;"></td><td></td></tr></tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Accounts -->
+                        <div id="tabAccounts" class="tab-panel sec-body">
+                            <div class="row g-3">
+                                <div class="col-lg-8" id="accountsGrid"></div>
+                                <div class="col-lg-4">
+                                    <!-- All Account Income Categories -->
+                                    <div style="font-size:13px; font-weight:700; color:#28a745; margin-bottom:8px;">
+                                        <i class="fas fa-arrow-down me-1"></i>
+                                        <span data-en="All Accounts Income Breakdown" data-bn="সকল একাউন্টের আয় ভাঙ্গন">সকল একাউন্টের আয় ভাঙ্গন</span>
+                                    </div>
+                                    <div id="allAccIncomeCatBox" class="cat-grid mb-3"></div>
+                                    <!-- All Account Expense Categories -->
+                                    <div style="font-size:13px; font-weight:700; color:#dc3545; margin-bottom:8px;">
+                                        <i class="fas fa-arrow-up me-1"></i>
+                                        <span data-en="All Accounts Expense Breakdown" data-bn="সকল একাউন্টের ব্যয় ভাঙ্গন">সকল একাউন্টের ব্যয় ভাঙ্গন</span>
+                                    </div>
+                                    <div id="allAccExpCatBox" class="cat-grid"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- sec-card -->
+
+                </div><!-- reportContent -->
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js"></script>
+    <script src="/js/income-expense-report.js"></script>
+</body>
+</html>

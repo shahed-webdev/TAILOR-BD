@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Income, Due & Expense - TailorBD" data-bn="জমা, বাকি ও খরচ - TailorBD">জমা, বাকি ও খরচ - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* Filter */
+        .filter-card { background:#fff; border-radius:10px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:18px; }
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control{ width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; font-family:inherit; }
+        .f-control:focus{ outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-load   { padding:8px 20px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-load:hover{ background:#5a68c9; }
+        .btn-outline{ padding:8px 14px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-outline:hover{ background:#f0f1fc; }
+
+        /* Summary Cards */
+        .sum-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+        @media(max-width:900px){ .sum-grid{ grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:480px){ .sum-grid{ grid-template-columns:1fr 1fr; } }
+        .s-card { background:#fff; border-radius:10px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); text-align:center; border-top:4px solid #6c7ae0; cursor:pointer; transition:box-shadow .2s; }
+        .s-card:hover { box-shadow:0 4px 18px rgba(0,0,0,.13); }
+        .s-card.active-tab { box-shadow:0 4px 18px rgba(108,122,224,.3); }
+        .s-card.income  { border-top-color:#28a745; }
+        .s-card.due     { border-top-color:#dc3545; }
+        .s-card.expense { border-top-color:#fd7e14; }
+        .s-card.net     { border-top-color:#17a2b8; }
+        .s-lbl { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:6px; }
+        .s-val { font-size:20px; font-weight:800; }
+        .s-val.green  { color:#28a745; }
+        .s-val.red    { color:#dc3545; }
+        .s-val.orange { color:#fd7e14; }
+        .s-val.teal   { color:#17a2b8; }
+        .s-sub { font-size:11px; color:#aaa; margin-top:3px; }
+
+        /* Tabs */
+        .tab-nav { display:flex; gap:0; border-bottom:2px solid #e0e3f7; margin-bottom:18px; }
+        .tab-btn { padding:10px 22px; background:none; border:none; font-size:13px; font-weight:600; color:#888; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; font-family:inherit; }
+        .tab-btn.active { color:#6c7ae0; border-bottom-color:#6c7ae0; }
+        .tab-btn:hover  { color:#6c7ae0; }
+        .tab-btn.income-tab  { }
+        .tab-btn.due-tab     { }
+        .tab-btn.expense-tab { }
+
+        /* Table */
+        .tbl-card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); overflow:hidden; }
+        .tbl-head { padding:12px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; }
+        .tbl-title { font-weight:700; font-size:14px; }
+        .tbl-title.income  { color:#28a745; }
+        .tbl-title.due     { color:#dc3545; }
+        .tbl-title.expense { color:#fd7e14; }
+        .r-table { width:100%; border-collapse:collapse; font-size:12px; }
+        .r-table thead th { background:#f8f9ff; padding:8px 10px; font-size:11px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap; }
+        .r-table tbody td { padding:7px 10px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+        .r-table tbody tr:hover { background:#fafbff; }
+        .amt-green { color:#28a745; font-weight:700; }
+        .amt-red   { color:#dc3545; font-weight:700; }
+        .amt-orange{ color:#fd7e14; font-weight:700; }
+        .badge-paid    { background:#e8fdf0; color:#28a745; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700; }
+        .badge-adv     { background:#e8f4ff; color:#1a6fc4; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700; }
+        .badge-del     { background:#f0f1fc; color:#6c7ae0; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700; }
+        .badge-due-status { background:#fff5f5; color:#dc3545; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700; }
+        .text-sm-muted  { font-size:11px; color:#aaa; }
+
+        /* Category chips */
+        .cat-chips { display:flex; flex-wrap:wrap; gap:8px; padding:12px 18px 0; }
+        .cat-chip { background:#fff8ee; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:600; color:#fd7e14; }
+        .cat-chip span { font-size:16px; font-weight:800; margin-left:5px; }
+
+        /* Pager */
+        .pager { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+        .pager button { padding:5px 11px; border:1px solid #ddd; border-radius:6px; background:#fff; font-size:12px; cursor:pointer; }
+        .pager button.active { background:#6c7ae0; color:#fff; border-color:#6c7ae0; }
+        .pager button:disabled { opacity:.4; cursor:not-allowed; }
+        .pager-info { font-size:12px; color:#888; margin-left:auto; }
+
+        /* Spinner */
+        .spin-wrap { text-align:center; padding:30px; color:#aaa; }
+        .spin { width:28px; height:28px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+
+        /* Print */
+        @media print {
+            #app-navbar,#app-sidebar,.filter-card,.tab-nav,.no-print { display:none !important; }
+            .main-content { margin-left:0 !important; }
+            .page-container { padding:0 !important; }
+            .tbl-card,.s-card { box-shadow:none; border:1px solid #ddd !important; }
+            .print-header { display:block !important; }
+            .tab-pane:not(.active) { display:block !important; }
+        }
+        .print-header { display:none; text-align:center; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #333; }
+        .print-header .ins-name  { font-size:20px; font-weight:800; }
+        .print-header .ins-meta  { font-size:12px; color:#444; margin:2px 0; }
+        .print-header .rep-title { font-size:15px; font-weight:700; margin:8px 0 2px; }
+        .print-header .rep-date  { font-size:12px; color:#666; }
+    </style>
+</head>
+<body>
+<div id="app-navbar"></div>
+<div id="app-sidebar"></div>
+
+<main class="main-content" id="mainContent">
+    <div class="dashboard-content">
+        <div class="page-container">
+
+            <!-- Title -->
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                    <i class="fas fa-file-invoice-dollar me-2"></i>
+                    <span data-en="Income, Due & Expense" data-bn="জমা, বাকি ও খরচ">জমা, বাকি ও খরচ</span>
+                </h5>
+                <button class="btn-outline" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    <span data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+                </button>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-card no-print">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date From" data-bn="তারিখ থেকে">তারিখ থেকে</label>
+                        <input type="date" id="dateFrom" class="f-control">
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date To" data-bn="তারিখ পর্যন্ত">তারিখ পর্যন্ত</label>
+                        <input type="date" id="dateTo" class="f-control">
+                    </div>
+                    <div class="col-md-8 d-flex gap-2 flex-wrap align-items-end">
+                        <button class="btn-load" onclick="loadAll()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                        </button>
+                        <button class="btn-outline" onclick="setToday()">
+                            <i class="fas fa-calendar-day me-1"></i>
+                            <span data-en="Today" data-bn="আজ">আজ</span>
+                        </button>
+                        <button class="btn-outline" onclick="setMonth()">
+                            <i class="fas fa-calendar me-1"></i>
+                            <span data-en="This Month" data-bn="এই মাস">এই মাস</span>
+                        </button>
+                        <button class="btn-outline" onclick="clearDates()">
+                            <i class="fas fa-times me-1"></i>
+                            <span data-en="All Time" data-bn="সব সময়">সব সময়</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="dateLabel" style="font-size:12px;color:#888;margin-top:6px;"></div>
+            </div>
+
+            <!-- Print Header -->
+            <div class="print-header">
+                <div class="ins-name" id="printInsName"></div>
+                <div class="ins-meta" id="printInsPhone"></div>
+                <div class="ins-meta" id="printInsAddress"></div>
+                <div class="rep-title" data-en="Income, Due & Expense Report" data-bn="জমা, বাকি ও খরচ রিপোর্ট">জমা, বাকি ও খরচ রিপোর্ট</div>
+                <div class="rep-date" id="printDateRange"></div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="sum-grid" id="sumGrid">
+                <div class="s-card income" onclick="switchTab('income')">
+                    <div class="s-lbl" data-en="Total Income" data-bn="মোট জমা">মোট জমা</div>
+                    <div class="s-val green" id="sTotalIncome">৳0.00</div>
+                </div>
+                <div class="s-card due" onclick="switchTab('due')">
+                    <div class="s-lbl" data-en="Total Due" data-bn="মোট বাকি">মোট বাকি</div>
+                    <div class="s-val red" id="sTotalDue">৳0.00</div>
+                    <div class="s-sub" id="sDueCount"></div>
+                </div>
+                <div class="s-card expense" onclick="switchTab('expense')">
+                    <div class="s-lbl" data-en="Total Expense" data-bn="মোট খরচ">মোট খরচ</div>
+                    <div class="s-val orange" id="sTotalExpense">৳0.00</div>
+                </div>
+                <div class="s-card net">
+                    <div class="s-lbl" data-en="Net (Income - Expense)" data-bn="নেট (জমা - খরচ)">নেট (জমা − খরচ)</div>
+                    <div class="s-val teal" id="sNet">৳0.00</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tab-nav no-print">
+                <button class="tab-btn income-tab active" id="tab-income" onclick="switchTab('income')">
+                    <i class="fas fa-hand-holding-usd me-1"></i>
+                    <span data-en="Income" data-bn="জমা">জমা</span>
+                </button>
+                <button class="tab-btn due-tab" id="tab-due" onclick="switchTab('due')">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    <span data-en="Due" data-bn="বাকি">বাকি</span>
+                </button>
+                <button class="tab-btn expense-tab" id="tab-expense" onclick="switchTab('expense')">
+                    <i class="fas fa-shopping-cart me-1"></i>
+                    <span data-en="Expense" data-bn="খরচ">খরচ</span>
+                </button>
+            </div>
+
+            <!-- Income Tab -->
+            <div class="tab-pane active" id="pane-income">
+                <div class="tbl-card">
+                    <div class="tbl-head">
+                        <span class="tbl-title income"><i class="fas fa-hand-holding-usd me-1"></i>
+                            <span data-en="Income Records" data-bn="জমার বিবরণ">জমার বিবরণ</span>
+                        </span>
+                        <span id="incomeCount" class="text-sm-muted"></span>
+                    </div>
+                    <div id="incomeSpinner" class="spin-wrap"><div class="spin"></div></div>
+                    <div id="incomeContent">
+                        <div style="overflow-x:auto;">
+                            <table class="r-table">
+                                <thead><tr>
+                                    <th data-en="Order#" data-bn="অর্ডার নং">অর্ডার নং</th>
+                                    <th data-en="Customer" data-bn="কাস্টমার">কাস্টমার</th>
+                                    <th data-en="Phone" data-bn="মোবাইল">মোবাইল</th>
+                                    <th data-en="Order Date" data-bn="অর্ডার তারিখ">অর্ডার তারিখ</th>
+                                    <th data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</th>
+                                    <th data-en="Total" data-bn="মোট">মোট</th>
+                                    <th data-en="Pre Paid" data-bn="পূর্বের জমা">পূর্বের জমা</th>
+                                    <th data-en="Paid" data-bn="জমা">জমা</th>
+                                    <th data-en="Discount" data-bn="ছাড়">ছাড়</th>
+                                    <th data-en="Due" data-bn="বাকি">বাকি</th>
+                                    <th data-en="Pay Date" data-bn="জমার তারিখ">জমার তারিখ</th>
+                                    <th data-en="Type" data-bn="ধরন">ধরন</th>
+                                    <th data-en="Account" data-bn="একাউন্ট">একাউন্ট</th>
+                                </tr></thead>
+                                <tbody id="incomeBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="px-3 pb-3 no-print" id="incomePager"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Due Tab -->
+            <div class="tab-pane" id="pane-due" style="display:none;">
+                <div class="tbl-card">
+                    <div class="tbl-head">
+                        <span class="tbl-title due"><i class="fas fa-exclamation-circle me-1"></i>
+                            <span data-en="Due Orders" data-bn="বাকি অর্ডার">বাকি অর্ডার</span>
+                        </span>
+                        <span id="dueCount" class="text-sm-muted"></span>
+                    </div>
+                    <div id="dueSpinner" class="spin-wrap"><div class="spin"></div></div>
+                    <div id="dueContent">
+                        <div style="overflow-x:auto;">
+                            <table class="r-table">
+                                <thead><tr>
+                                    <th data-en="Order#" data-bn="অর্ডার নং">অর্ডার নং</th>
+                                    <th data-en="Customer" data-bn="কাস্টমার">কাস্টমার</th>
+                                    <th data-en="Phone" data-bn="মোবাইল">মোবাইল</th>
+                                    <th data-en="Items" data-bn="পোষাক">পোষাক</th>
+                                    <th data-en="Order Date" data-bn="অর্ডার তারিখ">অর্ডার তারিখ</th>
+                                    <th data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</th>
+                                    <th data-en="Total" data-bn="মোট">মোট</th>
+                                    <th data-en="Paid" data-bn="জমা">জমা</th>
+                                    <th data-en="Discount" data-bn="ছাড়">ছাড়</th>
+                                    <th data-en="Due" data-bn="বাকি">বাকি</th>
+                                    <th data-en="Status" data-bn="অবস্থা">অবস্থা</th>
+                                </tr></thead>
+                                <tbody id="dueBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="px-3 pb-3 no-print" id="duePager"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Tab -->
+            <div class="tab-pane" id="pane-expense" style="display:none;">
+                <div class="tbl-card">
+                    <div class="tbl-head">
+                        <span class="tbl-title expense"><i class="fas fa-shopping-cart me-1"></i>
+                            <span data-en="Expense Records" data-bn="খরচের বিবরণ">খরচের বিবরণ</span>
+                        </span>
+                        <span id="expenseCount" class="text-sm-muted"></span>
+                    </div>
+                    <!-- Category filter -->
+                    <div class="px-3 pt-3 no-print d-flex gap-2 align-items-center flex-wrap">
+                        <label class="f-label mb-0" style="white-space:nowrap;" data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি:</label>
+                        <select id="categorySelect" class="f-control" style="width:auto;min-width:160px;" onchange="loadExpense(1)">
+                            <option value="" data-en="All Categories" data-bn="সব ক্যাটাগরি">সব ক্যাটাগরি</option>
+                        </select>
+                    </div>
+                    <!-- Category totals chips -->
+                    <div class="cat-chips" id="catChips"></div>
+                    <div id="expenseSpinner" class="spin-wrap"><div class="spin"></div></div>
+                    <div id="expenseContent">
+                        <div style="overflow-x:auto;">
+                            <table class="r-table">
+                                <thead><tr>
+                                    <th data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
+                                    <th data-en="For" data-bn="কি বাবদ">কি বাবদ</th>
+                                    <th data-en="Amount" data-bn="পরিমান">পরিমান</th>
+                                    <th data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                    <th data-en="Account" data-bn="একাউন্ট">একাউন্ট</th>
+                                </tr></thead>
+                                <tbody id="expenseBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="px-3 pb-3 no-print" id="expensePager"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div id="app-modals"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js"></script>
+<script src="/js/income-due-expense.js"></script>
+</body>
+</html>

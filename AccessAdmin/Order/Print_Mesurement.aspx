@@ -4,6 +4,8 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <link href="CSS/Print_Mesurement.css?v=1.0.0" rel="stylesheet" />
+    <!-- Barcode Library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
@@ -99,6 +101,11 @@
                             </tr>
                         </table>
 
+                        <!-- Barcode - Only for ShopCopy -->
+                        <div class="barcode-container" style="display: none; text-align: center; margin-bottom: 10px;">
+                            <svg class="barcode-svg" data-order-number='<%# Eval("OrderSerialNumber") %>'></svg>
+                        </div>
+
                         <div style="display: none" class="customer-name">
                             <%# Eval("CustomerName") %>
                         </div>
@@ -107,7 +114,7 @@
                         </div>
 
                         <div class="MesureMentSt">
-                            <asp:DataList ID="MeasurementDataList" runat="server" DataSourceID="OrderedMeasurmentSQL" RepeatDirection="Horizontal" RepeatColumns="10" Width="100%">
+                            <asp:DataList ID="MeasurementDataList" runat="server" DataSourceID="OrderedMeasurmentSQL" RepeatDirection="Horizontal" Width="100%">
                                 <ItemTemplate>
                                     <asp:HiddenField ID="Measurement_GroupIDHiddenField" runat="server" Value='<%# Eval("Measurement_GroupID") %>' />
                                     <asp:DataList ID="DataList" runat="server" DataSourceID="M_SQL" Width="100%">
@@ -130,8 +137,8 @@ WHERE(Measurement_Type.Measurement_GroupID = @Measurement_GroupID) AND (Ordered_
                                 </ItemTemplate>
                             </asp:DataList>
                             <asp:SqlDataSource ID="OrderedMeasurmentSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-                                SelectCommand="SELECT DISTINCT Measurement_Type.Measurement_GroupID,ISNULL(Measurement_Type.Ascending,9999) AS Ascending FROM Ordered_Measurement INNER JOIN
-Measurement_Type ON Ordered_Measurement.MeasurementTypeID = Measurement_Type.MeasurementTypeID WHERE (Ordered_Measurement.OrderListID = @OrderListID) ORDER BY Ascending">
+                                SelectCommand="SELECT Measurement_Type.Measurement_GroupID, MIN(ISNULL(Measurement_Type.Ascending, 9999)) AS Ascending FROM Ordered_Measurement INNER JOIN
+Measurement_Type ON Ordered_Measurement.MeasurementTypeID = Measurement_Type.MeasurementTypeID WHERE (Ordered_Measurement.OrderListID = @OrderListID) GROUP BY Measurement_Type.Measurement_GroupID ORDER BY Ascending">
                                 <SelectParameters>
                                     <asp:ControlParameter ControlID="OrderListIDHiddenField" Name="OrderListID" PropertyName="Value" />
                                 </SelectParameters>
@@ -251,6 +258,12 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td>বার কোড</td>
+                                    <td>
+                                        <asp:CheckBox ID="Print_BarcodeCheckBox" runat="server" Checked='<%# Bind("Print_Barcode") %>' Text=" " />
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>উপরের স্পেস</td>
                                     <td>
                                         <asp:TextBox ID="Print_TopSpaceTextBox" onkeypress="return isNumberKey(event)" autocomplete="off" onDrop="blur();return false;" onpaste="return false" Width="50px" CssClass="textbox" runat="server" Text='<%# Bind("Print_TopSpace") %>' />
@@ -286,7 +299,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                             </table>
                         </EditItemTemplate>
                     </asp:FormView>
-                    <asp:SqlDataSource ID="Print_settingSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT InstitutionID, Print_Customer_Name,Print_Customer_Address, Print_MasterCopy, Print_WorkmanCopy, Print_ShopCopy, Print_TopSpace, Print_S_Category, Print_Measurement_Name, Print_ShopName, Print_Font_Size FROM Institution WHERE (InstitutionID = @InstitutionID)" UpdateCommand="UPDATE Institution SET Print_Font_Size = @Print_Font_Size, Print_ShopName = @Print_ShopName, Print_Customer_Name = @Print_Customer_Name,Print_Customer_Address=@Print_Customer_Address, Print_MasterCopy = @Print_MasterCopy, Print_WorkmanCopy = @Print_WorkmanCopy, Print_ShopCopy = @Print_ShopCopy, Print_TopSpace = @Print_TopSpace, Print_S_Category = @Print_S_Category, Print_Measurement_Name = @Print_Measurement_Name WHERE (InstitutionID = @InstitutionID)">
+                    <asp:SqlDataSource ID="Print_settingSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT InstitutionID, Print_Customer_Name,Print_Customer_Address, Print_MasterCopy, Print_WorkmanCopy, Print_ShopCopy, Print_TopSpace, Print_S_Category, Print_Measurement_Name, Print_ShopName, Print_Font_Size, Print_Barcode FROM Institution WHERE (InstitutionID = @InstitutionID)" UpdateCommand="UPDATE Institution SET Print_Font_Size = @Print_Font_Size, Print_ShopName = @Print_ShopName, Print_Customer_Name = @Print_Customer_Name,Print_Customer_Address=@Print_Customer_Address, Print_MasterCopy = @Print_MasterCopy, Print_WorkmanCopy = @Print_WorkmanCopy, Print_ShopCopy = @Print_ShopCopy, Print_TopSpace = @Print_TopSpace, Print_S_Category = @Print_S_Category, Print_Measurement_Name = @Print_Measurement_Name, Print_Barcode = @Print_Barcode WHERE (InstitutionID = @InstitutionID)">
                         <SelectParameters>
                             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" Type="Int32" />
                         </SelectParameters>
@@ -301,6 +314,7 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                             <asp:Parameter Name="Print_TopSpace" />
                             <asp:Parameter Name="Print_S_Category" />
                             <asp:Parameter Name="Print_Measurement_Name" />
+                            <asp:Parameter Name="Print_Barcode" />
                             <asp:Parameter Name="InstitutionID" />
                         </UpdateParameters>
                     </asp:SqlDataSource>
@@ -475,6 +489,36 @@ WHERE (ODS.OrderListID = @OrderListID)) AS T ORDER BY T.NUB  FOR XML PATH('')), 
                 success: function (response) {
                     if (response.d) {
                         $(".ShopCopy").show();
+
+                        // Generate barcodes based on Print_Barcode setting
+                        $.ajax({
+                            type: "POST",
+                            url: pageUrl + '/PrintBarcode',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (res) {
+                                if (res.d) {
+                                    $(".barcode-container").show();
+                                    $(".barcode-svg").each(function () {
+                                        var orderNumber = $(this).data('order-number');
+                                        if (orderNumber) {
+                                            try {
+                                                JsBarcode(this, orderNumber.toString(), {
+                                                    format: "CODE128",
+                                                    width: 2,
+                                                    height: 50,
+                                                    displayValue: true,
+                                                    fontSize: 14,
+                                                    margin: 5
+                                                });
+                                            } catch (e) {
+                                                console.error("Barcode generation error:", e);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
                     }
                 },
                 failure: function (response) {

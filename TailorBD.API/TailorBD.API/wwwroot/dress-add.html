@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ড্রেস ও মাপজোখ যোগ করুন - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/dress-add.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Container (Auto-loads from component) -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container (Auto-loads from component) -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="lang-content" data-en="Add Dress & Measurements" data-bn="ড্রেস ও মাপজোখ যোগ করুন">ড্রেস ও মাপজোখ যোগ করুন</h1>
+                <p class="lang-content" data-en="Manage dress types and their specific charges" data-bn="ড্রেসের ধরন ও মাপজোখ বিস্তারিত পরিচালনা করুন">ড্রেসের ধরন ও মাপজোখ বিস্তারিত পরিচালনা করুন</p>
+            </div>
+
+            <!-- Add Dress Button -->
+            <div class="action-buttons mb-2">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDressModal">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <span class="lang-content" data-en="Add New Dress" data-bn="নতুন ড্রেস যোগ করুন">নতুন ড্রেস যোগ করুন</span>
+                </button>
+                <button type="button" class="btn btn-success" id="updateSerialsBtn" style="display: none;">
+                    <i class="fas fa-save me-2"></i>
+                    <span class="lang-content" data-en="Update Serials" data-bn="সিরিয়াল আপডেট করুন">সিরিয়াল আপডেট করুন</span>
+                </button>
+            </div>
+
+            <!-- Dresses Table -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="dressTable">
+                        <thead>
+                            <tr>
+                                <th class="lang-content" data-en="Edit" data-bn="সম্পাদনা">সম্পাদনা</th>
+                                <th class="lang-content" data-en="Dress Name" data-bn="ড্রেসের নাম">ড্রেসের নাম</th>
+                                <th class="lang-content" data-en="Image" data-bn="ছবি">ছবি</th>
+                                <th class="lang-content" data-en="Add Style" data-bn="স্টাইল যোগ করুন ">স্টাইল যোগ করুন</th>
+                                <th class="lang-content" data-en="Add Measurement" data-bn="মাপজোখ যোগ করুন">মাপজোখ যোগ করুন</th>
+                                <th class="lang-content" data-en="Serial" data-bn="সিরিয়াল">সিরিয়াল</th>
+                                <th class="lang-content" data-en="Delete" data-bn="মুছুন">মুছুন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dressTableBody">
+                            <!-- Rows will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals Container (Auto-loads from component) -->
+    <div id="app-modals"></div>
+
+    <!-- Add Dress Modal -->
+    <div class="modal fade" id="addDressModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title lang-content" data-en="Add New Dress" data-bn="নতুন ড্রেস যোগ করুন">নতুন ড্রেস যোগ করুন</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDressForm">
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Dress For" data-bn="ড্রেস কার জন্য">ড্রেস কার জন্য</label>
+                            <select class="form-select" id="clothFor" required>
+                                <option value="">নির্বাচন করুন</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Dress Name" data-bn="ড্রেসের নাম">ড্রেসের নাম</label>
+                            <input type="text" class="form-control" id="dressName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Serial Number" data-bn="সিরিয়াল নম্বর">সিরিয়াল নম্বর</label>
+                            <input type="number" class="form-control" id="dressSerial" min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Dress Image" data-bn="ড্রেসের ছবি">ড্রেসের ছবি</label>
+                            <input type="file" class="form-control" id="dressImage" accept="image/*">
+                            <small class="text-muted lang-content" data-en="JPG, PNG, GIF (Max 5MB)" data-bn="JPG, PNG, GIF (সর্বোচ্চ ৫ MB)">JPG, PNG, GIF (সর্বোচ্চ ৫ MB)</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="addDress()">
+                        <i class="fas fa-save me-2"></i>
+                        <span class="lang-content" data-en="Add Dress" data-bn="ড্রেস যোগ করুন">ড্রেস যোগ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Dress Modal -->
+    <div class="modal fade" id="editDressModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title lang-content" data-en="Edit Dress" data-bn="ড্রেস সম্পাদনা">ড্রেস সম্পাদনা</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDressForm">
+                        <input type="hidden" id="editDressId">
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Dress Name" data-bn="ড্রেসের নাম">ড্রেসের নাম</label>
+                            <input type="text" class="form-control" id="editDressName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Update Image" data-bn="ছবি আপডেট করুন">ছবি আপডেট করুন</label>
+                            <input type="file" class="form-control" id="editDressImage" accept="image/*">
+                            <small class="text-muted lang-content" data-en="Leave empty to keep existing image" data-bn="বিদ্যমান ছবি রাখতে খালি রাখুন">বিদ্যমান ছবি রাখতে খালি রাখুন</small>
+                        </div>
+                        <div class="mb-3">
+                            <img id="editDressImagePreview" src="" alt="Current Image" style="max-width: 200px; display: none;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="updateDress()">
+                        <i class="fas fa-save me-2"></i>
+                        <span class="lang-content" data-en="Update" data-bn="আপডেট">আপডেট</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Modal -->
+    <div class="modal fade" id="priceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        "<span id="priceDressName"></span>" 
+                        <span class="lang-content" data-en="Making Charges" data-bn="মেকিং চার্জ">মেকিং চার্জ</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Add/Edit Price Form -->
+                    <form id="priceForm" class="mb-4">
+                        <input type="hidden" id="priceId">
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <label class="form-label lang-content" data-en="Price For" data-bn="যার জন্য মূল্য">যার জন্য মূল্য</label>
+                                <input type="text" class="form-control" id="priceFor" 
+                                       placeholder="যেমন: পুরুষ, মহিলা, শিশু" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label lang-content" data-en="Price (?)" data-bn="মূল্য (হ)">মূল্য (হ)</label>
+                                <input type="number" class="form-control" id="price" 
+                                       placeholder="মূল্য লিখুন" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100" id="priceSubmitBtn">
+                                    <i class="fas fa-plus me-1"></i>
+                                    <span class="lang-content" data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Price List Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="lang-content" data-en="Price For" data-bn="যার জন্য মূল্য">যার জন্য মূল্য</th>
+                                    <th class="lang-content" data-en="Price" data-bn="মূল্য">মূল্য</th>
+                                    <th class="lang-content" data-en="Edit" data-bn="সম্পাদনা">সম্পাদনা</th>
+                                    <th class="lang-content" data-en="Delete" data-bn="মুছুন">মুছুন</th>
+                                </tr>
+                            </thead>
+                            <tbody id="priceTableBody">
+                                <tr>
+                                    <td colspan="4" class="text-center py-3">
+                                        <span class="spinner-border spinner-border-sm"></span>
+                                        <span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>
+                        <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Measurement Modal -->
+    <div class="modal fade" id="measurementModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg,#667eea,#764ba2); color:#fff;">
+                    <h5 class="modal-title mb-0">
+                        <i class="fas fa-ruler-combined me-2"></i>
+                        "<span id="measurementDressName"></span>" মাপজোখ
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-3">
+                    <!-- Modal alert area -->
+                    <div id="measurementModalAlert"></div>
+
+                    <!-- Add New Group Form -->
+                    <div class="card border-success mb-3">
+                        <div class="card-header bg-success bg-opacity-10 py-2">
+                            <strong class="text-success">
+                                <i class="fas fa-plus-circle me-1"></i> নতুন মাপজোখ গ্রুপ যোগ করুন
+                            </strong>
+                        </div>
+                        <div class="card-body py-2">
+                            <form id="measurementGroupForm">
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-sm-6">
+                                        <label class="form-label form-label-sm mb-1">গ্রুপের নাম</label>
+                                        <input type="text" class="form-control form-control-sm" id="measurementGroupName"
+                                               placeholder="যেমন: হাত, ছাতি, কোমর..." required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="form-label form-label-sm mb-1">সিরিয়াল</label>
+                                        <input type="number" class="form-control form-control-sm" id="measurementGroupSerial"
+                                               placeholder="১, ২, ৩..." min="1">
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="fas fa-plus me-1"></i> গ্রুপ যোগ করুন
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Groups List -->
+                    <div id="measurementGroupsList"></div>
+                </div>
+
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> বন্ধ করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Measurement Group Modal -->
+    <div class="modal fade" id="editGroupModal" tabindex="-1" data-bs-backdrop="false">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header py-2 bg-primary text-white">
+                    <h6 class="modal-title mb-0"><i class="fas fa-edit me-1"></i> গ্রুপ সম্পাদনা</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editGroupId">
+                    <div class="mb-3">
+                        <label class="form-label">গ্রুপের নাম</label>
+                        <input type="text" class="form-control" id="editGroupName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">সিরিয়াল</label>
+                        <input type="number" class="form-control" id="editGroupSerial" min="1" placeholder="১, ২, ৩...">
+                    </div>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">বাতিল</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="saveEditGroup()">
+                        <i class="fas fa-save me-1"></i> সেভ করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Measurement Type Modal -->
+    <div class="modal fade" id="editTypeModal" tabindex="-1" data-bs-backdrop="false">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header py-2 bg-info text-white">
+                    <h6 class="modal-title mb-0"><i class="fas fa-edit me-1"></i> মাপজোখ সম্পাদনা</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editTypeId">
+                    <input type="hidden" id="editTypeGroupId">
+                    <div class="mb-3">
+                        <label class="form-label">মাপজোখের নাম</label>
+                        <input type="text" class="form-control" id="editTypeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">সিরিয়াল</label>
+                        <input type="number" class="form-control" id="editTypeSerial" min="1" placeholder="১, ২, ৩...">
+                    </div>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">বাতিল</button>
+                    <button type="button" class="btn btn-info btn-sm text-white" onclick="saveEditType()">
+                        <i class="fas fa-save me-1"></i> সেভ করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    
+    <!-- Dress Add JS -->
+    <script src="/js/dress-add.js?v=2.1.4"></script>
+</body>
+</html>

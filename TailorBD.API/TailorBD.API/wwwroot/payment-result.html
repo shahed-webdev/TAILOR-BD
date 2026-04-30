@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পেমেন্ট ফলাফল - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .result-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.25);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* ── Header ── */
+        .result-header {
+            padding: 36px 30px 24px;
+        }
+        .result-header.success { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+        .result-header.failed  { background: linear-gradient(135deg, #fee2e2, #fecaca); }
+        .result-header.pending { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+        .result-header.loading { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+
+        .result-icon { font-size: 4rem; margin-bottom: 14px; display: block; }
+        .result-header.success .result-icon { color: #059669; }
+        .result-header.failed  .result-icon { color: #dc2626; }
+        .result-header.pending .result-icon { color: #d97706; }
+        .result-header.loading .result-icon { color: #7c3aed; }
+
+        .result-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .result-header.success .result-title { color: #065f46; }
+        .result-header.failed  .result-title { color: #991b1b; }
+        .result-header.pending .result-title { color: #92400e; }
+        .result-header.loading .result-title { color: #4c1d95; }
+
+        .result-subtitle {
+            font-size: .9rem;
+            opacity: .75;
+        }
+
+        /* ── Body ── */
+        .result-body { padding: 24px 30px; }
+
+        .detail-row-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: .88rem;
+        }
+        .detail-row-item:last-child { border-bottom: none; }
+        .detail-row-item .lbl { color: #64748b; }
+        .detail-row-item .val { font-weight: 600; color: #1e293b; }
+
+        /* ── Footer ── */
+        .result-footer {
+            padding: 18px 30px 28px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-home {
+            background: linear-gradient(135deg, #667eea, #5a68c9);
+            color: #fff; border: none; border-radius: 10px;
+            padding: 11px 24px; font-size: .9rem; font-weight: 700;
+            cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-home:hover { opacity: .9; color: #fff; }
+        .btn-invoice {
+            background: #f1f5f9; color: #475569;
+            border: none; border-radius: 10px;
+            padding: 11px 24px; font-size: .9rem; font-weight: 700;
+            cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-invoice:hover { background: #e2e8f0; color: #334155; }
+
+        /* spinner */
+        .sp-spinner {
+            width: 48px; height: 48px;
+            border: 4px solid #ede9fe;
+            border-top-color: #7c3aed;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* powered-by */
+        .powered-by {
+            padding: 14px 30px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            font-size: .72rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-card" id="resultCard">
+        <!-- Loading state -->
+        <div class="result-header loading" id="headerBox">
+            <div class="sp-spinner"></div>
+            <div class="result-title">যাচাই হচ্ছে...</div>
+            <div class="result-subtitle">পেমেন্ট তথ্য লোড হচ্ছে। অনুগ্রহ করে অপেক্ষা করুন।</div>
+        </div>
+        <div class="result-body" id="bodyBox"></div>
+        <div class="result-footer" id="footerBox"></div>
+        <div class="powered-by">
+            <i class="fas fa-shield-alt me-1"></i>
+            Powered by <strong>ShurjoPay</strong> &nbsp;|&nbsp; TailorBD Payment Gateway
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+    (function () {
+        // ── URL থেকে order_id পড়া ────────────────────────────────────────
+        var params  = new URLSearchParams(window.location.search);
+        var orderId = params.get('order_id') || params.get('orderId') || params.get('sp_order_id') || '';
+
+        if (!orderId) {
+            showResult('failed', null, 'Order ID পাওয়া যায়নি।');
+            return;
+        }
+
+        // ── Backend এ verify call ─────────────────────────────────────────
+        $.ajax({
+            url:         '/api/shurjopay/verify',
+            method:      'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ orderId: orderId }),
+            success: function (r) {
+                if (r.success || r.alreadyPaid) {
+                    showResult('success', r, null);
+                } else if (r.paymentStatus === 'Pending') {
+                    showResult('pending', r, r.message || 'পেমেন্ট প্রক্রিয়াধীন।');
+                } else {
+                    var failMsg = r.message && r.message !== 'Success'
+                        ? r.message : 'পেমেন্ট সম্পন্ন হয়নি। আবার চেষ্টা করুন।';
+                    showResult('failed', r, failMsg);
+                }
+            },
+            error: function (xhr) {
+                var msg = (xhr.responseJSON && xhr.responseJSON.message)
+                    ? xhr.responseJSON.message : 'সার্ভার সংযোগে সমস্যা।';
+                showResult('failed', null, msg);
+            }
+        });
+
+        // ── UI আপডেট ─────────────────────────────────────────────────────
+        function showResult(type, data, errorMsg) {
+            var $header = $('#headerBox');
+            var $body   = $('#bodyBox');
+            var $footer = $('#footerBox');
+
+            $header.removeClass('loading success failed pending').addClass(type);
+
+            var icon, title, subtitle;
+            if (type === 'success') {
+                icon     = '<i class="fas fa-check-circle result-icon"></i>';
+                title    = 'পেমেন্ট সফল হয়েছে!';
+                subtitle = 'আপনার বকেয়া বিল সফলভাবে পরিশোধ হয়েছে।';
+            } else if (type === 'pending') {
+                icon     = '<i class="fas fa-clock result-icon"></i>';
+                title    = 'পেমেন্ট প্রক্রিয়াধীন';
+                subtitle = errorMsg || 'আপনার পেমেন্ট প্রক্রিয়া চলছে।';
+            } else {
+                icon     = '<i class="fas fa-times-circle result-icon"></i>';
+                title    = 'পেমেন্ট ব্যর্থ';
+                subtitle = errorMsg || 'পেমেন্ট প্রক্রিয়া সম্পন্ন হয়নি।';
+            }
+
+            $header.html(
+                icon +
+                '<div class="result-title">' + title + '</div>' +
+                '<div class="result-subtitle">' + subtitle + '</div>'
+            );
+
+            // ── Detail rows ──
+            var fmt  = function (n) { return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 }); };
+            var rows = '';
+            if (data) {
+                if (data.transactionId) {
+                    rows += detailRow('ট্রানজেকশন ID', '<code style="font-size:.82rem;">' + data.transactionId + '</code>');
+                }
+                if (data.amount && data.amount > 0) {
+                    rows += detailRow('পরিশোধিত পরিমাণ', '<strong style="color:#059669;">৳' + fmt(data.amount) + ' টাকা</strong>');
+                }
+                rows += detailRow('Order ID', '<code style="font-size:.82rem;">' + orderId + '</code>');
+                if (data.paymentStatus) {
+                    var statusMap = { 'Paid': 'পেইড', 'Pending': 'প্রক্রিয়াধীন', 'Failed': 'ব্যর্থ', 'Completed': 'সম্পন্ন' };
+                    rows += detailRow('পেমেন্ট অবস্থা', statusMap[data.paymentStatus] || data.paymentStatus);
+                }
+            }
+
+            $body.html(rows
+                ? '<div style="background:#f8fafc;border-radius:10px;padding:14px 18px;">' + rows + '</div>'
+                : '');
+
+            // ── Footer buttons ──
+            var btns = '';
+            if (type === 'success') {
+                btns += '<a href="/dashboard.html" class="btn-home"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
+            } else if (type === 'failed') {
+                btns += '<a href="/due-invoice.html" class="btn-home"><i class="fas fa-redo"></i> আবার চেষ্টা করুন</a>';
+                btns += '<a href="/dashboard.html" class="btn-invoice"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
+            } else {
+                btns += '<a href="/due-invoice.html" class="btn-invoice"><i class="fas fa-file-invoice"></i> ইনভয়েস পেজ</a>';
+                btns += '<a href="/dashboard.html" class="btn-home"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
+            }
+            $footer.html(btns);
+        }
+
+        function detailRow(label, value) {
+            return '<div class="detail-row-item">' +
+                '<span class="lbl">' + label + '</span>' +
+                '<span class="val">' + value + '</span>' +
+                '</div>';
+        }
+    })();
+    </script>
+</body>
+</html>

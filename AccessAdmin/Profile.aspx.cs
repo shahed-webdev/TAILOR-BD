@@ -16,7 +16,49 @@ namespace TailorBD.AccessAdmin
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+                LoadDueNotice();
+            }
+        }
 
+        private void LoadDueNotice()
+        {
+            HttpCookie institutionCookie = Request.Cookies["InstitutionID"];
+            if (institutionCookie == null || string.IsNullOrEmpty(institutionCookie.Value))
+                return;
+
+            if (!int.TryParse(institutionCookie.Value, out int institutionID))
+                return;
+
+            string connStr = ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(connStr))
+            {
+                string sql = "SELECT COUNT(*) AS DueCount, ISNULL(SUM(Due), 0) AS DueTotal FROM Invoice WHERE InstitutionID = @InstitutionID AND PaymentStatus = 'Due'";
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionID);
+                    con.Open();
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            int dueCount = dr.GetInt32(0);
+                            decimal dueTotal = Convert.ToDecimal(dr[1]);
+
+                            if (dueCount > 0)
+                            {
+                                hfDueCount.Value = dueCount.ToString();
+                                hfDueTotal.Value = dueTotal.ToString("F2");
+
+                                DueNoticePanel.Visible = true;
+                                ltDueCount.Text = dueCount.ToString();
+                                ltDueTotal.Text = dueTotal.ToString("N2");
+                            }
+                        }
+                    }
+                }
+            }
         }
 
 

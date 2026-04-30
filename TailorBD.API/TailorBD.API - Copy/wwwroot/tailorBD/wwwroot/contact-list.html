@@ -1,0 +1,729 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Phone Contact List - TailorBD" data-bn="ফোন কন্টাক্ট লিস্ট - TailorBD">ফোন কন্টাক্ট লিস্ট - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px 220px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px 10px 220px;} }
+
+        /* ── Buttons ── */
+        .btn-pri  { padding:7px 16px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+        .btn-pri:hover  { background:#5a68c9; }
+        .btn-gray { padding:6px 14px; background:#f5f5f5; color:#555; border:1.5px solid #ddd; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
+        .btn-gray:hover { background:#eee; }
+        .btn-danger-sm { padding:4px 10px; background:#fff; color:#dc3545; border:1.5px solid #dc3545; border-radius:5px; font-size:11px; cursor:pointer; font-family:inherit; }
+        .btn-danger-sm:hover { background:#dc3545; color:#fff; }
+        .btn-edit-sm { padding:4px 10px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:5px; font-size:11px; cursor:pointer; font-family:inherit; }
+        .btn-edit-sm:hover { background:#6c7ae0; color:#fff; }
+        .btn-green { padding:10px 28px; background:#28a745; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+        .btn-green:hover { background:#218838; }
+        .btn-green:disabled { background:#aaa; cursor:not-allowed; }
+
+        /* ── Card ── */
+        .card-box  { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08); overflow:hidden; margin-bottom:16px; }
+        .card-head { padding:12px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; background:#fafbff; flex-wrap:wrap; gap:8px; }
+        .card-title{ font-weight:700; font-size:14px; color:#6c7ae0; }
+
+        /* ── Layout ── */
+        .layout { display:grid; grid-template-columns:220px 1fr; gap:16px; }
+        @media(max-width:768px){ .layout{ grid-template-columns:1fr; } }
+
+        /* ── Group panel ── */
+        .group-panel { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08); overflow:hidden; }
+        .group-head  { padding:12px 16px; background:#fafbff; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+        .group-title { font-weight:700; font-size:13px; color:#6c7ae0; }
+        .group-list  { list-style:none; margin:0; padding:6px 0; max-height:calc(100vh - 260px); overflow-y:auto; }
+        .group-list li a {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:9px 14px; color:#444; text-decoration:none; font-size:13px;
+            cursor:pointer; transition:background .15s;
+        }
+        .group-list li a:hover  { background:#f0f1fc; }
+        .group-list li a.active { background:#eef0fc; color:#6c7ae0; font-weight:700; }
+        .group-badge { background:#6c7ae0; color:#fff; border-radius:10px; padding:1px 7px; font-size:10px; font-weight:700; }
+        .group-actions { display:flex; gap:4px; }
+
+        /* ── Search / filter bar ── */
+        .filter-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; padding:10px 20px; border-bottom:1px solid #f0f0f0; }
+        .f-group  { display:flex; flex-direction:column; }
+        .f-label  { font-size:11px; font-weight:700; color:#666; margin-bottom:3px; }
+        .f-ctrl   { padding:6px 11px; border:1.5px solid #ddd; border-radius:7px; font-size:13px; font-family:inherit; }
+        .f-ctrl:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 2px rgba(108,122,224,.12); }
+
+        /* ── Summary ── */
+        .summary-strip { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:7px 20px; background:#fffbf0; border-bottom:1px solid #f0f0f0; font-size:12px; }
+        .sel-badge { background:#e65100; color:#fff; border-radius:5px; padding:2px 10px; font-size:12px; font-weight:700; }
+        .sel-zero  { background:#ddd; color:#888; border-radius:5px; padding:2px 10px; font-size:12px; font-weight:700; }
+
+        /* ── Contact table ── */
+        .c-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .c-table thead th { background:#f4f5ff; padding:9px 14px; font-size:11px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap; }
+        .c-table tbody td { padding:8px 14px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+        .c-table tbody tr:hover   { background:#f8f9ff; }
+        .c-table tbody tr.checked { background:#eef0fc; }
+        .c-table input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:#6c7ae0; }
+
+        /* ── Pager ── */
+        .pager-wrap { display:flex; gap:4px; flex-wrap:wrap; align-items:center; padding:8px 20px; background:#fafbff; border-top:1px solid #f0f0f0; }
+        .pager-wrap button { padding:4px 10px; border:1.5px solid #ddd; border-radius:5px; background:#fff; font-size:11px; cursor:pointer; font-family:inherit; font-weight:600; }
+        .pager-wrap button.active { background:#6c7ae0; color:#fff; border-color:#6c7ae0; }
+        .pager-wrap button:disabled { opacity:.35; cursor:not-allowed; }
+        .pager-info { font-size:11px; color:#888; margin-left:auto; }
+
+        /* ── Spinner ── */
+        .spin-wrap { text-align:center; padding:28px; color:#aaa; }
+        .spin { width:26px; height:26px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+        .no-data { text-align:center; padding:28px; color:#bbb; font-size:13px; }
+
+        /* ── Modal ── */
+        .modal-card { background:#fff; border-radius:14px; padding:24px; max-width:440px; width:100%; }
+        .modal-title-bar { font-weight:700; font-size:15px; color:#6c7ae0; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
+        .modal-backdrop-custom { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1100; display:flex; align-items:center; justify-content:center; }
+        .m-group  { margin-bottom:13px; }
+        .m-label  { font-size:12px; font-weight:700; color:#555; margin-bottom:4px; display:block; }
+        .m-ctrl   { width:100%; padding:8px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:13px; font-family:inherit; }
+        .m-ctrl:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 2px rgba(108,122,224,.12); }
+        .m-err  { color:#dc3545; font-size:11px; margin-top:3px; display:none; }
+
+        /* ── Compose bar (sticky bottom) ── */
+        #composeBar {
+            position:fixed; bottom:0; left:260px; right:0;
+            background:#fff; border-top:2px solid #6c7ae0;
+            box-shadow:0 -4px 20px rgba(108,122,224,.18); z-index:999;
+            transition:left .3s ease;
+        }
+        @media(max-width:992px){ #composeBar{ left:0; } }
+        .compose-collapsed { display:flex; align-items:center; gap:12px; padding:10px 30px; cursor:pointer; background:#f8f9ff; flex-wrap:wrap; }
+        .compose-collapsed:hover { background:#eef0fc; }
+        .compose-expanded  { padding:14px 30px 16px; display:none; }
+        .compose-arrow { margin-left:auto; color:#6c7ae0; transition:transform .2s; }
+        .compose-arrow.open { transform:rotate(180deg); }
+        .msg-area { width:100%; padding:10px 13px; border:1.5px solid #ddd; border-radius:8px; font-size:13px; font-family:inherit; resize:none; height:80px; box-sizing:border-box; line-height:1.6; }
+        .msg-area:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 2px rgba(108,122,224,.12); }
+        .sms-meta { display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:#888; margin-top:5px; }
+        .sms-meta b { color:#333; }
+        .err-msg { color:#dc3545; font-size:12px; font-weight:600; }
+    </style>
+</head>
+<body>
+<div id="app-navbar"></div>
+<div id="app-sidebar"></div>
+
+<main class="main-content" id="mainContent">
+<div class="dashboard-content">
+<div class="page-container">
+
+    <!-- Page title -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-weight:800;color:#6c7ae0;margin:0;">
+            <i class="fas fa-address-book me-2"></i>
+            <span data-en="Phone Contact List" data-bn="ফোন কন্টাক্ট লিস্ট">ফোন কন্টাক্ট লিস্ট</span>
+        </h5>
+        <div class="d-flex gap-2">
+            <span id="balBadge" style="background:#6c7ae0;color:#fff;border-radius:20px;padding:5px 16px;font-size:13px;font-weight:800;">
+                <i class="fas fa-spinner fa-spin"></i>
+            </span>
+            <a href="/sms.html" style="padding:7px 14px;background:#fff;color:#6c7ae0;border:1.5px solid #6c7ae0;border-radius:7px;font-size:13px;font-weight:600;text-decoration:none;">
+                <i class="fas fa-users me-1"></i>
+                <span data-en="Customer SMS" data-bn="কাস্টমার SMS">কাস্টমার SMS</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Layout -->
+    <div class="layout">
+
+        <!-- ── Left: Group panel ── -->
+        <div class="group-panel">
+            <div class="group-head">
+                <span class="group-title"><i class="fas fa-layer-group me-1"></i><span data-en="Groups" data-bn="গ্রুপ">গ্রুপ</span></span>
+                <button class="btn-pri" style="padding:5px 12px;font-size:12px;" onclick="openGroupModal()">
+                    <i class="fas fa-plus me-1"></i><span data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
+                </button>
+            </div>
+            <ul class="group-list" id="groupList">
+                <li><a class="active" data-id="0" onclick="selectGroup(0,this)">
+                    <span><i class="fas fa-globe me-1" style="color:#6c7ae0;font-size:11px;"></i>
+                    <span data-en="All Groups" data-bn="সব গ্রুপ">সব গ্রুপ</span></span>
+                    <span class="group-badge" id="allGroupBadge">0</span>
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- ── Right: Contacts card ── -->
+        <div class="card-box" style="margin-bottom:0;">
+            <div class="card-head">
+                <span class="card-title" id="activeGroupName">
+                    <i class="fas fa-address-card me-1"></i>সব গ্রুপ
+                </span>
+                <button class="btn-pri" onclick="openContactModal()">
+                    <i class="fas fa-user-plus me-1"></i>
+                    <span data-en="Add Contact" data-bn="কন্টাক্ট যোগ করুন">কন্টাক্ট যোগ করুন</span>
+                </button>
+            </div>
+
+            <!-- Filter bar -->
+            <div class="filter-bar">
+                <div class="f-group" style="flex:1;min-width:180px;">
+                    <label class="f-label" data-en="Search name / mobile" data-bn="নাম / মোবাইল খুঁজুন">নাম / মোবাইল খুঁজুন</label>
+                    <div style="position:relative;">
+                        <input type="text" id="cSearch" class="f-ctrl" style="width:100%;padding-right:30px;"
+                            placeholder="নাম বা মোবাইল নম্বর"
+                            data-en-placeholder="Name or mobile number"
+                            data-bn-placeholder="নাম বা মোবাইল নম্বর">
+                        <span id="cSpinner" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);display:none;">
+                            <i class="fas fa-spinner fa-spin" style="color:#6c7ae0;font-size:12px;"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="f-group">
+                    <label class="f-label">&nbsp;</label>
+                    <button class="btn-gray" onclick="resetSearch()">
+                        <span data-en="Reset" data-bn="রিসেট">রিসেট</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="summary-strip">
+                <span style="color:#888;" data-en="Total:" data-bn="মোট:">মোট:</span>
+                <span id="totalCount" style="font-weight:700;color:#333;">0</span>
+                <span style="margin:0 4px;color:#ddd;">|</span>
+                <span id="selBadge" class="sel-zero">নির্বাচিত: 0</span>
+                <button onclick="selectPageContacts()" style="padding:3px 10px;font-size:11px;background:#fff;color:#6c7ae0;border:1.5px solid #6c7ae0;border-radius:5px;cursor:pointer;font-family:inherit;font-weight:600;">
+                    <span data-en="Select Page" data-bn="এই পেজ">এই পেজ</span>
+                </button>
+                <button onclick="deselectAll()" style="padding:3px 10px;font-size:11px;background:#f5f5f5;color:#555;border:1.5px solid #ddd;border-radius:5px;cursor:pointer;font-family:inherit;font-weight:600;">
+                    <span data-en="Deselect All" data-bn="বাতিল">বাতিল</span>
+                </button>
+            </div>
+
+            <!-- Spinner / Table -->
+            <div id="cSpinWrap" class="spin-wrap"><div class="spin"></div></div>
+            <div id="cTableWrap" style="display:none;overflow-x:auto;">
+                <table class="c-table">
+                    <thead><tr>
+                        <th style="width:38px;text-align:center;">
+                            <input type="checkbox" id="chkAll" onchange="toggleAll(this)">
+                        </th>
+                        <th data-en="Group" data-bn="গ্রুপ">গ্রুপ</th>
+                        <th data-en="Name" data-bn="নাম">নাম</th>
+                        <th data-en="Mobile" data-bn="মোবাইল">মোবাইল</th>
+                        <th data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
+                        <th data-en="Added" data-bn="যোগের তারিখ">যোগের তারিখ</th>
+                        <th style="width:100px;" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                    </tr></thead>
+                    <tbody id="cBody"></tbody>
+                </table>
+            </div>
+            <div id="cPager" class="pager-wrap"></div>
+        </div>
+
+    </div>
+</div>
+</div>
+</main>
+
+<!-- ══ STICKY COMPOSE BAR ══ -->
+<div id="composeBar">
+    <div class="compose-collapsed" onclick="toggleCompose()">
+        <i class="fas fa-pen" style="color:#6c7ae0;font-size:15px;"></i>
+        <span style="font-size:13px;font-weight:700;color:#6c7ae0;"
+            data-en="Write &amp; Send SMS" data-bn="বার্তা লিখুন ও পাঠান">বার্তা লিখুন ও পাঠান</span>
+        <span id="composeSelInfo" style="font-size:12px;color:#aaa;background:#f5f5f5;border-radius:5px;padding:2px 10px;">নির্বাচিত: 0</span>
+        <span id="composeSmsInfo" style="font-size:11px;color:#888;"></span>
+        <i class="fas fa-chevron-up compose-arrow" id="composeArrow"></i>
+    </div>
+    <div class="compose-expanded" id="composeExpanded">
+        <div class="d-flex gap-3 align-items-start flex-wrap">
+            <div style="flex:1;min-width:240px;">
+                <textarea id="smsText" class="msg-area" oninput="updateCounter()"
+                    data-en-placeholder="Write your SMS message here..."
+                    data-bn-placeholder="এখানে এসএমএস বার্তা লিখুন..."
+                    placeholder="এখানে এসএমএস বার্তা লিখুন..."></textarea>
+                <div class="sms-meta">
+                    <span data-en="Length:" data-bn="দৈর্ঘ্য:">দৈর্ঘ্য:</span> <b id="cLen">0</b>
+                    &nbsp;|&nbsp;
+                    <span data-en="Per SMS:" data-bn="প্রতি SMS:">প্রতি SMS:</span> <b id="cSmsN">1</b>
+                    &nbsp;|&nbsp;
+                    <span data-en="Total to send:" data-bn="মোট পাঠাবে:">মোট পাঠাবে:</span>
+                    <b id="cTotal" style="color:#6c7ae0;">0</b> SMS
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding-top:2px;min-width:110px;">
+                <button class="btn-green" id="sendBtn" onclick="sendSms()">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    <span data-en="Send" data-bn="পাঠান">পাঠান</span>
+                </button>
+                <span class="err-msg" id="sendErrMsg" style="display:none;"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="app-modals"></div>
+
+<!-- ── Group Modal ── -->
+<div id="groupModal" class="modal-backdrop-custom" style="display:none;">
+    <div class="modal-card">
+        <div class="modal-title-bar">
+            <span id="groupModalTitle" data-en="Add Group" data-bn="গ্রুপ যোগ করুন">গ্রুপ যোগ করুন</span>
+            <i class="fas fa-times" style="cursor:pointer;color:#999;" onclick="closeGroupModal()"></i>
+        </div>
+        <input type="hidden" id="editGroupId">
+        <div class="m-group">
+            <label class="m-label" data-en="Group Name" data-bn="গ্রুপের নাম">গ্রুপের নাম</label>
+            <input type="text" id="groupNameInput" class="m-ctrl"
+                data-en-placeholder="Enter group name"
+                data-bn-placeholder="গ্রুপের নাম লিখুন"
+                placeholder="গ্রুপের নাম লিখুন">
+            <div class="m-err" id="groupNameErr">গ্রুপের নাম লিখুন</div>
+        </div>
+        <div class="d-flex gap-2 justify-content-end mt-3">
+            <button class="btn-gray" onclick="closeGroupModal()" data-en="Cancel" data-bn="বাতিল">বাতিল</button>
+            <button class="btn-pri" onclick="saveGroup()" data-en="Save" data-bn="সেভ করুন">সেভ করুন</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Contact Modal ── -->
+<div id="contactModal" class="modal-backdrop-custom" style="display:none;">
+    <div class="modal-card">
+        <div class="modal-title-bar">
+            <span id="contactModalTitle" data-en="Add Contact" data-bn="কন্টাক্ট যোগ করুন">কন্টাক্ট যোগ করুন</span>
+            <i class="fas fa-times" style="cursor:pointer;color:#999;" onclick="closeContactModal()"></i>
+        </div>
+        <input type="hidden" id="editContactId">
+        <div class="m-group">
+            <label class="m-label" data-en="Group" data-bn="গ্রুপ">গ্রুপ</label>
+            <select id="contactGroupSel" class="m-ctrl">
+                <option value="0">— গ্রুপ নির্বাচন করুন —</option>
+            </select>
+            <div class="m-err" id="contactGroupErr" data-en="Select a group" data-bn="গ্রুপ নির্বাচন করুন">গ্রুপ নির্বাচন করুন</div>
+        </div>
+        <div class="m-group">
+            <label class="m-label" data-en="Name" data-bn="নাম">নাম</label>
+            <input type="text" id="contactNameInput" class="m-ctrl"
+                data-en-placeholder="Person name"
+                data-bn-placeholder="ব্যক্তির নাম"
+                placeholder="ব্যক্তির নাম">
+            <div class="m-err" id="contactNameErr" data-en="Name is required" data-bn="নাম লিখুন">নাম লিখুন</div>
+        </div>
+        <div class="m-group">
+            <label class="m-label" data-en="Mobile No" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+            <input type="text" id="contactMobileInput" class="m-ctrl"
+                data-en-placeholder="01XXXXXXXXX"
+                data-bn-placeholder="01XXXXXXXXX"
+                placeholder="01XXXXXXXXX">
+            <div class="m-err" id="contactMobileErr" data-en="Enter valid mobile number" data-bn="সঠিক মোবাইল নম্বর লিখুন">সঠিক মোবাইল নম্বর লিখুন</div>
+        </div>
+        <div class="m-group">
+            <label class="m-label" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+            <input type="text" id="contactAddressInput" class="m-ctrl"
+                data-en-placeholder="Address (optional)"
+                data-bn-placeholder="ঠিকানা (ঐচ্ছিক)"
+                placeholder="ঠিকানা (ঐচ্ছিক)">
+        </div>
+        <div class="d-flex gap-2 justify-content-end mt-3">
+            <button class="btn-gray" onclick="closeContactModal()" data-en="Cancel" data-bn="বাতিল">বাতিল</button>
+            <button class="btn-pri" onclick="saveContact()" data-en="Save" data-bn="সেভ করুন">সেভ করুন</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    let institutionId = 0, registrationId = 0;
+    let activeGroupId = 0, activeGroupName = 'সব গ্রুপ';
+    let curPage = 1, totalPages = 1;
+    let groups = [];
+    let debTimer = null;
+    let composeOpen = false;
+
+    // ── Init ────────────────────────────────────────────────────────────────────
+    $(document).ready(function () {
+        institutionId  = parseInt(sessionStorage.getItem('institutionId')  || '0');
+        registrationId = parseInt(sessionStorage.getItem('registrationId') || '0');
+        if (!institutionId) {
+            $(document).on('app-session-ready', function () {
+                institutionId  = parseInt(sessionStorage.getItem('institutionId')  || '0');
+                registrationId = parseInt(sessionStorage.getItem('registrationId') || '0');
+                if (institutionId) init();
+            });
+            return;
+        }
+        init();
+    });
+
+    function init() {
+        loadBalance();
+        loadGroups();
+        loadContacts(1);
+    }
+
+    // ── Balance ─────────────────────────────────────────────────────────────────
+    function loadBalance() {
+        $.get('/api/Sms/info', { institutionId }).done(function (res) {
+            if (res.success)
+                $('#balBadge').html('<i class="fas fa-envelope me-1"></i>' + res.smsBalance + ' SMS');
+        });
+    }
+
+    // ── Groups ──────────────────────────────────────────────────────────────────
+    function loadGroups() {
+        $.get('/api/Sms/groups', { institutionId }).done(function (res) {
+            groups = res.data || [];
+            renderGroups();
+            populateGroupSelect();
+        });
+    }
+
+    function renderGroups() {
+        const $list = $('#groupList');
+        const allLi = $list.find('li:first');
+        $list.empty().append(allLi);
+
+        let totalAll = 0;
+        groups.forEach(function (g) {
+            totalAll += g.ContactCount || 0;
+            const isActive = g.SMS_GroupID === activeGroupId;
+            const $li = $('<li>').append(
+                $('<a>').attr('data-id', g.SMS_GroupID)
+                    .addClass(isActive ? 'active' : '')
+                    .on('click', function () { selectGroup(g.SMS_GroupID, this, g.GroupName); })
+                    .html(
+                        `<span><i class="fas fa-folder me-1" style="color:#6c7ae0;font-size:11px;"></i>${g.GroupName}</span>
+                         <span class="d-flex align-items-center gap-1">
+                           <span class="group-badge">${g.ContactCount || 0}</span>
+                           <span class="group-actions">
+                             <i class="fas fa-pen" style="color:#aaa;cursor:pointer;font-size:10px;padding:2px 4px;" 
+                                onclick="event.stopPropagation();openGroupModal(${g.SMS_GroupID},'${g.GroupName.replace(/'/g,"\\'")}')"></i>
+                             <i class="fas fa-trash" style="color:#dc3545;cursor:pointer;font-size:10px;padding:2px 4px;" 
+                                onclick="event.stopPropagation();deleteGroup(${g.SMS_GroupID})"></i>
+                           </span>
+                         </span>`
+                    )
+            );
+            $list.append($li);
+        });
+
+        $('#allGroupBadge').text(totalAll);
+        if (activeGroupId === 0) allLi.find('a').addClass('active');
+    }
+
+    function populateGroupSelect() {
+        const $sel = $('#contactGroupSel').empty()
+            .append('<option value="0">— গ্রুপ নির্বাচন করুন —</option>');
+        groups.forEach(function (g) {
+            $sel.append($('<option>').val(g.SMS_GroupID).text(g.GroupName));
+        });
+        if (activeGroupId > 0) $sel.val(activeGroupId);
+    }
+
+    window.selectGroup = function (id, el, name) {
+        activeGroupId   = id;
+        activeGroupName = name || 'সব গ্রুপ';
+        $('#groupList a').removeClass('active');
+        $(el).addClass('active');
+        $('#activeGroupName').html('<i class="fas fa-address-card me-1"></i>' + activeGroupName);
+        loadContacts(1);
+    };
+
+    // ── Group Modal ─────────────────────────────────────────────────────────────
+    window.openGroupModal = function (id, name) {
+        $('#editGroupId').val(id || '');
+        $('#groupNameInput').val(name || '');
+        $('#groupNameErr').hide();
+        const isEdit = !!id;
+        $('#groupModalTitle').text(isEdit
+            ? (window.currentLang === 'en' ? 'Edit Group' : 'গ্রুপ সম্পাদনা')
+            : (window.currentLang === 'en' ? 'Add Group' : 'গ্রুপ যোগ করুন'));
+        $('#groupModal').show();
+        setTimeout(() => $('#groupNameInput').focus(), 100);
+    };
+    window.closeGroupModal = function () { $('#groupModal').hide(); };
+
+    window.saveGroup = function () {
+        const name = $('#groupNameInput').val().trim();
+        if (!name) { $('#groupNameErr').show(); return; }
+        $('#groupNameErr').hide();
+        const id = parseInt($('#editGroupId').val() || '0');
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/api/Sms/groups/${id}` : '/api/Sms/groups';
+        $.ajax({ url, method, contentType: 'application/json',
+            data: JSON.stringify({ institutionId, registrationId, groupName: name })
+        }).done(function (res) {
+            if (res.success) { closeGroupModal(); loadGroups(); showToast(res.message, 'success'); }
+            else showToast(res.message, 'error');
+        });
+    };
+
+    window.deleteGroup = function (id) {
+        if (!confirm('এই গ্রুপ এবং এর সব কন্টাক্ট মুছে যাবে। নিশ্চিত?')) return;
+        $.ajax({ url: `/api/Sms/groups/${id}?institutionId=${institutionId}`, method: 'DELETE' })
+            .done(function (res) {
+                if (res.success) {
+                    if (activeGroupId === id) selectGroup(0, $('#groupList li:first a')[0]);
+                    loadGroups(); loadContacts(1);
+                    showToast(res.message, 'success');
+                }
+            });
+    };
+
+    // ── Contacts ────────────────────────────────────────────────────────────────
+    function loadContacts(page) {
+        curPage = page;
+        $('#cSpinWrap').show(); $('#cTableWrap').hide(); $('#cPager').empty();
+        const p = { institutionId, groupId: activeGroupId, page, pageSize: 100 };
+        const s = $('#cSearch').val().trim();
+        if (s) p.search = s;
+
+        $.get('/api/Sms/contacts', p).done(function (res) {
+            $('#cSpinWrap').hide(); $('#cTableWrap').show();
+            $('#cSpinner').hide();
+            totalPages = res.totalPages || 1;
+            $('#totalCount').text(res.total || 0);
+
+            const $b = $('#cBody').empty();
+            if (!res.data || !res.data.length) {
+                $b.append('<tr><td colspan="7" class="no-data"><i class="fas fa-address-book me-2"></i>কোনো কন্টাক্ট নেই</td></tr>');
+                updateSelBadge(); return;
+            }
+
+            res.data.forEach(function (c) {
+                $b.append(
+                    `<tr>
+                    <td style="text-align:center;"><input type="checkbox" class="c-chk"
+                        data-id="${c.SMS_NumberID}" data-phone="${c.MobileNo || ''}"
+                        onchange="onChkChange(this)"></td>
+                    <td><span style="background:#eef0fc;color:#6c7ae0;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;">${c.GroupName || ''}</span></td>
+                    <td style="font-weight:600;">${c.Name || '—'}</td>
+                    <td>${c.MobileNo || ''}</td>
+                    <td style="font-size:11px;color:#999;">${c.Address || '—'}</td>
+                    <td style="font-size:11px;color:#aaa;">${c.AddDate || ''}</td>
+                    <td>
+                        <button class="btn-edit-sm" onclick="openContactModal(${c.SMS_NumberID},'${(c.GroupName||'').replace(/'/g,"\\'")}',${c.SMS_GroupID},'${(c.Name||'').replace(/'/g,"\\'")}','${c.MobileNo||''}','${(c.Address||'').replace(/'/g,"\\'")}')">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="btn-danger-sm" onclick="deleteContact(${c.SMS_NumberID})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                    </tr>`
+                );
+            });
+
+            $('#chkAll').prop('checked', false).prop('indeterminate', false);
+            updateSelBadge();
+            renderPager(res.page, res.totalPages);
+        }).fail(function () { $('#cSpinWrap').hide(); $('#cTableWrap').show(); });
+    }
+
+    // Auto-search debounce
+    $(document).on('input', '#cSearch', function () {
+        clearTimeout(debTimer);
+        $('#cSpinner').show();
+        debTimer = setTimeout(function () { loadContacts(1); }, 500);
+    });
+
+    window.resetSearch = function () {
+        $('#cSearch').val('');
+        loadContacts(1);
+    };
+
+    // ── Contact Modal ───────────────────────────────────────────────────────────
+    window.openContactModal = function (id, groupName, groupId, name, mobile, address) {
+        $('#editContactId').val(id || '');
+        populateGroupSelect();
+        if (groupId) $('#contactGroupSel').val(groupId);
+        else if (activeGroupId > 0) $('#contactGroupSel').val(activeGroupId);
+        $('#contactNameInput').val(name || '');
+        $('#contactMobileInput').val(mobile || '');
+        $('#contactAddressInput').val(address || '');
+        $('.m-err').hide();
+        const isEdit = !!id;
+        $('#contactModalTitle').text(isEdit
+            ? (window.currentLang === 'en' ? 'Edit Contact' : 'কন্টাক্ট সম্পাদনা')
+            : (window.currentLang === 'en' ? 'Add Contact' : 'কন্টাক্ট যোগ করুন'));
+        $('#contactModal').show();
+        setTimeout(() => $('#contactNameInput').focus(), 100);
+    };
+    window.closeContactModal = function () { $('#contactModal').hide(); };
+
+    window.saveContact = function () {
+        let ok = true;
+        const groupId = parseInt($('#contactGroupSel').val() || '0');
+        const name    = $('#contactNameInput').val().trim();
+        const mobile  = $('#contactMobileInput').val().trim();
+        const address = $('#contactAddressInput').val().trim();
+
+        if (!groupId) { $('#contactGroupErr').show(); ok = false; } else $('#contactGroupErr').hide();
+        if (!name)    { $('#contactNameErr').show();  ok = false; } else $('#contactNameErr').hide();
+        if (!mobile)  { $('#contactMobileErr').show(); ok = false; } else $('#contactMobileErr').hide();
+        if (!ok) return;
+
+        const id = parseInt($('#editContactId').val() || '0');
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/api/Sms/contacts/${id}` : '/api/Sms/contacts';
+        $.ajax({ url, method, contentType: 'application/json',
+            data: JSON.stringify({ institutionId, registrationId, groupId, name, mobileNo: mobile, address })
+        }).done(function (res) {
+            if (res.success) { closeContactModal(); loadContacts(curPage); loadGroups(); showToast(res.message, 'success'); }
+            else showToast(res.message, 'error');
+        });
+    };
+
+    window.deleteContact = function (id) {
+        if (!confirm('এই কন্টাক্ট মুছে যাবে। নিশ্চিত?')) return;
+        $.ajax({ url: `/api/Sms/contacts/${id}`, method: 'DELETE' }).done(function (res) {
+            if (res.success) { loadContacts(curPage); loadGroups(); showToast(res.message, 'success'); }
+        });
+    };
+
+    // ── Checkbox helpers ────────────────────────────────────────────────────────
+    window.toggleAll = function (chk) {
+        $('.c-chk').prop('checked', chk.checked);
+        $('#cTableWrap tbody tr').toggleClass('checked', chk.checked);
+        updateSelBadge(); updateCounter();
+    };
+    window.selectPageContacts = function () {
+        $('.c-chk').prop('checked', true);
+        $('#cTableWrap tbody tr').addClass('checked');
+        $('#chkAll').prop('checked', true).prop('indeterminate', false);
+        updateSelBadge(); updateCounter();
+        if (!composeOpen && $('.c-chk:checked').length > 0) toggleCompose();
+    };
+    window.deselectAll = function () {
+        $('.c-chk').prop('checked', false);
+        $('#cTableWrap tbody tr').removeClass('checked');
+        $('#chkAll').prop('checked', false).prop('indeterminate', false);
+        updateSelBadge(); updateCounter();
+    };
+    window.onChkChange = function (el) {
+        const total = $('.c-chk').length, checked = $('.c-chk:checked').length;
+        $('#chkAll').prop('indeterminate', checked > 0 && checked < total);
+        $('#chkAll').prop('checked', checked === total && total > 0);
+        $(el).closest('tr').toggleClass('checked', el.checked);
+        updateSelBadge(); updateCounter();
+        if (!composeOpen && checked === 1) toggleCompose();
+    };
+
+    function updateSelBadge() {
+        const cnt = $('.c-chk:checked').length;
+        const lbl = (window.currentLang === 'en' ? 'Selected: ' : 'নির্বাচিত: ') + cnt;
+        if (cnt > 0) {
+            $('#selBadge').removeClass('sel-zero').addClass('sel-badge').text(lbl);
+            $('#composeSelInfo').text(lbl).css('color','#e65100');
+        } else {
+            $('#selBadge').removeClass('sel-badge').addClass('sel-zero')
+                .text(window.currentLang === 'en' ? 'Selected: 0' : 'নির্বাচিত: 0');
+            $('#composeSelInfo').text(window.currentLang === 'en' ? 'Selected: 0' : 'নির্বাচিত: 0').css('color','#aaa');
+        }
+    }
+
+    // ── Compose bar ─────────────────────────────────────────────────────────────
+    window.toggleCompose = function () {
+        composeOpen = !composeOpen;
+        if (composeOpen) { $('#composeExpanded').slideDown(180); $('#composeArrow').addClass('open'); setTimeout(() => $('#smsText').focus(), 200); }
+        else             { $('#composeExpanded').slideUp(180);   $('#composeArrow').removeClass('open'); }
+    };
+
+    window.updateCounter = function () {
+        const text = $('#smsText').val();
+        const isUni = /[^\u0000-\u00FF]/.test(text);
+        const perSms = isUni ? 70 : 160;
+        const len = text.length;
+        const smsN = Math.max(1, Math.ceil(len / perSms));
+        const sel  = $('.c-chk:checked').length;
+        const tot  = sel * smsN;
+        $('#cLen').text(len); $('#cSmsN').text(smsN); $('#cTotal').text(tot);
+        $('#composeSmsInfo').text(len > 0 && sel > 0 ? '→ ' + tot + ' SMS পাঠাবে' : '');
+    };
+
+    window.sendSms = function () {
+        const msg = $('#smsText').val().trim();
+        $('#sendErrMsg').hide();
+        if (!msg) { $('#sendErrMsg').text('বার্তা লিখুন').show(); return; }
+        const ids = [], phones = [];
+        $('.c-chk:checked').each(function () {
+            ids.push(parseInt($(this).data('id')));
+            phones.push(String($(this).data('phone')));
+        });
+        if (!ids.length) { $('#sendErrMsg').text('কমপক্ষে একজন নির্বাচন করুন').show(); return; }
+
+        const isUni = /[^\u0000-\u00FF]/.test(msg);
+        const smsN  = Math.max(1, Math.ceil(msg.length / (isUni ? 70 : 160)));
+        if (!confirm(ids.length + ' জনকে মোট ' + (ids.length * smsN) + ' টি SMS পাঠাবেন?')) return;
+
+        $('#sendBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>পাঠানো হচ্ছে...');
+        $.ajax({
+            url: '/api/Sms/contacts/send', method: 'POST', contentType: 'application/json',
+            data: JSON.stringify({ institutionId, message: msg, contactIds: ids })
+        }).done(function (res) {
+            if (res.success) {
+                showToast(res.message, 'success');
+                $('#smsText').val(''); updateCounter(); deselectAll(); loadBalance();
+                if (composeOpen) toggleCompose();
+            } else { $('#sendErrMsg').text(res.message).show(); }
+        }).always(function () {
+            $('#sendBtn').prop('disabled', false)
+                .html('<i class="fas fa-paper-plane me-2"></i><span data-en="Send" data-bn="পাঠান">পাঠান</span>');
+        });
+    };
+
+    // ── Pager ───────────────────────────────────────────────────────────────────
+    function renderPager(page, tp) {
+        const $w = $('#cPager').empty();
+        if (!tp || tp <= 1) return;
+        const btn = (label, pg, dis, active) =>
+            $('<button>').html(label).prop('disabled', !!dis).addClass(active ? 'active' : '')
+                .on('click', () => loadContacts(pg));
+        $w.append(btn('&laquo;', 1, page<=1));
+        $w.append(btn('&lsaquo;', page-1, page<=1));
+        const s = Math.max(1, page-2), e = Math.min(tp, s+4);
+        for (let i = s; i <= e; i++) $w.append(btn(i, i, false, i===page));
+        $w.append(btn('&rsaquo;', page+1, page>=tp));
+        $w.append(btn('&raquo;', tp, page>=tp));
+        $w.append('<span class="pager-info">পেজ ' + page + '/' + tp + '</span>');
+    }
+
+    // ── Toast helper ────────────────────────────────────────────────────────────
+    function showToast(msg, type) {
+        const bg = type === 'success' ? '#28a745' : '#dc3545';
+        const $t = $('<div>').text(msg).css({
+            position:'fixed', bottom:'90px', right:'24px', background:bg,
+            color:'#fff', padding:'10px 20px', borderRadius:'8px',
+            fontWeight:'600', fontSize:'13px', zIndex:2000, boxShadow:'0 4px 12px rgba(0,0,0,.2)'
+        });
+        $('body').append($t);
+        setTimeout(() => $t.fadeOut(400, () => $t.remove()), 3000);
+    }
+
+    // Close modals on backdrop click
+    $(document).on('click', '#groupModal, #contactModal', function (e) {
+        if ($(e.target).is('#groupModal'))   closeGroupModal();
+        if ($(e.target).is('#contactModal')) closeContactModal();
+    });
+
+    // Keyboard: Enter in modal inputs
+    $(document).on('keydown', '#groupNameInput', function (e) { if (e.key === 'Enter') saveGroup(); });
+    $(document).on('keydown', '#contactMobileInput,#contactAddressInput', function (e) { if (e.key === 'Enter') saveContact(); });
+
+}());
+</script>
+</body>
+</html>

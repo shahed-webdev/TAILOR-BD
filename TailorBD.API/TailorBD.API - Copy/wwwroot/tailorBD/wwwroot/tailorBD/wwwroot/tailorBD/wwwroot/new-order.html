@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নতুন অর্ডার - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/new-order.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <div>
+                    <h1 class="lang-content" data-en="New Order" data-bn="নতুন অর্ডার">নতুন অর্ডার</h1>
+                    <p class="text-muted lang-content" data-en="Create a new order by selecting or adding a customer" data-bn="একটি কাস্টমার নির্বাচন বা যুক্ত করে নতুন অর্ডার তৈরি করুন">
+                        একটি কাস্টমার নির্বাচন বা যুক্ত করে নতুন অর্ডার তৈরি করুন
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs custom-tabs mb-4" id="orderTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="new-customer-tab" data-bs-toggle="tab" data-bs-target="#new-customer" type="button">
+                        <i class="fas fa-user-plus me-2"></i>
+                        <span class="lang-content" data-en="New Customer" data-bn="নতুন কাস্টমার">নতুন কাস্টমার</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="existing-customer-tab" data-bs-toggle="tab" data-bs-target="#existing-customer" type="button">
+                        <i class="fas fa-users me-2"></i>
+                        <span class="lang-content" data-en="Existing Customer" data-bn="পুরাতন কাস্টমার">পুরাতন কাস্টমার</span>
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="orderTabsContent">
+                <!-- New Customer Tab -->
+                <div class="tab-pane fade show active" id="new-customer" role="tabpanel">
+                    <div class="order-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-plus me-2"></i>
+                                <span class="lang-content" data-en="New Customer Registration" data-bn="নতুন কাস্টমার নিবন্ধন">নতুন কাস্টমার নিবন্ধন</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="newCustomerForm" onsubmit="createCustomer(event)">
+                                <div class="row">
+                                    <!-- Gender Selection -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-venus-mars me-1"></i>
+                                            <span class="lang-content" data-en="Gender" data-bn="জেন্ডার">জেন্ডার</span>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="customerGender" required>
+                                            <option value="" data-en="Select..." data-bn="নির্বাচন করুন...">নির্বাচন করুন...</option>
+                                            <option value="1" selected data-en="Male" data-bn="পুরুষ">পুরুষ</option>
+                                            <option value="2" data-en="Female" data-bn="মহিলা">মহিলা</option>
+                                            <option value="3" data-en="Child" data-bn="শিশু">শিশু</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Customer Name -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-user me-1"></i>
+                                            <span class="lang-content" data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</span>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="customerName" 
+                                               placeholder="কাস্টমারের নাম লিখুন..." required autocomplete="off">
+                                        <div id="nameAutocompleteList" class="autocomplete-list"></div>
+                                    </div>
+
+                                    <!-- Mobile Number -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-phone me-1"></i>
+                                            <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</span>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="tel" class="form-control" id="customerPhone" 
+                                               placeholder="01XXXXXXXXX" required pattern="[0-9]{11}" maxlength="11" autocomplete="off">
+                                        <div id="phoneAutocompleteList" class="autocomplete-list"></div>
+                                        <div class="form-text" id="phoneCheckMessage"></div>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                            <span class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</span>
+                                        </label>
+                                        <textarea class="form-control" id="customerAddress" rows="2" 
+                                                  placeholder="ঠিকানা লিখুন..."></textarea>
+                                    </div>
+
+                                    <!-- Photo Upload -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-camera me-1"></i>
+                                            <span class="lang-content" data-en="Customer Photo" data-bn="কাস্টমারের ছবি">কাস্টমারের ছবি</span>
+                                        </label>
+                                        <input type="file" class="form-control" id="customerPhoto" accept="image/*">
+                                        <div class="form-text">
+                                            <span class="lang-content" data-en="Upload customer photo (Optional)" data-bn="কাস্টমারের ছবি আপলোড করুন (ঐচ্ছিক)">
+                                                কাস্টমারের ছবি আপলোড করুন (ঐচ্ছিক)
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Photo Preview -->
+                                    <div class="col-md-6 mb-3">
+                                        <div id="photoPreview" class="photo-preview" style="display: none;">
+                                            <img id="previewImage" src="" alt="Preview">
+                                            <button type="button" class="btn-remove-photo" onclick="removePhoto()">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Duplicate Warning -->
+                                <div id="duplicateWarning" class="alert alert-warning" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <span id="duplicateMessage"></span>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="createCustomerBtn">
+                                        <i class="fas fa-arrow-right me-2"></i>
+                                        <span class="lang-content" data-en="Continue to Order" data-bn="অর্ডারে যান">অর্ডারে যান</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing Customer Tab -->
+                <div class="tab-pane fade" id="existing-customer" role="tabpanel">
+                    <div class="order-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-search me-2"></i>
+                                <span class="lang-content" data-en="Search Customer" data-bn="কাস্টমার খুঁজুন">কাস্টমার খুঁজুন</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Search Form -->
+                            <form id="searchForm" onsubmit="searchCustomers(event)">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-hashtag me-1"></i>
+                                            <span class="lang-content" data-en="Customer No." data-bn="কাস্টমার নং">কাস্টমার নং</span>
+                                        </label>
+                                        <div class="search-autocomplete-wrap">
+                                            <input type="text" class="form-control" id="searchCustomerNo"
+                                                   placeholder="কাস্টমার নং..." autocomplete="off">
+                                            <div id="searchNoList" class="autocomplete-list"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-user me-1"></i>
+                                            <span class="lang-content" data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</span>
+                                        </label>
+                                        <div class="search-autocomplete-wrap">
+                                            <input type="text" class="form-control" id="searchCustomerName"
+                                                   placeholder="নাম লিখুন..." autocomplete="off">
+                                            <div id="searchNameList" class="autocomplete-list"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-phone me-1"></i>
+                                            <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</span>
+                                        </label>
+                                        <div class="search-autocomplete-wrap">
+                                            <input type="tel" class="form-control" id="searchCustomerPhone"
+                                                   placeholder="01XXXXXXXXX" autocomplete="off">
+                                            <div id="searchPhoneList" class="autocomplete-list"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 mb-3">
+                                        <label class="form-label d-block">&nbsp;</label>
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-search me-1"></i>
+                                            <span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <!-- Loading Spinner -->
+                            <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">
+                                    <span class="lang-content" data-en="Loading customers..." data-bn="কাস্টমার লোড হচ্ছে...">কাস্টমার লোড হচ্ছে...</span>
+                                </p>
+                            </div>
+
+                            <!-- Customers Table -->
+                            <div id="customersTable" class="table-responsive mt-4" style="display: none;">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="lang-content" data-en="Action" data-bn="অর্ডার">অর্ডার</th>
+                                            <th class="lang-content" data-en="Customer No." data-bn="কাস্টমার নং">কাস্টমার নং</th>
+                                            <th class="lang-content" data-en="Name" data-bn="নাম">নাম</th>
+                                            <th class="lang-content" data-en="Mobile" data-bn="মোবাইল">মোবাইল</th>
+                                            <th class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
+                                            <th class="lang-content" data-en="Total Orders" data-bn="মোট অর্ডার">মোট অর্ডার</th>
+                                            <th class="lang-content" data-en="Last Order" data-bn="শেষ অর্ডার">শেষ অর্ডার</th>
+                                            <th class="lang-content" data-en="Registration Date" data-bn="নিবন্ধনের তারিখ">নিবন্ধনের তারিখ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customersTableBody">
+                                        <!-- Customers will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div id="paginationContainer" class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 px-1" style="display: none !important;">
+                            </div>
+
+                            <!-- Empty State -->
+                            <div id="emptyState" class="text-center py-5" style="display: none;">
+                                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted lang-content" data-en="No customers found" data-bn="কোনো কাস্টমার পাওয়া যায়নি">কোনো কাস্টমার পাওয়া যায়নি</h5>
+                                <p class="text-muted lang-content" data-en="Try searching with different criteria" data-bn="ভিন্ন শর্তে খুঁজে দেখুন">ভিন্ন শর্তে খুঁজে দেখুন</p>
+                            </div>
+
+                            <!-- Initial State -->
+                            <div id="initialState" class="text-center py-5">
+                                <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                                <h5 class="text-muted lang-content" data-en="Search for customers" data-bn="কাস্টমার খুঁজুন">কাস্টমার খুঁজুন</h5>
+                                <p class="text-muted lang-content" data-en="Use customer number, name or mobile to find existing customers" 
+                                   data-bn="কাস্টমার নম্বর, নাম বা মোবাইল দিয়ে পুরাতন কাস্টমার খুঁজুন">
+                                    কাস্টমার নম্বর, নাম বা মোবাইল দিয়ে পুরাতন কাস্টমার খুঁজুন
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals Container -->
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js"></script>
+    
+    <!-- New Order JS -->
+    <script src="/js/new-order.js"></script>
+</body>
+</html>

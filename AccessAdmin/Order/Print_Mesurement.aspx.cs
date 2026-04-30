@@ -160,6 +160,18 @@ namespace TailorBD.AccessAdmin.Order
         }
 
         [WebMethod]
+        public static bool PrintBarcode()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SELECT Print_Barcode FROM Institution WHERE (InstitutionID = @InstitutionID)", con);
+            cmd.Parameters.AddWithValue("@InstitutionID", HttpContext.Current.Request.Cookies["InstitutionID"].Value);
+            con.Open();
+            bool Print_Barcode = Convert.ToBoolean(cmd.ExecuteScalar());
+            con.Close();
+            return Print_Barcode;
+        }
+
+        [WebMethod]
         public static double TopSpace()
         {
             SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["TailorBDConnectionString"].ConnectionString);

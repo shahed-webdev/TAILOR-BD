@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Supplier Management - TailorBD" data-bn="সরবরাহকারী ব্যবস্থাপনা - TailorBD">সরবরাহকারী ব্যবস্থাপনা - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* Card */
+        .card-box { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); padding:20px; margin-bottom:18px; }
+        .sec-title { font-size:13px; font-weight:700; color:#6c7ae0; text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+
+        /* Filter / Search */
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:13px; font-family:inherit; transition:border-color .2s; }
+        .f-control:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-primary2 { padding:8px 22px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .btn-primary2:hover { background:#5a68c9; }
+        .btn-outline2 { padding:7px 14px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+        .btn-outline2:hover { background:#f0f1fc; }
+        .btn-success2 { padding:7px 14px; background:#28a745; color:#fff; border:none; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+        .btn-success2:hover { background:#218838; }
+        .btn-danger2 { padding:7px 14px; background:#dc3545; color:#fff; border:none; border-radius:7px; font-size:12.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+        .btn-danger2:hover { background:#c82333; }
+
+        /* KPI chips */
+        .kpi-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+        .kpi-chip { background:#f4f5ff; border-radius:8px; padding:10px 16px; min-width:140px; border-left:3px solid #6c7ae0; }
+        .kpi-chip.green { border-color:#28a745; background:#f0fff4; }
+        .kpi-chip.red   { border-color:#dc3545; background:#fff5f5; }
+        .kpi-chip.orange{ border-color:#fd7e14; background:#fff8f0; }
+        .kpi-chip .cv { font-size:17px; font-weight:800; color:#333; }
+        .kpi-chip .cv.blue { color:#6c7ae0; }
+        .kpi-chip .cv.green{ color:#28a745; }
+        .kpi-chip .cv.red  { color:#dc3545; }
+        .kpi-chip .cv.orange{ color:#fd7e14; }
+        .kpi-chip .cl { font-size:11px; color:#888; margin-top:2px; }
+
+        /* Table */
+        .sup-tbl { width:100%; border-collapse:collapse; font-size:13px; }
+        .sup-tbl thead th { background:#f8f9ff; padding:9px 12px; font-size:12px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap; }
+        .sup-tbl tbody td { padding:9px 12px; border-bottom:1px solid #f2f2f2; vertical-align:middle; }
+        .sup-tbl tbody tr:hover { background:#fafbff; }
+        .due-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:700; }
+        .due-badge.has-due { background:#fff0f0; color:#dc3545; }
+        .due-badge.no-due  { background:#f0fff4; color:#28a745; }
+
+        /* Search box for table */
+        .tbl-search { position:relative; }
+        .tbl-search input { padding-left:32px; }
+        .tbl-search i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#aaa; font-size:13px; }
+
+        /* Toast */
+        .toast-wrap { position:fixed; top:18px; right:18px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+        .toast-item { padding:10px 16px; border-radius:8px; color:#fff; font-size:13px; font-weight:600; box-shadow:0 4px 16px rgba(0,0,0,.15); animation:slideIn .25s ease; min-width:220px; }
+        .toast-item.success { background:#28a745; }
+        .toast-item.error   { background:#dc3545; }
+        .toast-item.info    { background:#6c7ae0; }
+        @keyframes slideIn { from{transform:translateX(40px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+        /* Spinner */
+        .spin { width:22px; height:22px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; vertical-align:middle; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+
+        /* Modal overrides */
+        .modal-header { background:#6c7ae0; color:#fff; border-radius:10px 10px 0 0; }
+        .modal-header .btn-close { filter:invert(1); }
+        .modal-title { font-size:15px; font-weight:700; }
+        .modal-header.green { background:#28a745; }
+        .modal-header.orange { background:#fd7e14; }
+
+        /* Detail modal tabs */
+        .det-tab { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+        .det-tab button { padding:6px 14px; border:1.5px solid #ddd; background:#fff; border-radius:6px; font-size:12.5px; font-weight:600; cursor:pointer; color:#555; }
+        .det-tab button.active { border-color:#6c7ae0; background:#6c7ae0; color:#fff; }
+
+        /* Info chips in detail modal */
+        .inf-chip { background:#f4f5ff; border-radius:8px; padding:8px 14px; font-size:12.5px; margin-bottom:8px; }
+        .inf-chip .lbl { color:#888; font-size:11px; }
+        .inf-chip .val { font-weight:700; color:#333; font-size:14px; }
+
+        /* Due table in detail */
+        .due-tbl { width:100%; border-collapse:collapse; font-size:12.5px; }
+        .due-tbl thead th { background:#f8f9ff; padding:7px 10px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; text-align:center; white-space:nowrap; }
+        .due-tbl tbody td { padding:7px 10px; border-bottom:1px solid #f2f2f2; text-align:center; vertical-align:middle; }
+        .pay-input { width:110px; padding:5px 8px; border:1.5px solid #ddd; border-radius:6px; text-align:center; font-size:12.5px; font-family:inherit; }
+        .pay-input:focus { outline:none; border-color:#6c7ae0; }
+        .pay-input.over { border-color:#dc3545; background:#fff5f5; }
+
+        /* Progress bar */
+        .prog-wrap { background:#f0f0f0; border-radius:99px; height:6px; overflow:hidden; }
+        .prog-bar  { height:100%; border-radius:99px; background:#6c7ae0; }
+
+        @media print {
+            #app-navbar,#app-sidebar,.no-print,button { display:none !important; }
+            .main-content { margin-left:0 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <div class="toast-wrap" id="toastWrap"></div>
+    <div id="app-modals"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-container">
+
+                <!-- Page Title -->
+                <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                    <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                        <i class="fas fa-user-tie me-2"></i>
+                        <span data-en="Supplier Management" data-bn="সরবরাহকারী ব্যবস্থাপনা">সরবরাহকারী ব্যবস্থাপনা</span>
+                    </h5>
+                    <button class="btn-primary2" onclick="openAddModal()">
+                        <i class="fas fa-plus"></i>
+                        <span data-en="Add Supplier" data-bn="সরবরাহকারী যোগ করুন">সরবরাহকারী যোগ করুন</span>
+                    </button>
+                </div>
+
+                <!-- KPI Summary -->
+                <div class="kpi-row" id="kpiRow" style="display:none;"></div>
+
+                <!-- Supplier List -->
+                <div class="card-box">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <div class="sec-title mb-0"><i class="fas fa-list"></i> <span data-en="Supplier List" data-bn="সরবরাহকারীর তালিকা">সরবরাহকারীর তালিকা</span></div>
+                        <div class="tbl-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchBox" class="f-control tbl-search" style="width:220px;" oninput="filterTable()"
+                                data-bn-placeholder="নাম বা ফোন দিয়ে খুঁজুন..." data-en-placeholder="Search by name or phone" placeholder="নাম বা ফোন দিয়ে খুঁজুন...">
+                        </div>
+                    </div>
+
+                    <div id="listSpinner" style="text-align:center;padding:30px;"><div class="spin"></div></div>
+                    <div id="listWrap" style="display:none;overflow-x:auto;">
+                        <table class="sup-tbl" id="supTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th data-en="Company" data-bn="কোম্পানি">কোম্পানি</th>
+                                    <th data-en="Supplier Name" data-bn="সরবরাহকারীর নাম">সরবরাহকারীর নাম</th>
+                                    <th data-en="Phone" data-bn="ফোন">ফোন</th>
+                                    <th data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
+                                    <th data-en="Total Purchase" data-bn="মোট ক্রয়">মোট ক্রয়</th>
+                                    <th data-en="Paid" data-bn="পরিশোধ">পরিশোধ</th>
+                                    <th data-en="Due" data-bn="বাকি">বাকি</th>
+                                    <th data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody id="supTbody"></tbody>
+                        </table>
+                        <div id="noSupMsg" style="display:none;text-align:center;color:#bbb;padding:30px;font-size:14px;">
+                            <i class="fas fa-user-slash fa-2x mb-2" style="display:block;"></i>
+                            <span data-en="No suppliers found" data-bn="কোনো সরবরাহকারী পাওয়া যায়নি">কোনো সরবরাহকারী পাওয়া যায়নি</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- --------------- ADD SUPPLIER MODAL --------------- -->
+    <div class="modal fade" id="addModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 8px 30px rgba(0,0,0,.15);">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i><span data-en="Add New Supplier" data-bn="নতুন সরবরাহকারী যোগ করুন">নতুন সরবরাহকারী যোগ করুন</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Company Name (optional)" data-bn="কোম্পানির নাম (ঐচ্ছিক)">কোম্পানির নাম (ঐচ্ছিক)</label>
+                        <input type="text" id="addCompany" class="f-control" style="width:100%;"
+                            data-bn-placeholder="কোম্পানির নাম" data-en-placeholder="Company name" placeholder="কোম্পানির নাম">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label"><span data-en="Supplier Name" data-bn="সরবরাহকারীর নাম">সরবরাহকারীর নাম</span> <span style="color:#dc3545;">*</span></label>
+                        <input type="text" id="addName" class="f-control" style="width:100%;"
+                            data-bn-placeholder="সরবরাহকারীর নাম লিখুন" data-en-placeholder="Enter supplier name" placeholder="সরবরাহকারীর নাম লিখুন">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Phone" data-bn="ফোন">ফোন</label>
+                        <input type="tel" id="addPhone" class="f-control" style="width:100%;"
+                            data-bn-placeholder="মোবাইল নম্বর" data-en-placeholder="Mobile number" placeholder="মোবাইল নম্বর">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                        <input type="text" id="addAddress" class="f-control" style="width:100%;"
+                            data-bn-placeholder="ঠিকানা" data-en-placeholder="Address" placeholder="ঠিকানা">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline2" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> <span data-en="Cancel" data-bn="বাতিল">বাতিল</span>
+                    </button>
+                    <button type="button" class="btn-primary2" onclick="submitAdd()">
+                        <i class="fas fa-check"></i> <span data-en="Save Supplier" data-bn="সরবরাহকারী সেভ করুন">সরবরাহকারী সেভ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- --------------- EDIT SUPPLIER MODAL --------------- -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 8px 30px rgba(0,0,0,.15);">
+                <div class="modal-header" style="background:#fd7e14;">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i><span data-en="Edit Supplier" data-bn="সরবরাহকারী সম্পাদন করুন">সরবরাহকারী সম্পাদন করুন</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" id="editId">
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Company Name" data-bn="কোম্পানির নাম">কোম্পানির নাম</label>
+                        <input type="text" id="editCompany" class="f-control" style="width:100%;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label"><span data-en="Supplier Name" data-bn="সরবরাহকারীর নাম">সরবরাহকারীর নাম</span> <span style="color:#dc3545;">*</span></label>
+                        <input type="text" id="editName" class="f-control" style="width:100%;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Phone" data-bn="ফোন">ফোন</label>
+                        <input type="tel" id="editPhone" class="f-control" style="width:100%;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="f-label" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                        <input type="text" id="editAddress" class="f-control" style="width:100%;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline2" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> <span data-en="Cancel" data-bn="বাতিল">বাতিল</span>
+                    </button>
+                    <button type="button" class="btn-primary2" style="background:#fd7e14;" onclick="submitEdit()">
+                        <i class="fas fa-save"></i> <span data-en="Update" data-bn="আপডেট">আপডেট</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- --------------- DETAIL MODAL --------------- -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 8px 30px rgba(0,0,0,.15);">
+                <div class="modal-header green">
+                    <h5 class="modal-title" id="detModalTitle"><i class="fas fa-user-tie me-2"></i>সরবরাহকারীর বিস্তারিত</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3" id="detModalBody">
+                    <div style="text-align:center;padding:30px;"><div class="spin"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script>
+    (function () {
+        let institutionId  = 0;
+        let registrationId = 0;
+        let allSuppliers   = [];
+        let currentDetailId = 0;
+
+        // -- Session ----------------------------------------------------------
+        function getSession() {
+            institutionId  = parseInt(sessionStorage.getItem('institutionId')  || localStorage.getItem('session_institutionId')  || '0');
+            registrationId = parseInt(sessionStorage.getItem('registrationId') || localStorage.getItem('session_registrationId') || '0');
+        }
+
+        $(document).ready(function () {
+            $(document).one('app-session-ready institution-loaded institutionLoaded', function () {
+                getSession(); loadSuppliers();
+            });
+            setTimeout(function () { getSession(); if (institutionId) loadSuppliers(); }, 1500);
+
+            // language change � re-render KPI + table with new labels
+            $(document).on('languageChanged', function () {
+                applyPlaceholders();
+                if (allSuppliers.length) {
+                    renderKPI(allSuppliers);
+                    renderTable(allSuppliers);
+                }
+            });
+        });
+
+        function getLang() {
+            return (window.currentLang || localStorage.getItem('preferredLanguage') || 'bn') === 'en' ? 'en' : 'bn';
+        }
+
+        function applyPlaceholders() {
+            const lang = getLang();
+            $('[data-' + lang + '-placeholder]').each(function () {
+                $(this).attr('placeholder', $(this).data(lang + '-placeholder'));
+            });
+        }
+
+        // -- Load Supplier List ------------------------------------------------
+        function loadSuppliers() {
+            getSession();
+            if (!institutionId) return;
+            $('#listSpinner').show(); $('#listWrap').hide();
+
+            $.get('/api/ItemPurchase/suppliers-list?institutionId=' + institutionId, function (res) {
+                $('#listSpinner').hide();
+                if (!res.success) return;
+                allSuppliers = res.data || [];
+                renderKPI(allSuppliers);
+                renderTable(allSuppliers);
+                $('#listWrap').show();
+            }).fail(function () { $('#listSpinner').hide(); });
+        }
+
+        // -- KPI ---------------------------------------------------------------
+        function renderKPI(data) {
+            const lang = getLang();
+            const total     = data.length;
+            const totalAmt  = data.reduce(function (s, d) { return s + parseFloat(d.TotalAmount || 0); }, 0);
+            const totalPaid = data.reduce(function (s, d) { return s + parseFloat(d.TotalPaid   || 0); }, 0);
+            const totalDue  = data.reduce(function (s, d) { return s + parseFloat(d.TotalDue    || 0); }, 0);
+            const hasDue    = data.filter(function (d) { return parseFloat(d.TotalDue) > 0; }).length;
+
+            const labels = {
+                suppliers: lang === 'en' ? 'Total Suppliers' : 'মোট সরবরাহকারী',
+                totalAmt:  lang === 'en' ? 'Total Purchase'  : 'মোট ক্রয়',
+                paid:      lang === 'en' ? 'Total Paid'      : 'মোট পরিশোধ',
+                due:       lang === 'en' ? 'Total Due'       : 'মোট বাকি',
+                withDue:   lang === 'en' ? 'With Due'        : 'বাকি আছে'
+            };
+
+            $('#kpiRow').show().html(
+                chip('', total, labels.suppliers, 'blue') +
+                chip('৳', fmt(totalAmt), labels.totalAmt, 'blue') +
+                chip('৳', fmt(totalPaid), labels.paid, 'green', 'green') +
+                chip('৳', fmt(totalDue), labels.due, 'red', 'red') +
+                chip('', hasDue, labels.withDue, 'orange', 'orange')
+            );
+        }
+        function chip(pre, val, lbl, cls, cardCls) {
+            return '<div class="kpi-chip ' + (cardCls || '') + '"><div class="cv ' + cls + '">' + pre + val + '</div><div class="cl">' + lbl + '</div></div>';
+        }
+
+        // -- Table -------------------------------------------------------------
+        function renderTable(data) {
+            const lang = getLang();
+            const $b = $('#supTbody').empty();
+            if (!data.length) {
+                $('#noSupMsg').show(); return;
+            }
+            $('#noSupMsg').hide();
+            data.forEach(function (s, i) {
+                const due    = parseFloat(s.TotalDue);
+                const dueLbl = lang === 'en' ? (due > 0 ? '৳' + fmt(due) : 'Clear') : (due > 0 ? '৳' + fmt(due) : 'পরিষ্কার');
+                $b.append(
+                    '<tr data-name="' + esc(s.SupplierName).toLowerCase() + '" data-phone="' + esc(s.SupplierPhone) + '">' +
+                    '<td style="color:#aaa;font-size:12px;">' + (i + 1) + '</td>' +
+                    '<td style="font-size:12px;color:#888;">' + esc(s.SupplierCompanyName || '—') + '</td>' +
+                    '<td style="font-weight:700;color:#333;">' + esc(s.SupplierName) + '</td>' +
+                    '<td>' + (s.SupplierPhone ? '<a href="tel:' + esc(s.SupplierPhone) + '" style="color:#6c7ae0;">' + esc(s.SupplierPhone) + '</a>' : '<span style="color:#ccc;">—</span>') + '</td>' +
+                    '<td style="font-size:12px;color:#888;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(s.SupplierAddress || '—') + '</td>' +
+                    '<td style="font-weight:700;">৳' + fmt(s.TotalAmount) + '</td>' +
+                    '<td style="color:#28a745;font-weight:700;">৳' + fmt(s.TotalPaid) + '</td>' +
+                    '<td><span class="due-badge ' + (due > 0 ? 'has-due' : 'no-due') + '">' + dueLbl + '</span></td>' +
+                    '<td>' +
+                    '<div class="d-flex gap-1 flex-wrap">' +
+                    '<button class="btn-outline2" onclick="openDetail(' + s.SupplierID + ')" title="' + (lang === 'en' ? 'Details' : 'অজানা') + '"><i class="fas fa-eye"></i></button>' +
+                    '<button class="btn-outline2" onclick="openEdit(' + s.SupplierID + ')" title="' + (lang === 'en' ? 'Edit' : 'মঙ্গলবার') + '"><i class="fas fa-edit"></i></button>' +
+                    '<button class="btn-danger2" style="padding:6px 10px;" onclick="deleteSupplier(' + s.SupplierID + ',\'' + esc(s.SupplierName) + '\')" title="' + (lang === 'en' ? 'Delete' : 'অজানা') + '"><i class="fas fa-trash"></i></button>' +
+                    '</div></td>' +
+                    '</tr>');
+            });
+        }
+
+        // -- Table Search ------------------------------------------------------
+        window.filterTable = function () {
+            const q = $('#searchBox').val().toLowerCase().trim();
+            $('#supTbody tr').each(function () {
+                const name  = $(this).data('name') || '';
+                const phone = String($(this).data('phone') || '');
+                $(this).toggle(!q || name.includes(q) || phone.includes(q));
+            });
+        };
+
+        // -- ADD Supplier ------------------------------------------------------
+        window.openAddModal = function () {
+            $('#addCompany,#addName,#addPhone,#addAddress').val('');
+            new bootstrap.Modal('#addModal').show();
+        };
+
+        window.submitAdd = function () {
+            getSession();
+            const name = $('#addName').val().trim();
+            if (!name) { showToast(getLang() === 'en' ? 'Enter supplier name' : 'সরবরাহকারীর নাম লিখুন', 'error'); return; }
+
+            $.ajax({
+                url: '/api/ItemPurchase/add-supplier',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    InstitutionID:       institutionId,
+                    RegistrationID:      registrationId,
+                    SupplierName:        name,
+                    SupplierPhone:       $('#addPhone').val().trim(),
+                    SupplierAddress:     $('#addAddress').val().trim(),
+                    SupplierCompanyName: $('#addCompany').val().trim()
+                }),
+                success: function (res) {
+                    if (res.success) {
+                        bootstrap.Modal.getInstance('#addModal').hide();
+                        showToast(getLang() === 'en' ? 'Supplier added!' : 'ড্যাশবোর্ড নিশ্চিত করুন? ঠিকানা!', 'success');
+                        loadSuppliers();
+                    } else {
+                        showToast(res.message || 'ঠিকানা দিন', 'error');
+                    }
+                },
+                error: function () { showToast('পরবর্তী ধাপ', 'error'); }
+            });
+        };
+
+        // -- EDIT Supplier -----------------------------------------------------
+        window.openEdit = function (id) {
+            const s = allSuppliers.find(function (x) { return x.SupplierID === id; });
+            if (!s) return;
+            $('#editId').val(s.SupplierID);
+            $('#editCompany').val(s.SupplierCompanyName || '');
+            $('#editName').val(s.SupplierName);
+            $('#editPhone').val(s.SupplierPhone || '');
+            $('#editAddress').val(s.SupplierAddress || '');
+            new bootstrap.Modal('#editModal').show();
+        };
+
+        window.submitEdit = function () {
+            getSession();
+            const name = $('#editName').val().trim();
+            if (!name) { showToast(getLang() === 'en' ? 'Enter supplier name' : 'সরবরাহকারীর নাম লিখুন', 'error'); return; }
+
+            $.ajax({
+                url: '/api/ItemPurchase/update-supplier',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    SupplierID:          parseInt($('#editId').val()),
+                    InstitutionID:       institutionId,
+                    SupplierName:        name,
+                    SupplierPhone:       $('#editPhone').val().trim(),
+                    SupplierAddress:     $('#editAddress').val().trim(),
+                    SupplierCompanyName: $('#editCompany').val().trim()
+                }),
+                success: function (res) {
+                    if (res.success) {
+                        bootstrap.Modal.getInstance('#editModal').hide();
+                        showToast(getLang() === 'en' ? 'Updated!' : 'স্টাফ সংখ্যা!', 'success');
+                        loadSuppliers();
+                    } else {
+                        showToast(res.message || 'ঠিকানা দিন', 'error');
+                    }
+                },
+                error: function () { showToast('পরবর্তী ধাপ', 'error'); }
+            });
+        };
+
+        // -- DELETE Supplier ---------------------------------------------------
+        window.deleteSupplier = function (id, name) {
+            const msg = getLang() === 'en'
+                ? 'Delete "' + name + '"? This cannot be undone.'
+                : '"' + name + '" কে মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।';
+            if (!confirm(msg)) return;
+            getSession();
+
+            $.ajax({
+                url: '/api/ItemPurchase/delete-supplier?supplierId=' + id + '&institutionId=' + institutionId,
+                type: 'DELETE',
+                success: function (res) {
+                    if (res.success) {
+                        showToast(getLang() === 'en' ? 'Deleted!' : 'স্টাফ সংখ্যা!', 'success');
+                        loadSuppliers();
+                    } else {
+                        showToast(res.message, 'error');
+                    }
+                },
+                error: function () { showToast('পরবর্তী ধাপ', 'error'); }
+            });
+        };
+
+        // -- DETAIL Modal ------------------------------------------------------
+        window.openDetail = function (id) {
+            currentDetailId = id;
+            const s = allSuppliers.find(function (x) { return x.SupplierID === id; });
+            const title = s ? esc(s.SupplierName) : 'সরবরাহকারীর বিস্তারিত';
+            $('#detModalTitle').html('<i class="fas fa-user-tie me-2"></i>' + title);
+            $('#detModalBody').html('<div style="text-align:center;padding:30px;"><div class="spin"></div></div>');
+            new bootstrap.Modal('#detailModal').show();
+
+            getSession();
+            $.get('/api/ItemPurchase/supplier-details?supplierId=' + id + '&institutionId=' + institutionId, function (res) {
+                if (!res.success) { $('#detModalBody').html('<p class="text-center text-danger">' + (res.message || 'Error') + '</p>'); return; }
+                renderDetailModal(res);
+            }).fail(function () { $('#detModalBody').html('<p class="text-center text-danger">ডেটা লোড করতে সমস্যা হয়েছে</p>'); });
+        };
+
+        function renderDetailModal(res) {
+            const lang = getLang();
+            const inf  = res.info;
+            const dues = res.duePurchases || [];
+            const hist = res.payHistory   || [];
+            const accs = res.accounts     || [];
+
+            // Info chips
+            let infoHtml =
+                '<div class="row g-2 mb-3">' +
+                infoChip(lang === 'en' ? 'Company' : 'কোম্পানি', inf.SupplierCompanyName || '—') +
+                infoChip(lang === 'en' ? 'Supplier' : 'সরবরাহকারী', inf.SupplierName) +
+                infoChip(lang === 'en' ? 'Phone' : 'ফোন', inf.SupplierPhone || '—') +
+                infoChip(lang === 'en' ? 'Address' : 'ঠিকানা', inf.SupplierAddress || '—') +
+                '</div>';
+
+            // Summary chips
+            const totalDue = parseFloat(inf.TotalDue);
+            infoHtml +=
+                '<div class="row g-2 mb-3">' +
+                kpiChip('৳' + fmt(inf.TotalAmount), lang === 'en' ? 'Total Purchase' : 'মোট ক্রয়', '') +
+                kpiChip('৳' + fmt(inf.TotalPaid),   lang === 'en' ? 'Total Paid'     : 'মোট পরিশোধ', 'green') +
+                kpiChip('৳' + fmt(inf.TotalDue),    lang === 'en' ? 'Due'            : 'মোট বাকি', totalDue > 0 ? 'red' : 'green') +
+                kpiChip('৳' + fmt(inf.TotalReturn), lang === 'en' ? 'Return'         : 'মোট ফেরত', 'orange') +
+                '</div>';
+
+            // Tabs
+            const tab1 = lang === 'en' ? 'Due Payments' : 'বাকি পরিশোধ';
+            const tab2 = lang === 'en' ? 'History'      : 'পেমেন্ট ইতিহাস';
+            infoHtml += '<div class="det-tab">' +
+                '<button id="tabBtn1" class="active" onclick="switchTab(1)">' + tab1 + (dues.length ? ' <span style="background:#dc3545;color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;">' + dues.length + '</span>' : '') + '</button>' +
+                '<button id="tabBtn2" onclick="switchTab(2)">' + tab2 + '</button>' +
+                '</div>';
+
+            // Due Table
+            let dueHtml = '<div id="tabPane1">';
+            if (!dues.length) {
+                dueHtml += '<div style="text-align:center;color:#28a745;padding:20px;"><i class="fas fa-check-circle fa-2x mb-2" style="display:block;"></i>' +
+                    (lang === 'en' ? 'No pending dues!' : 'কোনো বাকি নেই!') + '</div>';
+            } else {
+                const totalDueAmt = dues.reduce(function (s, d) { return s + parseFloat(d.DueAmount); }, 0);
+                dueHtml +=
+                    '<div style="background:#fff5f5;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">' +
+                    '<span style="font-size:13px;color:#888;">' + (lang === 'en' ? 'Total Due' : 'মোট বাকি') + '</span>' +
+                    '<strong style="font-size:16px;color:#dc3545;">৳' + fmt(totalDueAmt) + '</strong></div>';
+
+                dueHtml += '<div style="overflow-x:auto;"><table class="due-tbl"><thead><tr>' +
+                    '<th>SN</th>' +
+                    '<th>' + (lang === 'en' ? 'Date' : 'তারিখ') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Total' : 'মোট') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Paid' : 'পরিশোধ') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Due' : 'বাকি') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Pay Now' : 'পরিশোধ করুন') + '</th>' +
+                    '</tr></thead><tbody>';
+
+                dues.forEach(function (d) {
+                    dueHtml += '<tr>' +
+                        '<td style="font-weight:700;color:#6c7ae0;">#' + d.PurchaseSN + '</td>' +
+                        '<td style="font-size:12px;color:#888;">' + (d.BuyingDate || '—') + '</td>' +
+                        '<td>৳' + fmt(d.TotalPrice) + '</td>' +
+                        '<td style="color:#28a745;">৳' + fmt(d.PaidAmount) + '</td>' +
+                        '<td style="color:#dc3545;font-weight:700;">৳' + fmt(d.DueAmount) + '</td>' +
+                        '<td><input type="number" class="pay-input" id="payAmt_' + d.FabricBuyingID + '"' +
+                        ' data-buying="' + d.FabricBuyingID + '" data-due="' + d.DueAmount + '"' +
+                        ' placeholder="0.00" min="0" max="' + d.DueAmount + '" step="0.01"' +
+                        ' oninput="validatePayInput(this)"></td>' +
+                        '</tr>';
+                });
+                dueHtml += '</tbody></table></div>';
+
+                // Account + pay date + submit
+                let accOpts = '<option value="0">' + (lang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া') + '</option>';
+                accs.forEach(function (a) {
+                    accOpts += '<option value="' + a.AccountID + '"' + (a.IsDefault ? ' selected' : '') + '>' + esc(a.AccountName) + '</option>';
+                });
+
+                dueHtml +=
+                    '<div class="row g-2 mt-2 align-items-end">' +
+                    '<div class="col-md-5"><label class="f-label">' + (lang === 'en' ? 'Account' : 'অ্যাকাউন্ট') + '</label>' +
+                    '<select id="payAccount" class="f-control" style="width:100%;">' + accOpts + '</select></div>' +
+                    '<div class="col-md-4"><label class="f-label">' + (lang === 'en' ? 'Pay Date' : 'পেমেন্টের তারিখ') + '</label>' +
+                    '<input type="date" id="payDate" class="f-control" style="width:100%;" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
+                    '<div class="col-md-3 d-flex align-items-end">' +
+                    '<button class="btn-success2" style="width:100%;justify-content:center;" onclick="submitPayDue(' + currentDetailId + ')">' +
+                    '<i class="fas fa-check"></i> ' + (lang === 'en' ? 'Pay' : 'পরিশোধ করুন') + '</button></div>' +
+                    '</div>';
+            }
+            dueHtml += '</div>';
+
+            // History
+            let histHtml = '<div id="tabPane2" style="display:none;">';
+            if (!hist.length) {
+                histHtml += '<div style="text-align:center;color:#bbb;padding:20px;">' + (lang === 'en' ? 'No payment history' : 'কোনো পেমেন্ট ইতিহাস নেই') + '</div>';
+            } else {
+                histHtml += '<div style="overflow-x:auto;"><table class="due-tbl"><thead><tr>' +
+                    '<th>' + (lang === 'en' ? 'SN' : 'ক্রমিক') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Amount' : 'পরিমাণ') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Date' : 'তারিখ') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Account' : 'অ্যাকাউন্ট') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Note' : 'নোট') + '</th>' +
+                    '</tr></thead><tbody>';
+                hist.forEach(function (h) {
+                    histHtml += '<tr>' +
+                        '<td style="font-weight:700;color:#6c7ae0;">' + (h.PurchaseSN ? '#' + h.PurchaseSN : '—') + '</td>' +
+                        '<td style="color:#28a745;font-weight:700;">৳' + fmt(h.PaidAmount) + '</td>' +
+                        '<td style="font-size:12px;color:#888;">' + (h.PaidDate || '—') + '</td>' +
+                        '<td style="font-size:12px;">' + esc(h.AccountName || '—') + '</td>' +
+                        '<td style="font-size:11px;color:#aaa;">' + esc(h.Situation || '') + '</td>' +
+                        '</tr>';
+                });
+                histHtml += '</tbody></table></div>';
+            }
+            histHtml += '</div>';
+
+            $('#detModalBody').html(infoHtml + dueHtml + histHtml);
+        }
+
+        // -- Tab Switch --------------------------------------------------------
+        window.switchTab = function (n) {
+            $('#tabPane1,#tabPane2').hide();
+            $('#tabBtn1,#tabBtn2').removeClass('active');
+            $('#tabPane' + n).show();
+            $('#tabBtn' + n).addClass('active');
+        };
+
+        // -- Validate pay input ------------------------------------------------
+        window.validatePayInput = function (inp) {
+            const due = parseFloat(inp.dataset.due);
+            const val = parseFloat(inp.value) || 0;
+            inp.classList.toggle('over', val > due);
+        };
+
+        // -- Submit Pay Due ----------------------------------------------------
+        window.submitPayDue = function (supplierId) {
+            getSession();
+            const payments = [];
+            $('.pay-input').each(function () {
+                const amt = parseFloat($(this).val()) || 0;
+                if (amt > 0) {
+                    const due = parseFloat($(this).data('due'));
+                    if (amt > due) {
+            showToast((getLang() === 'en' ? 'Payment exceeds due for #' : 'পরিশোধের পরিমাণ বাকির চেয়ে বেশি #') + $(this).data('buying'), 'error');
+                        return false;
+                    }
+                    payments.push({ BuyingId: parseInt($(this).data('buying')), PaidAmount: amt });
+                }
+            });
+            if (!payments.length) {
+                showToast(getLang() === 'en' ? 'Enter at least one amount' : 'অন্তত একটি পরিমাণ লিখুন', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: '/api/ItemPurchase/pay-due',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    InstitutionID:  institutionId,
+                    RegistrationID: registrationId,
+                    SupplierID:     supplierId,
+                    AccountID:      parseInt($('#payAccount').val()) || 0,
+                    PayDate:        $('#payDate').val(),
+                    Payments:       payments
+                }),
+                success: function (res) {
+                    if (res.success) {
+                        showToast(res.message || (getLang() === 'en' ? 'Payment done!' : 'পেমেন্ট সম্পন্ন হয়েছে!'), 'success');
+                        bootstrap.Modal.getInstance('#detailModal').hide();
+                        loadSuppliers();
+                    } else {
+                        showToast(res.message, 'error');
+                    }
+                },
+                error: function () { showToast('সার্ভার সমস্যা হয়েছে', 'error'); }
+            });
+        };
+
+        // -- Helpers -----------------------------------------------------------
+        function infoChip(lbl, val) {
+            return '<div class="col-md-6"><div class="inf-chip"><div class="lbl">' + lbl + '</div><div class="val">' + esc(val) + '</div></div></div>';
+        }
+        function kpiChip(val, lbl, cls) {
+            return '<div class="col-6 col-md-3"><div class="kpi-chip ' + cls + '">' +
+                '<div class="cv ' + cls + '">' + val + '</div><div class="cl">' + lbl + '</div></div></div>';
+        }
+        function fmt(n)  { return parseFloat(n || 0).toLocaleString('en-BD', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+        function esc(s)  { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        window.showToast = function (msg, type) {
+            const t = document.createElement('div');
+            t.className = 'toast-item ' + (type || 'info');
+            t.textContent = msg;
+            document.getElementById('toastWrap').appendChild(t);
+            setTimeout(function () { t.style.opacity = 0; setTimeout(function () { t.remove(); }, 300); }, 3500);
+        };
+
+    })();
+    </script>
+</body>
+</html>

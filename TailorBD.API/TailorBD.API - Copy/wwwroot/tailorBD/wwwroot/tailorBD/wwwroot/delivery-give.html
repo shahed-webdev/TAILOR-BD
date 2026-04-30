@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ডেলিভারি দিন - TailorBD</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .main-content { margin-left: 260px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        @media (max-width: 768px) { #app-navbar, .main-content { margin-left: 0; } }
+
+        .container { max-width: 100%; margin: 0 auto; padding: 10px; background: #f5f7fa; min-height: 100vh; }
+        .content { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-bottom: 20px; font-size: 22px; font-weight: 600; }
+
+        .search-section { margin-bottom: 20px; }
+        .search-tabs { display: flex; gap: 15px; margin-bottom: 15px; }
+        .search-tabs label { display: flex; align-items: center; cursor: pointer; font-size: 14px; }
+        .search-tabs input[type="radio"] { margin-right: 6px; }
+        .search-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 150px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 13px; }
+        .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .btn-search { padding: 8px 20px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px; }
+        .btn-search:hover { background: #5a68c9; }
+        .search-by-date { display: none; }
+        .search-by-date.active { display: block; }
+        .search-by-number { display: none; }
+        .search-by-number.active { display: block; }
+
+        .table-wrapper { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1400px; }
+        th { background: #6c7ae0; color: white; padding: 10px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+        td { padding: 8px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; text-align: center; }
+        tr:hover { background-color: #f8f9fa; }
+
+        .btn-deliver { padding: 5px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-deliver:hover { background: #218838; }
+        .btn-deliver-link { text-decoration: none; display: inline-block; transition: transform 0.2s; }
+        .btn-deliver-link:hover { transform: scale(1.2); }
+        .btn-details-icon { background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s; }
+        .btn-details-icon:hover { transform: scale(1.2); }
+
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .empty-message { text-align: center; padding: 40px; color: #666; }
+        .error-message { text-align: center; padding: 20px; color: #dc3545; }
+
+        .status-badge { padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+        .status-ready { background: #d4edda; color: #155724; }
+        .status-partial { background: #fff3cd; color: #856404; }
+
+        /* SMS Send Panel */
+        #smsSendPanel { transition: all 0.3s; }
+        .sms-msg-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; padding: 8px 12px; font-size: 13px; }
+        .sms-msg-error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; padding: 8px 12px; font-size: 13px; }
+
+        /* Order Details Modal Styles */
+        .customer-info-simple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; }
+        .customer-info-simple h5 { color: white; margin-bottom: 10px; }
+        .customer-info-simple p { color: rgba(255,255,255,0.95); }
+        .customer-info-simple .badge { font-size: 16px; }
+        .order-item-simple { border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #fff; }
+        .item-title { font-size: 18px; color: #2c3e50; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #6c7ae0; }
+        .measurements-simple, .styles-simple { margin-top: 15px; }
+        .section-label { font-weight: 600; color: #6c7ae0; margin-bottom: 10px; font-size: 15px; }
+        .badges-row { display: flex; flex-wrap: wrap; gap: 5px; }
+        .badges-row .badge { font-size: 14px; padding: 8px 12px; font-weight: 500; }
+        .measurement-groups-container { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; }
+        .measurement-group-column { display: flex; flex-direction: column; gap: 4px; min-width: 70px; }
+        .measurement-card-compact { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; min-height: 36px; }
+        .measurement-card-compact:hover { background: #e9ecef; }
+        .measurement-label-compact { font-size: 16px; color: #6c757d; font-weight: 500; margin-right: 8px; }
+        .measurement-value-compact { font-size: 16px; font-weight: 700; color: #2c3e50; }
+        .order-details-bottom { margin-top: 20px; padding-top: 15px; border-top: 2px solid #e9ecef; }
+        .order-details-bottom .alert { background: #e7f3ff; border: 1px solid #b3d9ff; color: #004085; font-size: 14px; }
+
+        /* jQuery UI Autocomplete */
+        .ui-autocomplete { max-height: 200px; overflow-y: auto; overflow-x: hidden; z-index: 9999 !important; font-size: 13px; border: 1px solid #6c7ae0; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .ui-menu-item { padding: 8px 12px; cursor: pointer; }
+        .ui-menu-item:hover, .ui-menu-item.ui-state-active { background: #6c7ae0; color: white; border: none; }
+        .ui-helper-hidden-accessible { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="app-navbar"></div>
+
+    <!-- Sidebar -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="container">
+                <div class="content">
+                    <h2><span class="lang-content" data-en="Delivery Give" data-bn="ডেলিভারি দিন">ডেলিভারি দিন</span></h2>
+
+                    <!-- Search Section -->
+                    <div class="search-section">
+                        <div class="search-tabs">
+                            <label>
+                                <input type="radio" name="searchType" value="number" checked>
+                                <span class="lang-content" data-en="Mobile No. & Order No." data-bn="মোবাইল নং ও অর্ডার নং">মোবাইল নং ও অর্ডার নং</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="searchType" value="date">
+                                <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারী তারিখ">ডেলিভারী তারিখ</span>
+                            </label>
+                        </div>
+
+                        <!-- Search by Number -->
+                        <div class="search-by-number active">
+                            <div class="search-form">
+                                <div class="form-group">
+                                    <label class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</label>
+                                    <input type="text" id="mobileNo" placeholder="মোবাইল নাম্বার">
+                                </div>
+                                <div class="form-group">
+                                    <label class="lang-content" data-en="Order Number" data-bn="অর্ডার নাম্বার">অর্ডার নাম্বার</label>
+                                    <input type="text" id="orderNo" placeholder="অর্ডার নাম্বার">
+                                </div>
+                                <div class="form-group" style="flex:0;">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Search by Date -->
+                        <div class="search-by-date">
+                            <div class="search-form">
+                                <div class="form-group">
+                                    <label class="lang-content" data-en="From Date" data-bn="কোন তারিখ থেকে">কোন তারিখ থেকে</label>
+                                    <input type="date" id="startDate">
+                                </div>
+                                <div class="form-group">
+                                    <label class="lang-content" data-en="To Date" data-bn="কোন তারিখ পর্যন্ত">কোন তারিখ পর্যন্ত</label>
+                                    <input type="date" id="endDate">
+                                </div>
+                                <div class="form-group" style="flex:0;">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMS Send Panel (shows when SMS checkboxes are checked) -->
+                    <div id="smsSendPanel" style="display:none; margin-bottom:12px; padding:12px 18px; background:#e8f4ff; border:1px solid #b3d9ff; border-radius:8px;">
+                        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                            <span style="font-size:14px; color:#004085;">
+                                <i class="fas fa-sms me-1" style="color:#6c7ae0;"></i>
+                                <strong><span id="smsSendCount">0</span></strong>
+                                <span class="lang-content" data-en=" order(s) selected for SMS" data-bn=" টি অর্ডার নির্বাচিত (SMS পাঠানো হবে)"> টি অর্ডার নির্বাচিত (SMS পাঠানো হবে)</span>
+                            </span>
+                            <button id="smsSendBtn"
+                                    style="padding:7px 18px; background:#6c7ae0; color:white; border:none; border-radius:5px; cursor:pointer; font-size:13px; font-weight:500;"
+                                    onclick="sendReadySms()">
+                                <i class="fas fa-paper-plane me-1"></i>
+                                <span class="lang-content" data-en="Send SMS" data-bn="SMS পাঠান">SMS পাঠান</span>
+                            </button>
+                        </div>
+                        <div id="smsStatusMsg" style="display:none; margin-top:8px; font-size:13px;"></div>
+                    </div>
+
+                    <!-- Orders Table -->
+                    <div class="table-wrapper">
+                        <div id="ordersTableContainer">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                <span class="lang-content" data-en="Loading ready-to-deliver orders..." data-bn="ডেলিভারির জন্য প্রস্তুত অর্ডার লোড হচ্ছে...">ডেলিভারির জন্য প্রস্তুত অর্ডার লোড হচ্ছে...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shared Modals (logout confirm, profile, etc.) -->
+    <div id="app-modals"></div>
+
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#6c7ae0; color:white;">
+                    <h5 class="modal-title"><i class="fas fa-clipboard-list me-2"></i>
+                        <span class="lang-content" data-en="Order Details" data-bn="অর্ডার বিস্তারিত">অর্ডার বিস্তারিত</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:invert(1);"></button>
+                </div>
+                <div class="modal-body" id="orderDetailsModalBody">
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery + jQuery UI (autocomplete) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- App Components (sidebar, navbar, modals, session) -->
+    <script src="/js/app-components.js"></script>
+    <!-- Delivery Give Page Logic -->
+    <script src="/js/delivery-give.js"></script>
+</body>
+</html>

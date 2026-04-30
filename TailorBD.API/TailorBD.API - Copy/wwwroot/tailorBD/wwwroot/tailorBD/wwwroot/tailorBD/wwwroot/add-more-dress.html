@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পোষাক যুক্ত করুন - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="container-fluid">
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">রিডিরেক্ট করা হচ্ছে...</p>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app-components.js"></script>
+    
+    <script>
+        // Initialize on page load
+        $(document).ready(function() {
+            console.log('Add More Dress: Page loaded, redirecting to dress-measurements...');
+            
+            // Check authentication
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const institutionId = sessionStorage.getItem('institutionId');
+            
+            if (!isLoggedIn || isLoggedIn !== 'true') {
+                console.log('Not logged in, redirecting to login');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!institutionId) {
+                console.log('No institution ID, redirecting to login');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Get orderId from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+            const customerIdParam = urlParams.get('customerId');
+            const clothForIdParam = urlParams.get('clothForId');
+
+            if (!orderId) {
+                showAlert('Order ID not found', 'danger');
+                setTimeout(() => {
+                    window.location.href = 'order-list.html';
+                }, 2000);
+                return;
+            }
+
+            if (customerIdParam && clothForIdParam) {
+                const redirectUrl = `dress-measurements.html?customerId=${customerIdParam}&clothForId=${clothForIdParam}&orderId=${orderId}`;
+                console.log('Redirecting using query params:', redirectUrl);
+                window.location.href = redirectUrl;
+                return;
+            }
+
+            console.log('Order ID:', orderId);
+            console.log('Institution ID:', institutionId);
+            
+            // Load order details using the correct search API
+            loadOrderDetails(orderId, institutionId);
+        });
+
+        // Load order details using the correct search API
+        function loadOrderDetails(orderId, institutionId) {
+            console.log('Loading order details using by-order-id API...');
+            
+            $.ajax({
+                type: "GET",
+                url: `/api/orders/by-order-id/${orderId}?institutionId=${institutionId}`,
+                contentType: "application/json",
+                success: function(response) {
+                    console.log('Order response:', response);
+                    
+                    if (response.success && response.data) {
+                        const order = response.data;
+                        const customerId = order.customerID ?? order.customerId;
+                        const clothForId = order.clothForID ?? order.clothForId;
+                        const resolvedOrderId = order.orderID ?? order.orderId ?? orderId;
+
+                        if (customerId == null || clothForId == null) {
+                            console.error('Missing customerId or clothForId in response');
+                            showAlert('অর্ডার পাওয়া যায়নি', 'danger');
+                            setTimeout(() => {
+                                window.location.href = 'order-list.html';
+                            }, 2000);
+                            return;
+                        }
+
+                        // Redirect to dress-measurements.html with customerId and clothForId
+                        const redirectUrl = `dress-measurements.html?customerId=${customerId}&clothForId=${clothForId}&orderId=${resolvedOrderId}`;
+                        console.log('Redirecting to:', redirectUrl);
+                        window.location.href = redirectUrl;
+                    } else {
+                        console.error('Order not found in response');
+                        showAlert('অর্ডার পাওয়া যায়নি', 'danger');
+                        setTimeout(() => {
+                            window.location.href = 'order-list.html';
+                        }, 2000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading order:', error);
+                    console.error('Status:', xhr.status);
+                    console.error('Response:', xhr.responseText);
+                    
+                    showAlert('অর্ডার লোড করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।', 'danger');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'order-list.html';
+                    }, 3000);
+                }
+            });
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const alert = $(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>`);
+            $('#alertContainer').append(alert);
+        }
+    </script>
+</body>
+</html>

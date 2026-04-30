@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কাস্টমার বিস্তারিত - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .container { max-width: 100%; padding: 10px; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 16px; }
+        h2 { color: #6c7ae0; margin-bottom: 14px; font-size: 20px; font-weight: 700; }
+
+        /* Profile */
+        .profile-section { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .profile-avatar-wrap { position: relative; flex-shrink: 0; }
+        .profile-photo { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; border: 3px solid #6c7ae0; cursor: pointer; display: block; }
+        .profile-avatar { width: 88px; height: 88px; border-radius: 50%; background: #6c7ae0; display: flex; align-items: center; justify-content: center; color: white; font-size: 34px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
+        .profile-photo-change {
+            position: absolute; bottom: 0; right: 0;
+            width: 26px; height: 26px; border-radius: 50%;
+            background: #6c7ae0; color: white; border: 2px solid white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .profile-photo-change:hover { background: #5a68c9; }
+        .profile-info ul { list-style: none; padding: 0; margin: 0; }
+        .profile-info ul li { font-size: 14px; color: #444; margin-bottom: 3px; }
+        .profile-info ul li strong { color: #222; font-size: 16px; }
+        .quick-links { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .quick-links a { font-size: 13px; color: #6c7ae0; text-decoration: none; font-weight: 500; }
+        .quick-links a:hover { text-decoration: underline; }
+        .quick-links span { color: #ccc; }
+
+        /* Photo modal */
+        .photo-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; }
+        .photo-modal-overlay.show { display: flex; }
+        .photo-modal-box { background: white; border-radius: 10px; padding: 24px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+        .photo-modal-box h5 { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 14px; }
+        .photo-preview { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 3px solid #e0e3f8; margin-bottom: 14px; }
+        .photo-preview-placeholder { width: 130px; height: 130px; border-radius: 50%; background: #e8eaf6; display: inline-flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 52px; border: 3px dashed #c5cae9; margin-bottom: 14px; }
+        .photo-file-input { display: none; }
+        .btn-choose-photo { display: inline-block; padding: 7px 18px; background: #e8eaf6; color: #5a68c9; border: 1px solid #c5cae9; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .btn-choose-photo:hover { background: #d1d5f5; }
+        .btn-save-photo { padding: 7px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-save-photo:hover { background: #218838; }
+        .btn-close-photo { padding: 7px 16px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .photo-modal-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+
+        /* Tabs */
+        .tabs-nav { display: flex; gap: 4px; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 9px 18px; border: none; background: none; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: #666; border-bottom: 2px solid transparent;
+            margin-bottom: -2px; transition: all 0.2s; white-space: nowrap;
+        }
+        .tab-btn.active { color: #6c7ae0; border-bottom-color: #6c7ae0; font-weight: 700; }
+        .tab-btn:hover { color: #6c7ae0; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Dress select */
+        .dress-select-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+        .dress-select-row select { flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; font-family: inherit; }
+        .dress-select-row select:focus { outline: none; border-color: #6c7ae0; }
+        .dress-select-row select option.has-measurement { font-weight: 700; color: #28a745; }
+        .dress-legend { font-size: 12px; color: #888; margin-bottom: 14px; }
+        .dress-legend span { color: #28a745; font-weight: 700; }
+
+        /* Measurement groups */
+        .measurement-section { display: flex; gap: 16px; flex-wrap: wrap; }
+        .measurement-group { background: #f8f9fa; border-radius: 6px; padding: 14px; min-width: 180px; }
+        .measurement-group h6 { color: #6c7ae0; font-weight: 700; font-size: 13px; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .measurement-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+        .measurement-item label { font-size: 13px; color: #555; white-space: nowrap; }
+        .measurement-item input { width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; text-align: center; font-family: inherit; }
+        .measurement-item input:focus { outline: none; border-color: #6c7ae0; }
+
+        /* Style section */
+        .style-section { margin-top: 18px; }
+        .style-category { margin-bottom: 16px; }
+        .style-category h6 { color: #555; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .style-items { display: flex; gap: 10px; flex-wrap: wrap; }
+        .style-item { border: 2px solid #ddd; border-radius: 6px; padding: 8px 12px; cursor: pointer; transition: all 0.2s; }
+        .style-item.checked { border-color: #6c7ae0; background: #f0f2ff; }
+        .style-item label { cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .style-item input[type=checkbox] { accent-color: #6c7ae0; width: 14px; height: 14px; }
+        .style-measure { margin-top: 5px; }
+        .style-measure input { width: 100%; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; }
+
+        /* Details textarea */
+        .details-box { margin-top: 16px; }
+        .details-box label { font-size: 13px; color: #555; font-weight: 500; margin-bottom: 5px; display: block; }
+        .details-box textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; min-height: 70px; resize: vertical; }
+
+        /* Buttons */
+        .btn-save {
+            padding: 9px 24px; background: #6c7ae0; color: white; border: none;
+            border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+        }
+        .btn-save:hover { background: #5a68c9; }
+        .btn-save:disabled { background: #aaa; cursor: not-allowed; }
+        .btn-print { padding: 9px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600; margin-top: 14px; margin-left: 8px; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-print:hover { background: #218838; }
+
+        /* Table */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #6c7ae0; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+        td { padding: 7px 8px; border-bottom: 1px solid #e0e0e0; text-align: center; vertical-align: middle; }
+        tr:hover { background: #f8f9fa; }
+        tfoot td { background: #f0f2ff; font-weight: 700; }
+
+        /* Due input */
+        .due-input { width: 90px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center; font-family: inherit; }
+        .due-input:focus { outline: none; border-color: #6c7ae0; }
+        .due-input.error-input { border-color: #dc3545; }
+
+        /* Alert */
+        .alert-msg { padding: 10px 14px; border-radius: 5px; font-size: 13px; margin-top: 10px; display: none; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Loading */
+        .loading { text-align: center; padding: 30px; color: #888; font-size: 14px; }
+        .empty-msg { text-align: center; padding: 20px; color: #aaa; font-size: 13px; }
+
+        /* Account select */
+        .account-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        .account-row select { padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; }
+        .btn-collect { padding: 9px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-collect:hover { background: #218838; }
+        .btn-collect:disabled { background: #aaa; cursor: not-allowed; }
+
+        /* Collect Panel */
+        .collect-panel { margin-top: 16px; background: #f8f9fe; border: 1px solid #e0e4ff; border-radius: 8px; padding: 16px 20px; }
+        .collect-summary { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+        .collect-total-box { text-align: center; }
+        .collect-label { display: block; font-size: 12px; color: #888; font-weight: 500; margin-bottom: 4px; }
+        .collect-total-val { font-size: 22px; font-weight: 800; color: #dc3545; }
+        .collect-arrow { font-size: 20px; color: #ccc; padding-bottom: 4px; }
+        .collect-input-group { display: flex; flex-direction: column; }
+        .collect-input {
+            width: 160px; padding: 9px 12px; border: 2px solid #6c7ae0; border-radius: 6px;
+            font-size: 16px; font-weight: 700; text-align: center; color: #333; font-family: inherit;
+            outline: none;
+        }
+        .collect-input:focus { border-color: #5a68c9; box-shadow: 0 0 0 3px rgba(108,122,224,0.15); }
+        .collect-input.error-input { border-color: #dc3545; }
+        #accountSelect { padding: 9px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: inherit; min-width: 160px; }
+        .collect-hint { font-size: 12px; color: #888; margin-top: 10px; }
+
+        /* Due table - remove old per-row inputs */
+        .due-paid-col { color: #28a745; font-weight: 600; }
+
+        /* Collect Panel hidden state */
+        .collect-panel-hidden { display: none; }
+
+        @media(max-width:768px) {
+            #app-navbar { margin-left: 0; }
+            .main-content { margin-left: 0; }
+            .measurement-section { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="container">
+
+                <!-- Customer Profile -->
+                <div class="card">
+                    <h2><i class="fas fa-user me-2"></i>
+                        <span data-en="Customer Details" data-bn="কাস্টমারের বিস্তারিত">কাস্টমারের বিস্তারিত</span>
+                    </h2>
+                    <div class="profile-section" id="profileSection">
+                        <div class="loading">লোড হচ্ছে...</div>
+                    </div>
+                    <div class="quick-links">
+                        <a href="/add-customer.html"><i class="fas fa-user-plus me-1"></i>
+                            <span data-en="Add New Customer" data-bn="নতুন কাস্টমার যোগ করুন">নতুন কাস্টমার যোগ করুন</span>
+                        </a>
+                        <span>|</span>
+                        <a href="#"><i class="fas fa-list me-1"></i>
+                            <span data-en="Customer List" data-bn="কাস্টমার তালিকা">কাস্টমার তালিকা</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ?abs -->
+                <div class="card">
+                    <div class="tabs-nav" id="tabsNav">
+                        <button type="button" class="tab-btn active" data-tab="measurements" data-en="Customer Measurement" data-bn="কাস্টমারের মাপ">কাস্টমারের মাপ</button>
+                        <button type="button" class="tab-btn" data-tab="due" id="tabDue" data-en="Collect Due" data-bn="বাকি সংগ্রহ করুন">বাকি সংগ্রহ করুন</button>
+                        <button type="button" class="tab-btn" data-tab="payrecords" id="tabPayRecords" data-en="Payment Records" data-bn="পেমেন্ট রেকর্ড">পেমেন্ট রেকর্ড</button>
+                        <button type="button" class="tab-btn" data-tab="pending" id="tabPending" data-en="Pending Orders" data-bn="চলমান অর্ডার">চলমান অর্ডার</button>
+                        <button type="button" class="tab-btn" data-tab="delivered" id="tabDelivered" data-en="Delivered Orders" data-bn="ডেলিভারি হয়েছে">ডেলিভারি হয়েছে</button>
+                    </div>
+
+                    <!-- Measurements Tab -->
+                    <div class="tab-panel active" id="tab-measurements">
+                        <div class="dress-select-row">
+                            <select id="dressSelect">
+                            <option value="0" data-en="Select dress to add measurement" data-bn="মাপ যোগ করতে পোশাক নির্বাচন করুন">মাপ যোগ করতে পোশাক নির্বাচন করুন</option>
+                            </select>
+                        </div>
+                        <div class="dress-legend"><span>★</span> সবুজ রঙে চিহ্নিত পোশাকে আগে থেকে মাপ আছে</div>
+                        <div id="measurementArea"><div class="empty-msg">পোশাক নির্বাচন করুন</div></div>
+                        <div id="measureSaveMsg" class="alert-msg"></div>
+                    </div>
+
+                    <!-- Due Tab -->
+                    <div class="tab-panel" id="tab-due">
+                        <div class="table-wrapper">
+                            <div id="dueTableContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                        <div class="collect-panel collect-panel-hidden" id="accountRow">
+                            <div class="collect-summary">
+                                <div class="collect-total-box">
+                                    <span class="collect-label" data-en="Total Due" data-bn="মোট বাকি">মোট বাকি</span>
+                                    <span class="collect-total-val" id="totalDueDisplay">0.00 /-</span>
+                                </div>
+                                <div class="collect-arrow"><i class="fas fa-arrow-right"></i></div>
+                                <div class="collect-input-group">
+                                    <label class="collect-label" data-en="How much paying?" data-bn="কত টাকা নিচ্ছেন?">কত টাকা নিচ্ছেন?</label>
+                                    <input type="number" id="collectAmountInput" class="collect-input" placeholder="0" min="0" inputmode="numeric">
+                                </div>
+                                <div class="collect-input-group">
+                                    <label class="collect-label" data-en="Discount" data-bn="ছাড়">ছাড়</label>
+                                    <input type="number" id="collectDiscountInput" class="collect-input" style="width:110px;border-color:#f59e0b;" placeholder="0" min="0" inputmode="numeric">
+                                </div>
+                                <div class="collect-input-group">
+                                    <label class="collect-label" data-en="Account" data-bn="হিসাব">হিসাব</label>
+                                    <select id="accountSelect">
+                                        <option value="">Without Account</option>
+                                    </select>
+                                </div>
+                                <button class="btn-collect" onclick="collectDue()">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                    <span data-en="Collect Due" data-bn="বাকি সংগ্রহ করুন">বাকি সংগ্রহ করুন</span>
+                                </button>
+                            </div>
+                            <div class="collect-hint">
+                                <i class="fas fa-info-circle me-1" style="color:#6c7ae0;"></i>
+                            <span data-en="Payment will be applied to orders from top to bottom" data-bn="পেমেন্ট উপর থেকে নিচের ক্রমে অর্ডারে প্রযোজ্য হবে">পেমেন্ট উপর থেকে নিচের ক্রমে অর্ডারে প্রযোজ্য হবে</span>
+                            </div>
+                        </div>
+                        <div id="dueMsg" class="alert-msg"></div>
+                    </div>
+
+                    <!-- Payment Records Tab -->
+                    <div class="tab-panel" id="tab-payrecords">
+                        <div class="table-wrapper">
+                            <div id="payRecordsContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Orders Tab -->
+                    <div class="tab-panel" id="tab-pending">
+                        <div class="table-wrapper">
+                            <div id="pendingOrdersContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Delivered Orders Tab -->
+                    <div class="tab-panel" id="tab-delivered">
+                        <div class="table-wrapper">
+                            <div id="deliveredOrdersContainer"><div class="loading">লোড হচ্ছে...</div></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <!-- Photo Upload Modal -->
+    <div class="photo-modal-overlay" id="photoModal">
+        <div class="photo-modal-box">
+        <h5><i class="fas fa-camera me-2"></i>ছবি পরিবর্তন করুন</h5>
+            <div id="photoPreviewWrap">
+                <div class="photo-preview-placeholder" id="photoPlaceholder"><i class="fas fa-user"></i></div>
+                <img id="photoPreviewImg" class="photo-preview" src="" style="display:none;" alt="preview">
+            </div>
+            <br>
+            <label class="btn-choose-photo" for="photoFileInput"><i class="fas fa-folder-open me-1"></i>ছবি বেছে নিন</label>
+            <input type="file" id="photoFileInput" class="photo-file-input" accept="image/*">
+            <div class="photo-modal-btns">
+                <button class="btn-save-photo" id="btnSavePhoto" onclick="saveCustomerPhoto()"><i class="fas fa-save me-1"></i>সংরক্ষণ করুন</button>
+                <button class="btn-close-photo" onclick="closePhotoModal()">বাতিল</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-modals"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tab switching � inline pure JS, no dependency on jQuery or other scripts
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+            e.preventDefault();
+            var tab = btn.getAttribute('data-tab');
+            document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+            var panel = document.getElementById('tab-' + tab);
+            if (panel) panel.classList.add('active');
+        });
+    </script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script src="/js/customer-details.js?v=2.1.4"></script>
+</body>
+</html>

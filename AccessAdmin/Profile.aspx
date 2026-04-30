@@ -6,6 +6,46 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
    <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
+
+   <asp:HiddenField ID="hfDueCount" runat="server" Value="0" />
+   <asp:HiddenField ID="hfDueTotal" runat="server" Value="0" />
+
+   <div id="dueNoticeOverlay">
+      <div id="dueNoticeModal">
+         <div class="modal-header">
+            <span><span class="modal-title-icon">&#9888;</span> বিশেষ বিজ্ঞপ্তি</span>
+            <button class="modal-close" onclick="closeDueModal()">&times;</button>
+         </div>
+         <div class="modal-body">
+         <p class="notice-text">   সম্মানিত গ্রাহক,
+
+আমরা আনন্দের সাথে জানাচ্ছি যে, আসন্ন পবিত্র ঈদুল আজ্বহার পরপরই আমাদের সফটওয়্যারের নতুন ভার্সন রিলিজ করা হবে। নতুন ভার্সনে সকল সেবা সম্পূর্ণ প্রিপেইড পদ্ধতিতে অনলাইন পেমেন্টের মাধ্যমে পরিচালিত হবে।
+
+তাই আপনাকে বিনীতভাবে অনুরোধ করা হচ্ছে, ঈদের আগেই আপনার যাবতীয় বকেয়া পরিশোধ করুন, যাতে নতুন ভার্সনে নিরবচ্ছিন্নভাবে সেবা গ্রহণ করতে পারেন।
+
+সাময়ীক অসুবিধার জন্য আন্তরিকভাবে দুঃখিত এবং আপনার সহযোগিতার জন্য ধন্যবাদ।
+
+বিনীত,
+[সফটওয়্যার কর্তৃপক্ষ]</p> 
+             <p class="due-note-highlight">নতুন ভার্সন v2.0 দেখতে <a href="https://v2.0.tailorbd.com/" target="_blank">ক্লিক করুন</a></p>
+        <%--    <div class="due-icon">&#128196;</div>--%>
+            <p class="due-count-text">
+               আপনার প্রতিষ্ঠানের <span class="badge" id="modalDueCount">0</span> টি বকেয়া রেকর্ড রয়েছে
+            </p>
+            <div class="due-amount-box">
+               <div class="due-label">মোট বকেয়া পরিমাণ:</div>
+               <div class="due-amount"><span id="modalDueTotal">0.00</span> টাকা</div>
+            </div>
+             <p class="due-note-highlight">বিঃদ্রঃ বকেয়া না থাকলে এই নোটিশ শো করবেনা।</p>
+         </div>
+         <div class="modal-footer">
+             
+            <a href="#Invoice" class="btn-due" onclick="closeDueModal();">&#128065; এখন বন্ধ করুন</a>
+            
+         </div>
+      </div>
+   </div>
+
    <h3>পরিচালকের প্রোফাইল </h3>
 
    <asp:FormView ID="AdminFormView" runat="server" DataKeyNames="RegistrationID" DataSourceID="AdminInfoSQL" OnItemUpdated="AdminFormView_ItemUpdated" Width="100%">
@@ -119,6 +159,15 @@
          </table>
       </EditItemTemplate>
    </asp:FormView>
+   <asp:Panel ID="DueNoticePanel" runat="server" Visible="false" CssClass="due-notice-card">
+      <div class="dnc-icon">&#9888;</div>
+      <div class="dnc-body">
+         <div class="dnc-title">বকেয়া বিজ্ঞপ্তি</div>
+         <div class="dnc-amount"><asp:Literal ID="ltDueTotal" runat="server" /> টাকা বকেয়া</div>
+         <div class="dnc-sub"><asp:Literal ID="ltDueCount" runat="server" /> টি বকেয়া ইনভয়েস রয়েছে &mdash; <a href="#Invoice">বিস্তারিত দেখুন</a></div>
+      </div>
+   </asp:Panel>
+
    <asp:SqlDataSource ID="AdminInfoSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
       SelectCommand="SELECT * FROM Registration WHERE (RegistrationID = @RegistrationID)"
       UpdateCommand="UPDATE Registration SET Name = @Name, FatherName = @FatherName, Gender = @Gender, Designation = @Designation, Address = @Address, City = @City, PostalCode = @PostalCode, Phone = @Phone, Email = @Email WHERE (RegistrationID = @RegistrationID)">
@@ -349,12 +398,29 @@
 
    <script src="../../JS/jq_Profile/jquery-ui-1.8.23.custom.min.js"></script>
    <script type="text/javascript">
+      function closeDueModal() {
+         document.getElementById('dueNoticeOverlay').style.display = 'none';
+      }
+
       $(function () {
          $('#main').tabs();
 
          var grandTotal = 0;
-         $("[id*=DueLabel]").each(function () { grandTotal = grandTotal + parseFloat($(this).text()) });
-         $("#Tota_Due").text("Total "+grandTotal+" /-");
+         $('[id*=DueLabel]').each(function () { grandTotal = grandTotal + parseFloat($(this).text()); });
+         $('#Tota_Due').text('Total ' + grandTotal + ' /-');
+
+         var dueCount = parseInt(document.getElementById('<%= hfDueCount.ClientID %>').value, 10) || 0;
+         var dueTotal = parseFloat(document.getElementById('<%= hfDueTotal.ClientID %>').value) || 0;
+
+         if (dueCount > 0) {
+            $('#modalDueCount').text(dueCount);
+            $('#modalDueTotal').text(dueTotal.toFixed(2));
+            $('#dueNoticeOverlay').fadeIn(300);
+         }
+
+         $('#dueNoticeOverlay').on('click', function (e) {
+            if ($(e.target).is('#dueNoticeOverlay')) { closeDueModal(); }
+         });
       });
    </script>
 </asp:Content>

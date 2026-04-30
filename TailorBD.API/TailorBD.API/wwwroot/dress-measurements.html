@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ড্রেস ও মাপজোখ - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/dress-measurements.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <div>
+                    <h1 class="lang-content" data-en="Dress & Measurements" data-bn="ড্রেস ও মাপজোখ">ড্রেস ও মাপজোখ</h1>
+                    <p class="text-muted lang-content" data-en="Add dress with measurements and styles" data-bn="মাপজোখ ও স্টাইল সহ ড্রেস যোগ করুন">
+                        মাপজোখ ও স্টাইল সহ ড্রেস যোগ করুন
+                    </p>
+                </div>
+            </div>
+
+            <!-- Customer Info & Order Cart Section -->
+            <div class="row mb-4">
+                <!-- Customer Info Card -->
+                <div class="col-lg-5 mb-3">
+                    <div class="customer-info-card h-100">
+                        <div class="customer-header">
+                            <div class="customer-avatar-large" id="customerAvatarLarge">
+                                <img id="customerImage" src="" alt="Customer" style="display: none;">
+                            </div>
+                            <div class="customer-details">
+                                <h3 id="customerNameDisplay">Loading...</h3>
+                                <div class="customer-badges">
+                                    <span class="badge badge-order">
+                                        <i class="fas fa-shopping-bag me-1"></i>
+                                        <span class="lang-content" data-en="Order No" data-bn="অর্ডার নং">অর্ডার নং</span>: 
+                                        <span id="orderNumberDisplay">-</span>
+                                    </span>
+                                    <span class="badge badge-customer">
+                                        <i class="fas fa-user me-1"></i>
+                                        <span class="lang-content" data-en="Customer No" data-bn="কাস্টমার নং">কাস্টমার নং</span>: 
+                                        <span id="customerNumberDisplay">-</span>
+                                    </span>
+                                    <span class="badge badge-phone">
+                                        <i class="fas fa-phone me-1"></i>
+                                        <span id="customerPhoneDisplay">-</span>
+                                    </span>
+                                </div>
+                                <div class="customer-address mt-2">
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    <span id="customerAddressDisplay">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Cart Section -->
+                <div class="col-lg-7 mb-3">
+                    <div class="order-cart-card h-100" id="orderCartSection" style="display: none;">
+                        <div class="card-header">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            <span class="lang-content" data-en="Ordered Dresses" data-bn="অর্ডার করা ড্রেস">অর্ডার করা ড্রেস</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="order-cart-list" id="orderCartList">
+                                <!-- Order items will be displayed here -->
+                            </div>
+                            <button class="btn btn-success w-100 mt-3" onclick="goToFinishOrder()">
+                                <i class="fas fa-arrow-right me-2"></i>
+                                <span class="lang-content" data-en="Continue to Finish Order" data-bn="অর্ডার সম্পন্ন করুন">অর্ডার সম্পন্ন করুন</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dress Selection -->
+            <div class="dress-selection-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-tshirt me-2"></i>
+                    <span data-en="Select Dress" data-bn="ড্রেস নির্বাচন করুন">ড্রেস নির্বাচন করুন</span>
+                </div>
+                <div class="card-body">
+                    <select class="form-select" id="dressSelect" onchange="selectDress()">
+                        <option value="0" data-en="Select a dress to add measurements" data-bn="মাপজোখ যোগ করতে ড্রেস নির্বাচন করুন">মাপজোখ যোগ করতে ড্রেস নির্বাচন করুন</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Measurements & Styles Section -->
+            <div id="measurementSection" style="display: none;">
+                <!-- Measurements Grid -->
+                <div class="measurements-card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-ruler me-2"></i>
+                        <span data-en="Measurements" data-bn="মাপজোখ">মাপজোখ</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="measurementGrid">
+                            <!-- Measurement groups will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Styles Section -->
+                <div class="styles-card mb-4" id="stylesCardWrapper" style="display:none;">
+                    <div class="card-header">
+                        <i class="fas fa-palette me-2"></i>
+                        <span data-en="Styles" data-bn="স্টাইল">স্টাইল</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="stylesContainer">
+                            <!-- Style categories will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details & Quantity -->
+                <div class="details-card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span data-en="Order Details" data-bn="অর্ডার বিস্তারিত">অর্ডার বিস্তারিত</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</span>
+                            </label>
+                            <textarea class="form-control" id="dressDetails" rows="3"
+                                      data-bn-placeholder="ড্রেস সম্পর্কে বিস্তারিত বিবরণ..."
+                                      data-en-placeholder="Detailed description about dress..."
+                                      placeholder="ড্রেস সম্পর্কে বিস্তারিত বিবরণ..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <span data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</span>
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="dressQuantity"
+                                   data-en-placeholder="Quantity"
+                                   data-bn-placeholder="পরিমাণ" placeholder="পরিমাণ" min="1" value="1" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing Card -->
+                <div class="pricing-card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-dollar-sign me-2"></i>
+                        <span data-en="Add Pricing" data-bn="মূল্য যোগ করুন">মূল্য যোগ করুন</span>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- Fabric / Item Code Section -->
+                        <div class="fabric-search-section mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-barcode me-1"></i>
+                                <span data-en="Item Code" data-bn="আইটেম কোড">আইটেম কোড</span>
+                                <span class="fabric-scan-hint ms-2">
+                                    <i class="fas fa-qrcode me-1"></i>
+                                    <span data-en="Scan barcode or enter code" data-bn="বারকোড স্ক্যান করুন বা কোড লিখুন">বারকোড স্ক্যান করুন বা কোড লিখুন</span>
+                                </span>
+                            </label>
+                            <div class="fabric-input-wrap">
+                                <span class="fabric-input-icon" id="fabricInputIcon">
+                                    <i class="fas fa-barcode"></i>
+                                </span>
+                                <input type="text" class="form-control fabric-code-field" id="fabricCodeInput"
+                                       data-en-placeholder="Enter code or scan barcode..."
+                                       data-bn-placeholder="কোড লিখুন বা বারকোড স্ক্যান করুন..." placeholder="কোড লিখুন বা বারকোড স্ক্যান করুন..."
+                                       autocomplete="off" spellcheck="false">
+                                <span class="fabric-input-status" id="fabricInputStatus"></span>
+                            </div>
+                            <div id="fabricSearchResult" class="fabric-result mt-2" style="display:none;"></div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- Manual Add Price Form -->
+                        <div class="row mb-3">
+                            <div class="col-md-4 mb-2">
+                                <input type="text" class="form-control" id="priceFor"
+                                       data-en-placeholder="What for"
+                                       data-bn-placeholder="কিসের জন্য" placeholder="কিসের জন্য" list="priceSuggestions">
+                                <datalist id="priceSuggestions"></datalist>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <input type="number" class="form-control" id="priceAmount"
+                                       data-en-placeholder="Amount"
+                                       data-bn-placeholder="পরিমাণ" placeholder="পরিমাণ" min="0" step="0.01">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <select class="form-select" id="savedPrices" onchange="selectSavedPrice()">
+                                    <option value="" data-en="Select saved price" data-bn="সংরক্ষিত মূল্য নির্বাচন করুন">সংরক্ষিত মূল্য নির্বাচন করুন</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-2">
+                                <button class="btn btn-primary w-100" onclick="addPrice()">
+                                    <i class="fas fa-plus me-1"></i>
+                                    <span data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Price List -->
+                        <div class="price-list" id="priceListSection" style="display: none;">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th data-en="For" data-bn="কিসের জন্য">কিসের জন্য</th>
+                                            <th data-en="Unit Price" data-bn="একক মূল্য">একক মূল্য</th>
+                                            <th data-en="Qty" data-bn="পরিমাণ">পরিমাণ</th>
+                                            <th data-en="Total" data-bn="মোট">মোট</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="priceListBody"></tbody>
+                                    <tfoot>
+                                        <tr class="table-primary">
+                                            <td colspan="3" class="text-end"><strong data-en="Grand Total:" data-bn="মোট মূল্য:">মোট মূল্য:</strong></td>
+                                            <td colspan="2"><strong id="grandTotal">৳0</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Add to Order Button -->
+                        <button class="btn btn-success btn-lg w-100 mt-3" onclick="addDressToOrder()">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span data-en="Add Dress to Order" data-bn="অর্ডারে ড্রেস যোগ করুন">অর্ডারে ড্রেস যোগ করুন</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals Container -->
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js?v=2.1.5"></script>
+    
+    <!-- Dress Measurements JS -->
+    <script src="/js/dress-measurements.js?v=2.1.5"></script>
+</body>
+</html>

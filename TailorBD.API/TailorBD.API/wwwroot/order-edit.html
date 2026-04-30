@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অর্ডার সম্পাদনা - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/Editorder.css">
+
+    
+    
+</head>
+<body>
+    <!-- Sidebar Container (Auto-loads from component) -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+        <!-- Navbar Container (Auto-loads from component) -->
+        <div id="app-navbar"></div>
+        
+        <div class="container-fluid mt-4">
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Alert Section -->
+            <div id="alertSection"></div>
+
+            <!-- Order Header -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0" data-en="Edit Order" data-bn="অর্ডার সম্পাদনা"><i class="fas fa-edit me-2"></i>
+                        </h5>
+                        <small><span class="lang-content" data-en="Order Number:" data-bn="অর্ডার নম্বর:">অর্ডার নম্বর:</span> <span id="orderNumber">...</span></small>
+                    </div>
+                    <button type="button" class="btn btn-danger" id="btnDeleteOrder" onclick="deleteOrder()">
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong><i class="fas fa-user me-2"></i><span class="lang-content" data-en="Customer:" data-bn="কাস্টমার:">কাস্টমার:</span></strong>
+                            <span id="customerName">...</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong><i class="fas fa-phone me-2"></i><span class="lang-content" data-en="Mobile:" data-bn="মোবাইল:">মোবাইল:</span></strong>
+                            <span id="customerPhone">...</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong><i class="fas fa-money-bill me-2"></i><span class="lang-content" data-en="Previously Paid:" data-bn="আগে পরিশোধ:">আগে পরিশোধ:</span></strong>
+                            <span id="previousPaidHeader" class="badge bg-success">৳0</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong><i class="fas fa-tags me-2"></i><span class="lang-content" data-en="Discount:" data-bn="ছাড়:">ছাড়:</span></strong>
+                            <span id="discountHeader" class="badge bg-info">৳0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Dress Section (Collapsed by default) -->
+            <div class="card mb-4">
+                <div class="card-header" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#addDressSection">
+                    <h6 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i><span class="lang-content" data-en="Add New Dress (Optional)" data-bn="নতুন ড্রেস যোগ করুন (ঐচ্ছিক)">নতুন ড্রেস যোগ করুন (ঐচ্ছিক)</span>
+                        <i class="fas fa-chevron-down float-end"></i>
+                    </h6>
+                </div>
+                <div id="addDressSection" class="collapse">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label class="form-label lang-content" data-en="Select Dress" data-bn="ড্রেস নির্বাচন করুন">ড্রেস নির্বাচন করুন</label>
+                                <select class="form-select" id="dressSelect" disabled>
+                                    <option value="" class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary w-100" id="btnAddDress" onclick="addDressToList()" disabled>
+                                    <i class="fas fa-plus me-2"></i><span class="lang-content" data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i><span class="lang-content" data-en="Order Items" data-bn="অর্ডারের আইটেম">অর্ডারের আইটেম</span></h5>
+                </div>
+                <div class="card-body">
+                    <div id="orderItemsContainer">
+                        <div class="text-center text-muted py-5">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 lang-content" data-en="Loading order..." data-bn="অর্ডার লোড হচ্ছে...">অর্ডার লোড হচ্ছে...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary and Submit Section -->
+            <div id="summarySection" style="display: none;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <!--<h5 class="mb-0 lang-content" data-en="Previously Paid:" data-bn="আরেকটি যোগ করুন?:">আরেকটি যোগ করুন?: <span class="text-success" id="previousPaid">?0</span></h5>-->
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-lg btn-primary" onclick="submitOrderUpdate()">
+                                    <i class="fas fa-save me-2"></i><span class="lang-content" data-en="Update Order" data-bn="অর্ডার আপডেট করুন">অর্ডার আপডেট করুন</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="fas fa-money-bill me-2"></i><span class="lang-content" data-en="Edit Payment" data-bn="পেমেন্ট সম্পাদনা">পেমেন্ট সম্পাদনা</span> — <span id="modalPaymentDressName"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Add Payment Form -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-plus me-2"></i><span class="lang-content" data-en="Add New Payment" data-bn="নতুন পেমেন্ট যোগ করুন">নতুন পেমেন্ট যোগ করুন</span></h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="addPaymentForm" onsubmit="addPayment(event)">
+                                <div class="row g-2">
+                                    <div class="col-md-5">
+                                        <label class="form-label lang-content" data-en="For What" data-bn="কিসের জন্য">কিসের জন্য</label>
+                                        <input type="text" class="form-control" id="paymentFor"
+                                               data-en-placeholder="e.g: Sewing, Fabric, Button etc."
+                                               data-bn-placeholder="যেমন: মজুরি, কাপড়, বোতাম" placeholder="যেমন: মজুরি, কাপড়, বোতাম" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</label>
+                                        <input type="number" class="form-control" id="paymentQuantity"
+                                               min="1" step="0.01" value="1" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label lang-content" data-en="Unit Price (৳)" data-bn="একক মূল্য (৳)">একক মূল্য (৳)</label>
+                                        <input type="number" class="form-control" id="paymentUnitPrice"
+                                               min="0" step="0.01" placeholder="0.00" required>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus me-1"></i><span class="lang-content" data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Existing Payments List -->
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-list me-2"></i><span class="lang-content" data-en="Payment List" data-bn="পেমেন্ট তালিকা">পেমেন্ট তালিকা</span></h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="paymentsListContainer">
+                                <p class="text-center text-muted lang-content" data-en="No payments" data-bn="কোনো পেমেন্ট নেই">কোনো পেমেন্ট নেই</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Measurement Modal -->
+    <div class="modal fade" id="measurementModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-ruler me-2"></i><span class="lang-content" data-en="Edit Measurements" data-bn="মাপ সম্পাদনা">মাপ সম্পাদনা</span> — <span id="modalMeasurementDressName"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="measurementsContainer">
+                        <div class="text-center py-5">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 lang-content" data-en="Loading measurements..." data-bn="মাপ লোড হচ্ছে...">মাপ লোড হচ্ছে...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveMeasurements()" data-bs-dismiss="modal">
+                        <i class="fas fa-save me-1"></i><span class="lang-content" data-en="Save" data-bn="সেভ করুন">সেভ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Style Modal -->
+    <div class="modal fade" id="styleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-paint-brush me-2"></i><span class="lang-content" data-en="Edit Styles" data-bn="স্টাইল সম্পাদনা">স্টাইল সম্পাদনা</span> — <span id="modalStyleDressName"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="stylesContainer">
+                        <div class="text-center py-5">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 lang-content" data-en="Loading styles..." data-bn="স্টাইল লোড হচ্ছে...">স্টাইল লোড হচ্ছে...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveStyles()" data-bs-dismiss="modal">
+                        <i class="fas fa-save me-1"></i><span class="lang-content" data-en="Save" data-bn="সেভ করুন">সেভ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Container (Auto-loads from component) -->
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Shared Components Loader (Must be loaded first) -->
+    <script src="/js/app-components.js?v=2.1.4"></script>
+
+    <!-- Page Specific JS -->
+    <script src="/js/order-edit.js?v=2.1.5"></script>
+    <script src="/js/order-edit-functions.js?v=2.1.5"></script>
+</body>
+</html>

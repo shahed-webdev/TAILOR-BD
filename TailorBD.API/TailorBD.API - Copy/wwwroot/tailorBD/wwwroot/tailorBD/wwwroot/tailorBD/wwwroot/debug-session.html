@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Debug - TailorBD</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #569cd6;
+            margin-top: 30px;
+        }
+        .data-item {
+            background: #1e1e1e;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #569cd6;
+        }
+        .key {
+            color: #9cdcfe;
+            font-weight: bold;
+        }
+        .value {
+            color: #ce9178;
+        }
+        .null {
+            color: #f44747;
+        }
+        .success {
+            color: #4ec9b0;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        button.danger {
+            background: #f44747;
+        }
+        button.danger:hover {
+            background: #ff6666;
+        }
+        .actions {
+            margin-top: 20px;
+            padding: 20px;
+            background: #1e1e1e;
+            border-radius: 4px;
+        }
+        pre {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 TailorBD - Session Debug Tool</h1>
+        
+        <h2>📊 Session Storage Data:</h2>
+        <div id="sessionData"></div>
+        
+        <h2>🌐 LocalStorage Data:</h2>
+        <div id="localData"></div>
+        
+        <h2>🍪 Cookies:</h2>
+        <div id="cookieData"></div>
+        
+        <div class="actions">
+            <h2>⚡ Actions:</h2>
+            <button onclick="refreshData()">🔄 Refresh Data</button>
+            <button onclick="testLogin()">🔐 Test Login</button>
+            <button onclick="goToDashboard()">📊 Go to Dashboard</button>
+            <button onclick="goToTailorInfo()">📝 Go to Tailor Info</button>
+            <button class="danger" onclick="clearSession()">🗑️ Clear Session</button>
+            <button class="danger" onclick="clearAll()">💣 Clear All Data</button>
+        </div>
+        
+        <h2>📝 Console Logs:</h2>
+        <pre id="consoleLogs"></pre>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        let logs = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            logs.push(logEntry);
+            updateConsole();
+        }
+
+        function updateConsole() {
+            $('#consoleLogs').text(logs.join('\n'));
+        }
+
+        function refreshData() {
+            log('Refreshing all data...', 'info');
+            displaySessionData();
+            displayLocalData();
+            displayCookies();
+            log('Data refreshed successfully', 'success');
+        }
+
+        function displaySessionData() {
+            const container = $('#sessionData');
+            container.empty();
+
+            const keys = ['username', 'registrationId', 'institutionId', 'institutionName', 'isLoggedIn'];
+            
+            if (sessionStorage.length === 0) {
+                container.html('<div class="data-item null">❌ No session data found</div>');
+                return;
+            }
+
+            keys.forEach(key => {
+                const value = sessionStorage.getItem(key);
+                const valueClass = value ? 'value' : 'null';
+                const icon = value ? '✅' : '❌';
+                container.append(`
+                    <div class="data-item">
+                        ${icon} <span class="key">${key}:</span> 
+                        <span class="${valueClass}">${value || 'null'}</span>
+                    </div>
+                `);
+            });
+        }
+
+        function displayLocalData() {
+            const container = $('#localData');
+            container.empty();
+
+            if (localStorage.length === 0) {
+                container.html('<div class="data-item null">❌ No local storage data</div>');
+                return;
+            }
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                container.append(`
+                    <div class="data-item">
+                        ✅ <span class="key">${key}:</span> 
+                        <span class="value">${value}</span>
+                    </div>
+                `);
+            }
+        }
+
+        function displayCookies() {
+            const container = $('#cookieData');
+            container.empty();
+
+            const cookies = document.cookie.split(';');
+            
+            if (cookies.length === 0 || (cookies.length === 1 && cookies[0] === '')) {
+                container.html('<div class="data-item null">❌ No cookies found</div>');
+                return;
+            }
+
+            cookies.forEach(cookie => {
+                const [key, value] = cookie.trim().split('=');
+                container.append(`
+                    <div class="data-item">
+                        ✅ <span class="key">${key}:</span> 
+                        <span class="value">${value}</span>
+                    </div>
+                `);
+            });
+        }
+
+        function testLogin() {
+            log('Testing login with hardcoded credentials...', 'info');
+            
+            $.ajax({
+                url: '/api/auth/login',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ username: 'admin', password: '123456' }),
+                success: function(response) {
+                    log('Login response received', 'success');
+                    log(JSON.stringify(response, null, 2), 'data');
+                    
+                    if (response.success) {
+                        sessionStorage.setItem('username', response.data.username);
+                        sessionStorage.setItem('registrationId', response.data.registrationId);
+                        sessionStorage.setItem('institutionId', response.data.institutionId);
+                        sessionStorage.setItem('institutionName', response.data.institutionName);
+                        sessionStorage.setItem('isLoggedIn', 'true');
+                        
+                        log('Session data stored successfully', 'success');
+                        refreshData();
+                    } else {
+                        log('Login failed: ' + response.message, 'error');
+                    }
+                },
+                error: function(xhr) {
+                    log('Login error: ' + xhr.status, 'error');
+                    log('Response: ' + xhr.responseText, 'error');
+                }
+            });
+        }
+
+        function goToDashboard() {
+            log('Navigating to dashboard...', 'info');
+            window.location.href = '/dashboard.html';
+        }
+
+        function goToTailorInfo() {
+            log('Navigating to tailor info...', 'info');
+            window.location.href = '/tailor-info.html';
+        }
+
+        function clearSession() {
+            if (confirm('Clear all session data?')) {
+                sessionStorage.clear();
+                log('Session data cleared', 'warning');
+                refreshData();
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Clear ALL data (session, local, cookies)?')) {
+                sessionStorage.clear();
+                localStorage.clear();
+                document.cookie.split(";").forEach(c => {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+                log('All data cleared', 'warning');
+                refreshData();
+            }
+        }
+
+        // Initialize
+        $(document).ready(function() {
+            log('Debug tool loaded', 'success');
+            refreshData();
+        });
+    </script>
+</body>
+</html>

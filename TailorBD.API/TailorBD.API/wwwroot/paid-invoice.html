@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Paid Invoices - TailorBD" data-bn="পরিশোধিত ইনভয়েস - TailorBD">পরিশোধিত ইনভয়েস - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <style>
+        .invoice-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(102,126,234,.10);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .invoice-card .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .invoice-card .card-title i { color: #16a34a; }
+
+        .inv-table { width: 100%; border-collapse: collapse; }
+        .inv-table thead th {
+            background: #f8fafc;
+            padding: 10px 12px;
+            font-size: .8rem;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        .inv-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .15s; }
+        .inv-table tbody tr:hover { background: #f8fafc; }
+        .inv-table tbody td { padding: 10px 12px; font-size: .85rem; color: #334155; vertical-align: middle; }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: #94a3b8; }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; color: #cbd5e1; }
+
+        .btn-detail {
+            background: #667eea; color: #fff; border: none; border-radius: 6px;
+            padding: 5px 12px; font-size: .78rem; cursor: pointer; font-weight: 500;
+        }
+        .btn-detail:hover { background: #5a68c9; color: #fff; }
+
+        .detail-row td { background: #f8fafc; padding: 12px 20px !important; }
+        .detail-table { width: 100%; margin: 0; border-collapse: collapse; }
+        .detail-table th {
+            padding: 5px 10px;
+            font-size: .75rem;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+        .detail-table td { padding: 5px 10px; font-size: .82rem; border-bottom: 1px solid #f1f5f9; }
+        .detail-total { font-weight: 700; color: #16a34a; }
+
+        .inv-count-badge {
+            background: #e0e7ff;
+            color: #4338ca;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: .72rem;
+        }
+
+        .sk-row { height: 44px; background: #f1f5f9; border-radius: 6px; margin-bottom: 8px; animation: skPulse 1.4s ease-in-out infinite; }
+        @keyframes skPulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+    </style>
+</head>
+<body>
+    <div id="app-sidebar"></div>
+    <main class="main-content" id="mainContent">
+        <div id="app-navbar"></div>
+        <div class="dashboard-content">
+            <div class="invoice-card">
+                <div class="card-title">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span class="lang-content" data-en="Paid Invoices" data-bn="পরিশোধিত ইনভয়েস">পরিশোধিত ইনভয়েস</span>
+                </div>
+
+                <div id="skeletonLoader">
+                    <div class="sk-row"></div><div class="sk-row"></div><div class="sk-row"></div>
+                </div>
+
+                <div style="overflow-x:auto; display:none;" id="tableWrap">
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><span class="lang-content" data-en="Paid Date" data-bn="পরিশোধের তারিখ">পরিশোধের তারিখ</span></th>
+                                <th><span class="lang-content" data-en="Total Paid" data-bn="মোট পরিশোধ">মোট পরিশোধ</span></th>
+                                <th><span class="lang-content" data-en="Method" data-bn="পদ্ধতি">পদ্ধতি</span></th>
+                                <th><span class="lang-content" data-en="Collected By" data-bn="গ্রহণকারী">গ্রহণকারী</span></th>
+                                <th><span class="lang-content" data-en="Invoices" data-bn="ইনভয়েস">ইনভয়েস</span></th>
+                                <th><span class="lang-content" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="empty-state" id="emptyState" style="display:none;">
+                    <i class="fas fa-file-invoice"></i>
+                    <p class="lang-content" data-en="No paid invoices found." data-bn="কোনো পরিশোধিত ইনভয়েস নেই।">কোনো পরিশোধিত ইনভয়েস নেই।</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script>
+    var _paymentGroups = [];
+
+    $(document).ready(function() {
+        var institutionId = sessionStorage.getItem('institutionId');
+        if (!institutionId) { window.location.href = '/login.html'; return; }
+        loadPaymentSummary(institutionId);
+    });
+
+    function loadPaymentSummary(institutionId) {
+        $.ajax({
+            url: '/api/invoice/payment-summary?institutionId=' + institutionId,
+            method: 'GET',
+            success: function(r) {
+                $('#skeletonLoader').hide();
+                if (r.success && r.data && r.data.length) {
+                    _paymentGroups = r.data;
+                    renderPayments(r.data);
+                    $('#tableWrap').show();
+                } else {
+                    $('#emptyState').show();
+                }
+            },
+            error: function() {
+                $('#skeletonLoader').hide();
+                $('#emptyState').show();
+            }
+        });
+    }
+
+    var fmt = function(n) { return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }); };
+    var fmtDate = function(d) {
+        if (!d) return '-';
+        var dt = new Date(d);
+        return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+
+    function renderPayments(groups) {
+        var $body = $('#invoiceBody');
+        $body.empty();
+
+        groups.forEach(function(g, idx) {
+            var amt = g.totalAmount || 0;
+            var invCount = g.invoices ? g.invoices.length : 0;
+
+            var row = '<tr>' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td>' + fmtDate(g.paidDate) + '</td>' +
+                '<td><strong style="color:#16a34a;">৳' + fmt(amt) + '</strong></td>' +
+                '<td>' + (g.payment_Method || '-') + '</td>' +
+                '<td>' + (g.collected_By || '-') + '</td>' +
+                '<td><span class="inv-count-badge">' + invCount + ' ইনভয়েস</span></td>' +
+                '<td><button class="btn-detail" onclick="toggleDetail(this,' + idx + ')"><i class="fas fa-eye me-1"></i><span class="lang-content" data-en="View" data-bn="দেখুন">দেখুন</span></button></td>' +
+                '</tr>';
+            $body.append(row);
+        });
+    }
+
+    function toggleDetail(btn, groupIdx) {
+        var $tr = $(btn).closest('tr');
+        var $next = $tr.next('.detail-row');
+        if ($next.length) {
+            $next.remove();
+            return;
+        }
+
+        var g = _paymentGroups[groupIdx];
+        if (!g || !g.invoices || !g.invoices.length) {
+            $tr.after('<tr class="detail-row"><td colspan="7" style="color:#94a3b8; font-size:.82rem; padding:12px 20px;">কোনো ইনভয়েস তথ্য নেই</td></tr>');
+            return;
+        }
+
+        var html = '<tr class="detail-row"><td colspan="7"><div style="padding:4px 0;">';
+        html += '<table class="detail-table"><thead><tr>' +
+            '<th>ইনভয়েসের বিষয়</th>' +
+            '<th>ইসুয়ের তারিখ</th>' +
+            '<th>শেষ তারিখ</th>' +
+            '<th>মোট</th>' +
+            '<th>ছাড়</th>' +
+            '<th>পরিশোধ</th>' +
+            '</tr></thead><tbody>';
+
+        var totalPaidInGroup = 0;
+        g.invoices.forEach(function(inv) {
+            totalPaidInGroup += (inv.paidAmount || 0);
+            html += '<tr>' +
+                '<td>' + (inv.invoice_For || '-') + '</td>' +
+                '<td>' + fmtDate(inv.issuDate) + '</td>' +
+                '<td>' + fmtDate(inv.endDate) + '</td>' +
+                '<td>৳' + fmt(inv.invoiceTotalAmount) + '</td>' +
+                '<td>৳' + fmt(inv.discount) + '</td>' +
+                '<td><strong style="color:#16a34a;">৳' + fmt(inv.paidAmount) + '</strong></td>' +
+                '</tr>';
+        });
+
+        html += '<tr style="border-top:2px solid #e2e8f0;"><td colspan="5"><strong>মোট পরিশোধ</strong></td><td class="detail-total">৳' + fmt(totalPaidInGroup) + '</td></tr>';
+        html += '</tbody></table>';
+        html += '</div></td></tr>';
+
+        $tr.after(html);
+    }
+    </script>
+</body>
+</html>

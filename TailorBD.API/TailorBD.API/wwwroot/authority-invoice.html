@@ -1,0 +1,882 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Management - TailorBD</title>
+
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+
+    <!-- Auth utility - MUST be first script, runs synchronously before any guard -->
+    <script src="/js/auth.js?v=2.1.4"></script>
+    <!-- Shared sidebar + navbar component -->
+    <script src="/js/authority-layout.js?v=2.1.5" data-page="invoice"></script>
+
+    <style>
+        :root {
+            --green-grad:  linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --orange-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            --red-grad:    linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        /* Page header */
+        .page-header {
+            background: var(--auth-grad); border-radius: var(--radius);
+            padding: 22px 28px; color: #fff;
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 8px 32px rgba(99,102,241,.3); margin-bottom: 22px;
+            position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content:''; position:absolute; width:200px; height:200px; border-radius:50%;
+            background:rgba(255,255,255,.07); top:-70px; right:-40px;
+        }
+        .page-header .ph-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0; z-index: 1;
+        }
+        .page-header .ph-text { z-index: 1; flex: 1; }
+        .page-header .ph-text h2 { font-size: 1.25rem; font-weight: 700; margin: 0 0 3px; }
+        .page-header .ph-text p  { font-size: .84rem; opacity: .82; margin: 0; }
+
+        /* Stat cards */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 14px; margin-bottom: 22px; }
+        .stat-card { background: #fff; border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 14px; }
+        .stat-card .sc-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; flex-shrink: 0; }
+        .stat-card .sc-val  { font-size: 1.4rem; font-weight: 800; color: #1e293b; line-height: 1; }
+        .stat-card .sc-lbl  { font-size: .73rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+
+        /* Action bar */
+        .action-bar {
+            background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+            padding: 16px 20px; margin-bottom: 20px;
+            display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+        }
+        .search-box { position: relative; flex: 1; min-width: 200px; }
+        .search-box input {
+            width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px;
+            padding: 9px 12px 9px 36px; font-size: .86rem; outline: none; transition: border-color .2s;
+        }
+        .search-box input:focus { border-color: #6366f1; }
+        .search-box i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: .82rem; }
+        .filter-select {
+            border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 9px 12px;
+            font-size: .86rem; outline: none; background: #fff; cursor: pointer;
+        }
+        .filter-select:focus { border-color: #6366f1; }
+
+        /* Action buttons */
+        .btn-action { display: flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 10px; font-size: .84rem; font-weight: 600; border: none; cursor: pointer; transition: all .22s; white-space: nowrap; }
+        .btn-primary-action { background: var(--auth-grad); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+        .btn-primary-action:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(99,102,241,.4); }
+        .btn-primary-action:disabled { opacity: .6; transform: none; cursor: not-allowed; }
+        .btn-success-action { background: var(--green-grad); color: #fff; box-shadow: 0 2px 8px rgba(16,185,129,.3); }
+        .btn-success-action:hover { transform: translateY(-1px); }
+        .btn-success-action:disabled { opacity: .6; transform: none; cursor: not-allowed; }
+        .btn-orange-action  { background: var(--orange-grad); color: #fff; box-shadow: 0 2px 8px rgba(249,115,22,.3); }
+        .btn-orange-action:hover { transform: translateY(-1px); }
+
+        /* Section card title badge */
+        .section-title .st-badge { margin-left: auto; background: #ede9fe; color: #6366f1; padding: 2px 10px; border-radius: 20px; font-size: .73rem; font-weight: 700; }
+
+        /* Table */
+        .table thead th { background: #f8fafc; color: #64748b; font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid #e2e8f0; padding: 11px 12px; white-space: nowrap; }
+        .table tbody td { padding: 4px 2px; vertical-align: middle; border-color: #f1f5f9; }
+        .table tbody tr:hover { background: #fafbff; }
+
+        /* Status badges */
+        .badge-due     { background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 20px; font-size: .73rem; font-weight: 700; }
+        .badge-paid    { background: #d1fae5; color: #065f46; padding: 3px 10px; border-radius: 20px; font-size: .73rem; font-weight: 700; }
+        .badge-partial { background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 20px; font-size: .73rem; font-weight: 700; }
+        .badge-auto    { background: #ede9fe; color: #5b21b6; padding: 2px 8px; border-radius: 20px; font-size: .68rem; font-weight: 600; }
+        .badge-valid   { background: #d1fae5; color: #065f46; padding: 3px 10px; border-radius: 20px; font-size: .73rem; font-weight: 700; }
+        .badge-invalid { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: .73rem; font-weight: 700; }
+        .badge-expiring{ background: #fff7ed; color: #c2410c; padding: 3px 10px; border-radius: 20px; font-size: .73rem; font-weight: 700; }
+
+        /* Row checkboxes */
+        .custom-check { width: 16px; height: 16px; cursor: pointer; accent-color: #6366f1; }
+
+        /* Small buttons */
+        .btn-sm-icon { border: none; border-radius: 8px; padding: 5px 10px; font-size: .76rem; font-weight: 600; cursor: pointer; transition: all .18s; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-renew { background: #ede9fe; color: #6366f1; border: 1px solid #c4b5fd; }
+        .btn-renew:hover { background: #6366f1; color: #fff; }
+        .btn-view  { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
+        .btn-view:hover  { background: #3b82f6; color: #fff; }
+
+        /* Expiry colors */
+        .expiry-expired  { color: #ef4444; font-weight: 600; }
+        .expiry-expiring { color: #f97316; font-weight: 600; }
+        .expiry-ok       { color: #10b981; }
+
+        /* Invoice lines panel */
+        .lines-table th { background: #f0f9ff; }
+        .lines-table tfoot td { font-weight: 700; background: #f8fafc; }
+
+        /* Tab nav */
+        .tab-nav { display: flex; gap: 4px; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+        .tab-btn { background: none; border: none; padding: 10px 18px; font-size: .87rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: all .2s; border-radius: 8px 8px 0 0; }
+        .tab-btn:hover { color: #6366f1; background: #f5f3ff; }
+        .tab-btn.active { color: #6366f1; border-bottom-color: #6366f1; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Auto log */
+        .log-item { border-left: 3px solid #6366f1; padding: 8px 14px; margin-bottom: 8px; background: #fafbff; border-radius: 0 8px 8px 0; }
+        .log-item .log-date  { font-size: .76rem; color: #94a3b8; }
+        .log-item .log-stats { font-size: .85rem; font-weight: 600; color: #1e293b; margin-top: 2px; }
+
+        @media (max-width: 768px) {
+            .stat-grid { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- -- MAIN -- -->
+<div class="auth-main">
+    <div class="auth-content">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div class="ph-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+            <div class="ph-text">
+                <h2>Invoice Management</h2>
+                <p>সব প্রতিষ্ঠানের জন্য বিল তৈরি, অটো-রিনিউ ও পেমেন্ট ব্যবস্থাপনা করুন</p>
+            </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-grid" id="statGrid">
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--auth-grad);"><i class="fas fa-building"></i></div>
+                <div><div class="sc-val" id="statTotal">�</div><div class="sc-lbl">মোট প্রতিষ্ঠান</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-clock"></i></div>
+                <div><div class="sc-val" id="statExpired">�</div><div class="sc-lbl">মেয়াদ শেষ</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-exclamation-triangle"></i></div>
+                <div><div class="sc-val" id="statExpiring">�</div><div class="sc-lbl">১৫ দিনে মেয়াদ শেষ</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-check-circle"></i></div>
+                <div><div class="sc-val" id="statDue">�</div><div class="sc-lbl">বকেয়া আছে এমন</div></div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('tab-institutions',this)"><i class="fas fa-building me-1"></i>প্রতিষ্ঠান তালিকা</button>
+            <button class="tab-btn" onclick="switchTab('tab-invoices',this)"><i class="fas fa-list me-1"></i>Invoice তালিকা</button>
+            <button class="tab-btn" onclick="switchTab('tab-create',this)"><i class="fas fa-plus-circle me-1"></i>নতুন Invoice</button>
+            <button class="tab-btn" onclick="switchTab('tab-auto',this)"><i class="fas fa-robot me-1"></i>অটো-জেনারেট</button>
+        </div>
+
+        <!-- --- TAB 1 � Institutions --- -->
+        <div class="tab-panel active" id="tab-institutions">
+            <div class="action-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="insSearch" placeholder="নাম, মোট বা পয়সা দিয়ে খুঁজুন..." oninput="filterInstitutions()">
+                </div>
+                <select class="filter-select" id="insValidation" onchange="loadInstitutions()">
+                    <option value="">সব</option>
+                    <option value="Valid">Valid</option>
+                    <option value="Invalid">Invalid</option>
+                </select>
+                <select class="filter-select" id="insExpiry" onchange="loadInstitutions()">
+                    <option value="">সব মেয়াদ</option>
+                    <option value="expired">মেয়াদ শেষ</option>
+                    <option value="expiring">শেষ হচ্ছে</option>
+                </select>
+                <button class="btn-action btn-success-action" id="bulkRenewBtn" onclick="bulkRenew()" disabled>
+                    <i class="fas fa-redo"></i> নির্বাচিত Renew
+                </button>
+                <button class="btn-action btn-primary-action" onclick="goCreateForSelected()">
+                    <i class="fas fa-file-invoice"></i> Invoice তৈরি
+                </button>
+            </div>
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-list"></i></div>
+                    প্রতিষ্ঠান তালিকা
+                    <div class="st-badge" id="insCountBadge">0</div>
+                    <label style="margin-left:auto;font-size:.8rem;color:#64748b;font-weight:500;cursor:pointer;">
+                        <input type="checkbox" id="selectAllIns" class="custom-check me-1" onchange="toggleSelectAll(this)"> সব নির্বাচন
+                    </label>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="insTable">
+                        <thead>
+                            <tr>
+                                <th style="width:36px;"></th>
+                                <th>প্রতিষ্ঠান</th>
+                                <th>মোট</th>
+                                <th>প্যাকেজ</th>
+                                <th>মেয়াদ শেষ</th>
+                                <th>বকেয়া</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="insTbody">
+                            <tr><td colspan="8" class="text-center py-4"><div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- TAB 2 � Invoice List --- -->
+        <div class="tab-panel" id="tab-invoices">
+            <div class="action-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="invSearchInstitution" placeholder="Institution ID..." oninput="loadInvoices()">
+                </div>
+                <select class="filter-select" id="invStatus" onchange="loadInvoices()">
+                    <option value="">সব Status</option>
+                    <option value="Due">Due</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Partial">Partial</option>
+                </select>
+                <button class="btn-action btn-primary-action" onclick="loadInvoices()">
+                    <i class="fas fa-sync"></i> রিফ্রেশ
+                </button>
+            </div>
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                    Invoice তালিকা
+                    <div class="st-badge" id="invCountBadge">0</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Invoice ID</th>
+                                <th>প্রতিষ্ঠান</th>
+                                <th>Invoice For</th>
+                                <th>Issue Date</th>
+                                <th>End Date</th>
+                                <th>মূল্য</th>
+                                <th>বকেয়া</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invTbody">
+                            <tr><td colspan="10" class="text-center py-4">Invoice তালিকা ফাঁকা</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3 px-1">
+                    <div style="font-size:.82rem;color:#64748b;" id="invPagInfo"></div>
+                    <div class="d-flex gap-2">
+                        <button class="btn-sm-icon btn-view" id="invPrevBtn" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <button class="btn-sm-icon btn-view" id="invNextBtn" onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- TAB 3 � Create Invoice --- -->
+        <div class="tab-panel" id="tab-create">
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-file-plus"></i></div>
+                    নতুন Invoice তৈরি
+                </div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;">নির্বাচিত প্রতিষ্ঠান</label>
+                        <div id="selectedInsChips" class="d-flex flex-wrap gap-2 mt-1 p-3 rounded-3" style="background:#f8fafc;border:1.5px solid #e2e8f0;min-height:42px;">
+                            <span class="text-muted small" id="noSelMsg">উপরে প্রতিষ্ঠান নির্বাচন করুন অথবা নিচে ID দিন</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;">Institution ID দিন (কমা দিয়ে)</label>
+                        <input type="text" id="manualInsIds" class="form-control" placeholder="যেমন: 1,2,5">
+                    </div>
+                    <div class="col-md-4">
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;">Invoice For</label>
+                        <input type="text" id="invoiceFor" class="form-control" placeholder="Monthly Renewal" value="Monthly Renewal">
+                    </div>
+                    <div class="col-md-2">
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;">Issue Date</label>
+                        <input type="date" id="issuDate" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;">End Date</label>
+                        <input type="date" id="endDate" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;">Discount (৳)</label>
+                        <input type="number" id="discount" class="form-control" value="0" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice Lines -->
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="st-icon"><i class="fas fa-list-ol"></i></div>
+                    Invoice Line Items
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col">
+                        <input type="text" id="lineDetails" class="form-control" placeholder="Description (যেমন: Renew – Basic)">
+                    </div>
+                    <div class="col-auto">
+                        <input type="number" id="lineAmount" class="form-control" placeholder="Amount (৳)" min="0" style="width:140px;">
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn-action btn-primary-action" onclick="addLine()">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table lines-table">
+                        <thead><tr><th>Description</th><th>Amount (৳)</th><th></th></tr></thead>
+                        <tbody id="linesTbody"><tr id="noLinesRow"><td colspan="3" class="text-center text-muted py-2">কোনো line item নেই</td></tr></tbody>
+                        <tfoot><tr><td class="text-end">মোট:</td><td id="linesTotal">৳ 0.00</td><td></td></tr></tfoot>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button class="btn-action btn-primary-action" id="createInvoiceBtn" onclick="submitCreateInvoice()">
+                        <i class="fas fa-paper-plane"></i> Invoice তৈরি করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- TAB 4 � Auto Generate --- -->
+        <div class="tab-panel" id="tab-auto">
+            <div class="row g-4">
+                <!-- Info card -->
+                <div class="col-md-5">
+                    <div class="section-card h-100">
+                        <div class="section-title">
+                            <div class="st-icon"><i class="fas fa-robot"></i></div>
+                    অটো-জেনারেট কিভাবে কাজ করে
+                        </div>
+                        <div class="d-flex flex-column gap-3" style="font-size:.88rem;color:#475569;">
+                            <div class="d-flex gap-3 align-items-start">
+                                <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+                                <div><strong>প্রতিদিন রাত ১২:০৫ মিনিটে</strong> স্বয়ংক্রিয়ভাবে চালু হয়</div>
+                            </div>
+                            <div class="d-flex gap-3 align-items-start">
+                                <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+                                <div>যে সব প্রতিষ্ঠানের <strong>মেয়াদ শেষ হয়েছে</strong> তাদের জন্য invoice তৈরি হয়</div>
+                            </div>
+                            <div class="d-flex gap-3 align-items-start">
+                                <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
+                                <div>একই তারিখে দ্বিতীয়বার auto-invoice তৈরি হয় না (<strong>duplicate protection</strong>)</div>
+                            </div>
+                            <div class="d-flex gap-3 align-items-start">
+                                <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">4</div>
+                                <div>কোনো ভুল হলে স্বয়ংক্রিয়, লোগে সংরক্ষিত থাকে <strong>পরের দিনেই দেখতে পাবেন</strong></div>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 rounded-3" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
+                            <div style="font-size:.78rem;color:#64748b;margin-bottom:2px;">পরবর্তী অটো-রান</div>
+                            <div style="font-size:1rem;font-weight:700;color:#10b981;" id="nextRunTime">/div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Manual trigger -->
+                <div class="col-md-7">
+                    <div class="section-card">
+                        <div class="section-title">
+                            <div class="st-icon" style="background:var(--green-grad);"><i class="fas fa-magic"></i></div>
+                            এখনই ম্যানুয়ালি চালু করুন
+                        </div>
+                        <p style="font-size:.88rem;color:#64748b;margin-bottom:16px;">
+                            এই বোতাম চাপলে যে সব প্রতিষ্ঠানের মেয়াদ শেষ হয়েছে তাদের জন্য auto-invoice তৈরি,
+                            তবে বারবার চাপলে ডুপ্লিকেট invoice তৈরি হবে না
+                        </p>
+                        <button class="btn-action btn-success-action" id="autoGenBtn" onclick="runAutoGenerate()" style="font-size:1rem;padding:13px 28px;">
+                            <i class="fas fa-magic"></i> এখনই চালু করুন
+                        </button>
+                        <div id="autoGenResult" class="mt-3" style="display:none;"></div>
+                    </div>
+
+                    <!-- Log -->
+                    <div class="section-card mt-4">
+                        <div class="section-title">
+                            <div class="st-icon"><i class="fas fa-history"></i></div>
+                            অটো-রান ইতিহাস
+                            <button class="btn-sm-icon btn-view ms-auto" onclick="loadAutoLog()"><i class="fas fa-sync"></i></button>
+                        </div>
+                        <div id="autoLogContainer">
+                            <div class="text-center text-muted py-3" style="font-size:.85rem;">কোনো লগ নেই</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- auth-content -->
+</div><!-- auth-main -->
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">পেমেন্ট গ্রহণ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="payInvoiceId">
+                <div class="mb-2">
+                    <label style="font-size:.82rem;font-weight:600;color:#475569;">মোট মূল্য</label>
+                    <div id="payTotal" style="font-size:1.1rem;font-weight:700;color:#1e293b;"></div>
+                </div>
+                <div>
+                    <label style="font-size:.82rem;font-weight:600;color:#475569;">Paid Amount (৳)</label>
+                    <input type="number" id="payAmount" class="form-control mt-1" min="0" step="0.01">
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">বাতিল</button>
+                <button class="btn btn-success rounded-pill px-4" onclick="submitPayment()">সেভ করুন</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastWrap"></div>
+
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script>
+// -- State ---------------------------------------------------------------------
+let allInstitutions = [];
+let selectedInsIds  = new Set();
+let invPage         = 1;
+let invTotal        = 0;
+let lines           = [];
+
+// -- Helpers -------------------------------------------------------------------
+function esc(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function fmt(d) {
+    if (!d) return '-';
+    const dt = d instanceof Date ? d : new Date(d);
+    return dt.toLocaleDateString('bn-BD', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function fmtDate(d) { return fmt(d); }
+
+// -- Payment Modal -------------------------------------------------------------
+function openPayModal(invoiceId, totalAmount) {
+    document.getElementById('payInvoiceId').value = invoiceId;
+    document.getElementById('payTotal').textContent = '৳ ' + parseFloat(totalAmount||0).toFixed(2);
+    document.getElementById('payAmount').value = '';
+    new bootstrap.Modal(document.getElementById('paymentModal')).show();
+}
+
+async function submitPayment() {
+    const id  = document.getElementById('payInvoiceId').value;
+    const amt = parseFloat(document.getElementById('payAmount').value) || 0;
+    if (amt < 0) { toast('ভুল পরিমাণ', 'error'); return; }
+    try {
+        const res  = await fetch(`/api/invoice/${id}/payment`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paidAmount: amt })
+        });
+        const data = await res.json();
+        bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+        if (data.success) { toast('পেমেন্ট সফল হয়েছে', 'success'); loadInvoices(); }
+        else { toast(data.message, 'error'); }
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+}
+
+// -- Toast ---------------------------------------------------------------------
+function toast(msg, type='info') {
+    const t = $(`<div class="toast-item ${type}">${msg}</div>`);
+    $('#toastWrap').append(t);
+    setTimeout(()=>t.fadeOut(300,()=>t.remove()), 3500);
+}
+
+// -- Tabs ----------------------------------------------------------------------
+function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'tab-invoices') loadInvoices();
+}
+
+// -- Load Institutions ---------------------------------------------------------
+async function loadInstitutions() {
+    const validation = document.getElementById('insValidation').value;
+    const expiry     = document.getElementById('insExpiry').value;
+    const search     = document.getElementById('insSearch').value;
+    try {
+        const url = `/api/invoice/institutions?validation=${encodeURIComponent(validation)}&expiry=${encodeURIComponent(expiry)}&search=${encodeURIComponent(search)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        allInstitutions = data.data || [];
+        renderInstitutions(allInstitutions);
+        updateStats();
+    } catch(e) { toast('প্রতিষ্ঠান লোড হয়নি: '+e.message,'error'); }
+}
+
+function filterInstitutions() {
+    const q = document.getElementById('insSearch').value.toLowerCase();
+    const filtered = allInstitutions.filter(i =>
+        (i.institutionName||'').toLowerCase().includes(q) ||
+        (i.phone||'').includes(q) ||
+        (i.userName||'').toLowerCase().includes(q));
+    renderInstitutions(filtered);
+}
+
+function renderInstitutions(list) {
+    document.getElementById('insCountBadge').textContent = list.length;
+    const tbody = document.getElementById('insTbody');
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">কোনো প্রতিষ্ঠান পাওয়া যায়নি</td></tr>';
+        return;
+    }
+    tbody.innerHTML = list.map(ins => {
+        const expiry = ins.expire_Date ? new Date(ins.expire_Date) : null;
+        const now    = new Date();
+        const diff   = expiry ? Math.ceil((expiry - now) / 86400000) : null;
+        let expClass = 'expiry-ok', expTag = '';
+        if (!expiry) { expClass=''; }
+        else if (diff < 0)   { expClass='expiry-expired';  expTag=`<span class="badge-expiring ms-1">মেয়াদ শেষ</span>`; }
+        else if (diff <= 15) { expClass='expiry-expiring'; expTag=`<span class="badge-expiring ms-1">${diff}d</span>`; }
+
+        const validBadge = ins.validation === 'Valid'
+            ? `<span class="badge-valid">Valid</span>`
+            : `<span class="badge-invalid">Invalid</span>`;
+        const due     = parseFloat(ins.totalDue||0);
+        const checked = selectedInsIds.has(ins.institutionId) ? 'checked' : '';
+        return `<tr>
+            <td><input type="checkbox" class="custom-check ins-check" data-id="${ins.institutionId}" ${checked} onchange="toggleInsSelect(${ins.institutionId},this.checked)"></td>
+            <td>
+                <div style="font-weight:600;font-size:.88rem;color:#1e293b;">${esc(ins.institutionName)}</div>
+                <div style="font-size:.75rem;color:#94a3b8;">${esc(ins.userName)}</div>
+            </td>
+            <td>${esc(ins.phone||'�')}</td>
+            <td>
+                <div style="font-size:.83rem;">${esc(ins.packageName||'�')}</div>
+                ${ins.packageInterval ? `<span class="badge-auto">${esc(ins.packageInterval)} দিন</span>` : ''}}
+            </td>
+            <td class="${expClass}">${expiry ? fmt(expiry) : '-'}${expTag}</td>
+            <td style="color:${due>0?'#ef4444':'#10b981'};font-weight:600;">৳ ${due.toFixed(2)}</td>
+            <td>${validBadge}</td>
+            <td>
+                <button class="btn-sm-icon btn-renew" onclick="oneClickRenew(${ins.institutionId},'${esc(ins.institutionName)}')">
+                    <i class="fas fa-redo"></i> Renew
+                </button>
+                <button class="btn-sm-icon btn-view ms-1" onclick="viewInvoices(${ins.institutionId})">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function updateStats() {
+    const now = new Date();
+    document.getElementById('statTotal').textContent    = allInstitutions.length;
+    document.getElementById('statExpired').textContent  = allInstitutions.filter(i => i.expire_Date && new Date(i.expire_Date) < now).length;
+    document.getElementById('statExpiring').textContent = allInstitutions.filter(i => {
+        if (!i.expire_Date) return false;
+        const d = Math.ceil((new Date(i.expire_Date) - now) / 86400000);
+        return d >= 0 && d <= 15;
+    }).length;
+    document.getElementById('statDue').textContent = allInstitutions.filter(i => parseFloat(i.totalDue||0) > 0).length;
+}
+
+function toggleSelectAll(cb) {
+    document.querySelectorAll('.ins-check').forEach(c => {
+        c.checked = cb.checked;
+        const id = parseInt(c.dataset.id);
+        cb.checked ? selectedInsIds.add(id) : selectedInsIds.delete(id);
+    });
+    updateBulkBtn();
+}
+
+function toggleInsSelect(id, checked) {
+    checked ? selectedInsIds.add(id) : selectedInsIds.delete(id);
+    updateBulkBtn();
+}
+
+function updateBulkBtn() {
+    document.getElementById('bulkRenewBtn').disabled = selectedInsIds.size === 0;
+    updateSelectedChips();
+}
+
+function updateSelectedChips() {
+    const container = document.getElementById('selectedInsChips');
+    const noMsg = document.getElementById('noSelMsg');
+    if (selectedInsIds.size === 0) {
+        container.innerHTML = '';
+        container.appendChild(noMsg);
+        noMsg.style.display = '';
+        return;
+    }
+    noMsg.style.display = 'none';
+    container.innerHTML = '';
+    selectedInsIds.forEach(id => {
+        const ins  = allInstitutions.find(i => i.institutionId === id);
+        const chip = document.createElement('span');
+        chip.style.cssText = 'background:#ede9fe;color:#6366f1;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:6px;';
+        chip.innerHTML = `${esc(ins?.institutionName || '#'+id)} <span onclick="removeChip(${id})" style="cursor:pointer;opacity:.7;">×</span>`;
+        container.appendChild(chip);
+    });
+}
+
+function removeChip(id) {
+    selectedInsIds.delete(id);
+    const cb = document.querySelector(`.ins-check[data-id="${id}"]`);
+    if (cb) cb.checked = false;
+    updateBulkBtn();
+}
+
+function goCreateForSelected() {
+    switchTab('tab-create', document.querySelectorAll('.tab-btn')[2]);
+    updateSelectedChips();
+}
+
+// -- One-click renew -----------------------------------------------------------
+async function oneClickRenew(id, name) {
+    if (!confirm(`"${name}" এর জন্য Renewal Invoice তৈরি করবেন?`)) return;
+    try {
+        const res  = await fetch(`/api/invoice/renew/${id}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) { toast(`✔ Invoice #${data.invoiceId} তৈরি হয়েছে`, 'success'); loadInstitutions(); }
+        else { toast(data.message, 'error'); }
+    } catch(e) { toast('Error: '+e.message, 'error'); }
+}
+
+async function bulkRenew() {
+    if (!selectedInsIds.size) return;
+    if (!confirm(`${selectedInsIds.size}টি প্রতিষ্ঠানের জন্য Renewal Invoice তৈরি করবেন?`)) return;
+    let ok=0, fail=0;
+    for (const id of selectedInsIds) {
+        try {
+            const r = await fetch(`/api/invoice/renew/${id}`,{method:'POST'});
+            const d = await r.json();
+            d.success ? ok++ : fail++;
+        } catch { fail++; }
+    }
+    toast(`${ok} Renew সফল, ${fail} ব্যর্থ`, ok>0?'success':'error');
+    selectedInsIds.clear(); updateBulkBtn(); loadInstitutions();
+}
+
+// -- Invoice list --------------------------------------------------------------
+function viewInvoices(insId) {
+    document.getElementById('invSearchInstitution').value = insId;
+    switchTab('tab-invoices', document.querySelectorAll('.tab-btn')[1]);
+    loadInvoices();
+}
+
+async function loadInvoices() {
+    const insId  = document.getElementById('invSearchInstitution').value.trim();
+    const status = document.getElementById('invStatus').value;
+    const url    = `/api/invoice/list?page=${invPage}&pageSize=20${insId?'&institutionId='+insId:''}${status?'&status='+status:''}`;
+    try {
+        const res  = await fetch(url);
+        const data = await res.json();
+        const list = data.data || [];
+        invTotal   = data.total || 0;
+        document.getElementById('invCountBadge').textContent = invTotal;
+        document.getElementById('invPagInfo').textContent    = `${list.length} / ${invTotal} Invoice`;
+        document.getElementById('invPrevBtn').disabled = invPage <= 1;
+        document.getElementById('invNextBtn').disabled = invPage * 20 >= invTotal;
+
+        const tbody = document.getElementById('invTbody');
+        if (!list.length) {
+            tbody.innerHTML='<tr><td colspan="10" class="text-center py-4 text-muted">কোনো Invoice পাওয়া যায়নি</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map(inv => {
+            const statusBadge = inv.paymentStatus==='Paid' ? `<span class="badge-paid">Paid</span>`
+                              : inv.paymentStatus==='Partial' ? `<span class="badge-partial">Partial</span>`
+                              : `<span class="badge-due">Due</span>`;
+            const autoBadge = inv.isAutoGenerated ? `<span class="badge-auto">Auto</span>` : `<span class="badge-auto" style="background:#f1f5f9;color:#64748b;">Manual</span>`;
+            const due = (parseFloat(inv.totalAmount||0) - parseFloat(inv.paidAmount||0)).toFixed(2);
+            return `<tr>
+                <td>#${inv.invoiceID}</td>
+                <td>
+                    <div style="font-weight:600;font-size:.85rem;">${esc(inv.institutionName)}</div>
+                    <div style="font-size:.73rem;color:#94a3b8;">${esc(inv.userName)}</div>
+                </td>
+                <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(inv.invoice_For||'')}</td>
+                <td>${inv.issuDate ? fmtDate(inv.issuDate) : '-'}</td>
+                <td>${inv.endDate  ? fmtDate(inv.endDate)  : '-'}</td>
+                <td style="font-weight:600;">৳ ${parseFloat(inv.totalAmount||0).toFixed(2)}</td>
+                <td style="color:${due>0?'#ef4444':'#10b981'};font-weight:600;">৳ ${due}</td>
+                <td>${statusBadge}</td>
+                <td>${autoBadge}</td>
+                <td>
+                    <button class="btn-sm-icon btn-renew" onclick="openPayModal(${inv.invoiceID},${inv.totalAmount||0})">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch(e) { toast('Invoice লোড হয়নি: '+e.message,'error'); }
+}
+
+function changePage(dir) { invPage = Math.max(1, invPage+dir); loadInvoices(); }
+
+// -- Create Invoice ------------------------------------------------------------
+function addLine() {
+    const det = document.getElementById('lineDetails').value.trim();
+    const amt = parseFloat(document.getElementById('lineAmount').value) || 0;
+    if (!det || amt <= 0) { toast('Description ও Amount দিন', 'error'); return; }
+    lines.push({ details: det, amount: amt });
+    renderLines();
+    document.getElementById('lineDetails').value = '';
+    document.getElementById('lineAmount').value  = '';
+}
+
+function removeLine(idx) { lines.splice(idx,1); renderLines(); }
+
+function renderLines() {
+    const tbody = document.getElementById('linesTbody');
+    document.getElementById('noLinesRow')?.remove();
+    if (!lines.length) {
+        tbody.innerHTML = '<tr id="noLinesRow"><td colspan="3" class="text-center text-muted py-2">কোনো line item নেই</td></tr>';
+        document.getElementById('linesTotal').textContent = '৳ 0.00';
+        return;
+    }
+    tbody.innerHTML = lines.map((l,i) => `
+        <tr>
+            <td>${esc(l.details)}</td>
+            <td style="font-weight:600;">৳ ${l.amount.toFixed(2)}</td>
+            <td><button class="btn-sm-icon" style="background:#fef2f2;color:#ef4444;border:1px solid #fecaca;" onclick="removeLine(${i})"><i class="fas fa-trash"></i></button></td>
+        </tr>`).join('');
+    const total = lines.reduce((s,l)=>s+l.amount,0);
+    document.getElementById('linesTotal').textContent = '৳ '+total.toFixed(2);
+}
+
+async function submitCreateInvoice() {
+    const ids       = [...selectedInsIds];
+    const manualIds = document.getElementById('manualInsIds').value.split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n));
+    const allIds    = [...new Set([...ids,...manualIds])];
+    if (!allIds.length) { toast('কোনো প্রতিষ্ঠান নির্বাচন করা হয়নি', 'error'); return; }
+    if (!lines.length)  { toast('অন্তত একটি invoice line যোগ করুন', 'error'); return; }
+
+    const payload = {
+        institutionIds: allIds,
+        invoiceFor:  document.getElementById('invoiceFor').value.trim() || 'Monthly Renewal',
+        issuDate:    document.getElementById('issuDate').value || null,
+        endDate:     document.getElementById('endDate').value  || null,
+        discount:    parseFloat(document.getElementById('discount').value) || 0,
+        lines:       lines.map(l=>({details: l.details, amount: l.amount}))
+    };
+
+    const btn = document.getElementById('createInvoiceBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>তৈরি হচ্ছে...';
+
+    try {
+        const res  = await fetch('/api/invoice/create', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+        const data = await res.json();
+        if (data.success) {
+            toast(`✔ ${data.created}তি Invoice তৈরি হয়েছে!`, 'success');
+            lines = []; renderLines();
+            selectedInsIds.clear(); updateBulkBtn();
+            document.getElementById('manualInsIds').value = '';
+        } else { toast(data.message, 'error'); }
+    } catch(e) { toast('Error: '+e.message,'error'); }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Invoice তৈরি করুন';
+}
+
+// -- Auto generate -------------------------------------------------------------
+async function runAutoGenerate() {
+    const btn = document.getElementById('autoGenBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>চলছে...';
+    const res = document.getElementById('autoGenResult');
+    res.style.display='none';
+    try {
+        const r = await fetch('/api/invoice/auto-generate', {method:'POST'});
+        const d = await r.json();
+        res.style.display='block';
+        if (d.success) {
+            res.innerHTML = `
+                <div class="p-3 rounded-3" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
+                    <div style="font-size:1.95rem;font-weight:700;color:#065f46;margin-bottom:8px;">✔ সফলভাবে সম্পন্ন</div>
+                    <div class="row text-center g-2">
+                        <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#10b981;">${d.result.generated}</div><div style="font-size:.75rem;color:#64748b;">তৈরি হয়েছে</div></div>
+                        <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#6366f1;">${d.result.skipped}</div><div style="font-size:.75rem;color:#64748b;">Skip হয়েছে</div></div>
+                        <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#ef4444;">${d.result.errors}</div><div style="font-size:.75rem;color:#64748b;">Error</div></div>
+                    </div>
+                </div>`;
+        } else {
+            res.innerHTML = `<div class="p-3" style="color:#991b1b;">? ${d.message}</div>`;
+        }
+    } catch (e) {
+        res.style.display='block';
+        res.innerHTML = `<div class="p-3" style="color:#991b1b;">? Error: ${e.message}</div>`;
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-magic"></i> এখনই চালু করুন';
+}
+
+// -- Auto log -----------------------------------------------------------------
+async function loadAutoLog() {
+    const container = document.getElementById('autoLogContainer');
+    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</div>';
+    try {
+        const res  = await fetch('/api/invoice/auto-generate/log');
+        const data = await res.json();
+        const list = data.data || [];
+        if (!list.length) {
+            container.innerHTML = `<div class="text-center py-4 text-muted" style="font-size:.85rem;">কোনো লগ পাওয়া যায়নি</div>`;
+            return;
+        }
+        container.innerHTML = list.map(l => {
+            const date = l.runDate ? new Date(l.runDate) : null;
+            return `<div class="log-item">
+                <div class="log-date">${date ? fmt(date) : '-'}</div>
+                <div class="log-stats">
+                    তৈরি: <span style="color:#10b981;">${l.generated}</span> &bull;
+                    Skip: <span style="color:#6366f1;">${l.skipped}</span> &bull;
+                    Error: <span style="color:#ef4444;">${l.errors}</span>
+                </div>
+                ${l.details ? `<div style="font-size:.75rem;color:#94a3b8;margin-top:2px;">${esc(l.details)}</div>` : ''}
+            </div>`;
+        }).join('');
+    } catch(e) {
+        container.innerHTML = `<div class="text-center py-3" style="color:#991b1b;">? Error: ${e.message}</div>`;
+    }
+}
+
+// -- Init ----------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+    loadInstitutions();
+    // Set today as default issue date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('issuDate').value = today;
+    // Set next-run label
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 5, 0, 0);
+    document.getElementById('nextRunTime').textContent = tomorrow.toLocaleString('bn-BD');
+});
+</script>
+
+</body>
+</html>

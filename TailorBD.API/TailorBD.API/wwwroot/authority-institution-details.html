@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institution Details - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+    <script src="/js/auth.js?v=2.1.4"></script>
+    <script src="/js/authority-layout.js?v=2.1.4" data-page="institution-details"></script>
+</head>
+<body>
+<div class="auth-main">
+<div class="auth-content">
+
+    <!-- Section Card -->
+    <div class="section-card">
+        <!-- Header -->
+        <div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+            <div class="section-title mb-0" style="border:none;padding:0;">
+                <div class="st-icon"><i class="fas fa-store"></i></div>
+                সব প্রতিষ্ঠান
+                <span class="badge bg-secondary ms-2 fw-normal" id="shopCount">0</span>
+            </div>
+            <div class="ms-auto d-flex gap-2 flex-wrap">
+                <a href="/authority-signup.html" class="btn btn-sm btn-primary rounded-pill px-3">
+                    <i class="fas fa-plus me-1"></i> নতুন যোগ
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
+            <div class="input-group" style="max-width:260px;">
+                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
+                       placeholder="নাম / মোট / পয়সা..." oninput="applyFilters()">
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary filter-btn active"
+                        data-filter="payment" data-value="" onclick="setFilter('payment','',this)">সব</button>
+                <button type="button" class="btn btn-sm btn-outline-success filter-btn"
+                        data-filter="payment" data-value="Paid" onclick="setFilter('payment','Paid',this)">
+                    <i class="fas fa-check-circle me-1"></i>Paid
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger filter-btn"
+                        data-filter="payment" data-value="Due" onclick="setFilter('payment','Due',this)">
+                    <i class="fas fa-clock me-1"></i>Unpaid
+                </button>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary filter-btn active"
+                        data-filter="status" data-value="" onclick="setFilter('status','',this)">সব</button>
+                <button type="button" class="btn btn-sm btn-outline-primary filter-btn"
+                        data-filter="status" data-value="Valid" onclick="setFilter('status','Valid',this)">
+                    <i class="fas fa-toggle-on me-1"></i>Active
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-warning filter-btn"
+                        data-filter="status" data-value="Invalid" onclick="setFilter('status','Invalid',this)">
+                    <i class="fas fa-toggle-off me-1"></i>Deactive
+                </button>
+            </div>
+            <button class="btn btn-sm btn-light border" onclick="loadShops()" title="Refresh">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i>
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" style="font-size:.86rem;">
+                <thead style="background:#f8fafc;">
+                    <tr>
+                        <th style="width:40px;">#</th>
+                        <th>প্রতিষ্ঠান</th>
+                        <th>ইউজারনেম</th>
+                        <th>মোট</th>
+                        <th>প্যাকেজ</th>
+                        <th>মেয়াদ</th>
+                        <th>মূল্য</th>
+                        <th>পেমেন্ট</th>
+                        <th>স্ট্যাটাস</th>
+                        <th style="width:110px;">কার্যক্রম</th>
+                    </tr>
+                </thead>
+                <tbody id="shopTableBody">
+                    <tr><td colspan="10" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary bar -->
+        <div class="d-flex gap-4 flex-wrap mt-2 pt-2 border-top" style="font-size:.82rem;color:#64748b;">
+            <span><i class="fas fa-store me-1 text-primary"></i>মোট: <strong id="summTotal">0</strong></span>
+            <span><i class="fas fa-toggle-on me-1 text-success"></i>Active: <strong id="summActive">0</strong></span>
+            <span><i class="fas fa-toggle-off me-1 text-warning"></i>Deactive: <strong id="summDeactive">0</strong></span>
+            <span><i class="fas fa-check-circle me-1 text-success"></i>Paid: <strong id="summPaid">0</strong></span>
+            <span><i class="fas fa-clock me-1 text-danger"></i>Due: <strong id="summDue">0</strong></span>
+        </div>
+    </div>
+
+</div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<!-- Package Change Modal -->
+<div class="modal fade" id="packageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-box-open me-2 text-info"></i>প্যাকেজ পরিবর্তন</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pkgInstitutionId">
+                <div class="mb-3">
+                    <label style="font-size:.82rem;font-weight:600;color:#475569;">প্রতিষ্ঠান</label>
+                    <div id="pkgInstitutionName" style="font-weight:700;color:#1e293b;font-size:.95rem;"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" style="font-size:.82rem;font-weight:600;color:#475569;">নতুন প্যাকেজ নির্বাচন করুন</label>
+                    <select id="pkgSelect" class="form-select" onchange="onPackageSelectChange()">
+                        <option value="">বাছাই করুন...</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" style="font-size:.82rem;font-weight:600;color:#475569;">
+                        পেমেন্ট রাখুন (৳) <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">৳</span>
+                        <input type="number" id="pkgRenewAmount" class="form-control" placeholder="যেমন: 600, 800, 1000" min="0" step="0.01" style="border-left:0;">
+                    </div>
+                </div>
+                <div class="alert alert-info small mb-0" style="font-size:.81rem;">
+                    <i class="fas fa-info-circle me-1"></i>
+                    প্যাকেজ পরিবর্তন হলে প্রতিষ্ঠানের বিদ্যমান Interval অপরিবর্তিত থাকবে
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">বাতিল</button>
+                <button class="btn btn-info text-white rounded-pill px-4" onclick="submitPackageChange()">
+                    <i class="fas fa-save me-1"></i>পরিবর্তন সেভ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastWrap"></div>
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/authority-profile.js?v=2.1.5"></script>
+</body>
+</html>

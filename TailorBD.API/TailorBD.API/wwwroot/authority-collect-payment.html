@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collect Payment - TailorBD</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+
+    <!-- Auth utility - MUST be first script, runs synchronously before any guard -->
+    <script src="/js/auth.js?v=2.1.4"></script>
+    <!-- Shared sidebar + navbar component -->
+    <script src="/js/authority-layout.js?v=2.1.4" data-page="collect-payment"></script>
+
+    <style>
+        :root {
+            --green-grad:  linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --red-grad:    linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --orange-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            --blue-grad:   linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        /* Page header */
+        .page-header {
+            background: var(--green-grad);
+            border-radius: 14px; padding: 22px 28px; color: #fff;
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 8px 32px rgba(16,185,129,.3);
+            margin-bottom: 22px; position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content:''; position:absolute; width:200px; height:200px;
+            border-radius:50%; background:rgba(255,255,255,.07); top:-70px; right:-40px;
+        }
+        .ph-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(255,255,255,.2); border: 1.5px solid rgba(255,255,255,.35);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0; z-index: 1;
+        }
+        .ph-text { z-index: 1; flex: 1; }
+        .ph-text h2 { font-size: 1.25rem; font-weight: 700; margin: 0 0 3px; }
+        .ph-text p  { font-size: .84rem; opacity: .85; margin: 0; }
+
+        /* Stat cards */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 14px; margin-bottom: 22px; }
+        .stat-card { background: #fff; border-radius: 14px; padding: 16px 15px; box-shadow: 0 4px 20px rgba(0,0,0,.08); display: flex; align-items: center; gap: 14px; }
+        .stat-card .sc-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; flex-shrink: 0; }
+        .stat-card .sc-val  { font-size: 1.4rem; font-weight: 800; color: #1e293b; line-height: 1; }
+        .stat-card .sc-lbl  { font-size: .73rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+
+        /* View toggle */
+        .view-toggle { display: flex; gap: 4px; background: #f1f5f9; border-radius: 10px; padding: 4px; }
+        .view-btn { background: none; border: none; padding: 7px 14px; border-radius: 7px; font-size: .83rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all .2s; }
+        .view-btn.active { background: #fff; color: #6366f1; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+
+        /* Institution cards grid */
+        .ins-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 16px; }
+        .ins-card { background: #fff; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,.07); overflow: hidden; transition: transform .2s, box-shadow .2s; border: 1.5px solid #e2e8f0; }
+        .ins-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,.12); }
+        .ins-card.has-due   { border-color: #fecaca; }
+        .ins-card.all-clear { border-color: #bbf7d0; }
+
+        .ins-card-header { padding: 14px 16px 10px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; }
+        .ins-avatar { width: 42px; height: 42px; border-radius: 10px; background: var(--auth-grad); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; font-weight: 700; flex-shrink: 0; }
+        .ins-card-header .ins-name { font-size: .9rem; font-weight: 700; color: #1e293b; line-height: 1.2; }
+        .ins-card-header .ins-user { font-size: .75rem; color: #94a3b8; }
+        .ins-card-header .ms-auto  { display: flex; gap: 6px; align-items: center; }
+
+        .ins-card-body { padding: 12px 16px; }
+        .ins-meta-row { display: flex; justify-content: space-between; font-size: .78rem; color: #64748b; margin-bottom: 6px; }
+        .ins-meta-row span { display: flex; align-items: center; gap: 5px; }
+
+        .due-amount { font-size: 1.2rem; font-weight: 800; color: #ef4444; display: flex; align-items: baseline; gap: 4px; }
+        .due-amount small { font-size: .75rem; font-weight: 500; color: #94a3b8; }
+
+        .ins-card-footer { padding: 10px 16px; border-top: 1px solid #f1f5f9; display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* Invoice rows inside card */
+        .inv-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px dashed #f1f5f9; font-size: .8rem; }
+        .inv-row:last-child { border-bottom: none; }
+        .inv-row .inv-for  { flex: 1; color: #475569; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .inv-row .inv-amt  { font-weight: 700; color: #ef4444; white-space: nowrap; }
+        .inv-row .inv-amt.paid { color: #10b981; }
+
+        /* Badges */
+        .badge-due     { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 700; white-space: nowrap; }
+        .badge-paid    { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 700; white-space: nowrap; }
+        .badge-partial { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 700; white-space: nowrap; }
+        .badge-valid   { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 700; }
+        .badge-invalid { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 700; }
+        .badge-expiring{ background: #fff7ed; color: #c2410c; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 700; }
+
+        /* Small action buttons */
+        .btn-sm-act { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 8px; border: none; font-size: .78rem; font-weight: 600; cursor: pointer; transition: all .18s; white-space: nowrap; }
+        .btn-collect { background: var(--green-grad); color: #fff; box-shadow: 0 2px 8px rgba(16,185,129,.25); }
+        .btn-collect:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,.35); }
+        .btn-renew-sm { background: #ede9fe; color: #6366f1; border: 1px solid #c4b5fd; }
+        .btn-renew-sm:hover { background: #6366f1; color: #fff; }
+        .btn-view-sm  { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
+        .btn-view-sm:hover  { background: #3b82f6; color: #fff; }
+
+        /* Table view */
+        .table-view { display: none; }
+        .table thead th { background: #f8fafc; color: #64748b; font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid #e2e8f0; padding: 11px 14px; white-space: nowrap; }
+        .table tbody td { padding: 12px 14px; vertical-align: middle; border-color: #f1f5f9; }
+        .table tbody tr:hover { background: #fafbff; }
+
+        /* Invoice detail modal */
+        .inv-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: .85rem; }
+        .inv-detail-row:last-child { border-bottom: none; }
+        .inv-detail-row .inv-d-label { color: #64748b; }
+        .inv-detail-row .inv-d-val   { font-weight: 600; color: #1e293b; }
+
+        /* Quick pay rows */
+        .quick-pay-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+        .quick-pay-row:last-child { border-bottom: none; }
+        .quick-pay-row .qp-for { flex: 1; font-size: .83rem; color: #475569; font-weight: 500; }
+        .quick-pay-row .qp-due { font-size: .83rem; font-weight: 700; color: #ef4444; width: 80px; text-align: right; }
+        .quick-pay-row .qp-inp { width: 100px; }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .empty-state i  { font-size: 3rem; margin-bottom: 14px; opacity: .4; }
+        .empty-state h5 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; color: #64748b; }
+        .empty-state p  { font-size: .85rem; }
+
+        /* Invoice select rows */
+        .inv-select-row {
+            display: grid;
+            grid-template-columns: 28px 1fr auto auto auto;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            margin-bottom: 8px;
+            background: #fff;
+            transition: border-color .18s, background .18s;
+        }
+        .inv-select-row.selected {
+            border-color: #6366f1;
+            background: #f5f3ff;
+        }
+        .inv-select-row .inv-chk { cursor: pointer; width: 16px; height: 16px; accent-color: #6366f1; }
+        .inv-select-row .inv-info { min-width: 0; }
+        .inv-select-row .inv-info .inv-title { font-weight: 700; font-size: .83rem; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .inv-select-row .inv-info .inv-sub   { font-size: .72rem; color: #94a3b8; }
+        .inv-select-row .inv-due-lbl { font-size: .8rem; font-weight: 700; color: #ef4444; white-space: nowrap; }
+        .inv-select-row .inv-amt-inp { width: 110px; }
+        .inv-select-row .inv-amt-inp input { font-size: .82rem; padding: 5px 8px; }
+
+        /* Select-all bar */
+        .sel-all-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; background: #f8fafc; border-radius: 10px;
+            border: 1.5px solid #e2e8f0; margin-bottom: 10px;
+            font-size: .82rem; font-weight: 600; color: #475569;
+        }
+        .sel-all-bar input[type=checkbox] { width: 16px; height: 16px; accent-color: #6366f1; cursor: pointer; }
+
+        /* Payment fields panel */
+        .pay-fields-panel {
+            background: #f8fafc; border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            padding: 14px 16px; margin-top: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .ins-grid  { grid-template-columns: 1fr; }
+            .stat-grid { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- -- MAIN -- -->
+<div class="auth-main">
+    <div class="auth-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="ph-icon"><i class="fas fa-hand-holding-usd"></i></div>
+            <div class="ph-text">
+                <h2>পেমেন্ট সংগ্রহ করুন</h2>
+                <p>প্রতিষ্ঠানসমূহের বকেয়া দেখুন এবং সহজে পেমেন্ট সংগ্রহ করুন</p>
+            </div>
+            <div style="z-index:1;margin-left:auto;display:flex;gap:8px;align-items:center;">
+                <a href="/authority-collected-payment-report.html" class="btn-sm-act" style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.3);text-decoration:none;">
+                    <i class="fas fa-receipt"></i> পেমেন্ট রিপোর্ট
+                </a>
+                <button class="btn-sm-act btn-collect" onclick="loadData()" id="refreshBtn">
+                    <i class="fas fa-sync-alt" id="refreshIcon"></i> রিফ্রেশ
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--auth-grad);"><i class="fas fa-building"></i></div>
+                <div><div class="sc-val" id="statTotal">�</div><div class="sc-lbl">মোট প্রতিষ্ঠান</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-exclamation-circle"></i></div>
+                <div><div class="sc-val" id="statDueIns">�</div><div class="sc-lbl">বকেয়া প্রতিষ্ঠান</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div><div class="sc-val" id="statDueInv">�</div><div class="sc-lbl">বকেয়া Invoice</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-taka-sign"></i></div>
+                <div><div class="sc-val" id="statTotalDue">�</div><div class="sc-lbl">মোট বকেয়া (৳)</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-check-circle"></i></div>
+                <div><div class="sc-val" id="statClearIns">�</div><div class="sc-lbl">পরিশোধিত প্রতিষ্ঠান</div></div>
+            </div>
+        </div>
+
+        <!-- Filter + View Toggle -->
+        <div class="section-card d-flex flex-wrap gap-3 align-items-center mb-3" style="padding:14px 18px;">
+            <!-- Search -->
+            <div class="input-group" style="max-width:260px;">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted" style="font-size:.82rem;"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
+                       placeholder="নাম / মোট / পয়সা..." oninput="applyFilters()">
+            </div>
+
+            <!-- Due filter -->
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary filter-btn active"
+                        onclick="setDueFilter('',this)">সব</button>
+                <button type="button" class="btn btn-sm btn-outline-danger filter-btn"
+                        onclick="setDueFilter('due',this)">
+                    <i class="fas fa-exclamation-circle me-1"></i>বকেয়া আছে
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-success filter-btn"
+                        onclick="setDueFilter('clear',this)">
+                    <i class="fas fa-check-circle me-1"></i>পরিশোধিত
+                </button>
+            </div>
+
+            <!-- Status filter -->
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary filter-btn2 active"
+                        onclick="setStatusFilter('',this)">সব</button>
+                <button type="button" class="btn btn-sm btn-outline-primary filter-btn2"
+                        onclick="setStatusFilter('Valid',this)">Active</button>
+                <button type="button" class="btn btn-sm btn-outline-warning filter-btn2"
+                        onclick="setStatusFilter('Invalid',this)">Inactive</button>
+            </div>
+
+            <!-- Sort -->
+            <select class="form-select form-select-sm" style="max-width:170px;" id="sortSelect" onchange="applyFilters()">
+                <option value="due_desc">বেশি বকেয়া আগে</option>
+                <option value="due_asc">কম বকেয়া আগে</option>
+                <option value="name_asc">নাম অনুসারে</option>
+                <option value="expire_asc">মেয়াদ শেষ আগে</option>
+            </select>
+
+            <!-- View toggle -->
+            <div class="view-toggle ms-auto">
+                <button class="view-btn active" id="btnCardView" onclick="setView('card')">
+                    <i class="fas fa-th-large me-1"></i>Card
+                </button>
+                <button class="view-btn" id="btnTableView" onclick="setView('table')">
+                    <i class="fas fa-table me-1"></i>Table
+                </button>
+            </div>
+        </div>
+
+        <!-- Results count -->
+        <div class="d-flex align-items-center gap-2 mb-3" id="resultInfo" style="font-size:.83rem;color:#64748b;"></div>
+
+        <!-- -- CARD VIEW -- -->
+        <div id="cardView">
+            <div class="ins-grid" id="insCardGrid">
+                <div class="section-card text-center py-5">
+                    <div class="spinner-border text-primary me-2"></div> লোড হচ্ছে...
+                </div>
+            </div>
+        </div>
+
+        <!-- -- TABLE VIEW -- -->
+        <div id="tableView" class="table-view">
+            <div class="section-card" style="padding:0;overflow:hidden;">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>প্রতিষ্ঠান</th>
+                                <th>নাম</th>
+                                <th>মোট</th>
+                                <th>মেয়াদ</th>
+                                <th>মোট Invoice</th>
+                                <th>বকেয়া (৳)</th>
+                                <th>স্ট্যাটাস</th>
+                                <th style="width:160px;">কার্যক্রম</th>
+                            </tr>
+                        </thead>
+                        <tbody id="insTbody">
+                            <tr><td colspan="9" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<!-- ---------- COLLECT PAYMENT MODAL ---------- -->
+<div class="modal fade" id="collectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:16px 16px 0 0;">
+                <div>
+                    <h5 class="modal-title fw-bold" style="color:#065f46;">
+                        <i class="fas fa-hand-holding-usd me-2 text-success"></i>পেমেন্ট সংগ্রহ
+                    </h5>
+                    <div id="collectInsName" style="font-size:.83rem;color:#64748b;"></div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+
+                <!-- Summary row -->
+                <div class="row g-3 mb-3">
+                    <div class="col-4">
+                        <div class="p-3 rounded-3 text-center" style="background:#fef2f2;border:1.5px solid #fecaca;">
+                            <div style="font-size:.68rem;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:3px;">মোট বকেয়া</div>
+                            <div style="font-size:1.2rem;font-weight:800;color:#ef4444;" id="modalTotalDue">? 0</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 rounded-3 text-center" style="background:#f0f9ff;border:1.5px solid #bae6fd;">
+                            <div style="font-size:.68rem;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:3px;">মোট Invoice</div>
+                            <div style="font-size:1.2rem;font-weight:800;color:#0284c7;" id="modalTotalInv">0</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 rounded-3 text-center" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
+                            <div style="font-size:.68rem;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:3px;">Paid Invoice</div>
+                            <div style="font-size:1.2rem;font-weight:800;color:#10b981;" id="modalPaidInv">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice list -->
+                <div id="dueInvList">
+                    <div class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-success"></div> লোড হচ্ছে...
+                    </div>
+                </div>
+
+                <!-- Payment fields panel � shows when =1 invoice selected -->
+                <div class="pay-fields-panel" id="payFieldsPanel" style="display:none;">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div style="font-size:.83rem;font-weight:700;color:#1e293b;">
+                            <i class="fas fa-bolt text-warning me-1"></i>
+                            নির্বাচিত: <span id="selectedCount" class="text-success">0</span> টি Invoice
+                        </div>
+                        <button class="btn btn-sm btn-outline-success rounded-pill" onclick="fillFullPayment()" style="font-size:.75rem;">
+                            <i class="fas fa-check-double me-1"></i>পূর্ণ পায়না পূরণ
+                        </button>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-sm-6">
+                            <label style="font-size:.76rem;font-weight:600;color:#64748b;">পেমেন্ট মাধ্যম</label>
+                            <select id="bulkPaymentMethod" class="form-select form-select-sm mt-1">
+                                <option value="Cash">Cash</option>
+                                <option value="Bkash">Bkash</option>
+                                <option value="Nagad">Nagad</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Visa Card">Visa Card</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label style="font-size:.76rem;font-weight:600;color:#64748b;">সংগ্রাহক</label>
+                            <input type="text" id="bulkCollectedBy" class="form-control form-control-sm mt-1" placeholder="নাম দিন">
+                        </div>
+                        <div class="col-12">
+                            <label style="font-size:.76rem;font-weight:600;color:#64748b;">ছাড় (৳) — নির্বাচিত Invoice এ সমানভাবে বণ্টন</label>
+                            <div class="input-group input-group-sm mt-1">
+                                <span class="input-group-text bg-white">?</span>
+                                <input type="number" id="bulkDiscount" class="form-control" min="0" step="0.01" placeholder="0.00" value="0" oninput="recalcPayTotal()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 p-2 rounded-3"
+                         style="background:#fff;border:1.5px solid #bbf7d0;">
+                        <div style="font-size:.82rem;font-weight:700;color:#64748b;">মোট পায়না হবে:</div>
+                        <div style="font-size:1.1rem;font-weight:800;color:#10b981;" id="quickPayTotal">? 0</div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">বাতিল করুন</button>
+                <button class="btn btn-success rounded-pill px-4 fw-bold" id="submitPayBtn"
+                        onclick="submitBulkPayment()" disabled>
+                    <i class="fas fa-paper-plane me-2"></i>পেমেন্ট জমা দিন
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastWrap"></div>
+
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/authority-collect-payment.js?v=2.1.5"></script>
+</body>
+</html>

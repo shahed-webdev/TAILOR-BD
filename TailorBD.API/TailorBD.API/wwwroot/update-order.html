@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Update Order - TailorBD" data-bn="অর্ডার আপডেট - TailorBD">অর্ডার আপডেট - TailorBD</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/quick-order.css" rel="stylesheet">
+    <link href="/css/update-order.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Navbar -->
+        <div id="app-navbar"></div>
+
+        <div class="content-area">
+            <div id="alertContainer"></div>
+
+            <!-- Page Loading Overlay -->
+            <div id="pageLoadingOverlay" class="page-loading-overlay" style="display:none">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-3 text-muted" data-en="Loading order..." data-bn="অর্ডার লোড হচ্ছে...">অর্ডার লোড হচ্ছে...</p>
+            </div>
+
+            <!-- Page Header -->
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1">
+                        <i class="fas fa-edit text-warning me-2"></i>
+                        <span data-en="Update Order" data-bn="অর্ডার আপডেট">অর্ডার আপডেট</span>
+                        <span id="orderNumberDisplay" class="order-badge ms-2" style="display:none">
+                            <span data-en="Order #" data-bn="অর্ডার #">অর্ডার #</span>
+                            <span id="orderNumber"></span>
+                        </span>
+                    </h4>
+                    <p class="text-muted mb-0 small">
+                        <span data-en="Modify dresses, measurements, styles and payments" data-bn="ড্রেস, মাপ, স্টাইল ও পেমেন্ট পরিবর্তন করুন">ড্রেস, মাপ, স্টাইল ও পেমেন্ট পরিবর্তন করুন</span>
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="order-list.html" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        <span data-en="Back to List" data-bn="তালিকায় ফিরুন">তালিকায় ফিরুন</span>
+                    </a>
+                    <button class="btn btn-danger" id="deleteOrderBtn" onclick="deleteOrder()" style="display:none">
+                        <i class="fas fa-trash-alt me-1"></i>
+                        <span data-en="Delete Order" data-bn="অর্ডার মুছুন">অর্ডার মুছুন</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customer Info Bar -->
+            <div id="customerInfoBar" class="customer-info-bar mb-4" style="display:none">
+                <div class="customer-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="customer-name" id="selectedCustomerName"></div>
+                    <div class="customer-phone" id="selectedCustomerPhone"></div>
+                </div>
+            </div>
+
+            <!-- Add Dress Row -->
+            <div class="add-dress-card mb-4" id="addDressSection" style="display:none">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fas fa-tshirt text-primary"></i>
+                    <span class="fw-semibold text-muted small" data-en="Select and add a new dress to this order" data-bn="এই অর্ডারে নতুন ড্রেস নির্বাচন করুন">এই অর্ডারে নতুন ড্রেস নির্বাচন করুন</span>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <select class="form-select" id="dressSelect">
+                            <option value="" data-en="[ Select Dress ]" data-bn="[ ড্রেস নির্বাচন করুন ]">[ ড্রেস নির্বাচন করুন ]</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn-add-dress" onclick="addDressToList()">
+                            <i class="fas fa-plus me-1"></i>
+                            <span data-en="Add Dress" data-bn="ড্রেস যোগ করুন">ড্রেস যোগ করুন</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dress List Table -->
+            <div id="dressListSection" style="display:none" class="dress-list-card card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-list-ul"></i>
+                    <span data-en="Dress List" data-bn="ড্রেস তালিকা">ড্রেস তালিকা</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width:48px">#</th>
+                                    <th data-en="Dress" data-bn="ড্রেস">ড্রেস</th>
+                                    <th style="width:110px" class="text-center" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</th>
+                                    <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="dressListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Lists per Dress -->
+            <div id="paymentListsContainer"></div>
+
+            <!-- Order Summary & Update -->
+            <div id="orderSummarySection" style="display:none">
+                <div class="row justify-content-end">
+                    <div class="col-md-5 col-lg-4">
+                        <div class="summary-card card">
+                            <div class="card-header">
+                                <i class="fas fa-receipt"></i>
+                                <span data-en="Order Summary" data-bn="অর্ডার সারসংক্ষেপ">অর্ডার সারসংক্ষেপ</span>
+                            </div>
+                            <div class="card-body">
+
+                                <!-- Grand Total -->
+                                <div class="summary-total-row">
+                                    <span class="label" data-en="Grand Total" data-bn="মোট">মোট</span>
+                                    <span class="value">৳<span id="grandTotal">0</span></span>
+                                </div>
+
+                                <!-- Due Amount -->
+                                <div class="summary-due-row">
+                                    <span class="label" data-en="Due Amount" data-bn="বাকি পরিমাণ">বাকি পরিমাণ</span>
+                                    <span class="value">৳<span id="dueAmount">0</span></span>
+                                </div>
+
+                                <button class="btn-submit-order" id="updateOrderBtn" onclick="updateOrder()">
+                                    <i class="fas fa-save me-2"></i>
+                                    <span data-en="Update Order" data-bn="অর্ডার আপডেট করুন">অর্ডার আপডেট করুন</span>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Measurement Modal -->
+    <div class="modal fade" id="measurementModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="measurementModalTitle">
+                        <i class="fas fa-ruler-combined me-2"></i>
+                        <span data-en="Measurements" data-bn="মাপজোখ">মাপজোখ</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="measurementModalBody"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-1"></i>
+                        <span data-en="Done" data-bn="সম্পন্ন">সম্পন্ন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Style Modal -->
+    <div class="modal fade" id="styleModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="styleModalTitle">
+                        <i class="fas fa-magic me-2"></i>
+                        <span data-en="Styles" data-bn="স্টাইল">স্টাইল</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="styleModalBody"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-1"></i>
+                        <span data-en="Done" data-bn="সম্পন্ন">সম্পন্ন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-teal text-white">
+                    <h5 class="modal-title" id="paymentModalTitle">
+                        <span data-en="Add Payment" data-bn="পেমেন্ট যোগ করুন">পেমেন্ট যোগ করুন</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Saved prices dropdown -->
+                    <div id="savedPricesWrap" class="mb-3" style="display:none">
+                        <label class="form-label" data-en="Saved Prices" data-bn="সংরক্ষিত মূল্য">সংরক্ষিত মূল্য</label>
+                        <select class="form-select" id="savedPriceSelect" onchange="applySavedPrice()">
+                            <option value="" data-en="[ Select Saved Price ]" data-bn="[ সংরক্ষিত মূল্য নির্বাচন করুন ]">[ সংরক্ষিত মূল্য নির্বাচন করুন ]</option>
+                        </select>
+                    </div>
+
+                    <!-- Manual add -->
+                    <div class="mb-3">
+                        <label class="form-label" data-en="Payment For" data-bn="পেমেন্টের কারণ">পেমেন্টের কারণ</label>
+                        <input type="text" class="form-control" id="pmtFor"
+                               data-en-placeholder="e.g. Making Charge" data-bn-placeholder="যেমন: মজুরি" placeholder="যেমন: মজুরি">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" data-en="Amount" data-bn="পরিমাণ">পরিমাণ</label>
+                        <input type="number" class="form-control" id="pmtAmount" min="0" step="0.01"
+                               data-en-placeholder="Amount" data-bn-placeholder="পরিমাণ" placeholder="পরিমাণ">
+                    </div>
+                    <button class="btn btn-success w-100" onclick="addPayment()">
+                        <i class="fas fa-plus me-1"></i>
+                        <span data-en="Add Payment" data-bn="পেমেন্ট যোগ করুন">পেমেন্ট যোগ করুন</span>
+                        </button>
+
+                    <hr>
+
+                    <!-- Fabric / Item Code -->
+                    <h6 class="fw-bold">
+                        <i class="fas fa-barcode me-1 text-muted"></i>
+                        <span data-en="Item Code" data-bn="আইটেম কোড">আইটেম কোড</span>
+                    </h6>
+                    <div class="mb-2">
+                        <input type="text" class="form-control" id="fabricCodeModal"
+                               data-en-placeholder="Type code and press Enter" data-bn-placeholder="কোড লিখুন এবং Enter চাপুন" placeholder="কোড লিখুন এবং Enter চাপুন"
+                               autocomplete="off">
+                        <div id="fabricResultModal" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.5"></script>
+    <script src="/js/update-order.js?v=2.1.5"></script>
+
+    <!-- Shared Modals -->
+    <div id="app-modals"></div>
+</body>
+</html>

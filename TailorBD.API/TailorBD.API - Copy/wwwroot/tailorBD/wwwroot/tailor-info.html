@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailor Shop Info - TailorBD | প্রতিষ্ঠানের তথ্য</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/tailor-info.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Container (Auto-loads from component) -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container (Auto-loads from component) -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="shop-info-container">
+                <!-- Alert Messages -->
+                <div id="alertContainer"></div>
+
+                <!-- Header with Logo -->
+                <div class="info-header" id="shopHeader">
+                    <div class="shop-logo-section">
+                        <div class="shop-logo-wrapper">
+                            <img src="https://ui-avatars.com/api/?name=Tailor+Shop&background=667eea&color=fff&size=150" 
+                                 alt="Shop Logo" id="shopLogo">
+                        </div>
+                        <input type="file" id="logoInput" accept="image/*" style="display: none;">
+                        <button class="logo-upload-btn" onclick="document.getElementById('logoInput').click()">
+                            <i class="fas fa-camera me-2"></i>
+                            <span class="lang-content" data-en="Update Logo" data-bn="লোগো আপডেট">Update Logo</span>
+                        </button>
+                    </div>
+                    <div class="shop-header-info">
+                        <h2 id="shopNameDisplay">Your Tailor Shop</h2>
+                        <p><i class="fas fa-phone me-2"></i><span id="shopPhoneDisplay">---</span></p>
+                        <p><i class="fas fa-envelope me-2"></i><span id="shopEmailDisplay">---</span></p>
+                        <p><i class="fas fa-map-marker-alt me-2"></i><span id="shopAddressDisplay">---</span></p>
+                    </div>
+                </div>
+
+                <!-- Info Cards Grid -->
+                <div class="info-cards-grid">
+                    <!-- Basic Information Card -->
+                    <div class="info-card">
+                        <h3>
+                            <i class="fas fa-info-circle"></i>
+                            <span class="lang-content" data-en="Basic Information" data-bn="মৌলিক তথ্য">Basic Information</span>
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Institution Name" data-bn="প্রতিষ্ঠানের নাম">Institution Name</label>
+                            <input type="text" class="form-control" id="institutionName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Dialog Title" data-bn="ডায়লগ শিরোনাম">Dialog Title</label>
+                            <input type="text" class="form-control" id="dialogTitle">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Established" data-bn="স্থাপিত">Established</label>
+                            <input type="text" class="form-control" id="established" placeholder="e.g., 2020">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Staff" data-bn="স্টাফ">Staff</label>
+                            <input type="text" class="form-control" id="staff" placeholder="Number of staff">
+                        </div>
+                    </div>
+
+                    <!-- Contact Information Card -->
+                    <div class="info-card">
+                        <h3>
+                            <i class="fas fa-address-book"></i>
+                            <span class="lang-content" data-en="Contact Information" data-bn="যোগাযোগের তথ্য">Contact Information</span>
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Phone" data-bn="ফোন">Phone</label>
+                            <input type="tel" class="form-control" id="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Email" data-bn="ই-মেইল">Email</label>
+                            <input type="email" class="form-control" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Website" data-bn="ওয়েবসাইট">Website</label>
+                            <input type="url" class="form-control" id="website" placeholder="https://example.com">
+                        </div>
+                    </div>
+
+                    <!-- Address Information Card -->
+                    <div class="info-card">
+                        <h3>
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span class="lang-content" data-en="Address Information" data-bn="ঠিকানার তথ্য">Address Information</span>
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label lang-content" data-en="Address" data-bn="ঠিকানা">Address</label>
+                            <textarea class="form-control" id="address" rows="3" required></textarea>
+                        </div>
+                        <div class="info-row">
+                            <div class="form-group">
+                                <label class="form-label lang-content" data-en="City" data-bn="সিটি">City</label>
+                                <input type="text" class="form-control" id="city">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label lang-content" data-en="State" data-bn="স্টেট">State</label>
+                                <input type="text" class="form-control" id="state">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="form-group">
+                                <label class="form-label lang-content" data-en="Local Area" data-bn="লোকাল এরিয়া">Local Area</label>
+                                <input type="text" class="form-control" id="localArea">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label lang-content" data-en="Postal Code" data-bn="পোস্টকোড">Postal Code</label>
+                                <input type="text" class="form-control" id="postalCode">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="loadShopInfo()">
+                        <i class="fas fa-redo"></i>
+                        <span class="lang-content" data-en="Reset" data-bn="রিসেট">Reset</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveBtn" onclick="saveShopInfo()">
+                        <i class="fas fa-save"></i>
+                        <span class="lang-content" data-en="Save Changes" data-bn="পরিবর্তন সংরক্ষণ">Save Changes</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals Container (Auto-loads from component) -->
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Shared Components Loader (Must be loaded first) -->
+    <script src="/js/app-components.js"></script>
+    
+    <!-- Page-specific script -->
+    <script src="/js/tailor-info.js"></script>
+    
+    <script>
+        // Set page title
+        $(document).ready(function() {
+            $('#pageTitle').text('প্রতিষ্ঠানের তথ্য');
+        });
+    </script>
+</body>
+</html>

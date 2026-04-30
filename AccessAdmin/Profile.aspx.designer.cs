@@ -7,11 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TailorBD.AccessAdmin {
-    
-    
-    public partial class Profile {
-        
+namespace TailorBD.AccessAdmin
+{
+
+
+    public partial class Profile
+    {
+
         /// <summary>
         /// ScriptManager1 control.
         /// </summary>
@@ -20,7 +22,25 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.ScriptManager ScriptManager1;
-        
+
+        /// <summary>
+        /// hfDueCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfDueCount;
+
+        /// <summary>
+        /// hfDueTotal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfDueTotal;
+
         /// <summary>
         /// AdminFormView control.
         /// </summary>
@@ -29,7 +49,34 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.FormView AdminFormView;
-        
+
+        /// <summary>
+        /// DueNoticePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel DueNoticePanel;
+
+        /// <summary>
+        /// ltDueTotal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltDueTotal;
+
+        /// <summary>
+        /// ltDueCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltDueCount;
+
         /// <summary>
         /// AdminInfoSQL control.
         /// </summary>
@@ -38,7 +85,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource AdminInfoSQL;
-        
+
         /// <summary>
         /// InvoiceGridView control.
         /// </summary>
@@ -47,7 +94,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView InvoiceGridView;
-        
+
         /// <summary>
         /// InvoiceSQL control.
         /// </summary>
@@ -56,7 +103,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource InvoiceSQL;
-        
+
         /// <summary>
         /// PaidRecordGridView control.
         /// </summary>
@@ -65,7 +112,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView PaidRecordGridView;
-        
+
         /// <summary>
         /// PaidRecordSQL control.
         /// </summary>
@@ -74,7 +121,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource PaidRecordSQL;
-        
+
         /// <summary>
         /// UpdatePanel1 control.
         /// </summary>
@@ -83,7 +130,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.UpdatePanel UpdatePanel1;
-        
+
         /// <summary>
         /// ChangePassword1 control.
         /// </summary>
@@ -92,7 +139,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ChangePassword ChangePassword1;
-        
+
         /// <summary>
         /// LIUSQL control.
         /// </summary>
@@ -101,7 +148,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource LIUSQL;
-        
+
         /// <summary>
         /// SMSBalanceGridView control.
         /// </summary>
@@ -110,7 +157,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView SMSBalanceGridView;
-        
+
         /// <summary>
         /// SMSBalanceSQL control.
         /// </summary>
@@ -119,7 +166,7 @@ namespace TailorBD.AccessAdmin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource SMSBalanceSQL;
-        
+
         /// <summary>
         /// UpdateProgress control.
         /// </summary>

@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মানি রিসিট - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/money-receipt.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-overlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header no-print mb-3">
+                <h1 class="lang-content" data-en="Money Receipt" data-bn="মানি রিসিট">মানি রিসিট</h1>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="no-print action-bar">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <button class="btn btn-primary me-2" onclick="window.print()">
+                            <i class="fas fa-print me-2"></i><span class="lang-content" data-en="Print" data-bn="প্রিন্ট করুন">প্রিন্ট করুন</span>
+                        </button>
+                        <button class="btn btn-secondary me-2" onclick="goBack()">
+                            <i class="fas fa-arrow-left me-2"></i><span class="lang-content" data-en="Go Back" data-bn="ফিরে যান">ফিরে যান</span>
+                        </button>
+                        <button class="btn btn-danger me-2" onclick="downloadPDF()" title="Download as PDF">
+                            <i class="fas fa-file-pdf me-2"></i><span class="lang-content" data-en="Download PDF" data-bn="পিডিএফ ডাউনলোড">পিডিএফ ডাউনলোড</span>
+                        </button>
+                        <button class="btn btn-success me-2" onclick="shareAsPDF()" title="Share as PDF">
+                            <i class="fas fa-share-alt me-2"></i><span class="lang-content" data-en="Share PDF" data-bn="পিডিএফ শেয়ার">পিডিএফ শেয়ার</span>
+                        </button>
+                        <a href="/print-settings.html" class="btn btn-outline-primary">
+                            <i class="fas fa-cog me-2"></i><span class="lang-content" data-en="Print Settings" data-bn="প্রিন্ট সেটিং">প্রিন্ট সেটিং</span>
+                        </a>
+                    </div>
+                    <div class="print-size-controls">
+                        <label class="me-2"><strong class="lang-content" data-en="Print Size:" data-bn="প্রিন্ট সাইজ:">প্রিন্ট সাইজ:</strong></label>
+                        <select class="form-select form-select-sm" id="printSizeSelect" style="width: auto;">
+                            <option value="3">3 inch</option>
+                            <option value="3.5">3.5 inch</option>
+                            <option value="4" selected>4 inch</option>
+                            <option value="4.5">4.5 inch</option>
+                            <option value="5">5 inch</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs no-print" id="receiptTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="receipt-tab" data-bs-toggle="tab" data-bs-target="#receiptTab" type="button" role="tab">
+                        <i class="fas fa-receipt me-2"></i><span class="lang-content" data-en="Money Receipt" data-bn="মানি রিসিট">মানি রিসিট</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="measurement-tab" data-bs-toggle="tab" data-bs-target="#measurementTab" type="button" role="tab">
+                        <i class="fas fa-ruler me-2"></i><span class="lang-content" data-en="Measurement" data-bn="মাপ">মাপ</span>
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="receiptTabContent">
+                <!-- Money Receipt Tab -->
+                <div class="tab-pane fade show active" id="receiptTab" role="tabpanel">
+                    <div class="receipt-container">
+                        <!-- Institution Header -->
+                        <div class="receipt-header">
+                            <h2 class="institution-name" id="receiptInstitutionName">...</h2>
+                            <p class="institution-subtitle" id="dialogTitle"></p>
+                            <div class="institution-contact">
+                                <span id="institutionPhone"></span>
+                                <span class="mx-1" id="institutionSeparator" style="display:none;">|</span>
+                                <span id="institutionAddress"></span>
+                            </div>
+                        </div>
+
+                        <!-- Customer Info -->
+                        <div class="customer-section">
+                            <div class="customer-order-container">
+                                <!-- Customer Info - Left Side -->
+                                <div class="customer-info-box">
+                                    <h6 class="info-title lang-content" data-en="Customer Information" data-bn="কাস্টমারের তথ্য">কাস্টমারের তথ্য</h6>
+                                    <p><strong class="lang-content" data-en="Name:" data-bn="নাম:">নাম:</strong> <span id="customerName">...</span></p>
+                                    <p><strong class="lang-content" data-en="Mobile:" data-bn="মোবাইল:">মোবাইল:</strong> <span id="customerPhone">...</span></p>
+                                    <p><strong class="lang-content" data-en="Address:" data-bn="ঠিকানা:">ঠিকানা:</strong> <span id="customerAddress">...</span></p>
+                                </div>
+                                
+                                <!-- Order Info - Right Side -->
+                                <div class="order-info-box">
+                                    <h6 class="info-title lang-content" data-en="Order Information" data-bn="অর্ডারের তথ্য">অর্ডারের তথ্য</h6>
+                                    <p><strong class="lang-content" data-en="Order No:" data-bn="অর্ডার নং:">অর্ডার নং:</strong> <span id="orderSerialNumber">...</span></p>
+                                    <p><strong class="lang-content" data-en="Order Date:" data-bn="অর্ডার:">অর্ডার:</strong> <span id="orderDate">...</span></p>
+                                    <p><strong class="lang-content" data-en="Delivery:" data-bn="ডেলিভারি:">ডেলিভারি:</strong> <span id="deliveryDate">...</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Barcode Section -->
+                        <div class="barcode-section">
+                            <svg id="barcodeReceipt"></svg>
+                        </div>
+
+                        <!-- Order Items Table -->
+                        <table class="table receipt-table">
+                            <thead>
+                                <tr>
+                                    <th class="lang-content" data-en="Dress" data-bn="পোশাক">পোশাক</th>
+                                    <th class="lang-content" data-en="Description" data-bn="বিবরণ">বিবরণ</th>
+                                    <th class="text-center lang-content" data-en="Quantity" data-bn="পরিমান">পরিমান</th>
+                                    <th class="text-end lang-content" data-en="Price" data-bn="মূল্য">মূল্য</th>
+                                    <th class="text-end lang-content" data-en="Total" data-bn="মোট">মোট</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsBody">
+                                <tr>
+                                    <td colspan="5" class="text-center lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Payment Summary -->
+                        <div class="payment-summary">
+                            <table class="summary-table">
+                                <tr>
+                                    <td class="lang-content" data-en="Total:" data-bn="সর্বমোট:">সর্বমোট:</td>
+                                    <td class="text-end"><strong id="totalAmount">৳0.00</strong></td>
+                                </tr>
+                                <tr id="discountRow" style="display: none;">
+                                    <td class="lang-content" data-en="Discount:" data-bn="ডিসকাউন্ট:">ডিসকাউন্ট:</td>
+                                    <td class="text-end">৳<span id="discountAmount">0.00</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="lang-content" data-en="Paid:" data-bn="পরিশোধিত:">পরিশোধিত:</td>
+                                    <td class="text-end">৳<span id="paidAmount">0.00</span></td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td><strong class="lang-content" data-en="Due:" data-bn="বাকি:">বাকি:</strong></td>
+                                    <td class="text-end"><strong id="dueAmount">৳0.00</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="receipt-footer">
+                            <p class="lang-content" data-en="Made with TailorBD" data-bn="TailorBD দিয়ে তৈরী">TailorBD দিয়ে তৈরী</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Measurements Tab -->
+                <div class="tab-pane fade" id="measurementTab" role="tabpanel">
+                    <!-- Hide Border Checkbox - Always visible -->
+                    <div class="no-print mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="hideBorderCheckbox">
+                            <label class="form-check-label lang-content" for="hideBorderCheckbox" data-en="Hide Border" data-bn="বর্ডার লুকান">
+                                বর্ডার লুকান
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Measurement Print Options -->
+                    <div class="no-print measurement-controls" id="measurementControls" style="display: none;">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="mb-0"><strong class="lang-content" data-en="Print Options:" data-bn="প্রিন্ট অপশন:">প্রিন্ট অপশন:</strong></label>
+                                <select class="form-select form-select-sm" id="measurementPageSize" style="width: auto;"></select>
+                            </div>
+                            <div class="d-flex align-items-center gap-2" id="measurementPager" style="display: none;">
+                                <button class="btn btn-outline-secondary btn-sm" id="measurementPrevBtn">
+                                    <span class="lang-content" data-en="Previous" data-bn="পূর্ববর্তী">পূর্ববর্তী</span>
+                                </button>
+                                <span class="page-info" id="measurementPageInfo"></span>
+                                <button class="btn btn-outline-secondary btn-sm" id="measurementNextBtn">
+                                    <span class="lang-content" data-en="Next" data-bn="পরবর্তী">পরবর্তী</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="measurement-container" id="measurementContainer">
+                        <p class="text-center lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js"></script>
+    
+    <!-- Money Receipt JS -->
+    <script src="/js/money-receipt.js"></script>
+</body>
+</html>

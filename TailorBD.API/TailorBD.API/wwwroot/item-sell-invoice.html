@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পরবর্তী ধাপ? - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --print-width: 4in;
+            --receipt-top-space: 0px;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
+            background: #f0f2f8;
+            min-height: 100vh;
+        }
+
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} }
+
+        /* -- Action Bar (no-print) ------------------- */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 14px 20px;
+            background: #fff;
+            border-bottom: 1px solid #e8eaf0;
+            margin-bottom: 20px;
+        }
+        .action-left  { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .action-right { display: flex; gap: 8px; align-items: center; }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+            transition: opacity .15s;
+        }
+        .btn-action:hover { opacity: .85; }
+        .btn-print   { background: #6c7ae0; color: #fff; }
+        .btn-pdf     { background: #dc3545; color: #fff; }
+        .btn-share   { background: #28a745; color: #fff; }
+        .btn-new     { background: #fd7e14; color: #fff; }
+        .btn-back    { background: #fff; color: #555; border: 1.5px solid #ddd; }
+        .btn-settings { background: #6c7ae0; color: #fff; border: none; }
+
+        .print-size-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; }
+        .print-size-wrap select { padding: 5px 8px; border: 1.5px solid #ddd; border-radius: 7px; font-size: 13px; font-family: inherit; }
+
+        /* -- Page body layout ------------------------- */
+        .page-body { display: flex; justify-content: center; padding: 0 16px 40px; }
+
+        /* -- Receipt Card ---------------------------- */
+        .receipt {
+            width: 100%;
+            max-width: 384px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(108,122,224,.13);
+            overflow: hidden;
+            transition: max-width .2s;
+        }
+
+        /* Header � no background, just text center */
+        .receipt-header {
+            background: #fff;
+            color: #222;
+            padding: 14px 16px 10px;
+            text-align: center;
+            border-bottom: 2px solid #222;
+        }
+        .shop-name {
+            font-size: 17px; font-weight: 800; color: #111;
+            letter-spacing: .3px; line-height: 1.3;
+        }
+        .shop-subtitle {
+            font-size: 11px; color: #555; font-style: italic; margin-top: 2px;
+        }
+        .shop-contact {
+            font-size: 11px; color: #444; margin-top: 3px;
+        }
+
+        /* Info row: receipt info LEFT, customer RIGHT */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 8px 14px;
+            border-bottom: 1px dashed #ccc;
+            gap: 8px;
+        }
+        .info-left, .info-right {
+            font-size: 11.5px;
+            line-height: 1.7;
+            color: #333;
+        }
+        .info-left { text-align: left; }
+        .info-right { text-align: right; }
+        .info-label { color: #888; font-size: 10.5px; }
+        .info-val   { font-weight: 700; color: #222; }
+
+        /* Barcode */
+        .barcode-section { text-align: center; padding: 4px 6px 2px; border-bottom: 1px dashed #ccc; }
+        .barcode-section svg { max-width: 100%; width: 100%; }
+
+        /* Items table */
+        .items-section { padding: 10px 14px 0; }
+        .section-title { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .inv-table { width: 100%; border-collapse: collapse; }
+        .inv-table thead th {
+            background: #222;
+            color: #fff;
+            padding: 5px 6px;
+            font-size: 10px; font-weight: 700;
+            text-align: center;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .inv-table thead th:nth-child(2) { text-align: left; }
+        .inv-table tbody td {
+            padding: 7px 6px; border-bottom: 1px solid #f0f0f0;
+            text-align: center; vertical-align: middle; font-size: 11.5px;
+        }
+        .inv-table tbody td:nth-child(2) { text-align: left; }
+        .inv-table tbody tr:last-child td { border-bottom: none; }
+        .item-code { font-weight: 700; color: #fd7e14; font-size: 11px; }
+        .item-name { font-size: 11.5px; color: #333; }
+        .item-unit { font-size: 10px; color: #aaa; }
+
+        /* Totals */
+        .totals-section {
+            padding: 10px 14px;
+            border-top: 2px solid #222;
+        }
+        .total-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; }
+        .total-row .lbl { color: #555; }
+        .total-row .val { font-weight: 600; color: #222; }
+        .total-row.gross { border-bottom: 1px dashed #ddd; padding-bottom: 5px; margin-bottom: 2px; }
+        .total-row.gross .val { font-size: 14px; font-weight: 800; }
+        .total-row.disc  .val { color: #fd7e14; }
+        .total-row.paid  .val { color: #28a745; }
+        .total-row.due   .val { font-size: 14px; font-weight: 800; color: #dc3545; }
+        .total-row.due-zero .val { font-size: 14px; font-weight: 800; color: #28a745; }
+        .divider { border: none; border-top: 1px dashed #ddd; margin: 4px 0; }
+
+        /* Footer */
+        .receipt-footer {
+            text-align: center; padding: 10px 14px 14px;
+            border-top: 2px dashed #222; margin-top: 2px;
+        }
+        .thank-you  { font-size: 12px; font-weight: 700; color: #333; margin-bottom: 3px; }
+        .powered-by { font-size: 10px; color: #aaa; }
+
+        /* Spinner */
+        .spin-wrap { text-align: center; padding: 50px 20px; color: #aaa; }
+        .spin {
+            width: 32px; height: 32px;
+            border: 3px solid #e0e3f7; border-top-color: #6c7ae0;
+            border-radius: 50%; animation: spin .7s linear infinite;
+            display: inline-block; margin-bottom: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Settings Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1050; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: #fff; border-radius: 14px; padding: 24px; width: 95%; max-width: 420px; box-shadow: 0 12px 40px rgba(0,0,0,.2); max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-size: 15px; font-weight: 700; color: #444; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { background: none; border: none; font-size: 22px; color: #aaa; cursor: pointer; line-height: 1; }
+        .modal-close:hover { color: #333; }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13.5px; color: #444; }
+        .setting-row:last-of-type { border-bottom: none; }
+        .setting-row input[type=number], .setting-row select, .setting-row textarea {
+            border: 1.5px solid #ddd; border-radius: 7px; padding: 5px 8px;
+            font-size: 13px; font-family: inherit; width: 110px;
+        }
+        .setting-row textarea { width: 160px; height: 52px; resize: vertical; }
+        .btn-save-settings {
+            width: 100%; margin-top: 14px; padding: 10px;
+            background: #6c7ae0; color: #fff; border: none;
+            border-radius: 8px; font-size: 14px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+        }
+        .btn-save-settings:hover { background: #5a68d4; }
+
+        /* Toast */
+        .toast-wrap { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast-item { padding: 10px 16px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,.15); animation: slideIn .25s ease; min-width: 200px; }
+        .toast-item.success { background: #28a745; }
+        .toast-item.error   { background: #dc3545; }
+        .toast-item.info    { background: #6c7ae0; }
+        @keyframes slideIn { from{transform:translateX(40px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+        /* Loading overlay */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.7); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+
+        /* -- PRINT ------------------------------------ */
+        @media print {
+            @page {
+                size: var(--print-width) auto;
+                margin: 0;
+            }
+
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            .action-bar,
+            .toast-wrap,
+            .modal-overlay,
+            .loading-overlay,
+            #app-sidebar,
+            #app-navbar,
+            .page-header {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+
+            .dashboard-content { padding: 0 !important; }
+
+            .page-body {
+                padding: 0 !important;
+                justify-content: center;
+                /* top space is applied via --receipt-top-space CSS variable */
+                padding-top: var(--receipt-top-space, 0px) !important;
+            }
+
+            .receipt {
+                max-width: var(--print-width) !important;
+                width: var(--print-width) !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+            }
+
+            .receipt-header {
+                background: #fff !important;
+                color: #000 !important;
+            }
+
+            .inv-table thead th {
+                background: #222 !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar & Navbar (loaded by app-components.js) -->
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <div id="app-modals"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="spin"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-box">
+            <div class="modal-title">
+                <span><i class="fas fa-cog me-2" style="color:#6c7ae0;"></i>ইনভয়েস দেখুন</span>
+                <button class="modal-close" onclick="closeSettings()">&times;</button>
+            </div>
+
+            <div class="setting-row">
+                <span>পরবর্তী ধাপ</span>
+                <input type="checkbox" id="sShowShopName" style="width:18px;height:18px;cursor:pointer;">
+            </div>
+            <div class="setting-row">
+                <span>দোকান পয়সা?</span>
+                <input type="checkbox" id="sShowBarcode" style="width:18px;height:18px;cursor:pointer;">
+            </div>
+            <div class="setting-row">
+                <span>ইসুয়ের তারিখ</span>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <input type="number" id="sTopSpace" min="0" max="200" value="0" style="width:70px;">
+                    <span style="font-size:12px;color:#888;">px</span>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span>দোকান নাম?</span>
+                <select id="sFontSize">
+                    <option value="11">11 PX</option>
+                    <option value="12">12 PX</option>
+                    <option value="13">13 PX</option>
+                    <option value="14" selected>14 PX</option>
+                    <option value="16">16 PX</option>
+                    <option value="18">18 PX</option>
+                    <option value="19">19 PX</option>
+                    <option value="20">20 PX</option>
+                </select>
+            </div>
+            <div class="setting-row" style="align-items:flex-start;padding-top:10px;">
+                <span style="padding-top:4px;">ঠিকানা (Powered By)</span>
+                <textarea id="sPoweredBy" placeholder="TailorBD ইউজার নাম?"></textarea>
+            </div>
+
+            <button class="btn-save-settings" onclick="saveSettings()">
+                <i class="fas fa-save me-2"></i>সাইনিং পরিমাণ মোট?
+            </button>
+        </div>
+    </div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+
+            <!-- Action Bar -->
+            <div class="action-bar no-print">
+                <div class="action-left">
+                    <button class="btn-action btn-print" onclick="window.print()">
+                        <i class="fas fa-print"></i> রিফ্রেশ
+                    </button>
+                    <button class="btn-action btn-pdf" onclick="downloadPDF()">
+                        <i class="fas fa-file-pdf"></i> PDF রিফ্রেশ
+                    </button>
+                    <button class="btn-action btn-share" onclick="shareAsPDF()">
+                        <i class="fas fa-share-alt"></i> ঠিকানা
+                    </button>
+                    <a class="btn-action btn-new" href="/item-sell.html">
+                        <i class="fas fa-plus"></i> দোকান পয়সা?
+                    </a>
+                    <a class="btn-action btn-back" href="/item-sell-record.html">
+                        <i class="fas fa-history"></i> ঠিকানা
+                    </a>
+                    <a class="btn-action" href="#" id="btnReturnLink"
+                       style="background:#fff3f3;color:#dc3545;border:1.5px solid #f5c6cb;">
+                        <i class="fas fa-undo-alt"></i> মোট?
+                    </a>
+                </div>
+                <div class="action-right">
+                    <div class="print-size-wrap">
+                        <span>মোট?:</span>
+                        <select id="printSizeSelect">
+                            <option value="3">3 inch</option>
+                            <option value="3.5">3.5 inch</option>
+                            <option value="4" selected>4 inch</option>
+                            <option value="4.5">4.5 inch</option>
+                            <option value="5">5 inch</option>
+                        </select>
+                    </div>
+                    <button class="btn-action btn-settings" onclick="openSettings()">
+                        <i class="fas fa-cog"></i> পয়সা
+                    </button>
+                </div>
+            </div>
+
+            <!-- Page Body -->
+            <div class="page-body">
+                <div class="receipt" id="receipt">
+                    <div class="spin-wrap" id="spinWrap">
+                        <div class="spin"></div>
+                        <div>মোট? লোড হচ্ছে...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script>
+    (function () {
+        const params    = new URLSearchParams(window.location.search);
+        const sellingId = parseInt(params.get('id') || '0');
+
+        function getLang() {
+            return window.currentLang || localStorage.getItem('preferredLanguage') || 'bn';
+        }
+
+        let printSettings = null;
+        let receiptData   = null;
+        let initCalled    = false;
+
+        function getInstitutionId() {
+            return sessionStorage.getItem('institutionId')
+                || localStorage.getItem('session_institutionId')
+                || '';
+        }
+
+        function init() {
+            if (initCalled) return;
+            initCalled = true;
+            const institutionId = getInstitutionId();
+            Promise.all([
+                loadPrintSettings(institutionId),
+                loadInvoice()
+            ]).then(function () {
+                renderReceipt();
+                applyPrintSize(document.getElementById('printSizeSelect').value);
+            }).catch(function (err) {
+                console.error('Invoice load error:', err);
+                document.getElementById('receipt').innerHTML =
+                    '<div style="text-align:center;padding:40px;color:#dc3545;"><i class="fas fa-exclamation-circle fa-2x"></i><br>দোকান নাম ??সব প্রতিষ্ঠান দেখুন?</div>';
+            });
+        }
+
+        $(document).ready(function () {
+            // If session event already fired before ready, init immediately
+            if (getInstitutionId()) {
+                init();
+            } else {
+                $(document).one('app-session-ready institution-loaded institutionLoaded', function () {
+                    init();
+                });
+                // Fallback
+                setTimeout(function () { init(); }, 1500);
+            }
+
+            $(document).on('languageChanged', function () {
+                if (receiptData) renderReceipt();
+            });
+        });
+
+        // -- Print settings ----------------------------
+        function loadPrintSettings(institutionId) {
+            if (!institutionId) { printSettings = defaultSettings(); return Promise.resolve(); }
+            return fetch('/api/institution/' + institutionId + '/print-settings')
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    printSettings = (res.success && res.data && res.data.moneyReceipt)
+                        ? res.data.moneyReceipt : defaultSettings();
+                })
+                .catch(function () { printSettings = defaultSettings(); });
+        }
+
+        function defaultSettings() {
+            return { showShopName: true, showReceiptBarcode: false, topSpace: 0, fontSize: 12, poweredByInfo: 'TailorBD ইউজার নাম?' };
+        }
+
+        // -- Invoice data ------------------------------
+        function loadInvoice() {
+            if (!sellingId) return Promise.reject('no id');
+            return fetch('/api/ItemSell/invoice?sellingId=' + sellingId)
+                .then(function (r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function (res) {
+                    if (!res.success || !res.header) throw new Error(res.message || 'not found');
+                    receiptData = res;
+                });
+        }
+
+        // -- Render ------------------------------------
+        function renderReceipt() {
+            if (!receiptData || !receiptData.header) return;
+            const h     = receiptData.header;
+            const items = receiptData.items || [];
+            const s     = printSettings || defaultSettings();
+            const lang  = getLang();
+            const topPx = parseInt(s.topSpace) || 0;
+
+            const dt = new Date(h.SellingDate)
+                .toLocaleDateString('en-BD', { day:'2-digit', month:'short', year:'numeric' });
+
+            let rows = '';
+            items.forEach(function (item, i) {
+                rows += `
+                <tr>
+                    <td style="color:#aaa;font-size:11px;">${i + 1}</td>
+                    <td>
+                        <div class="item-code">${esc(item.FabricCode)}</div>
+                        <div class="item-name">${esc(item.FabricsName)}</div>
+                    </td>
+                    <td>
+                        <span>${fmtQ(item.SellingQuantity)}</span>
+                        <div class="item-unit">${esc(item.UnitName || '')}</div>
+                    </td>
+                    <td>?${fmt(item.SellingUnitPrice)}</td>
+                    <td style="font-weight:700;">?${fmt(item.SellingPrice)}</td>
+                </tr>`;
+            });
+
+            const hasDiscount = parseFloat(h.SellingDiscountAmount) > 0;
+            const hasPaid     = parseFloat(h.SellingPaidAmount) > 0;
+            const isDue       = parseFloat(h.SellingDueAmount) > 0;
+
+            const subTitle    = h.InstitutionSubTitle ? `<div class="shop-subtitle">${esc(h.InstitutionSubTitle)}</div>` : '';
+            const phoneAddr   = [h.InstitutionPhone, h.InstitutionAddress].filter(Boolean).join(' | ');
+            const contactLine = phoneAddr ? `<div class="shop-contact">${esc(phoneAddr)}</div>` : '';
+            const headerBlock = s.showShopName !== false ? `
+            <div class="receipt-header">
+                <div class="shop-name">${esc(h.InstitutionName)}</div>
+                ${subTitle}${contactLine}
+            </div>` : '';
+
+            const custRight = h.CustomerName
+                ? `<div class="info-val">${esc(h.CustomerName)}</div>${h.CustomerPhone ? '<div>' + esc(h.CustomerPhone) + '</div>' : ''}`
+                : `<div style="color:#aaa;font-size:10.5px;">${lang==='en'?'Walk-in':'ঠিকানা দিন'}</div>`;
+
+            const barcodeBlock = s.showReceiptBarcode
+                ? `<div class="barcode-section"><svg id="receiptBarcode"></svg></div>` : '';
+
+            const poweredBy = s.poweredByInfo || 'TailorBD ইউজার নাম?';
+
+            const html = `
+            ${headerBlock}
+            <div class="info-row">
+                <div class="info-left">
+                    <div class="info-label">${lang==='en'?'Receipt':'শক্তিশালী'}</div>
+                    <div class="info-val">#${h.SellingSN}</div>
+                    <div>${dt}</div>
+                </div>
+                <div class="info-right">
+                    <div class="info-label">${lang==='en'?'Customer':'মঙ্গলবার'}</div>
+                    ${custRight}
+                </div>
+            </div>
+            ${barcodeBlock}
+            <div class="items-section">
+                <table class="inv-table" style="font-size:${s.fontSize || 12}px;">
+                    <thead><tr>
+                        <th>#</th>
+                        <th>${lang==='en'?'Item':'অজানা'}</th>
+                        <th>${lang==='en'?'Qty':'দুর্বল'}</th>
+                        <th>${lang==='en'?'Rate':'মে'}</th>
+                        <th>${lang==='en'?'Total':'জুন'}</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+            <div class="totals-section" style="font-size:${s.fontSize || 12}px;">
+                <div class="total-row gross">
+                    <span class="lbl">${lang==='en'?'Subtotal':'জুন'}</span>
+                    <span class="val">?${fmt(h.SellingTotalPrice)}</span>
+                </div>
+                ${hasDiscount ? `<div class="total-row disc"><span class="lbl">${lang==='en'?'Discount':'শক্তিশালী'}</span><span class="val">- ?${fmt(h.SellingDiscountAmount)}</span></div>` : ''}
+                ${hasPaid ? `<div class="total-row paid"><span class="lbl">${lang==='en'?'Paid':'দুর্বল'}</span><span class="val">?${fmt(h.SellingPaidAmount)}</span></div>` : ''}
+                <hr class="divider">
+                <div class="total-row ${isDue ? 'due' : 'due-zero'}">
+                    <span class="lbl">${isDue ? (lang==='en'?'Due':'শক্তিশালী') : (lang==='en'?'Fully Paid ?':'উত্তর লিখুনমোট ?')}</span>
+                    <span class="val">?${fmt(h.SellingDueAmount)}</span>
+                </div>
+            </div>
+            <div class="receipt-footer">
+                <div class="thank-you">${lang==='en'?'Thank you for your purchase!':'পরবর্তী ধাপ? রিফ্রেশ!'}</div>
+                <div class="powered-by">${esc(poweredBy)}</div>
+            </div>`;
+
+            document.getElementById('receipt').innerHTML = html;
+
+            // Return link
+            if (h.SellingSN) {
+                document.getElementById('btnReturnLink').href = '/item-sell-return.html?sn=' + h.SellingSN;
+            }
+
+            // Top space
+            const topPxVal = topPx + 'px';
+            document.documentElement.style.setProperty('--receipt-top-space', topPxVal);
+            document.querySelector('.page-body').style.paddingTop = topPxVal;
+
+            // Barcode
+            if (s.showReceiptBarcode && h.SellingSN) {
+                setTimeout(function () {
+                    try {
+                        JsBarcode('#receiptBarcode', h.SellingSN.toString(), {
+                            format: 'CODE128', width: 2, height: 28,
+                            displayValue: true, fontSize: 10, margin: 2, textMargin: 1
+                        });
+                    } catch (e) { console.error('Barcode error:', e); }
+                }, 100);
+            }
+        }
+
+        // -- Print size --------------------------------
+        function applyPrintSize(size) {
+            const map   = { '3':'3in','3.5':'3.5in','4':'4in','4.5':'4.5in','5':'5in' };
+            const pxMap = { '3':288,'3.5':336,'4':384,'4.5':432,'5':480 };
+            document.documentElement.style.setProperty('--print-width', map[size] || '4in');
+            document.getElementById('receipt').style.maxWidth = (pxMap[size] || 384) + 'px';
+        }
+
+        document.getElementById('printSizeSelect').addEventListener('change', function () {
+            applyPrintSize(this.value);
+        });
+
+        // -- Settings modal ----------------------------
+        window.openSettings = function () {
+            const s = printSettings || defaultSettings();
+            document.getElementById('sShowShopName').checked = s.showShopName !== false;
+            document.getElementById('sShowBarcode').checked  = !!s.showReceiptBarcode;
+            document.getElementById('sTopSpace').value       = s.topSpace || 0;
+            document.getElementById('sFontSize').value       = s.fontSize || 12;
+            document.getElementById('sPoweredBy').value      = s.poweredByInfo || '';
+            document.getElementById('settingsModal').classList.add('show');
+        };
+
+        window.closeSettings = function () {
+            document.getElementById('settingsModal').classList.remove('show');
+        };
+
+        window.saveSettings = function () {
+            const institutionId = getInstitutionId();
+            if (!institutionId) { showToast('Session expired', 'error'); return; }
+            const updated = {
+                showShopName:       document.getElementById('sShowShopName').checked,
+                showReceiptBarcode: document.getElementById('sShowBarcode').checked,
+                topSpace:           parseInt(document.getElementById('sTopSpace').value) || 0,
+                fontSize:           parseInt(document.getElementById('sFontSize').value) || 12,
+                poweredByInfo:      document.getElementById('sPoweredBy').value || ''
+            };
+            fetch('/api/institution/' + institutionId + '/money-receipt-print-settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updated)
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (res.success) {
+                    printSettings = Object.assign(printSettings || {}, updated);
+                    closeSettings();
+                    showToast('পয়সা উত্তর লিখুন?', 'success');
+                    renderReceipt();
+                } else { showToast(res.message || 'Save failed', 'error'); }
+            })
+            .catch(function () { showToast('Save failed', 'error'); });
+        };
+
+        // -- PDF Download ------------------------------
+        window.downloadPDF = function () {
+            if (!receiptData) { showToast('মোট? বিল হিসাব', 'error'); return; }
+            showToast('PDF দোকান পয়সা...', 'info');
+            captureReceipt().then(function (canvas) {
+                const { jsPDF } = window.jspdf;
+                const imgData   = canvas.toDataURL('image/png');
+                const pxPerMm   = canvas.width / (document.getElementById('receipt').offsetWidth / 96 * 25.4);
+                const pdfW      = canvas.width  / pxPerMm;
+                const pdfH      = canvas.height / pxPerMm;
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfW, pdfH] });
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+                pdf.save('মোট?-' + (receiptData.header.SellingSN || 'receipt') + '.pdf');
+                showToast('PDF ?আরেকটি যোগ করুন', 'success');
+            }).catch(function () { showToast('PDF ?সম্পূর্ণ ঠিকানা দিন?', 'error'); });
+        };
+
+        // -- Share -------------------------------------
+        window.shareAsPDF = function () {
+            if (!receiptData) { showToast('মোট? বিল হিসাব', 'error'); return; }
+            showToast('?পরবর্তী ধাপ? উত্তর লিখুন...', 'info');
+            captureReceipt().then(function (canvas) {
+                const sn = receiptData.header.SellingSN || 'receipt';
+                canvas.toBlob(function (blob) {
+                    const file = new File([blob], 'মোট?-' + sn + '.png', { type: 'image/png' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({ title: 'পরবর্তী ধাপ? #' + sn, files: [file] })
+                            .catch(function (e) { if (e.name !== 'AbortError') showToast('?ইসুয়ের তারিখ', 'info'); });
+                    } else {
+                        const link = document.createElement('a');
+                        link.download = 'মোট?-' + sn + '.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        showToast('মোট ?কর্মী সংখ্যা', 'info');
+                    }
+                }, 'image/png');
+            }).catch(function () { showToast('নিবন্ধন ব্যর্থ হয়েছে', 'error'); });
+        };
+
+        function captureReceipt() {
+            const el = document.getElementById('receipt');
+            const origRadius = el.style.borderRadius;
+            const origShadow = el.style.boxShadow;
+            el.style.borderRadius = '0';
+            el.style.boxShadow    = 'none';
+            return html2canvas(el, { scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false })
+                .then(function (canvas) {
+                    el.style.borderRadius = origRadius;
+                    el.style.boxShadow    = origShadow;
+                    return canvas;
+                });
+        }
+
+        // -- Helpers -----------------------------------
+        function fmt(n)  { return Number(n||0).toLocaleString('en-BD', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+        function fmtQ(n) { return Number(n||0).toLocaleString('en-BD', { maximumFractionDigits:3 }); }
+        function esc(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
+        window.showToast = function (msg, type) {
+            const t = document.createElement('div');
+            t.className = 'toast-item ' + (type || 'info');
+            t.textContent = msg;
+            document.getElementById('toastWrap').appendChild(t);
+            setTimeout(function () { t.style.opacity = 0; setTimeout(function () { t.remove(); }, 300); }, 3000);
+        };
+
+    })();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,287 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>স্থায়ীভাবে অর্ডার ডিলেট - TailorBD</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+
+    <style>
+        #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .container { max-width: 100%; margin: 0 auto; padding: 10px; background: #f5f7fa; min-height: 100vh; }
+        .content { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #dc3545; margin-bottom: 15px; font-size: 22px; font-weight: 600; }
+
+        /* Search Panel */
+        .search-panel { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-bottom: 15px; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 13px; }
+        .form-group input { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .form-group input:focus { outline: none; border-color: #dc3545; box-shadow: 0 0 0 2px rgba(220,53,69,0.15); }
+
+        .btn-search {
+            padding: 8px 20px; background: #6c7ae0; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .btn-search:hover { background: #5a68c9; }
+
+        /* Legend */
+        .legend-group { display: flex; gap: 15px; margin-bottom: 12px; font-size: 13px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 3px; }
+        .legend-pending { background: #fff3cd; border: 1px solid #ffc107; }
+        .legend-partly { background: #cce5ff; border: 1px solid #66b2ff; }
+        .legend-delivered { background: #d4edda; border: 1px solid #28a745; }
+
+        /* Table */
+        .table-wrapper { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #dc3545; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
+        td { padding: 7px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; text-align: center; }
+        tr:hover { background-color: #fff5f5; }
+        tr.status-pending { background: #fffde7; }
+        tr.status-partly { background: #e3f2fd; }
+        tr.status-delivered { background: #f1f8e9; }
+        tr.status-pending:hover { background: #fff9c4; }
+        tr.status-partly:hover { background: #bbdefb; }
+        tr.status-delivered:hover { background: #dcedc8; }
+        .order-no { font-weight: 700; font-size: 14px; }
+        .customer-name { font-weight: 600; text-align: left; }
+        .customer-number { color: #888; font-size: 12px; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .badge-pending { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .badge-partly { background: #cce5ff; color: #004085; border: 1px solid #66b2ff; }
+        .badge-delivered { background: #d4edda; color: #155724; border: 1px solid #28a745; }
+
+        /* Checkbox */
+        input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: #dc3545; }
+
+        /* Loading/Empty */
+        .loading, .empty-message, .error-message { text-align: center; padding: 40px; color: #666; font-size: 14px; }
+        .error-message { color: #dc3545; }
+
+        /* Summary */
+        .summary-text { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 10px; }
+
+        /* Delete Panel */
+        .delete-panel {
+            background: #fff5f5; border: 2px solid #dc3545; border-radius: 6px;
+            padding: 15px; margin-top: 20px; display: none;
+        }
+        .delete-panel h5 { color: #dc3545; margin-bottom: 12px; font-size: 15px; font-weight: 600; }
+        .delete-info { color: #721c24; font-size: 14px; margin-bottom: 12px; }
+        .btn-delete {
+            padding: 9px 24px; background: #dc3545; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-delete:hover { background: #c82333; }
+        .btn-delete:disabled { background: #aaa; cursor: not-allowed; }
+
+        /* Alert messages */
+        .alert-msg { padding: 10px 15px; border-radius: 4px; font-size: 14px; margin-top: 10px; display: none; }
+        .alert-success-msg { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error-msg { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Warning banner */
+        .warning-banner {
+            background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;
+            padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
+        }
+        .warning-banner i { color: #856404; font-size: 18px; }
+        .warning-banner span { color: #856404; font-size: 13px; font-weight: 500; }
+
+        /* Pagination */
+        .pagination-wrap { display: flex; justify-content: center; gap: 6px; margin-top: 15px; flex-wrap: wrap; }
+        .page-btn {
+            padding: 5px 12px; border: 1px solid #ddd; background: white; border-radius: 4px;
+            cursor: pointer; font-size: 13px; color: #444;
+        }
+        .page-btn:hover { background: #f0f0f0; }
+        .page-btn.active { background: #dc3545; color: white; border-color: #dc3545; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Confirm Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 9999; align-items: center; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white; border-radius: 8px; padding: 24px; max-width: 420px;
+            width: 90%; box-shadow: 0 8px 24px rgba(0,0,0,0.2); text-align: center;
+        }
+        .modal-box .modal-icon { font-size: 48px; color: #dc3545; margin-bottom: 12px; }
+        .modal-box h4 { color: #333; margin-bottom: 10px; font-size: 18px; }
+        .modal-box p { color: #666; font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+        .modal-btn-row { display: flex; gap: 10px; justify-content: center; }
+        .btn-confirm-yes {
+            padding: 9px 28px; background: #dc3545; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;
+        }
+        .btn-confirm-yes:hover { background: #c82333; }
+        .btn-confirm-no {
+            padding: 9px 28px; background: #6c757d; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;
+        }
+        .btn-confirm-no:hover { background: #5a6268; }
+
+        /* Autocomplete */
+        .autocomplete-wrapper { position: relative; }
+        .autocomplete-list {
+            position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;
+            background: white; border: 1px solid #ddd; border-top: none;
+            border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .autocomplete-list div { padding: 8px 10px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+        .autocomplete-list div:hover, .autocomplete-list div.active { background: #fff0f0; color: #dc3545; }
+
+        @media (max-width: 768px) {
+            #app-navbar { margin-left: 0; }
+            .main-content { margin-left: 0; }
+            .search-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="container">
+                <div class="content">
+                    <h2>
+                        <i class="fas fa-trash-alt me-2"></i>
+                        <span data-en="Permanently Delete Order" data-bn="স্থায়ীভাবে অর্ডার ডিলেট করুন">স্থায়ীভাবে অর্ডার ডিলেট করুন</span>
+                    </h2>
+
+                    <!-- Warning Banner -->
+                    <div class="warning-banner">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span data-en="Warning: Deleted orders cannot be recovered. All related data including measurements, payments and delivery records will be permanently removed."
+                              data-bn="সতর্কতা: ডিলেট করা অর্ডার পুনরায় পাওয়া সম্ভব নয়। মাপ, পেমেন্ট এবং ডেলিভারি সংক্রান্ত সকল তথ্যাদি স্থায়ীভাবে মুছে যাবে।">
+                            সতর্কতা: ডিলেট করা অর্ডার পুনরায় পাওয়া সম্ভব নয়। মাপ, পেমেন্ট এবং ডেলিভারি সংক্রান্ত সকল তথ্যাদি স্থায়ীভাবে মুছে যাবে।
+                        </span>
+                    </div>
+
+                    <!-- Search Panel -->
+                    <div class="search-panel">
+                        <div class="search-grid">
+                            <div class="form-group autocomplete-wrapper">
+                                <label data-en="Order Number" data-bn="অর্ডার নাম্বার">অর্ডার নাম্বার</label>
+                                <input type="text" id="searchOrderNo" autocomplete="off"
+                                    data-en-placeholder="Order Number"
+                                    data-bn-placeholder="অর্ডার নাম্বার"
+                                    placeholder="অর্ডার নাম্বার">
+                                <div class="autocomplete-list" id="orderNoSuggestions" style="display:none;"></div>
+                            </div>
+                            <div class="form-group autocomplete-wrapper">
+                                <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                                <input type="text" id="searchCustomerName" autocomplete="off"
+                                    data-en-placeholder="Customer Name"
+                                    data-bn-placeholder="কাস্টমারের নাম"
+                                    placeholder="কাস্টমারের নাম">
+                                <div class="autocomplete-list" id="customerNameSuggestions" style="display:none;"></div>
+                            </div>
+                            <div class="form-group autocomplete-wrapper">
+                                <label data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</label>
+                                <input type="text" id="searchMobileNo" autocomplete="off"
+                                    data-en-placeholder="Mobile Number"
+                                    data-bn-placeholder="মোবাইল নাম্বার"
+                                    placeholder="মোবাইল নাম্বার">
+                                <div class="autocomplete-list" id="mobileNoSuggestions" style="display:none;"></div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn-search" onclick="searchDeleteOrders()">
+                                    <i class="fas fa-search"></i>
+                                    <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="legend-group">
+                        <div class="legend-item">
+                            <div class="legend-dot legend-pending"></div>
+                            <span data-en="Pending" data-bn="অপেক্ষমাণ">Pending</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot legend-partly"></div>
+                            <span data-en="Partly Delivered" data-bn="আংশিক ডেলিভারি">Partly Delivered</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot legend-delivered"></div>
+                            <span data-en="Delivered" data-bn="ডেলিভার হয়েছে">Delivered</span>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="summary-text" id="summaryText"></div>
+
+                    <!-- Orders Table -->
+                    <div class="table-wrapper">
+                        <div id="ordersTableContainer">
+                            <div class="loading">
+                                <span data-en="Loading orders..." data-bn="অর্ডার লোড হচ্ছে...">অর্ডার লোড হচ্ছে...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-wrap" id="paginationWrap"></div>
+
+                    <!-- Delete Panel -->
+                    <div class="delete-panel" id="deletePanel">
+                        <h5>
+                            <i class="fas fa-trash-alt me-2"></i>
+                            <span data-en="Selected Orders for Deletion" data-bn="নির্বাচিত অর্ডার ডিলেট করুন">নির্বাচিত অর্ডার ডিলেট করুন</span>
+                        </h5>
+                        <div class="delete-info" id="deleteInfo">
+                            <span data-en="Select orders from the list to delete" data-bn="অর্ডার ডিলেট করার জন্য তালিকা থেকে অর্ডার নির্বাচন করুন">অর্ডার ডিলেট করার জন্য তালিকা থেকে অর্ডার নির্বাচন করুন</span>
+                        </div>
+                        <button type="button" class="btn-delete" id="btnDelete" onclick="confirmDelete()" disabled>
+                            <i class="fas fa-trash-alt"></i>
+                            <span data-en="Delete" data-bn="ডিলেট করুন">ডিলেট করুন</span>
+                        </button>
+                        <div id="deleteMsg" class="alert-msg"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h4 data-en="Confirm Permanent Delete" data-bn="স্থায়ী ডিলেট নিশ্চিত করুন">স্থায়ী ডিলেট নিশ্চিত করুন</h4>
+            <p id="confirmMsg" data-en="Selected orders and all related data will be permanently deleted. This cannot be undone. Are you sure?"
+               data-bn="আপনার নির্বাচিত অর্ডার সমূহ ডিলেট করলে, অর্ডার সমূহের সকল তথ্যাদি পুনরায় পাওয়া সম্ভব নয়। আপনি কি অর্ডার স্থায়ীভাবে ডিলেট করতে চান?">
+                আপনার নির্বাচিত অর্ডার সমূহ ডিলেট করলে, অর্ডার সমূহের সকল তথ্যাদি পুনরায় পাওয়া সম্ভব নয়। আপনি কি অর্ডার স্থায়ীভাবে ডিলেট করতে চান?
+            </p>
+            <div class="modal-btn-row">
+                <button class="btn-confirm-yes" onclick="executeDelete()" data-en="Yes" data-bn="হ্যাঁ">হ্যাঁ</button>
+                <button class="btn-confirm-no" onclick="closeConfirmModal()" data-en="No" data-bn="না">না</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-modals"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js"></script>
+    <script src="/js/delete-order.js"></script>
+</body>
+</html>

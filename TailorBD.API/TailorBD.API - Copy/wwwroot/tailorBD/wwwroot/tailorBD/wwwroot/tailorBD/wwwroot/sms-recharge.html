@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="SMS Recharge - TailorBD" data-bn="SMS রিচার্জ - TailorBD">SMS রিচার্জ - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .page-container { padding:16px 24px 60px; }
+        @media(max-width:992px){ .main-content{margin-left:0;} .page-container{padding:10px 10px 60px;} }
+
+        .card-box { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08); overflow:hidden; margin-bottom:20px; }
+        .card-head { padding:14px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; background:#fafbff; }
+        .card-title { font-weight:700; font-size:14px; color:#6c7ae0; }
+
+        .recharge-form-wrap { padding:24px 20px; max-width:560px; margin:0 auto; }
+
+        .sms-price-box {
+            background:linear-gradient(135deg,#f0f2ff,#e8ecff);
+            border:2px solid #6c7ae0; border-radius:12px;
+            padding:18px 24px; margin-bottom:24px;
+            display:flex; align-items:center; gap:14px;
+        }
+        .sms-price-icon { font-size:2.2rem; color:#6c7ae0; }
+        .sms-price-info .label { font-size:12px; color:#64748b; font-weight:600; }
+        .sms-price-info .value { font-size:1.5rem; font-weight:800; color:#6c7ae0; }
+
+        .f-group { margin-bottom:18px; }
+        .f-label { font-size:13px; font-weight:700; color:#374151; margin-bottom:6px; display:block; }
+        .f-ctrl {
+            width:100%; padding:10px 14px;
+            border:1.5px solid #ddd; border-radius:8px;
+            font-size:14px; font-family:inherit; transition:border-color .2s;
+        }
+        .f-ctrl:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.12); }
+
+        .bill-preview {
+            background:#f9fafb; border:1.5px solid #e5e7eb;
+            border-radius:10px; padding:16px 20px; margin-bottom:20px;
+        }
+        .bill-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:5px 0; border-bottom:1px dashed #e5e7eb; }
+        .bill-row:last-child { border-bottom:none; }
+        .bill-row.total { font-weight:800; font-size:15px; color:#6c7ae0; padding-top:10px; }
+        .bill-label { color:#6b7280; }
+        .bill-value { font-weight:600; color:#111; }
+
+        .btn-recharge {
+            width:100%; padding:13px;
+            background:linear-gradient(135deg,#6c7ae0,#5a68c9);
+            color:#fff; border:none; border-radius:10px;
+            font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;
+            display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s;
+        }
+        .btn-recharge:hover { background:linear-gradient(135deg,#5a68c9,#4a58b9); transform:translateY(-1px); }
+        .btn-recharge:disabled { background:#aaa; cursor:not-allowed; transform:none; }
+
+        .btn-outline-sm {
+            padding:6px 14px; background:#fff; color:#6c7ae0;
+            border:1.5px solid #6c7ae0; border-radius:6px;
+            font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
+            text-decoration:none; display:inline-flex; align-items:center;
+        }
+        .btn-outline-sm:hover { background:#f0f2ff; color:#6c7ae0; }
+
+        .bal-chip {
+            background:#6c7ae0; color:#fff; border-radius:20px;
+            padding:5px 18px; font-size:13px; font-weight:800;
+            display:inline-flex; align-items:center; gap:6px;
+        }
+
+        /* ── SMS Due Bills section ── */
+        .due-inv-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .due-inv-table thead th {
+            background:#fef2f2; padding:9px 14px;
+            font-size:11px; font-weight:700; color:#991b1b;
+            border-bottom:2px solid #fecaca; white-space:nowrap;
+        }
+        .due-inv-table tbody td { padding:9px 14px; border-bottom:1px solid #fff5f5; vertical-align:middle; }
+        .due-inv-table tbody tr:hover { background:#fff5f5; }
+        .due-total-row td { background:#fef2f2; font-weight:800; font-size:14px; color:#dc2626; }
+
+        /* ── Alert ── */
+        .alert-sms-due {
+            background:linear-gradient(135deg,#fff7ed,#fef3c7);
+            border:1.5px solid #f59e0b; border-radius:10px;
+            padding:14px 18px; margin-bottom:20px;
+            display:flex; align-items:flex-start; gap:12px;
+        }
+        .alert-sms-due i { color:#d97706; font-size:1.2rem; margin-top:2px; }
+        .alert-sms-due .alert-text { font-size:13px; color:#374151; line-height:1.6; }
+
+        .spin { width:20px; height:20px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        #successOverlay {
+            display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+            background:rgba(0,0,0,.55); z-index:9999;
+            align-items:center; justify-content:center;
+        }
+        #successOverlay.show { display:flex; }
+        .success-card {
+            background:#fff; border-radius:16px; padding:40px 32px;
+            text-align:center; max-width:400px; width:90%;
+            box-shadow:0 20px 60px rgba(0,0,0,.25); animation:popIn .3s ease-out;
+        }
+        @keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+    </style>
+</head>
+<body>
+<div id="app-sidebar"></div>
+
+<main class="main-content" id="mainContent">
+<div id="app-navbar"></div>
+<div class="dashboard-content">
+<div class="page-container">
+
+    <!-- Page title -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-weight:800;color:#6c7ae0;margin:0;">
+            <i class="fas fa-mobile-alt me-2"></i>
+            <span data-en="SMS Recharge" data-bn="SMS রিচার্জ">SMS রিচার্জ</span>
+        </h5>
+        <div class="d-flex gap-2 align-items-center">
+            <span class="bal-chip" id="smsBalanceChip">
+                <i class="fas fa-sms"></i>
+                <span id="smsBalText" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span>
+            </span>
+            <a href="/sms.html" class="btn-outline-sm">
+                <i class="fas fa-paper-plane me-1"></i>
+                <span data-en="Send SMS" data-bn="SMS পাঠান">SMS পাঠান</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ── Recharge Form ── -->
+    <div class="card-box" style="max-width:600px;">
+        <div class="card-head">
+            <span class="card-title">
+                <i class="fas fa-plus-circle me-2"></i>
+                <span data-en="New Recharge" data-bn="নতুন রিচার্জ">নতুন রিচার্জ</span>
+            </span>
+        </div>
+        <div class="recharge-form-wrap">
+
+            <!-- Price info box -->
+            <div class="sms-price-box">
+                <div class="sms-price-icon"><i class="fas fa-tag"></i></div>
+                <div class="sms-price-info">
+                    <div class="label" data-en="Per SMS Price" data-bn="প্রতি SMS মূল্য">প্রতি SMS মূল্য</div>
+                    <div class="value">৳ <span id="perSmsDisplay">0.36</span> <span data-en="paisa" data-bn="পয়সা">পয়সা</span></div>
+                </div>
+            </div>
+
+            <!-- SMS quantity -->
+            <div class="f-group">
+                <label class="f-label" for="smsQtyInput">
+                    <i class="fas fa-sms me-1" style="color:#6c7ae0;"></i>
+                    <span data-en="How many SMS to recharge?" data-bn="কতটি SMS রিচার্জ করবেন?">কতটি SMS রিচার্জ করবেন?</span>
+                </label>
+                <input type="number" id="smsQtyInput" class="f-ctrl"
+                    data-en-placeholder="e.g: 500, 1000, 2000..."
+                    data-bn-placeholder="যেমন: 500, 1000, 2000..."
+                    placeholder="যেমন: 500, 1000, 2000..."
+                    min="1" step="1" oninput="updateBillPreview()">
+                <div style="font-size:11px;color:#888;margin-top:4px;">
+                    <span data-en="Minimum 100 SMS recharge" data-bn="সর্বনিম্ন ১০০ SMS রিচার্জ করুন">সর্বনিম্ন ১০০ SMS রিচার্জ করুন</span>
+                </div>
+            </div>
+
+            <!-- Bill preview -->
+            <div class="bill-preview" id="billPreview" style="display:none;">
+                <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:8px;">
+                    <i class="fas fa-calculator me-1"></i>
+                    <span data-en="Bill Calculation" data-bn="বিল হিসাব">বিল হিসাব</span>
+                </div>
+                <div class="bill-row">
+                    <span class="bill-label" data-en="SMS Amount" data-bn="SMS পরিমাণ">SMS পরিমাণ</span>
+                    <span class="bill-value" id="previewQty">0 টি</span>
+                </div>
+                <div class="bill-row">
+                    <span class="bill-label" data-en="Per SMS Rate" data-bn="প্রতি SMS দর">প্রতি SMS দর</span>
+                    <span class="bill-value">৳ <span id="previewRate">0.36</span></span>
+                </div>
+                <div class="bill-row total">
+                    <span data-en="Total Bill" data-bn="মোট বিল">মোট বিল</span>
+                    <span id="previewTotal" style="color:#6c7ae0;">৳ 0.00</span>
+                </div>
+            </div>
+
+            <!-- Recharge button -->
+            <button class="btn-recharge" id="rechargeBtn" onclick="doRecharge()" disabled>
+                <i class="fas fa-bolt"></i>
+                <span data-en="Recharge & Create Bill" data-bn="রিচার্জ করুন ও বিল তৈরি করুন">রিচার্জ করুন ও বিল তৈরি করুন</span>
+            </button>
+
+            <div style="text-align:center;margin-top:12px;font-size:12px;color:#6b7280;line-height:1.6;">
+                <span data-en="Recharge will be added to SMS balance" data-bn="রিচার্জ করলে SMS ব্যালেন্সে যোগ হবে">রিচার্জ করলে SMS ব্যালেন্সে যোগ হবে</span><br>
+                <span data-en="and a due invoice will be created automatically." data-bn="এবং স্বয়ংক্রিয়ভাবে একটি বকেয়া ইনভয়েস তৈরি হবে।">এবং স্বয়ংক্রিয়ভাবে একটি বকেয়া ইনভয়েস তৈরি হবে।</span><br>
+                <span style="color:#dc2626;font-weight:600;">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    <span data-en="SMS service will be stopped if bill not paid within 7 days." data-bn="৭ দিনের মধ্যে বিল পরিশোধ না করলে SMS সুবিধা বন্ধ হবে।">৭ দিনের মধ্যে বিল পরিশোধ না করলে SMS সুবিধা বন্ধ হবে।</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── SMS Due Bills ── -->
+    <div class="card-box" id="smsDueBillsCard" style="display:none;">
+        <div class="card-head" style="background:#fef2f2;">
+            <span class="card-title" style="color:#dc2626;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span data-en="Unpaid SMS Bills" data-bn="বকেয়া SMS বিলসমূহ">বকেয়া SMS বিলসমূহ</span>
+            </span>
+            <a href="/due-invoice.html" class="btn-outline-sm" style="color:#dc2626;border-color:#dc2626;">
+                <i class="fas fa-file-invoice me-1"></i>
+                <span data-en="View Invoice" data-bn="ইনভয়েস দেখুন">ইনভয়েস দেখুন</span>
+            </a>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="due-inv-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th data-en="Invoice For" data-bn="ইনভয়েসের বিষয়">ইনভয়েসের বিষয়</th>
+                        <th data-en="Issue Date" data-bn="ইস্যু তারিখ">ইস্যু তারিখ</th>
+                        <th data-en="Due Date" data-bn="শেষ তারিখ">শেষ তারিখ</th>
+                        <th data-en="Total" data-bn="মোট">মোট</th>
+                        <th data-en="Paid" data-bn="পরিশোধ">পরিশোধ</th>
+                        <th data-en="Due" data-bn="বকেয়া">বকেয়া</th>
+                    </tr>
+                </thead>
+                <tbody id="smsDueBillsBody"></tbody>
+            </table>
+        </div>
+        <div id="smsDueTotalRow" style="padding:12px 20px;background:#fef2f2;border-top:1px solid #fecaca;">
+            <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px;">
+                <span><span data-en="Total Due:" data-bn="মোট বকেয়া:" style="color:#888;">মোট বকেয়া:</span>
+                    <strong id="smsDueTotalAmt" style="color:#dc2626;font-size:15px;">৳0</strong></span>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+</main>
+
+<!-- ── Success Overlay ── -->
+<div id="successOverlay">
+    <div class="success-card">
+        <div style="margin-bottom:16px;">
+            <i class="fas fa-check-circle" style="font-size:4rem;color:#10b981;"></i>
+        </div>
+        <h5 style="font-weight:800;color:#065f46;margin-bottom:8px;" data-en="Recharge Successful!" data-bn="রিচার্জ সফল!">রিচার্জ সফল!</h5>
+        <p style="color:#334155;font-size:14px;line-height:1.6;" id="successMsg"></p>
+        <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;margin:14px 0;font-size:13px;color:#92400e;">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            <strong data-en="Due invoice has been created." data-bn="বকেয়া ইনভয়েস তৈরি হয়েছে।">বকেয়া ইনভয়েস তৈরি হয়েছে।</strong><br>
+            <span data-en="Please pay within 7 days." data-bn="৭ দিনের মধ্যে পরিশোধ করুন।">৭ দিনের মধ্যে পরিশোধ করুন।</span>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button onclick="goToDashboard()" style="padding:10px 20px;background:#6c7ae0;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">
+                <i class="fas fa-home me-1"></i>
+                <span data-en="Dashboard" data-bn="ড্যাশবোর্ড">ড্যাশবোর্ড</span>
+            </button>
+            <button onclick="closeSuccess()" style="padding:10px 20px;background:#e5e7eb;color:#374151;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">
+                <i class="fas fa-redo me-1"></i>
+                <span data-en="Recharge More" data-bn="আরো রিচার্জ">আরো রিচার্জ</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="app-modals"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var PER_SMS_PRICE = 0.36;
+    var institutionId = null;
+
+    $(document).ready(function () {
+        institutionId = sessionStorage.getItem('institutionId');
+        if (!institutionId) { window.location.href = '/login.html'; return; }
+        loadSmsBalance();
+        loadSmsDueBills();
+    });
+
+    // ── SMS Balance ──
+    function loadSmsBalance() {
+        $.ajax({
+            url: '/api/sms/balance/' + institutionId,
+            method: 'GET',
+            success: function (r) {
+                var lang = window.currentLang === 'en' ? 'en' : 'bn';
+                if (r.success) {
+                    $('#smsBalText').text(r.balance + (lang === 'en' ? ' SMS left' : ' SMS বাকি'));
+                } else {
+                    $('#smsBalText').text(lang === 'en' ? 'Unknown' : 'অজানা');
+                }
+            },
+            error: function () {
+                $('#smsBalText').text(window.currentLang === 'en' ? 'Load failed' : 'লোড ব্যর্থ');
+            }
+        });
+    }
+
+    // ── SMS Due Bills ──
+    function loadSmsDueBills() {
+        $.ajax({
+            url: '/api/invoice/list?institutionId=' + institutionId + '&status=Due&pageSize=50',
+            method: 'GET',
+            success: function (r) {
+                if (!r.success || !r.data) return;
+                // শুধু SMS Recharge invoice ফিল্টার করি
+                var smsDues = r.data.filter(function (inv) {
+                    return inv.invoice_For && inv.invoice_For.toLowerCase().indexOf('sms') !== -1;
+                });
+                if (!smsDues.length) return;
+
+                var html = '';
+                var totalDue = 0;
+                smsDues.forEach(function (inv, i) {
+                    var due = (inv.totalAmount || 0) - (inv.discount || 0) - (inv.paidAmount || 0);
+                    totalDue += due;
+                    html += '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td>' + (inv.invoice_For || '-') + '</td>' +
+                        '<td>' + fmtDate(inv.issuDate) + '</td>' +
+                        '<td>' + fmtDate(inv.endDate) + '</td>' +
+                        '<td>৳' + fmt(inv.totalAmount) + '</td>' +
+                        '<td>৳' + fmt(inv.paidAmount) + '</td>' +
+                        '<td style="color:#dc2626;font-weight:700;">৳' + fmt(due) + '</td>' +
+                        '</tr>';
+                });
+
+                $('#smsDueBillsBody').html(html);
+                $('#smsDueTotalAmt').text('৳' + fmt(totalDue));
+                $('#smsDueBillsCard').show();
+
+                // language update trigger
+                if (typeof window.updateLanguage === 'function') window.updateLanguage();
+            }
+        });
+    }
+
+    // ── Bill preview ──
+    window.updateBillPreview = function () {
+        var qty = parseInt($('#smsQtyInput').val()) || 0;
+        var lang = window.currentLang === 'en' ? 'en' : 'bn';
+        var btn = document.getElementById('rechargeBtn');
+        if (qty >= 1) {
+            var total = qty * PER_SMS_PRICE;
+            $('#previewQty').text(qty.toLocaleString('en-IN') + (lang === 'en' ? ' pcs' : ' টি'));
+            $('#previewTotal').text('৳ ' + total.toFixed(2));
+            $('#billPreview').show();
+            btn.disabled = false;
+        } else {
+            $('#billPreview').hide();
+            btn.disabled = true;
+        }
+    };
+
+    // ── Do Recharge ──
+    window.doRecharge = function () {
+        var qty = parseInt($('#smsQtyInput').val()) || 0;
+        var lang = window.currentLang === 'en' ? 'en' : 'bn';
+        if (qty < 1) {
+            alert(lang === 'en' ? 'Enter SMS quantity.' : 'SMS পরিমাণ দিন।');
+            return;
+        }
+        var total = qty * PER_SMS_PRICE;
+        var confirmMsg = lang === 'en'
+            ? 'Recharge ' + qty.toLocaleString('en-IN') + ' SMS?\nTotal Bill: ৳' + total.toFixed(2) + '\n\nA due invoice will be created.'
+            : qty.toLocaleString('en-IN') + ' টি SMS রিচার্জ করতে চান?\nমোট বিল: ৳' + total.toFixed(2) + '\n\nএকটি বকেয়া ইনভয়েস তৈরি হবে।';
+        if (!confirm(confirmMsg)) return;
+
+        var btn = document.getElementById('rechargeBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spin" style="border-top-color:#fff;border-color:rgba(255,255,255,.3);"></div> ' +
+            (lang === 'en' ? 'Processing...' : 'প্রক্রিয়া হচ্ছে...');
+
+        $.ajax({
+            url: '/api/invoice/sms-recharge',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                institutionId: parseInt(institutionId),
+                rechargeSms: qty,
+                perSmsPrice: PER_SMS_PRICE
+            }),
+            success: function (r) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bolt"></i> ' +
+                    (lang === 'en' ? 'Recharge & Create Bill' : 'রিচার্জ করুন ও বিল তৈরি করুন');
+                if (r.success) {
+                    $('#smsQtyInput').val('');
+                    $('#billPreview').hide();
+                    btn.disabled = true;
+                    var msg = qty.toLocaleString('en-IN') + (lang === 'en' ? ' SMS added to your account.<br>' : ' টি SMS আপনার অ্যাকাউন্টে যোগ হয়েছে।<br>') +
+                        (lang === 'en' ? 'Total Bill: ' : 'মোট বিল: ') + '<strong>৳' + total.toFixed(2) + '</strong><br>' +
+                        (lang === 'en' ? 'Invoice No: ' : 'ইনভয়েস নং: ') + '<strong>#' + r.invoiceId + '</strong>';
+                    $('#successMsg').html(msg);
+                    $('#successOverlay').addClass('show');
+                    loadSmsBalance();
+                    loadSmsDueBills();
+                } else {
+                    alert((lang === 'en' ? 'Error: ' : 'ত্রুটি: ') + (r.message || ''));
+                }
+            },
+            error: function (xhr) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bolt"></i> ' +
+                    (lang === 'en' ? 'Recharge & Create Bill' : 'রিচার্জ করুন ও বিল তৈরি করুন');
+                var msg = lang === 'en' ? 'Recharge failed.' : 'রিচার্জ ব্যর্থ হয়েছে।';
+                try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e){}
+                alert(msg);
+            }
+        });
+    };
+
+    window.goToDashboard = function () { window.location.href = '/dashboard.html'; };
+    window.closeSuccess  = function () {
+        $('#successOverlay').removeClass('show');
+        loadSmsBalance();
+        $('#smsDueBillsCard').hide();
+        loadSmsDueBills();
+    };
+
+    // Re-render dynamic text on language change
+    $(document).on('languageChanged', function (e, lang) {
+        loadSmsBalance();
+        window.updateBillPreview();
+        $('#smsDueBillsBody tr').find('td').filter(function(){
+            return $(this).text().includes(' টি') || $(this).text().includes(' pcs');
+        }).each(function(){
+            var qty = parseInt($(this).text()) || 0;
+            if (qty > 0) $(this).text(qty.toLocaleString('en-IN') + (lang === 'en' ? ' pcs' : ' টি'));
+        });
+    });
+
+    function fmt(n) {
+        return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+    }
+    function fmtDate(d) {
+        if (!d) return '-';
+        return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    }
+
+})();
+</script>
+</body>
+</html>

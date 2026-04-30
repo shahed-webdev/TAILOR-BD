@@ -1,0 +1,502 @@
+﻿// Customer List Page
+(function () {
+    'use strict';
+
+    let institutionId, registrationId;
+    let currentPage = 1;
+    let totalPages = 1;
+    const pageSize = 100;
+    let deleteTargetId = null;
+    let editRowId = null;
+    let photoTargetId = null;
+    let photoFile = null;
+    let allCustomers = [];
+    let sortColumn = null;
+    let sortAsc = true;
+
+    // ── Auto-suggest helpers ──────────────────────────────────────
+    var suggestTimer = null;
+
+    function buildSuggestBox(inputEl) {
+        var box = $('<ul class="customer-suggest-box"></ul>');
+        $('body').append(box);
+        return box;
+    }
+
+    function positionSuggestBox(inputEl, box) {
+        var offset = $(inputEl).offset();
+        var h = $(inputEl).outerHeight();
+        box.css({ top: offset.top + h, left: offset.left, width: $(inputEl).outerWidth() });
+    }
+
+    function hideSuggestBox(box) {
+        box.empty().hide();
+    }
+
+    function attachSuggest(inputId, paramName, displayFn) {
+        var $input = $('#' + inputId);
+        var box = buildSuggestBox($input[0]);
+
+        $input.on('input keyup', function () {
+            clearTimeout(suggestTimer);
+            var val = $(this).val().trim();
+            if (val.length < 1) { hideSuggestBox(box); return; }
+
+            suggestTimer = setTimeout(function () {
+                $.ajax({
+                    url: '/api/customer-page/customer-list?institutionId=' + institutionId +
+                         '&pageSize=7&page=1&' + paramName + '=' + encodeURIComponent(val),
+                    method: 'GET',
+                    success: function (r) {
+                        box.empty();
+                        if (!r.success || !r.data || !r.data.customers || !r.data.customers.length) {
+                            hideSuggestBox(box); return;
+                        }
+                        r.data.customers.forEach(function (c) {
+                            var text = displayFn(c);
+                            var li = $('<li></li>').text(text);
+                            li.on('mousedown', function (e) {
+                                e.preventDefault();
+                                $input.val(text);
+                                hideSuggestBox(box);
+                                searchCustomers();
+                            });
+                            box.append(li);
+                        });
+                        positionSuggestBox($input[0], box);
+                        box.show();
+                    }
+                });
+            }, 250);
+        });
+
+        $input.on('blur', function () {
+            setTimeout(function () { hideSuggestBox(box); }, 200);
+        });
+
+        $input.on('keydown', function (e) {
+            if (!box.is(':visible')) return;
+            var items = box.find('li');
+            var active = box.find('li.active');
+            if (e.keyCode === 40) {           // down
+                e.preventDefault();
+                var next = active.length ? active.removeClass('active').next() : items.first();
+                next.addClass('active');
+            } else if (e.keyCode === 38) {    // up
+                e.preventDefault();
+                var prev = active.length ? active.removeClass('active').prev() : items.last();
+                prev.addClass('active');
+            } else if (e.keyCode === 13 && active.length) {
+                e.preventDefault();
+                $input.val(active.text());
+                hideSuggestBox(box);
+                searchCustomers();
+            } else if (e.keyCode === 27) {
+                hideSuggestBox(box);
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+
+    $(document).ready(function () {
+        institutionId = parseInt(sessionStorage.getItem('institutionId'));
+        registrationId = parseInt(sessionStorage.getItem('registrationId'));
+
+        if (!institutionId || !registrationId) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        // Clear other fields on focus
+        $('#searchCustomerNo').on('focus', function () { $('#searchName, #searchMobile').val(''); });
+        $('#searchMobile').on('focus', function () { $('#searchCustomerNo, #searchName').val(''); });
+        $('#searchName').on('focus', function () { $('#searchCustomerNo, #searchMobile').val(''); });
+
+        // Enter key
+        $('#searchCustomerNo, #searchName, #searchMobile').on('keyup', function (e) {
+            if (e.keyCode === 13) searchCustomers();
+        });
+
+        // Auto-suggest: নাম → customerName param, মোবাইল → phone param
+        attachSuggest('searchName',   'customerName', function (c) { return c.customerName; });
+        attachSuggest('searchMobile', 'phone',        function (c) { return c.phone; });
+
+        loadCustomers();
+    });
+
+    window.searchCustomers = function () {
+        currentPage = 1;
+        loadCustomers();
+    };
+
+    function loadCustomers() {
+        $('#customerTableContainer').html('<div class="loading"><i class="fas fa-spinner fa-spin me-2"></i>লোড হচ্ছে...</div>');
+        $('#summaryText').text('');
+        $('#totalDueText').hide();
+        $('#paginationWrap').empty();
+
+        const custNo = $('#searchCustomerNo').val().trim();
+        const name   = $('#searchName').val().trim();
+        const mobile = $('#searchMobile').val().trim();
+
+        let url = `/api/customer-page/customer-list?institutionId=${institutionId}&page=${currentPage}&pageSize=${pageSize}`;
+        if (custNo)  url += `&customerNo=${encodeURIComponent(custNo)}`;
+        if (name)    url += `&customerName=${encodeURIComponent(name)}`;
+        if (mobile)  url += `&phone=${encodeURIComponent(mobile)}`;
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (r) {
+                if (r.success && r.data) {
+                    const d = r.data;
+                    totalPages = d.totalPages || 1;
+
+                    $('#summaryText').text('সর্বমোট : ' + d.totalCount + ' জন কাস্টমার');
+
+                    if (d.totalDue > 0) {
+                        $('#totalDueText').text('মোট বাকি: ৳' + formatNumber(d.totalDue)).show();
+                    }
+
+                    if (d.customers && d.customers.length > 0) {
+                        allCustomers = d.customers;
+                        sortColumn = null;
+                        sortAsc = true;
+                        renderTable(allCustomers);
+                        renderPagination(d.currentPage, d.totalPages);
+                    } else {
+                        $('#customerTableContainer').html('<div class="empty-msg">কোনো কাস্টমার পাওয়া যায়নি</div>');
+                    }
+                } else {
+                    $('#customerTableContainer').html('<div class="empty-msg">কোনো রেকর্ড নেই</div>');
+                }
+            },
+            error: function () {
+                $('#customerTableContainer').html('<div class="empty-msg" style="color:#dc3545;">লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।</div>');
+            }
+        });
+    }
+
+    function renderTable(customers) {
+        let rows = '';
+        customers.forEach(function (c) {
+            const dueHtml = c.customerDue > 0
+                ? `<span class="due-badge">${formatNumber(c.customerDue)}</span>`
+                : `<span class="due-zero">0</span>`;
+
+            const photoUrl = `/api/Customers/${c.customerId}/photo?institutionId=${institutionId}`;
+            const photoHtml = `<div class="cust-photo-wrap" onclick="openPhotoModal(${c.customerId})" title="ছবি পরিবর্তন করতে ক্লিক করুন">
+                <img class="cust-photo" src="${photoUrl}" alt="ছবি"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <span class="cust-photo-placeholder" style="display:none;"><i class="fas fa-user"></i></span>
+            </div>`;
+
+            rows += `<tr id="row_${c.customerId}" data-customer-id="${c.customerId}" data-cloth-for="${c.clothForId}">
+                <td>
+                    <a class="btn-details" href="/customer-details.html?customerId=${c.customerId}&clothForId=${c.clothForId}">
+                        <i class="fas fa-eye"></i> বিস্তারিত
+                    </a>
+                </td>
+                <td>
+                    <a class="btn-order" href="/dress-measurements.html?customerId=${c.customerId}&clothForId=${c.clothForId}">
+                        <i class="fas fa-plus"></i> অর্ডার
+                    </a>
+                </td>
+                <td class="view-cell">${c.customerNumber}</td>
+                <td class="customer-name-td view-cell">
+                    <span class="customer-number">(${c.customerNumber})</span>${escapeHtml(c.customerName)}
+                </td>
+                <td class="view-cell">${escapeHtml(c.phone || '-')}</td>
+                <td class="view-cell">${escapeHtml(c.address || '-')}</td>
+                <td class="view-cell">${escapeHtml(c.description || '-')}</td>
+                <td>${dueHtml}</td>
+                <td>${c.date ? formatDate(c.date) : '-'}</td>
+                <td class="view-cell">${photoHtml}</td>
+                <td>
+                    <button class="btn-edit" onclick="startEdit(${c.customerId})" title="ইডিট করুন"><i class="fas fa-edit"></i></button>
+                </td>
+                <td>
+                    <button class="btn-delete" onclick="openDeleteModal(${c.customerId})" title="ডিলেট করুন"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+            <tr id="editrow_${c.customerId}" style="display:none; background:#f0f7ff;">
+                <td colspan="2"></td>
+                <td></td>
+                <td><input class="edit-input" id="edit_name_${c.customerId}" value="${escapeAttr(c.customerName)}" placeholder="নাম"></td>
+                <td><input class="edit-input" id="edit_phone_${c.customerId}" value="${escapeAttr(c.phone)}" placeholder="মোবাইল"></td>
+                <td><input class="edit-input" id="edit_address_${c.customerId}" value="${escapeAttr(c.address)}" placeholder="ঠিকানা"></td>
+                <td><input class="edit-input" id="edit_desc_${c.customerId}" value="${escapeAttr(c.description)}" placeholder="বিবরণ"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <button class="btn-save-row" onclick="saveEdit(${c.customerId})"><i class="fas fa-check"></i></button>
+                </td>
+                <td>
+                    <button class="btn-cancel-row" onclick="cancelEdit(${c.customerId})"><i class="fas fa-times"></i></button>
+                </td>
+            </tr>`;
+        });
+
+        function sortIcon(col) {
+            if (sortColumn !== col) return ' <span class="sort-icon">⇅</span>';
+            return sortAsc ? ' <span class="sort-icon asc">▲</span>' : ' <span class="sort-icon desc">▼</span>';
+        }
+
+        $('#customerTableContainer').html(`
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:80px;" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                        <th style="width:80px;" data-en="Order" data-bn="অর্ডার দিন">অর্ডার দিন</th>
+                        <th class="sortable" data-sort="customerNumber" data-en="No." data-bn="কাস্টমার নং">কাস্টমার নং${sortIcon('customerNumber')}</th>
+                        <th class="sortable" data-sort="customerName" data-en="Name" data-bn="নাম">নাম${sortIcon('customerName')}</th>
+                        <th class="sortable" data-sort="phone" data-en="Mobile" data-bn="মোবাইল">মোবাইল${sortIcon('phone')}</th>
+                        <th data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
+                        <th data-en="Description" data-bn="বিবরণ">বিবরণ</th>
+                        <th class="sortable" data-sort="customerDue" data-en="Due" data-bn="বাকি টাকা">বাকি টাকা${sortIcon('customerDue')}</th>
+                        <th class="sortable" data-sort="date" data-en="Reg. Date" data-bn="নিবন্ধনের তারিখ">নিবন্ধনের তারিখ${sortIcon('date')}</th>
+                        <th style="width:70px;" data-en="Photo" data-bn="ছবি">ছবি</th>
+                        <th style="width:50px;"></th>
+                        <th style="width:50px;"></th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>`);
+
+        // Attach sort click handlers
+        $('#customerTableContainer').find('th.sortable').on('click', function () {
+            const col = $(this).data('sort');
+            if (sortColumn === col) {
+                sortAsc = !sortAsc;
+            } else {
+                sortColumn = col;
+                sortAsc = col === 'customerDue' ? false : true; // due: বেশি বাকি আগে
+            }
+            allCustomers.sort(function (a, b) {
+                let va = a[col];
+                let vb = b[col];
+                if (col === 'customerDue') {
+                    va = parseFloat(va) || 0;
+                    vb = parseFloat(vb) || 0;
+                } else if (col === 'customerNumber') {
+                    va = parseInt(va) || 0;
+                    vb = parseInt(vb) || 0;
+                } else if (col === 'date') {
+                    va = va ? new Date(va).getTime() : 0;
+                    vb = vb ? new Date(vb).getTime() : 0;
+                } else {
+                    va = (va || '').toString().toLowerCase();
+                    vb = (vb || '').toString().toLowerCase();
+                }
+                if (va < vb) return sortAsc ? -1 : 1;
+                if (va > vb) return sortAsc ? 1 : -1;
+                return 0;
+            });
+            renderTable(allCustomers);
+        });
+
+        if (window.updateLanguage) window.updateLanguage();
+    }
+
+    window.startEdit = function (customerId) {
+        if (editRowId && editRowId !== customerId) cancelEdit(editRowId);
+        editRowId = customerId;
+        $(`#row_${customerId} .view-cell`).hide();
+        $(`#row_${customerId} .btn-edit`).hide();
+        $(`#editrow_${customerId}`).show();
+    };
+
+    window.cancelEdit = function (customerId) {
+        editRowId = null;
+        $(`#row_${customerId} .view-cell`).show();
+        $(`#row_${customerId} .btn-edit`).show();
+        $(`#editrow_${customerId}`).hide();
+    };
+
+    window.saveEdit = function (customerId) {
+        const name    = $(`#edit_name_${customerId}`).val().trim();
+        const phone   = $(`#edit_phone_${customerId}`).val().trim();
+        const address = $(`#edit_address_${customerId}`).val().trim();
+        const desc    = $(`#edit_desc_${customerId}`).val().trim();
+
+        if (!name) { alert('নাম দিন'); return; }
+
+        $.ajax({
+            url: '/api/customer-page/update-customer',
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ customerId, institutionId, customerName: name, phone, address, description: desc }),
+            success: function (r) {
+                if (r.success) {
+                    cancelEdit(customerId);
+                    loadCustomers();
+                } else {
+                    alert(r.message || 'আপডেট করতে সমস্যা হয়েছে');
+                }
+            },
+            error: function () { alert('সমস্যা হয়েছে। আবার চেষ্টা করুন।'); }
+        });
+    };
+
+    window.openDeleteModal = function (customerId) {
+        deleteTargetId = customerId;
+        $('#deleteModal').addClass('show');
+    };
+
+    window.closeDeleteModal = function () {
+        deleteTargetId = null;
+        $('#deleteModal').removeClass('show');
+    };
+
+    window.confirmDeleteCustomer = function () {
+        if (!deleteTargetId) return;
+        $('#deleteModal').removeClass('show');
+
+        $.ajax({
+            url: `/api/customer-page/delete-customer/${deleteTargetId}?institutionId=${institutionId}`,
+            method: 'DELETE',
+            success: function (r) {
+                if (r.success) {
+                    loadCustomers();
+                } else {
+                    alert(r.message || 'ডিলেট করতে সমস্যা হয়েছে');
+                }
+                deleteTargetId = null;
+            },
+            error: function (xhr) {
+                const msg = xhr.responseJSON ? xhr.responseJSON.message : 'সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+                alert(msg);
+                deleteTargetId = null;
+            }
+        });
+    };
+
+    window.openPhotoModal = function (customerId) {
+        photoTargetId = customerId;
+        photoFile = null;
+        $('#photoFileInput').val('');
+        $('#photoPreviewImg').hide().attr('src', '');
+        $('#photoPlaceholder').show();
+        $('#btnSavePhoto').prop('disabled', false);
+
+        // Load existing photo
+        var img = new Image();
+        img.onload = function () {
+            $('#photoPlaceholder').hide();
+            $('#photoPreviewImg').attr('src', img.src).show();
+        };
+        img.src = '/api/Customers/' + customerId + '/photo?institutionId=' + institutionId + '&_t=' + Date.now();
+
+        $('#photoModal').addClass('show');
+    };
+
+    window.closePhotoModal = function () {
+        photoTargetId = null;
+        photoFile = null;
+        $('#photoModal').removeClass('show');
+    };
+
+    $('#photoFileInput').on('change', function () {
+        var file = this.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            alert('ছবির সাইজ ২ MB এর বেশি হওয়া যাবে না');
+            $(this).val('');
+            return;
+        }
+        photoFile = file;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#photoPlaceholder').hide();
+            $('#photoPreviewImg').attr('src', e.target.result).show();
+        };
+        reader.readAsDataURL(file);
+    });
+
+    window.saveCustomerPhoto = function () {
+        if (!photoFile) { alert('অনুগ্রহ করে একটি ছবি বেছে নিন'); return; }
+        if (!photoTargetId) return;
+
+        // capture before closePhotoModal() clears them
+        var savedId   = photoTargetId;
+        var savedFile = photoFile;
+
+        var formData = new FormData();
+        formData.append('photo', savedFile);
+
+        $('#btnSavePhoto').prop('disabled', true).text('সেভ হচ্ছে...');
+
+        $.ajax({
+            url: '/api/Customers/' + savedId + '/photo?institutionId=' + institutionId,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (r) {
+                if (r.success) {
+                    closePhotoModal();
+                    // Use the already-read base64 data URL — no server round-trip, no cache issue
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var dataUrl = e.target.result;
+                        var $wrap = $('#row_' + savedId + ' .cust-photo-wrap');
+                        var $img = $wrap.find('.cust-photo');
+                        $img[0].onerror = null;
+                        $img.attr('src', dataUrl).show();
+                        $wrap.find('.cust-photo-placeholder').hide();
+                    };
+                    reader.readAsDataURL(savedFile);
+                } else {
+                    alert(r.message || 'ছবি সেভ করতে সমস্যা হয়েছে');
+                    $('#btnSavePhoto').prop('disabled', false).html('<i class="fas fa-save me-1"></i>সেভ করুন');
+                }
+            },
+            error: function () {
+                alert('সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                $('#btnSavePhoto').prop('disabled', false).html('<i class="fas fa-save me-1"></i>সেভ করুন');
+            }
+        });
+    };
+
+    function renderPagination(current, total) {
+        if (total <= 1) { $('#paginationWrap').empty(); return; }
+
+        let html = `<button class="page-btn" ${current === 1 ? 'disabled' : ''} onclick="goToPage(${current - 1})">&laquo;</button>`;
+        const start = Math.max(1, current - 2);
+        const end   = Math.min(total, current + 2);
+        if (start > 1) { html += `<button class="page-btn" onclick="goToPage(1)">1</button>`; if (start > 2) html += `<span style="padding:4px 6px;">...</span>`; }
+        for (let i = start; i <= end; i++) {
+            html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+        if (end < total) { if (end < total - 1) html += `<span style="padding:4px 6px;">...</span>`; html += `<button class="page-btn" onclick="goToPage(${total})">${total}</button>`; }
+        html += `<button class="page-btn" ${current === total ? 'disabled' : ''} onclick="goToPage(${current + 1})">&raquo;</button>`;
+        $('#paginationWrap').html(html);
+    }
+
+    window.goToPage = function (page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        loadCustomers();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function formatNumber(n) {
+        return Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    function escapeHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function escapeAttr(str) {
+        return String(str || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+})();

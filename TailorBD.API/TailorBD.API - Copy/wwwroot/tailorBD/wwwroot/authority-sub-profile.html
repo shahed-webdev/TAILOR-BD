@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub Authority Dashboard - TailorBD</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+
+    <!-- Auth guard + shared sidebar/navbar (Sub-Authority mode) -->
+    <script src="/js/auth.js"></script>
+    <script src="/js/authority-layout.js" data-page="sub-dashboard"></script>
+
+    <style>
+        .auth-content { overflow-x: hidden; }
+
+        /* ── Welcome banner ── */
+        .dash-header {
+            background: var(--auth-grad);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 8px 32px rgba(99,102,241,.28);
+            position: relative;
+            overflow: hidden;
+        }
+        .dash-header::before {
+            content:''; position:absolute; width:220px; height:220px; border-radius:50%;
+            background:rgba(255,255,255,.07); top:-80px; right:-40px; pointer-events:none;
+        }
+        .dash-avatar {
+            width:58px; height:58px; border-radius:14px;
+            background:rgba(255,255,255,.22);
+            border:2px solid rgba(255,255,255,.35);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.4rem; font-weight:800; color:#fff;
+            flex-shrink:0; z-index:1; overflow:hidden;
+        }
+        .dash-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+        .dash-title { z-index:1; flex:1; min-width:0; }
+        .dash-title h2 { font-size:1.2rem; font-weight:800; margin:0 0 3px; }
+        .dash-title p  { font-size:.82rem; opacity:.82; margin:0; }
+        .access-badge {
+            z-index:1;
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(255,255,255,.18);
+            border:1.5px solid rgba(255,255,255,.3);
+            border-radius:20px; padding:5px 14px;
+            font-size:.78rem; font-weight:700; margin-top:8px;
+        }
+        .dash-avatar-wrap { z-index:1; opacity:.2; flex-shrink:0; }
+
+        /* ── Section heading ── */
+        .dash-section-title {
+            font-size:.74rem; font-weight:700; color:#94a3b8;
+            text-transform:uppercase; letter-spacing:.8px;
+            margin-bottom:12px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .dash-section-title::after { content:''; flex:1; height:1px; background:#e2e8f0; }
+
+        /* ── Page grid ── */
+        .page-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(170px,1fr));
+            gap:14px;
+            margin-bottom:28px;
+        }
+        .page-card {
+            background:#fff;
+            border:1.5px solid #e2e8f0;
+            border-radius:var(--radius);
+            padding:20px 16px;
+            text-align:center;
+            cursor:pointer;
+            transition:all .2s;
+            text-decoration:none;
+            color:inherit;
+            display:block;
+            box-shadow:var(--shadow);
+        }
+        .page-card:hover {
+            border-color:#a5b4fc;
+            box-shadow:0 6px 24px rgba(99,102,241,.18);
+            transform:translateY(-3px);
+            color:inherit;
+        }
+        .page-card .pc-icon {
+            width:52px; height:52px; border-radius:14px;
+            background:var(--auth-grad);
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 12px;
+            font-size:1.2rem; color:#fff;
+        }
+        .page-card .pc-label { font-size:.85rem; font-weight:700; color:#1e293b; }
+        .page-card .pc-group { font-size:.71rem; color:#94a3b8; margin-top:3px; }
+
+        /* ── Shimmer loading ── */
+        .shimmer {
+            background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);
+            background-size:200% 100%;
+            animation:shimmer 1.4s infinite;
+            border-radius:var(--radius); height:120px;
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        /* ── No access ── */
+        .no-access {
+            text-align:center; padding:50px 20px;
+            background:#fff; border-radius:var(--radius);
+            border:1.5px dashed #e2e8f0;
+        }
+        .no-access i { font-size:3rem; color:#cbd5e1; margin-bottom:14px; display:block; }
+        .no-access h5 { color:#64748b; font-weight:700; }
+        .no-access p  { color:#94a3b8; font-size:.85rem; }
+
+        /* ── Responsive ── */
+        @media (max-width:640px) {
+            .dash-header { flex-wrap:wrap; padding:18px 20px; }
+            .dash-title h2 { font-size:1.05rem; }
+            .dash-avatar-wrap { display:none; }
+            .page-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media (max-width:400px) {
+            .page-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="auth-main">
+<div class="auth-content">
+
+    <!-- ── Welcome Header ── -->
+    <div class="dash-header">
+        <div class="dash-avatar" id="dashAvatar">
+            <span id="dashInitials">SA</span>
+        </div>
+        <div class="dash-title">
+            <h2>স্বাগতম, <span id="dashName">Sub Authority</span>!</h2>
+            <p id="dashDesig">Sub Authority Panel</p>
+            <div class="access-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span id="accessCount">0</span> টি পেইজ অ্যাক্সেসযোগ্য
+            </div>
+        </div>
+        <div class="dash-avatar-wrap">
+            <i class="fas fa-user-shield" style="font-size:5rem;"></i>
+        </div>
+    </div>
+
+    <!-- ── Quick Access ── -->
+    <div class="dash-section-title"><i class="fas fa-bolt"></i> দ্রুত প্রবেশ</div>
+
+    <div class="section-card">
+        <!-- Shimmer loading -->
+        <div id="loadingGrid" class="page-grid">
+            <div class="shimmer"></div>
+            <div class="shimmer"></div>
+            <div class="shimmer"></div>
+            <div class="shimmer"></div>
+        </div>
+
+        <!-- Pages grid -->
+        <div class="page-grid" id="pageGrid" style="display:none;"></div>
+
+        <!-- No access -->
+        <div class="no-access" id="noAccess" style="display:none;">
+            <i class="fas fa-lock"></i>
+            <h5>কোনো পেইজ অ্যাক্সেসযোগ্য নয়</h5>
+            <p>পেইজ এক্সেস পেতে আপনার Authority-র সাথে যোগাযোগ করুন।</p>
+        </div>
+    </div>
+
+</div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<div id="toastWrap"></div>
+
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ── Page key → HTML URL map (সব authority pages) ────────────────────────────
+var PAGE_URLS = {
+    'profile':             '/authority-profile.html',
+    'package':             '/authority-package.html',
+    'signup':              '/authority-signup.html',
+    'invoice':             '/authority-invoice.html',
+    'collect-payment':     '/authority-collect-payment.html',
+    'institution-details': '/authority-institution-details.html',
+    'users':               '/authority-users.html',
+    'roles':               '/authority-roles.html',
+    'sub-authority':       '/authority-sub-authority.html',
+    'marketing':           '/authority-marketing.html'
+};
+
+$(document).ready(function () {
+    // Auth guard — only Sub-Authority allowed
+    TailorAuth.restore();
+    var isLoggedIn = TailorAuth.get('isLoggedIn');
+    var category   = TailorAuth.get('category');
+
+    if (!isLoggedIn || isLoggedIn !== 'true') {
+        window.location.replace('/login.html');
+        return;
+    }
+    if (category !== 'Sub-Authority') {
+        window.location.replace(category === 'Authority' ? '/authority-profile.html' : '/dashboard.html');
+        return;
+    }
+
+    var name  = TailorAuth.get('name') || TailorAuth.get('username') || 'Sub Authority';
+    var desig = TailorAuth.get('designation') || 'Sub Authority';
+    var regId = parseInt(TailorAuth.get('registrationId') || '0', 10);
+
+    // Header info
+    $('#dashName').text(name);
+    $('#dashDesig').text(desig);
+
+    // Avatar initials
+    var initials = name.trim().split(' ').slice(0,2).map(function(w){ return w[0] || ''; }).join('').toUpperCase();
+    $('#dashInitials').text(initials || 'SA');
+
+    // Load pages
+    if (regId) {
+        loadMyPages(regId);
+    } else {
+        showNoAccess();
+    }
+});
+
+function loadMyPages(regId) {
+    $.get('/api/subadmin/my-pages/' + regId, function (res) {
+        $('#loadingGrid').hide();
+        if (res.success && res.data && res.data.length) {
+            renderPages(res.data);
+        } else {
+            showNoAccess();
+        }
+    }).fail(function () {
+        $('#loadingGrid').hide();
+        showNoAccess();
+    });
+}
+
+function renderPages(pages) {
+    $('#accessCount').text(pages.length);
+    var $grid = $('#pageGrid').empty().show();
+
+    pages.forEach(function (p) {
+        var url = PAGE_URLS[p.key] || '#';
+        $grid.append(
+            '<a class="page-card" href="' + url + '">' +
+                '<div class="pc-icon"><i class="fas ' + escHtml(p.icon) + '"></i></div>' +
+                '<div class="pc-label">' + escHtml(p.label) + '</div>' +
+                '<div class="pc-group">' + escHtml(p.group) + '</div>' +
+            '</a>'
+        );
+    });
+}
+
+function showNoAccess() {
+    $('#loadingGrid').hide();
+    $('#accessCount').text('0');
+    $('#noAccess').show();
+}
+
+function escHtml(s) {
+    return String(s || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

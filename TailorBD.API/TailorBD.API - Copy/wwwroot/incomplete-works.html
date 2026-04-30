@@ -1,0 +1,667 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অর্ডারের কাজ সম্পূর্ণ করুন - TailorBD</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Dashboard CSS (includes sidebar and navbar styles) -->
+    <link rel="stylesheet" href="/css/dashboard.css">
+    
+    <style>
+        /* Fix for Navbar and Main Content to work with Sidebar */
+        #app-navbar {
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Container */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .content {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .work-complete-container {
+            padding: 20px;
+            max-width: 100%;
+        }
+
+        .work-complete-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Search Section */
+        .search-section {
+            margin-bottom: 15px;
+        }
+
+        .search-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .search-tabs label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .search-tabs input[type="radio"] {
+            margin-right: 6px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #555;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6c7ae0;
+        }
+
+        .btn-search {
+            padding: 7px 16px;
+            background: #6c7ae0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .btn-search:hover {
+            background: #5a68c9;
+        }
+
+        .search-by-number,
+        .search-by-date {
+            display: none;
+        }
+
+        .search-by-number.active,
+        .search-by-date.active {
+            display: block;
+        }
+
+        .orders-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        /* Total Count */
+        .total-count {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .legend-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+
+        .legend-box.today {
+            background-color: #d4edda; /* Greenish */
+        }
+
+        .legend-box.overdue {
+            background-color: #ffe6e6;
+        }
+
+        .legend-box.partly {
+            background-color: #e6f7ff;
+        }
+
+        /* Table Styles */
+        .orders-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 12px;
+        }
+
+        th {
+            background: #6c7ae0;
+            color: white;
+            padding: 8px 4px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: 11px;
+        }
+
+        td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Row Colors */
+        tr.today {
+            background-color: #d4edda !important; /* Light greenish */
+        }
+
+        tr.overdue {
+            background-color: #ffe6e6;
+        }
+
+        tr.partly-completed {
+            background-color: #e6f7ff;
+        }
+
+        tr.selected {
+            background-color: #e3f2fd;
+        }
+
+        /* Nested Order List Table */
+        .order-list-nested {
+            width: 100%;
+            margin: 0;
+            font-size: 11px;
+        }
+
+        .order-list-nested th,
+        .order-list-nested td {
+            padding: 4px 2px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .order-list-nested th {
+            background: #f5f5f5;
+            color: #333;
+            font-size: 10px;
+        }
+
+        /* Input Fields - More Compact */
+        .store-input, .details-input {
+            width: 100%;
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .pending-input {
+            width: 45px;
+            padding: 3px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        /* Checkboxes */
+        .order-checkbox,
+        .order-list-checkbox,
+        .order-list-item-checkbox,
+        .sms-checkbox {
+            cursor: pointer;
+            transform: scale(0.9);
+        }
+
+        /* View Measurement Link */
+        .view-measurement-link {
+            color: #6c7ae0;
+            text-decoration: none;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .view-measurement-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Print Icon */
+        .print-icon {
+            color: #6c7ae0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .print-icon:hover {
+            color: #5a68c9;
+        }
+
+        /* Column Widths - Optimized */
+        table th:nth-child(1),
+        table td:nth-child(1) {
+            width: 30px;
+            text-align: center;
+        }
+
+        table th:nth-child(2),
+        table td:nth-child(2) {
+            width: 60px;
+        }
+
+        table th:nth-child(3),
+        table td:nth-child(3) {
+            min-width: 140px;
+        }
+
+        table th:nth-child(4),
+        table td:nth-child(4) {
+            width: 90px;
+        }
+
+        table th:nth-child(5),
+        table td:nth-child(5) {
+            min-width: 100px;
+        }
+
+        table th:nth-child(6),
+        table td:nth-child(6) {
+            min-width: 200px;
+        }
+
+        table th:nth-child(7),
+        table td:nth-child(7) {
+            width: 85px;
+        }
+
+        table th:nth-child(8),
+        table td:nth-child(8) {
+            width: 85px;
+        }
+
+        table th:nth-child(9),
+        table td:nth-child(9) {
+            width: 70px;
+            text-align: right;
+        }
+
+        table th:nth-child(10),
+        table td:nth-child(10) {
+            width: 100px;
+        }
+
+        table th:nth-child(11),
+        table td:nth-child(11) {
+            width: 100px;
+        }
+
+        table th:nth-child(12),
+        table td:nth-child(12) {
+            width: 40px;
+            text-align: center;
+        }
+
+        table th:nth-child(13),
+        table td:nth-child(13) {
+            width: 40px;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading:before {
+            content: "";
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            padding: 15px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        /* Complete Button */
+        .btn-complete {
+            margin-top: 15px;
+            padding: 10px 24px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-complete:hover:not(:disabled) {
+            background: #218838;
+        }
+
+        .btn-complete:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* jQuery UI Autocomplete Customization */
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 9999 !important;
+            font-size: 12px;
+            border: 1px solid #6c7ae0;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .ui-menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .ui-menu-item:hover,
+        .ui-state-active {
+            background-color: #6c7ae0 !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            table {
+                font-size: 11px;
+            }
+
+            th {
+                padding: 6px 3px;
+                font-size: 10px;
+            }
+
+            td {
+                padding: 4px 3px;
+            }
+
+            .store-input, .details-input {
+                padding: 3px;
+                font-size: 10px;
+            }
+
+            .order-list-nested {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Mobile: Remove sidebar margin */
+            #app-navbar {
+                margin-left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            table {
+                font-size: 10px;
+            }
+
+            th {
+                padding: 4px 2px;
+            }
+
+            td {
+                padding: 3px 2px;
+            }
+
+            .orders-table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Container -->
+    <div id="app-navbar"></div>
+
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="work-complete-container">
+                <h2><span class="lang-content" data-en="Complete Incomplete Orders" data-bn="যে সকল অর্ডারের কাজ শেষ হয়েছে টিক দিয়ে সম্পূর্ণ করুন">যে সকল অর্ডারের কাজ সম্পূর্ণ করুন</span></h2>
+
+                <!-- Search Section -->
+                <div class="search-section">
+                    <div class="search-tabs">
+                        <label>
+                            <input type="radio" name="searchType" value="number" checked>
+                            <span class="lang-content" data-en="Order No. and Mobile No." data-bn="অর্ডার নং এবং মোবাইল নং">অর্ডার নং এবং মোবাইল নং</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="searchType" value="date">
+                            <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারী তারিখ">ডেলিভারী তারিখ</span>
+                        </label>
+                    </div>
+
+                    <!-- Search by Number -->
+                    <div class="search-by-number active">
+                        <div class="search-form">
+                            <div class="form-group">
+                                <label for="mobileNo" class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</label>
+                                <input type="text" id="mobileNo" list="mobileNoList" class="lang-content" data-en-placeholder="Mobile Number" data-bn-placeholder="মোবাইল নাম্বার" placeholder="মোবাইল নাম্বার">
+                                <datalist id="mobileNoList"></datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="customerName" class="lang-content" data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                                <input type="text" id="customerName" list="customerNameList" class="lang-content" data-en-placeholder="Customer Name" data-bn-placeholder="কাস্টমারের নাম" placeholder="কাস্টমারের নাম">
+                                <datalist id="customerNameList"></datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="orderNo" class="lang-content" data-en="Order Number" data-bn="অর্ডার নাম্বার">অর্ডার নাম্বার</label>
+                                <input type="text" id="orderNo" list="orderNoList" class="lang-content" data-en-placeholder="Example: 10,20,30" data-bn-placeholder="উদাহরণ: 10,20,30" placeholder="উদাহরণ: 10,20,30">
+                                <datalist id="orderNoList"></datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="address" class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                                <input type="text" id="address" list="addressList" class="lang-content" data-en-placeholder="Address" data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা">
+                                <datalist id="addressList"></datalist>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search by Date -->
+                    <div class="search-by-date">
+                        <div class="search-form">
+                            <div class="form-group">
+                                <label for="startDate" class="lang-content" data-en="From Date" data-bn="কোন তারিখ থেকে">কোন তারিখ থেকে</label>
+                                <input type="date" id="startDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="endDate" class="lang-content" data-en="To Date" data-bn="কোন তারিখ পর্যন্ত">কোন তারিখ পর্যন্ত</label>
+                                <input type="date" id="endDate">
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="orders-table-container">
+                    <div class="total-count" id="totalCount">
+                        <span class="lang-content" data-en="Total: 0 incomplete orders" data-bn="সর্বমোট: 0 টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে">সর্বমোট: 0 টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে</span>
+                    </div>
+
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-box today"></div>
+                            <span class="lang-content" data-en="Today's Delivery Date" data-bn="আজকের ডেলিভারী তারিখ">আজকের ডেলিভারী তারিখ</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box overdue"></div>
+                            <span class="lang-content" data-en="Delivery Date Passed" data-bn="ডেলিভারী তারিখ অতিক্রান্ত">ডেলিভারী তারিখ অতিক্রান্ত</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box partly"></div>
+                            <span class="lang-content" data-en="Partly Completed" data-bn="আংশিক সম্পূর্ণ">আংশিক সম্পূর্ণ</span>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <div id="ordersTableContainer">
+                            <div class="loading"><span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span></div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-complete" id="btnComplete" onclick="completeWork()" disabled>
+                        <span class="lang-content" data-en="Complete Work" data-bn="কাজ সম্পূর্ণ করুন">কাজ সম্পূর্ণ করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals Container -->
+    <div id="app-modals"></div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- jQuery UI for autocomplete -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js"></script>
+    
+    <!-- Incomplete Works JS -->
+    <script src="/js/incomplete-works.js"></script>
+</body>
+</html>

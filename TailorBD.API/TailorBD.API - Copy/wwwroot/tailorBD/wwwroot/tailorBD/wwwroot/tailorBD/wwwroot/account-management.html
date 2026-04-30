@@ -1,0 +1,388 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাকাউন্ট ম্যানেজমেন্ট - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    
+    <style>
+        .account-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+            cursor: pointer;
+        }
+
+        .account-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .account-card.default {
+            border-left-color: #11998e;
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.05) 0%, rgba(56, 239, 125, 0.05) 100%);
+        }
+
+        .account-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .account-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .account-balance {
+            font-size: 28px;
+            font-weight: 800;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .account-balance.positive {
+            color: #11998e;
+        }
+
+        .account-balance.negative {
+            color: #f5576c;
+        }
+
+        .account-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .stat-value.income {
+            color: #11998e;
+        }
+
+        .stat-value.expense {
+            color: #f5576c;
+        }
+
+        .account-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-account-action {
+            flex: 1;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-deposit {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-withdraw {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .default-badge {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .add-account-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .icon-balance {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .icon-income {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .icon-expense {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .icon-accounts {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="lang-content" data-en="Account Management" data-bn="অ্যাকাউন্ট ম্যানেজমেন্ট">অ্যাকাউন্ট ম্যানেজমেন্ট</h1>
+                    <p class="lang-content" data-en="Manage your accounts with deposits and withdrawals" data-bn="জমা ও উত্তোলন সহ আপনার অ্যাকাউন্টগুলি পরিচালনা করুন">জমা ও উত্তোলন সহ আপনার অ্যাকাউন্টগুলি পরিচালনা করুন</p>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-icon icon-balance">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <p class="text-muted mb-1 lang-content" data-en="Total Balance" data-bn="মোট ব্যালেন্স">মোট ব্যালেন্স</p>
+                    <h3 id="totalBalance">৳0</h3>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon icon-income">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <p class="text-muted mb-1 lang-content" data-en="Total Deposit" data-bn="মোট জমা">মোট জমা</p>
+                    <h3 class="text-success" id="totalDeposit">৳0</h3>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon icon-expense">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <p class="text-muted mb-1 lang-content" data-en="Total Withdraw" data-bn="মোট উত্তোলন">মোট উত্তোলন</p>
+                    <h3 class="text-danger" id="totalWithdraw">৳0</h3>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-icon icon-accounts">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <p class="text-muted mb-1 lang-content" data-en="Total Accounts" data-bn="মোট অ্যাকাউন্ট">মোট অ্যাকাউন্ট</p>
+                    <h3 id="totalAccounts">0</h3>
+                </div>
+            </div>
+
+            <!-- Add Account Card -->
+            <div class="add-account-card">
+                <h4 class="mb-3">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <span class="lang-content" data-en="Add New Account" data-bn="নতুন অ্যাকাউন্ট যুক্ত করুন">নতুন অ্যাকাউন্ট যুক্ত করুন</span>
+                </h4>
+                <form id="addAccountForm" onsubmit="addAccount(event)">
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label lang-content" data-en="Account Name" data-bn="অ্যাকাউন্টের নাম">অ্যাকাউন্টের নাম</label>
+                            <input type="text" class="form-control" id="accountName" 
+                                   placeholder="Enter account name..." required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-light w-100">
+                                <i class="fas fa-plus me-2"></i>
+                                <span class="lang-content" data-en="Add Account" data-bn="অ্যাকাউন্ট যুক্ত করুন">অ্যাকাউন্ট যুক্ত করুন</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Accounts List -->
+            <div class="row" id="accountsList">
+                <!-- Accounts will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Deposit/Withdraw Modal -->
+    <div class="modal fade" id="transactionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transactionModalTitle">Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transactionForm" onsubmit="submitTransaction(event)">
+                        <input type="hidden" id="transactionAccountId">
+                        <input type="hidden" id="transactionType">
+                        
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Amount" data-bn="পরিমাণ">পরিমাণ</label>
+                            <input type="number" class="form-control" id="transactionAmount" 
+                                   placeholder="0.00" required min="1" step="0.01">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Note (Optional)" data-bn="নোট (ঐচ্ছিক)">নোট (ঐচ্ছিক)</label>
+                            <textarea class="form-control" id="transactionNote" rows="3" 
+                                      placeholder="Enter transaction note..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Date" data-bn="তারিখ">তারিখ</label>
+                            <input type="date" class="form-control" id="transactionDate" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Cancel" data-bn="বাতিল">বাতিল</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="submitTransaction(event)">
+                        <i class="fas fa-check me-2"></i>
+                        <span class="lang-content" data-en="Confirm" data-bn="নিশ্চিত করুন">নিশ্চিত করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Account Modal -->
+    <div class="modal fade" id="editAccountModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title lang-content" data-en="Edit Account" data-bn="অ্যাকাউন্ট সম্পাদনা">অ্যাকাউন্ট সম্পাদনা</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAccountForm" onsubmit="updateAccount(event)">
+                        <input type="hidden" id="editAccountId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Account Name" data-bn="অ্যাকাউন্টের নাম">অ্যাকাউন্টের নাম</label>
+                            <input type="text" class="form-control" id="editAccountName" required>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="editDefaultStatus">
+                            <label class="form-check-label lang-content" data-en="Set as Default Account" data-bn="ডিফল্ট অ্যাকাউন্ট হিসেবে সেট করুন">
+                                ডিফল্ট অ্যাকাউন্ট হিসেবে সেট করুন
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="lang-content" data-en="Cancel" data-bn="বাতিল">বাতিল</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="updateAccount(event)">
+                        <i class="fas fa-save me-2"></i>
+                        <span class="lang-content" data-en="Save Changes" data-bn="পরিবর্তন সংরক্ষণ">পরিবর্তন সংরক্ষণ</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js"></script>
+    
+    <!-- Account Management JS -->
+    <script src="/js/account-management.js"></script>
+</body>
+</html>

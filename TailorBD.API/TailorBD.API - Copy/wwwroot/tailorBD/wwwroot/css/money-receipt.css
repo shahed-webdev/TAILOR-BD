@@ -1,0 +1,1152 @@
+/* Money Receipt Styles - Thermal Printer Optimized */
+:root {
+    --print-width: 4in;
+    --measurement-top-space: 0px;
+}
+
+body {
+    font-family: 'Noto Sans Bengali', 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f5f7fa;
+    padding: 0;
+    margin: 0;
+}
+
+/* Main Content with Sidebar */
+.main-content {
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+    padding: 0;
+}
+
+@media (min-width: 992px) {
+    .main-content {
+        margin-left: 260px;
+    }
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.action-bar {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-bar .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.action-bar .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.action-bar .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.action-bar .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.print-size-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-tabs {
+    background: white;
+    padding: 10px 15px 0;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.nav-tabs .nav-link {
+    color: #666;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.nav-tabs .nav-link.active {
+    color: #6f42c1;
+    background: transparent;
+    border-bottom: 3px solid #6f42c1;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #6f42c1;
+}
+
+.tab-content {
+    background: white;
+    padding: 0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Receipt Container */
+.receipt-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px 20px 20px;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: visible;
+}
+
+.receipt-header {
+    text-align: center;
+    margin: 0 0 2px 0;
+    padding: 0 0 5px 0;
+    border-bottom: 1px solid #666;
+    background-color: #fff !important;
+    overflow: visible;
+    color: #000 !important;
+}
+
+.institution-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0px 0;
+    color: #000 !important;
+    font-family: 'Noto Sans Bengali', sans-serif;
+    background-color: transparent !important;
+    display: block;
+    line-height: 1.4;
+    min-height: 1em;
+}
+
+/* Receipt page specific id to avoid conflicts with navbar/sidebar */
+#receiptInstitutionName {
+    color: #000 !important;
+
+}
+
+@media print {
+    #receiptInstitutionName {
+        color: #000 !important;
+      
+        -webkit-text-fill-color: #000 !important;
+    }
+}
+
+.institution-subtitle {
+    font-size: 12px;
+    font-style: italic;
+    color: #666 !important;
+    margin: 5px 0 0 0;
+    padding: 0;
+    background-color: transparent !important;
+}
+
+.institution-contact {
+    font-size: 13px;
+    color: #444 !important;
+    margin: 5px 0 0 0;
+    padding: 0;
+    background-color: transparent !important;
+}
+
+.institution-contact span {
+    color: inherit !important;
+}
+
+/* Customer Section */
+.customer-section {
+    margin: 0px 0;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    background-color: white !important;
+}
+
+.customer-order-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 0;
+    background-color: white !important;
+}
+
+.customer-info-box,
+.order-info-box {
+    border: 1px solid #ddd;
+    padding: 8px;
+    background-color: white !important;
+}
+
+.info-title {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+    background-color: white !important;
+}
+
+.customer-info-box p,
+.order-info-box p {
+    margin: 4px 0;
+    font-size: 12px;
+    line-height: 1.4;
+    background-color: transparent;
+}
+
+.customer-info-box strong,
+.order-info-box strong {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Hide shop info when setting is disabled */
+.receipt-header.hide-shop-name .institution-name,
+.receipt-header.hide-shop-name .institution-subtitle,
+.receipt-header.hide-shop-name .institution-contact {
+    display: none;
+}
+
+.receipt-header.hide-shop-name {
+    border-bottom: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Old grid style - keep for backward compatibility but hide */
+.customer-info-grid {
+    display: none;
+}
+
+.customer-info p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.customer-info-grid p {
+    margin: 4px 0;
+}
+
+.customer-info-grid strong {
+    color: #333;
+}
+
+/* Barcode Section */
+.barcode-section {
+    text-align: center;
+    margin: 6px 0;
+    padding: 2px 0;
+}
+
+.barcode-section svg {
+    max-width: 100%;
+    height: auto;
+}
+
+#barcodeReceipt {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Measurement Barcode Section */
+.measurement-barcode-section {
+    text-align: center;
+    margin: 0px 0;
+    padding: 0px 0;
+}
+
+.measurement-barcode-section svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Receipt Table */
+.receipt-table {
+    width: 100%;
+    margin: 10px 0;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.receipt-table thead th {
+    background: #000000;
+    color: #ffffff;
+    padding: 6px 4px;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.receipt-table tbody td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: top;
+    font-size: 9px;
+    line-height: 1.3;
+}
+
+/* Column specific widths */
+.receipt-table thead th:nth-child(1), /* Dress */
+.receipt-table tbody td:nth-child(1) {
+    width: 20%;
+    font-weight: 600;
+}
+
+.receipt-table thead th:nth-child(2), /* Description */
+.receipt-table tbody td:nth-child(2) {
+    width: 35%;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.receipt-table thead th:nth-child(3), /* Quantity */
+.receipt-table tbody td:nth-child(3) {
+    width: 15%;
+    text-align: center;
+}
+
+.receipt-table thead th:nth-child(4), /* Price */
+.receipt-table tbody td:nth-child(4) {
+    width: 15%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.receipt-table thead th:nth-child(5), /* Total */
+.receipt-table tbody td:nth-child(5) {
+    width: 15%;
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+/* Payment Summary */
+.payment-summary {
+    margin-top: 20px;
+}
+
+.summary-table {
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+}
+
+.summary-table td {
+    padding: 5px 0;
+    font-size: 14px;
+}
+
+.summary-table .total-row {
+    border-top: 2px solid #333;
+    padding-top: 10px;
+    font-size: 16px;
+}
+
+/* Receipt Footer */
+.receipt-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+    font-size: 11px;
+    color: #666;
+}
+
+/* Measurements Container */
+.measurement-container {
+    padding: 5px 20px;
+    background: white;
+    min-height: 0;
+    height: auto;
+}
+
+/* Main container for all measurements */
+.measurements-main-container {
+    max-width: 380px;
+    margin: 0 auto;
+    margin-top: var(--measurement-top-space, 0px);
+    height: auto;
+    padding: 6px 8px;
+    box-sizing: border-box;
+}
+
+/* Container for each item (all copies + details) */
+.measurement-item-container {
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    height: auto;
+}
+
+.measurement-item-container:last-child {
+    margin-bottom: 0;
+}
+
+/* Measurement Copy Styles */
+.measurement-copy {
+    page-break-inside: avoid;
+    margin-bottom: 4px;
+    padding:1px 0;
+      height: auto;
+}
+
+.measurement-copy:last-of-type {
+    margin-bottom: 4px;
+    border-bottom: none;
+}
+
+/* Measurement Header Styles */
+.measurement-header {
+    text-align: center;
+    margin-bottom: 1px;
+}
+
+.measurement-header h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: bold;
+    color: #000;
+    font-family: Tahoma, 'Noto Sans Bengali', sans-serif;
+}
+
+.copy-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 1px;
+    padding-bottom: 1px;
+}
+
+/* Measurement Info Table */
+.measurement-info-table {
+    width: 100%;
+    margin-bottom: 10px;
+    border-collapse: collapse;
+}
+
+.measurement-info-table td {
+    border: 1px solid #000;
+    padding: 0px 0 0px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.measurement-info-table td:first-child {
+    width: 33%;
+}
+
+.measurement-info-table td:nth-child(2) {
+    width: 34%;
+}
+
+.measurement-info-table td:nth-child(2) strong {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.measurement-info-table td:last-child {
+    width: 33%;
+}
+
+/* Measurement Details Section - shown ONCE after all copies */
+.measurement-details-section {
+
+    margin-bottom: 0;
+    padding-bottom: 0;
+    height: auto;
+}
+
+.customer-name-section {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: #000;
+    padding-bottom: 0;
+}
+
+.customer-address-section {
+    text-align: center;
+    font-size: 15px;
+    color: #000;
+    margin: 3px 0 10px 0;
+    padding-bottom: 0;
+}
+
+/* Measurement Grid - OLD STYLE with border around each cell */
+.measurement-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 3px;
+    margin-bottom: 10px;
+    height: auto;
+    width: 100%;
+}
+
+.measurement-item {
+    text-align: center;
+    padding: 0;
+    height: auto;
+    min-width: 52px;
+}
+
+/* Measurement box with name and value in SAME border */
+.measurement-item table {
+    border: 1px solid #666;
+    width: 100%;
+    border-collapse: collapse;
+    height: 100%;
+    margin-bottom: 0;
+    min-width: 52px;
+}
+
+.measurement-item table tr td {
+    padding: 5px 3px;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 52px;
+}
+
+.measurement-value {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    padding: 2px 0;
+    min-width: 52px;
+}
+
+.measurement-label {
+    display: block;
+    font-size: 11px;
+    color: #000;
+    padding: 2px 0;
+    min-width: 52px;
+}
+
+/* Hide measurement names by default */
+.measurement-grid:not(.show-measurement-names) .measurement-label {
+    display: none;
+}
+
+.measurement-grid:not(.show-measurement-names) .measurement-value {
+    padding: 0px 0px;
+}
+
+.measurement-grid:not(.show-measurement-names) hr {
+    display: none;
+}
+
+/* Hide borders when checkbox is checked */
+.measurement-grid-container.hide-borders table,
+.measurement-grid-container.hide-borders table td {
+    border: none !important;
+}
+
+/* Measurement Grid Container - NEW STRUCTURE */
+.measurement-grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    width: 100%;
+    margin-bottom: 1px;
+}
+
+.measurement-grid-container table {
+    border: 1px solid #666;
+    border-collapse: collapse;
+    display: inline-table;
+    vertical-align: top;
+    min-width: 52px;
+    flex: 0 0 auto;
+}
+
+.measurement-grid-container table td {
+    border: 1px solid #666;
+    padding: 1px 1px;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 52px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.measurement-grid-container table td:empty,
+.measurement-grid-container table tr:empty {
+    display: none !important;
+    border: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Hide measurement names by default */
+.measurement-grid-container:not(.show-measurement-names) .measurement-label {
+    display: none;
+}
+
+.measurement-grid-container:not(.show-measurement-names) .measurement-value {
+    padding: 0px 0px;
+}
+
+.measurement-grid-container:not(.show-measurement-names) hr {
+    display: none;
+}
+
+/* Hide borders when checkbox is checked */
+.measurement-grid-container.hide-borders table,
+.measurement-grid-container.hide-borders table td {
+    border: none !important;
+}
+
+/* Measurement Grid Container - NEW STRUCTURE */
+.measurement-grid-container {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 1px;
+    font-size: 0; /* Remove whitespace between inline-block elements */
+}
+
+.measurement-grid-container table {
+    border: 1px solid #666;
+    border-collapse: collapse;
+    display: inline-table;
+    vertical-align: top;
+    margin-right: 1px;
+    margin-bottom: 1px;
+    font-size: initial; /* Reset font-size */
+    min-width: 52px;
+}
+
+.measurement-grid-container table:last-child {
+    margin-right: 0;
+}
+
+.measurement-grid-container table td {
+    border: 1px solid #666;
+    padding: 1px;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 46px;
+}
+
+/* Ensure no empty cells */
+.measurement-grid-container table td:empty,
+.measurement-grid-container table tr:empty {
+    display: none !important;
+}
+
+/* Hide empty cells in print */
+@media print {
+    .measurement-grid-container {
+        display: inline-block;
+        width: 100%;
+        font-size: 0;
+    }
+
+    .measurement-grid-container table {
+        border: 1px solid #666;
+        border-collapse: collapse;
+        display: inline-table;
+        vertical-align: top;
+        margin-right: 1px;
+        margin-bottom: 1px;
+        font-size: initial;
+    }
+
+    .measurement-grid-container table td {
+        border: 1px solid #666;
+        padding: 1px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    /* Hide borders when hide-borders class is applied */
+    .measurement-grid-container.hide-borders table,
+    .measurement-grid-container.hide-borders table td {
+        border: none !important;
+    }
+
+    .measurement-grid-container table td:empty,
+    .measurement-grid-container table tr:empty {
+        display: none !important;
+        border: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}
+
+/* Styles Section */
+.styles-section {
+    
+    padding-bottom: 0;
+    font-size: 14px;
+    font-style: italic;
+    color: #000;
+    page-break-inside: avoid;
+    height: auto;
+}
+
+/* Details Section */
+.details-section {
+    margin: 2px 0 0 0;
+    padding-bottom: 0;
+    font-size: 14px;
+    font-style: italic;
+    color: #000;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    height: auto;
+}
+
+/* Print Styles */
+@media print {
+    @page {
+        size: var(--print-width) auto;
+        margin: 0;
+    }
+    
+    @page :first {
+        margin-top: 0;
+    }
+    
+    @page :last {
+        margin-bottom: 0;
+    }
+
+    html {
+        height: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white;
+        height: auto;
+        min-height: auto !important;
+    }
+
+    /* Hide non-printable elements */
+    .no-print,
+    .nav-tabs,
+    .action-bar,
+    .page-header,
+    #app-sidebar,
+    #app-navbar {
+        display: none !important;
+    }
+
+    .tab-pane:not(.active) {
+        display: none !important;
+    }
+    
+    .tab-pane {
+        page-break-before: avoid !important;
+        page-break-after: avoid !important;
+        page-break-inside: auto !important;
+        height: auto !important;
+    }
+
+    .tab-pane:first-child {
+        page-break-before: avoid !important;
+    }
+    
+    .tab-pane.active {
+        page-break-after: avoid !important;
+    }
+    
+    .tab-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        page-break-after: avoid !important;
+    }
+
+    /* Center alignment for print */
+    .receipt-container {
+        max-width: var(--print-width, 800px);
+        margin: 0 auto !important;
+        padding: 0 20px 20px 20px !important;
+        border: none !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        height: auto !important;
+        background-color: white !important;
+    }
+
+    .measurements-main-container {
+        padding: 6px 8px;
+    }
+
+    /* Apply top margin from settings - directly to receipt header */
+    .receipt-header {
+        margin-top: var(--print-top-space, 0px) !important;
+        margin-bottom: 2px;
+        padding: 0 0 5px 0;
+        background-color: white !important;
+    }
+    
+    .institution-name,
+    .institution-subtitle,
+    .institution-contact {
+         color: #000 !important;
+    }
+
+    /* Apply font size from settings */
+    .receipt-table,
+    .customer-info,
+    .payment-summary {
+        font-size: var(--print-font-size, 14px) !important;
+    }
+
+    /* Institution name, subtitle, and contact visibility */
+    .receipt-header.hide-shop-name .institution-name,
+    .receipt-header.hide-shop-name .institution-subtitle,
+    .receipt-header.hide-shop-name .institution-contact {
+        display: none;
+    }
+    
+    /* When shop name is hidden, remove top border */
+    .receipt-header.hide-shop-name {
+        border-bottom: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Table styling for print */
+    .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .receipt-table th {
+        background-color: #686868 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Print size specific adjustments */
+    [data-print-size="3"] .receipt-container {
+        padding: 0 10px 10px 10px !important;
+        font-size: 11px !important;
+    }
+    
+    [data-print-size="3"] .receipt-header {
+        margin-top: var(--print-top-space, 0px);
+        margin-bottom: 5px;
+        padding: 0 0 5px 0;
+    }
+    
+    [data-print-size="3"] .customer-section {
+        padding: 5px;
+    }
+    
+    [data-print-size="3"] .institution-name {
+        font-size: 16px !important;
+        margin: 0;
+        padding: 0;
+    }
+    
+    [data-print-size="3"] .institution-subtitle {
+        font-size: 10px !important;
+        margin: 3px 0 0 0;
+        padding: 0;
+    }
+    
+    [data-print-size="3"] .institution-contact {
+        font-size: 10px !important;
+        margin: 3px 0 0 0;
+        padding: 0;
+    }
+    
+    [data-print-size="3"] .customer-info-grid {
+        font-size: 10px !important;
+    }
+    
+    [data-print-size="3"] .receipt-table {
+        font-size: 9px !important;
+        table-layout: fixed !important;
+    }
+    
+    [data-print-size="3"] .receipt-table th,
+    [data-print-size="3"] .receipt-table td {
+        padding: 3px 2px !important;
+        font-size: 9px !important;
+    }
+    
+    [data-print-size="3"] .receipt-table th:nth-child(1),
+    [data-print-size="3"] .receipt-table td:nth-child(1) { width: 24%; }
+    
+    [data-print-size="3"] .receipt-table th:nth-child(2),
+    [data-print-size="3"] .receipt-table td:nth-child(2) { width: 18%; }
+    
+    [data-print-size="3"] .receipt-table th:nth-child(3),
+    [data-print-size="3"] .receipt-table td:nth-child(3) { width: 10%; }
+    
+    [data-print-size="3"] .receipt-table th:nth-child(4),
+    [data-print-size="3"] .receipt-table td:nth-child(4) { width: 24%; }
+    
+    [data-print-size="3"] .receipt-table th:nth-child(5),
+    [data-print-size="3"] .receipt-table td:nth-child(5) { width: 24%; }
+    
+    [data-print-size="3.5"] .receipt-container {
+        padding: 0 12px 12px 12px !important;
+        font-size: 12px !important;
+    }
+    
+    [data-print-size="3.5"] .receipt-header {
+        margin-top: var(--print-top-space, 0px);
+        margin-bottom: 5px;
+        padding: 0 0 2px 0;
+    }
+    
+    [data-print-size="3.5"] .customer-section {
+        padding: 5px;
+    }
+    
+    [data-print-size="3.5"] .institution-name {
+        font-size: 18px !important;
+        margin: 0;
+        padding: 0;
+    }
+    
+    [data-print-size="3.5"] .institution-subtitle {
+        font-size: 10px !important;
+        margin: 3px 0 0 0;
+        padding: 0;
+    }
+    
+    [data-print-size="3.5"] .institution-contact {
+        font-size: 10px !important;
+        margin: 3px 0 0 0;
+        padding: 0;
+    }
+    
+    [data-print-size="3.5"] .customer-info-grid {
+        font-size: 11px !important;
+    }
+    
+    [data-print-size="3.5"] .receipt-table {
+        font-size: 10px !important;
+        table-layout: fixed !important;
+    }
+    
+    [data-print-size="3.5"] .receipt-table th,
+    [data-print-size="3.5"] .receipt-table td {
+        padding: 4px 2px !important;
+        font-size: 10px !important;
+    }
+    
+    [data-print-size="3.5"] .receipt-table th:nth-child(1),
+    [data-print-size="3.5"] .receipt-table td:nth-child(1) { width: 23%; }
+    
+    [data-print-size="3.5"] .receipt-table th:nth-child(2),
+    [data-print-size="3.5"] .receipt-table td:nth-child(2) { width: 19%; }
+    
+    [data-print-size="3.5"] .receipt-table th:nth-child(3),
+    [data-print-size="3.5"] .receipt-table td:nth-child(3) { width: 11%; }
+    
+    [data-print-size="3.5"] .receipt-table th:nth-child(4),
+    [data-print-size="3.5"] .receipt-table td:nth-child(4) { width: 23.5%; }
+    
+    [data-print-size="3.5"] .receipt-table th:nth-child(5),
+    [data-print-size="3.5"] .receipt-table td:nth-child(5) { width: 23.5%; }
+    
+    /* 4 inch print adjustments */
+    [data-print-size="4"] .receipt-container {
+        padding: 0 15px 15px 15px !important;
+        font-size: 13px !important;
+    }
+    
+    [data-print-size="4"] .receipt-table {
+        font-size: 11px !important;
+        table-layout: fixed !important;
+    }
+    
+    [data-print-size="4"] .receipt-table th,
+    [data-print-size="4"] .receipt-table td {
+        padding: 5px 3px !important;
+        font-size: 11px !important;
+    }
+    
+    [data-print-size="4"] .receipt-table th:nth-child(1),
+    [data-print-size="4"] .receipt-table td:nth-child(1) { width: 22%; }
+    
+    [data-print-size="4"] .receipt-table th:nth-child(2),
+    [data-print-size="4"] .receipt-table td:nth-child(2) { width: 20%; }
+    
+    [data-print-size="4"] .receipt-table th:nth-child(3),
+    [data-print-size="4"] .receipt-table td:nth-child(3) { width: 12%; }
+    
+    [data-print-size="4"] .receipt-table th:nth-child(4),
+    [data-print-size="4"] .receipt-table td:nth-child(4) { width: 23%; }
+    
+    [data-print-size="4"] .receipt-table th:nth-child(5),
+    [data-print-size="4"] .receipt-table td:nth-child(5) { width: 23%; }
+    
+    /* 4.5 inch print adjustments */
+    [data-print-size="4.5"] .receipt-container {
+        padding: 0 18px 18px 18px !important;
+        font-size: 13px !important;
+    }
+    
+    [data-print-size="4.5"] .receipt-table {
+        font-size: 12px !important;
+        table-layout: fixed !important;
+    }
+    
+    [data-print-size="4.5"] .receipt-table th,
+    [data-print-size="4.5"] .receipt-table td {
+        padding: 6px 4px !important;
+        font-size: 12px !important;
+    }
+    
+    [data-print-size="4.5"] .receipt-table th:nth-child(1),
+    [data-print-size="4.5"] .receipt-table td:nth-child(1) { width: 22%; }
+    
+    [data-print-size="4.5"] .receipt-table th:nth-child(2),
+    [data-print-size="4.5"] .receipt-table td:nth-child(2) { width: 20%; }
+    
+    [data-print-size="4.5"] .receipt-table th:nth-child(3),
+    [data-print-size="4.5"] .receipt-table td:nth-child(3) { width: 12%; }
+    
+    [data-print-size="4.5"] .receipt-table th:nth-child(4),
+    [data-print-size="4.5"] .receipt-table td:nth-child(4) { width: 23%; }
+    
+    [data-print-size="4.5"] .receipt-table th:nth-child(5),
+    [data-print-size="4.5"] .receipt-table td:nth-child(5) { width: 23%; }
+    
+    /* 5 inch print adjustments */
+    [data-print-size="5"] .receipt-container {
+        padding: 0 20px 20px 20px !important;
+        font-size: 14px !important;
+    }
+    
+    [data-print-size="5"] .receipt-table {
+        font-size: 13px !important;
+        table-layout: fixed !important;
+    }
+    
+    [data-print-size="5"] .receipt-table th,
+    [data-print-size="5"] .receipt-table td {
+        padding: 7px 5px !important;
+        font-size: 13px !important;
+    }
+    
+    [data-print-size="5"] .receipt-table th:nth-child(1),
+    [data-print-size="5"] .receipt-table td:nth-child(1) { width: 22%; }
+    
+    [data-print-size="5"] .receipt-table th:nth-child(2),
+    [data-print-size="5"] .receipt-table td:nth-child(2) { width: 20%; }
+    
+    [data-print-size="5"] .receipt-table th:nth-child(3),
+    [data-print-size="5"] .receipt-table td:nth-child(3) { width: 12%; }
+    
+    [data-print-size="5"] .receipt-table th:nth-child(4),
+    [data-print-size="5"] .receipt-table td:nth-child(4) { width: 23%; }
+    
+    [data-print-size="5"] .receipt-table th:nth-child(5),
+    [data-print-size="5"] .receipt-table td:nth-child(5) { width: 23%; }
+}
+
+/* Print Size Specific Adjustments */
+/* 3 inch */
+body.print-size-3 .receipt-table {
+    font-size: 8px;
+}
+
+body.print-size-3 .receipt-table thead th,
+body.print-size-3 .receipt-table tbody td {
+    padding: 4px 2px;
+    font-size: 7px;
+}
+
+/* 3.5 inch */
+body.print-size-3-5 .receipt-table {
+    font-size: 9px;
+}
+
+body.print-size-3-5 .receipt-table thead th,
+body.print-size-3-5 .receipt-table tbody td {
+    padding: 5px 3px;
+    font-size: 8px;
+}
+
+/* 4 inch (default) */
+body.print-size-4 .receipt-table {
+    font-size: 10px;
+}
+
+body.print-size-4 .receipt-table thead th,
+body.print-size-4 .receipt-table tbody td {
+    padding: 6px 4px;
+    font-size: 9px;
+}
+
+/* 4.5 inch */
+body.print-size-4-5 .receipt-table {
+    font-size: 11px;
+}
+
+body.print-size-4-5 .receipt-table thead th,
+body.print-size-4-5 .receipt-table tbody td {
+    padding: 7px 5px;
+    font-size: 10px;
+}
+
+/* 5 inch */
+body.print-size-5 .receipt-table {
+    font-size: 12px;
+}
+
+body.print-size-5 .receipt-table thead th,
+body.print-size-5 .receipt-table tbody td {
+    padding: 8px 6px;
+    font-size: 11px;
+}
+
+/* Ensure table remains aligned in all sizes */
+.receipt-table thead th,
+.receipt-table tbody td {
+    max-width: none;
+    overflow: visible;
+}
+
+/* For very long descriptions, allow wrapping but maintain alignment */
+.receipt-table tbody td:nth-child(2) {
+    word-break: break-word;
+    hyphens: auto;
+}

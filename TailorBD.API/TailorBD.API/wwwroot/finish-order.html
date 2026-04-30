@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অর্ডার সম্পন্ন করুন - TailorBD</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- jQuery UI for Datepicker -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    
+    <!-- Custom CSS -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/finish-order.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar Container -->
+    <div id="app-sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Navbar Container -->
+        <div id="app-navbar"></div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <div>
+                    <h1 class="lang-content" data-en="Finish Order" data-bn="অর্ডার সম্পন্ন করুন">অর্ডার সম্পন্ন করুন</h1>
+                    <p class="text-muted lang-content" data-en="Complete order with payment and delivery date" data-bn="পেমেন্ট এবং ডেলিভারি তারিখ সহ অর্ডার সম্পন্ন করুন">
+                        পেমেন্ট এবং ডেলিভারি তারিখ সহ অর্ডার সম্পন্ন করুন
+                    </p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-primary" onclick="addMoreDress()">
+                        <i class="fas fa-plus me-2"></i>
+                        <span class="lang-content" data-en="Add More Dress" data-bn="আরো পোশাক যুক্ত করুন">আরো পোশাক যুক্ত করুন</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customer Info Card -->
+            <div class="customer-info-card mb-4" id="customerInfoCard" style="display: none;">
+                <div class="customer-header">
+                    <div class="customer-avatar-large" id="customerAvatarLarge">
+                        <img id="customerImage" src="" alt="Customer" style="display: none;">
+                    </div>
+                    <div class="customer-details">
+                        <h3 id="customerNameDisplay">Loading...</h3>
+                        <div class="customer-badges">
+                            <span class="badge badge-order">
+                                <i class="fas fa-shopping-bag me-1"></i>
+                                <span class="lang-content" data-en="Order No" data-bn="অর্ডার নং">অর্ডার নং</span>: 
+                                <span id="orderNumberDisplay">-</span>
+                            </span>
+                            <span class="badge badge-customer">
+                                <i class="fas fa-user me-1"></i>
+                                <span class="lang-content" data-en="Customer No" data-bn="কাস্টমার নং">কাস্টমার নং</span>: 
+                                <span id="customerNumberDisplay">-</span>
+                            </span>
+                            <span class="badge badge-phone">
+                                <i class="fas fa-phone me-1"></i>
+                                <span id="customerPhoneDisplay">-</span>
+                            </span>
+                        </div>
+                        <div class="customer-address mt-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <span id="customerAddressDisplay">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Details Card -->
+            <div class="order-details-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-list-alt me-2"></i>
+                    <span class="lang-content" data-en="Order Details" data-bn="অর্ডারের বিস্তারিত">অর্ডারের বিস্তারিত</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="lang-content" data-en="Dress" data-bn="ড্রেস">ড্রেস</th>
+                                    <th class="lang-content" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                                    <th class="lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</th>
+                                    <th class="lang-content" data-en="Unit Price" data-bn="একক মূল্য">একক মূল্য</th>
+                                    <th class="text-end lang-content" data-en="Total" data-bn="মোট">মোট</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderDetailsBody">
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-primary">
+                                    <td colspan="4" class="text-end"><strong class="lang-content" data-en="Total Amount:" data-bn="সর্বমোট টাকা:">সর্বমোট টাকা:</strong></td>
+                                    <td class="text-end"><strong id="orderTotalAmount">৳0.00</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment & Delivery Card -->
+            <div class="payment-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-money-bill-wave me-2"></i>
+                    <span class="lang-content" data-en="Payment & Delivery" data-bn="পেমেন্ট ও ডেলিভারি">পেমেন্ট ও ডেলিভারি</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <!-- Account Selection -->
+                        <div class="col-md-3 mb-3" id="accountSection" style="display: none;">
+                            <label class="form-label">
+                                <i class="fas fa-university me-1"></i>
+                                <span class="lang-content" data-en="Account" data-bn="হিসাব">হিসাব</span>
+                            </label>
+                            <select class="form-select" id="accountSelect">
+                                <option value="" class="lang-content" data-en="Select Account" data-bn="অ্যাকাউন্ট নির্বাচন করুন">অ্যাকাউন্ট নির্বাচন করুন</option>
+                            </select>
+                        </div>
+
+                        <!-- New Discount Input -->
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>
+                                    <i class="fas fa-percentage me-1"></i>
+                                    <span class="lang-content" data-en="Discount" data-bn="ছাড়">ছাড়</span>
+                                </span>
+                                <span class="previous-amount-label" id="previousDiscountLabel" style="display: none;">
+                                    <span class="lang-content" data-en="Previous Discount:" data-bn="পূর্বের ডিসকাউন্ট:">পূর্বের ডিসকাউন্ট:</span> 
+                                    <strong class="text-primary" id="previousDiscountAmount">৳0.00</strong>
+                                </span>
+                            </label>
+                            <input type="number" class="form-control" id="discountAmount" 
+                                   placeholder="নতুন ডিসকাউন্ট" min="0" step="0.01" value="0">
+                            <small class="text-muted" id="discountLimitText"></small>
+                        </div>
+
+                        <!-- New Paid Amount Input -->
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>
+                                    <i class="fas fa-money-bill me-1"></i>
+                                    <span class="lang-content" data-en="Paid Amount" data-bn="পরিশোধিত পরিমাণ">পরিশোধিত পরিমাণ</span>
+                                </span>
+                                <span class="previous-amount-label" id="previousPaidLabel" style="display: none;">
+                                    <span class="lang-content" data-en="Previous Paid:" data-bn="পূর্বের পেইড:">পূর্বের পেইড:</span> 
+                                    <strong class="text-success" id="previousPaidAmount">৳0.00</strong>
+                                </span>
+                            </label>
+                            <input type="number" class="form-control" id="paidAmount" 
+                                   placeholder="নতুন পেমেন্ট" min="0" step="0.01" value="0">
+                        </div>
+
+                        <!-- Delivery Date -->
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-calendar me-1"></i>
+                                <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="deliveryDate" 
+                                   placeholder="ডেলিভারি তারিখ নির্বাচন করুন" readonly required>
+                        </div>
+                    </div>
+
+                    <!-- Due Amount Display -->
+                    <div class="due-amount-display mb-3">
+                        <h5 class="mb-0">
+                            <span id="dueAmountLabel">বাকি থাকছে ৳0.00 টাকা</span>
+                        </h5>
+                        <small class="text-danger" id="errorMessage"></small>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="btn btn-success btn-lg w-100" id="submitButton" onclick="submitOrder()">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span class="lang-content" data-en="Complete Order" data-bn="অর্ডার সম্পন্ন করুন">অর্ডার সম্পন্ন করুন</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals Container -->
+    <div id="app-modals"></div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Components -->
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    
+    <!-- Finish Order JS -->
+    <script src="/js/finish-order.js?v=2.1.4"></script>
+</body>
+</html>

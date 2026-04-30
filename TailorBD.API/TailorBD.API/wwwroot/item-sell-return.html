@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Sales Return - TailorBD" data-bn="বিক্রয় ফেরত - TailorBD">বিক্রয় ফেরত - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        .card-box { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); padding:20px; margin-bottom:18px; }
+        .section-title { font-size:13px; font-weight:700; color:#6c7ae0; text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+
+        /* Search bar */
+        .search-row { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; }
+        .f-label { font-size:12.5px; font-weight:500; color:#555; margin-bottom:4px; display:block; }
+        .f-control { padding:8px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:13.5px; font-family:inherit; transition:border-color .2s; }
+        .f-control:focus { outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-find { padding:8px 22px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .btn-find:hover { background:#5a68c9; }
+
+        /* Receipt info */
+        .receipt-info { display:flex; flex-wrap:wrap; gap:10px; }
+        .info-chip { background:#f4f5ff; border-radius:8px; padding:8px 14px; font-size:12.5px; }
+        .info-chip .lbl { color:#888; font-size:11px; }
+        .info-chip .val { font-weight:700; color:#333; font-size:14px; }
+        .val.green { color:#28a745; }
+        .val.red   { color:#dc3545; }
+        .val.orange{ color:#fd7e14; }
+
+        /* Items table */
+        .ret-tbl { width:100%; border-collapse:collapse; font-size:13px; }
+        .ret-tbl thead th { background:#f8f9ff; padding:9px 10px; font-size:11.5px; font-weight:700; color:#555; border-bottom:2px solid #e8eaf6; text-align:center; white-space:nowrap; }
+        .ret-tbl tbody td { padding:9px 10px; border-bottom:1px solid #f2f2f2; text-align:center; vertical-align:middle; }
+        .ret-tbl tbody tr:hover { background:#fafbff; }
+        .item-code { font-weight:700; color:#6c7ae0; }
+        .qty-input { width:80px; padding:5px 8px; border:1.5px solid #ddd; border-radius:6px; text-align:center; font-size:13px; font-family:inherit; }
+        .qty-input:focus { outline:none; border-color:#6c7ae0; }
+        .qty-input.over { border-color:#dc3545; background:#fff5f5; }
+        .row-total { font-weight:700; color:#333; }
+
+        /* Summary */
+        .summary-box { background:#f8f9ff; border-radius:8px; padding:14px 18px; font-size:13px; }
+        .sum-row { display:flex; justify-content:space-between; padding:4px 0; }
+        .sum-row.total { border-top:2px solid #e0e3f7; margin-top:6px; padding-top:8px; font-size:15px; font-weight:800; color:#6c7ae0; }
+        .sum-row.return-note { color:#fd7e14; font-size:12px; font-style:italic; justify-content:center; }
+
+        /* Submit form */
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        @media(max-width:640px){ .form-grid{ grid-template-columns:1fr; } }
+
+        .btn-submit { padding:10px 30px; background:#28a745; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:background .2s; }
+        .btn-submit:hover { background:#218838; }
+        .btn-submit:disabled { opacity:.5; cursor:not-allowed; }
+
+        /* Toast */
+        .toast-wrap { position:fixed; top:18px; right:18px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+        .toast-item { padding:10px 16px; border-radius:8px; color:#fff; font-size:13px; font-weight:600; box-shadow:0 4px 16px rgba(0,0,0,.15); animation:slideIn .25s ease; min-width:200px; }
+        .toast-item.success { background:#28a745; }
+        .toast-item.error   { background:#dc3545; }
+        .toast-item.info    { background:#6c7ae0; }
+        @keyframes slideIn { from{transform:translateX(40px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+        .hidden { display:none !important; }
+        .spin { width:28px; height:28px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:sp .7s linear infinite; display:inline-block; vertical-align:middle; }
+        @keyframes sp { to{transform:rotate(360deg);} }
+
+        .toggle-stock label { font-size:13px; color:#555; }
+        .toggle-stock input { width:18px; height:18px; cursor:pointer; accent-color:#6c7ae0; }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <div class="toast-wrap" id="toastWrap"></div>
+    <div id="app-modals"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-container">
+
+                <!-- Title -->
+                <h5 style="font-weight:700;color:#6c7ae0;margin-bottom:16px;">
+                    <i class="fas fa-undo-alt me-2"></i><span data-bn="বিক্রয় ফেরত / এক্সচেঞ্জ" data-en="Sales Return / Exchange">বিক্রয় ফেরত / এক্সচেঞ্জ</span>
+                </h5>
+
+                <!-- Step 1: Search Receipt -->
+                <div class="card-box">
+                    <div class="section-title"><i class="fas fa-search"></i> <span data-bn="রিসিট নম্বর দিয়ে খুঁজুন" data-en="Search by Receipt Number">রিসিট নম্বর দিয়ে খুঁজুন</span></div>
+                    <div class="search-row">
+                        <div>
+                            <label class="f-label" data-bn="রিসিট নম্বর (SN)" data-en="Receipt No (SN)">রিসিট নম্বর (SN)</label>
+                            <input type="number" id="inSN" class="f-control" data-bn-placeholder="যেমন: 74" data-en-placeholder="e.g: 74" placeholder="যেমন: 74" style="width:160px;"
+                                onkeydown="if(event.key==='Enter') findReceipt()">
+                        </div>
+                        <button class="btn-find" onclick="findReceipt()">
+                            <i class="fas fa-search"></i> <span data-bn="খুঁজুন" data-en="Find">খুঁজুন</span>
+                        </button>
+                        <span id="findSpinner" class="hidden"><div class="spin"></div></span>
+                    </div>
+                </div>
+
+                <!-- Step 2: Receipt Info -->
+                <div id="receiptSection" class="hidden">
+
+                    <!-- Info chips -->
+                    <div class="card-box">
+                        <div class="section-title"><i class="fas fa-receipt"></i> <span data-bn="রিসিট তথ্য" data-en="Receipt Info">রিসিট তথ্য</span></div>
+                        <div class="receipt-info" id="receiptInfo"></div>
+                    </div>
+
+                    <!-- Return Items Table -->
+                    <div class="card-box">
+                        <div class="section-title"><i class="fas fa-boxes"></i> <span data-bn="ফেরতের পরিমাণ দিন" data-en="Enter Return Quantity">ফেরতের পরিমাণ দিন</span></div>
+                        <p style="font-size:12px;color:#888;margin-bottom:10px;background:#fffbe6;border-left:3px solid #ffc107;padding:8px 12px;border-radius:5px;">
+                            <i class="fas fa-info-circle" style="color:#ffc107;"></i>
+                            <strong data-bn="ফেরতের পরিমাণ" data-en="Return Quantity">ফেরতের পরিমাণ</strong> <span data-bn="কাস্টমার কতটুকু ফেরত দিচ্ছে তা লিখুন। বাকিটা রাখা হবে। সব রাখতে 0 দিন, সব ফেরত দিতে পূর্ণ পরিমাণ দিন।" data-en="Enter how much the customer returns. The rest will be kept. Enter 0 to keep all, enter full quantity to return all.">কাস্টমার কতটুকু ফেরত দিচ্ছে তা লিখুন। বাকিটা রাখা হবে। সব রাখতে 0 দিন, সব ফেরত দিতে পূর্ণ পরিমাণ দিন।</span>
+                        </p>
+                        <div style="overflow-x:auto;">
+                            <table class="ret-tbl">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th data-bn="কোড" data-en="Code">কোড</th>
+                                        <th data-bn="আইটেমের নাম" data-en="Item Name">আইটেমের নাম</th>
+                                        <th data-bn="ইউনিট" data-en="Unit">ইউনিট</th>
+                                        <th data-bn="বিক্রিত পরিমাণ" data-en="Sold Qty">বিক্রিত পরিমাণ</th>
+                                        <th data-bn="ফেরতের পরিমাণ" data-en="Return Qty">ফেরতের পরিমাণ</th>
+                                        <th data-bn="রাখা পরিমাণ" data-en="Kept Qty">রাখা পরিমাণ</th>
+                                        <th data-bn="একক মূল্য" data-en="Unit Price">একক মূল্য</th>
+                                        <th data-bn="রাখা মূল্য" data-en="Kept Value">রাখা মূল্য</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="returnItemsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Summary + Submit -->
+                    <div class="card-box">
+                        <div class="row g-4">
+                            <div class="col-md-5">
+                                <div class="section-title"><i class="fas fa-calculator"></i> <span data-bn="সারসংক্ষেপ" data-en="Summary">সারসংক্ষেপ</span></div>
+                                <div class="summary-box">
+                                    <div class="sum-row">
+                                        <span data-bn="মূল বিক্রয়" data-en="Original Sale">মূল বিক্রয়</span>
+                                        <span id="sumOriginal">৳ 0.00</span>
+                                    </div>
+                                    <div class="sum-row">
+                                        <span data-bn="ফেরতের পরের মূল্য" data-en="Value After Return">ফেরতের পরের মূল্য</span>
+                                        <span id="sumKeptAmt" style="color:#333;">৳ 0.00</span>
+                                    </div>
+                                    <div class="sum-row">
+                                        <span data-bn="ছাড়" data-en="Discount">ছাড়</span>
+                                        <span id="sumDiscount" style="color:#fd7e14;">- ৳ 0.00</span>
+                                    </div>
+                                    <div class="sum-row total">
+                                        <span data-bn="নতুন মোট" data-en="New Total">নতুন মোট</span>
+                                        <span id="sumNewTotal">৳ 0.00</span>
+                                    </div>
+                                    <div class="sum-row">
+                                        <span data-bn="আগের পরিশোধ" data-en="Previous Paid">আগের পরিশোধ</span>
+                                        <span id="sumOldPaid" style="color:#28a745;">- ৳ 0.00</span>
+                                    </div>
+                                    <div class="sum-row" id="sumNewPaidRow" style="display:none;">
+                                        <span data-bn="নতুন পেমেন্ট" data-en="New Payment">নতুন পেমেন্ট</span>
+                                        <span id="sumNewPaid" style="color:#28a745;">- ৳ 0.00</span>
+                                    </div>
+                                    <div class="sum-row total" style="color:#dc3545;">
+                                        <span data-bn="বাকি" data-en="Due">বাকি</span>
+                                        <span id="sumDue">৳ 0.00</span>
+                                    </div>
+                                    <div class="sum-row return-note hidden" id="refundNote"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-7">
+                                <div class="section-title"><i class="fas fa-cog"></i> <span data-bn="ফেরতের বিবরণ" data-en="Return Details">ফেরতের বিবরণ</span></div>
+                                <div class="form-grid">
+                                    <div>
+                                        <label class="f-label" data-bn="ছাড় (টাকা)" data-en="Discount (Tk)">ছাড় (টাকা)</label>
+                                        <input type="number" id="inDiscount" class="f-control" value="0" min="0"
+                                            style="width:100%;" oninput="recalculate()">
+                                    </div>
+                                    <div>
+                                        <label class="f-label" data-bn="অ্যাকাউন্ট" data-en="Account">অ্যাকাউন্ট</label>
+                                        <select id="inAccount" class="f-control" style="width:100%;"></select>
+                                    </div>
+                                    <div>
+                                        <label class="f-label">
+                                            <span data-bn="নতুন পেমেন্ট (টাকা)" data-en="New Payment (Tk)">নতুন পেমেন্ট (টাকা)</span>
+                                            <small id="paidHint" style="color:#6c7ae0;font-weight:400;"></small>
+                                        </label>
+                                        <input type="number" id="inNewPaid" class="f-control" value=""
+                                            data-bn-placeholder="শূন্য রাখতে 0 লিখুন" data-en-placeholder="Leave blank for 0"
+                                            placeholder="শূন্য রাখতে 0 লিখুন"
+                                            min="0" style="width:100%;" oninput="recalculate()">
+                                    </div>
+                                    <div>
+                                        <label class="f-label" data-bn="ফেরতের তারিখ" data-en="Return Date">ফেরতের তারিখ</label>
+                                        <input type="date" id="inReturnDate" class="f-control" style="width:100%;">
+                                    </div>
+                                    <div class="toggle-stock d-flex align-items-center gap-2 pt-2" style="grid-column:1/-1;">
+                                        <input type="checkbox" id="inAddToStock" checked>
+                                        <label for="inAddToStock" data-bn="স্টকে যোগ করবেন?" data-en="Add to Stock?">স্টকে যোগ করবেন?</label>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn-submit" id="btnSubmit" onclick="submitReturn()">
+                                        <i class="fas fa-check-circle"></i> <span data-bn="ফেরত সম্পন্ন করুন" data-en="Complete Return">ফেরত সম্পন্ন করুন</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /receiptSection -->
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script>
+    (function () {
+        let institutionId   = 0;
+        let registrationId  = 0;
+        let currentReceipt  = null;   // header
+        let currentItems    = [];     // array of items from API
+
+        // -- Session ----------------------------------------------------------
+        function getSession() {
+            institutionId  = parseInt(sessionStorage.getItem('institutionId')
+                           || localStorage.getItem('session_institutionId') || '0');
+            registrationId = parseInt(sessionStorage.getItem('registrationId')
+                           || localStorage.getItem('session_registrationId') || '0');
+        }
+
+        $(document).ready(function () {
+            $(document).one('app-session-ready institution-loaded institutionLoaded', function () {
+                getSession();
+            });
+            setTimeout(getSession, 1500);
+
+            // Set today as default return date
+            document.getElementById('inReturnDate').value = new Date().toISOString().split('T')[0];
+
+            // Auto-fill SN from URL ?sn=
+            const urlSN = new URLSearchParams(window.location.search).get('sn');
+            if (urlSN) {
+                document.getElementById('inSN').value = urlSN;
+                setTimeout(function () { findReceipt(); }, 600);
+            }
+
+            // Update receipt info chips and account option on language change
+            $(document).on('languageChanged', function (e, lang) {
+                $('#inAccount option[value="0"]').text(lang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া');
+                if (currentReceipt) {
+                    renderReceiptInfo(currentReceipt);
+                }
+            });
+        });
+
+        // -- Find Receipt -----------------------------------------------------
+        window.findReceipt = function () {
+            getSession();
+            if (!institutionId) { showToast('প্রতিষ্ঠান লোড হয়নি', 'error'); return; }
+            const sn = document.getElementById('inSN').value.trim();
+            if (!sn) { showToast('রিসিট নম্বর দিন', 'error'); return; }
+
+            $('#findSpinner').removeClass('hidden');
+            $('#receiptSection').addClass('hidden');
+
+            $.get('/api/ItemSell/return-info?institutionId=' + institutionId + '&sellingSN=' + sn, function (res) {
+                $('#findSpinner').addClass('hidden');
+                if (!res.success) { showToast(res.message || 'রিসিট পাওয়া যায়নি', 'error'); return; }
+
+                currentReceipt = res.header;
+                currentItems   = res.items || [];
+
+                renderReceiptInfo(res.header);
+                renderReturnTable(res.items);
+                loadAccounts(res.accounts);
+                recalculate();
+
+                $('#receiptSection').removeClass('hidden');
+            }).fail(function () {
+                $('#findSpinner').addClass('hidden');
+                showToast('সার্ভার এরর হয়েছে', 'error');
+            });
+        };
+
+        // -- Render receipt info chips -----------------------------------------
+        function renderReceiptInfo(h) {
+            const hasDue      = parseFloat(h.SellingDueAmount) > 0;
+            const hasDiscount = parseFloat(h.SellingDiscountAmount) > 0;
+            const lang        = window.currentLang === 'en' ? 'en' : 'bn';
+
+            const t = {
+                receipt:   lang === 'en' ? 'Receipt No'   : 'রিসিট নম্বর',
+                date:      lang === 'en' ? 'Date'         : 'তারিখ',
+                customer:  lang === 'en' ? 'Customer'     : 'কাস্টমার',
+                total:     lang === 'en' ? 'Total Sale'   : 'মোট বিক্রয়',
+                discount:  lang === 'en' ? 'Discount'     : 'ছাড়',
+                paid:      lang === 'en' ? 'Paid'         : 'পরিশোধ',
+                due:       lang === 'en' ? 'Due'          : 'বাকি',
+                prevReturn:lang === 'en' ? 'Prev Return'  : 'আগের ফেরত'
+            };
+
+            $('#receiptInfo').html(`
+                <div class="info-chip">
+                    <div class="lbl">${t.receipt}</div>
+                    <div class="val">#${esc(h.SellingSN)}</div>
+                </div>
+                <div class="info-chip">
+                    <div class="lbl">${t.date}</div>
+                    <div class="val">${esc(h.SellingDate)}</div>
+                </div>
+                ${h.CustomerName ? `
+                <div class="info-chip">
+                    <div class="lbl">${t.customer}</div>
+                    <div class="val">${esc(h.CustomerName)}
+                        ${h.CustomerPhone ? '<br><small style="color:#888;">📞 ' + esc(h.CustomerPhone) + '</small>' : ''}
+                    </div>
+                </div>` : ''}
+                <div class="info-chip">
+                    <div class="lbl">${t.total}</div>
+                    <div class="val">৳ ${fmt(h.SellingTotalPrice)}</div>
+                </div>
+                ${hasDiscount ? `
+                <div class="info-chip">
+                    <div class="lbl">${t.discount}</div>
+                    <div class="val orange">৳ ${fmt(h.SellingDiscountAmount)}</div>
+                </div>` : ''}
+                <div class="info-chip">
+                    <div class="lbl">${t.paid}</div>
+                    <div class="val green">৳ ${fmt(h.SellingPaidAmount)}</div>
+                </div>
+                <div class="info-chip">
+                    <div class="lbl">${t.due}</div>
+                    <div class="val ${hasDue ? 'red' : 'green'}">৳ ${fmt(h.SellingDueAmount)}</div>
+                </div>
+                ${parseFloat(h.SellingReturnAmount) > 0 ? `
+                <div class="info-chip">
+                    <div class="lbl">${t.prevReturn}</div>
+                    <div class="val orange">৳ ${fmt(h.SellingReturnAmount)}</div>
+                </div>` : ''}
+            `);
+
+            // Pre-fill discount input with existing discount if any
+            if (hasDiscount) {
+                $('#inDiscount').val(parseFloat(h.SellingDiscountAmount).toFixed(2));
+            }
+        }
+
+        // -- Render return table -----------------------------------------------
+        function renderReturnTable(items) {
+            const $body = $('#returnItemsBody').empty();
+            items.forEach(function (item, i) {
+                const soldQty = parseFloat(item.SellingQuantity);
+                $body.append(`
+                <tr data-idx="${i}">
+                    <td>${i + 1}</td>
+                    <td class="item-code">${esc(item.FabricCode)}</td>
+                    <td style="text-align:left;">${esc(item.FabricsName)}</td>
+                    <td>${esc(item.UnitName || '')}</td>
+                    <td style="font-weight:600;">${soldQty.toFixed(2)}</td>
+                    <td>
+                        <input type="number" class="qty-input ret-qty" id="retQty-${i}"
+                            value="0"
+                            min="0" max="${soldQty}"
+                            step="0.01"
+                            data-sold="${soldQty}"
+                            data-uprice="${item.SellingUnitPrice}"
+                            data-idx="${i}"
+                            oninput="onQtyChange(this)">
+                    </td>
+                    <td class="keep-qty-display" id="keepQtyDisplay-${i}" style="font-weight:600;color:#28a745;">
+                        ${soldQty.toFixed(2)}
+                    </td>
+                    <td>৳ ${fmt(item.SellingUnitPrice)}</td>
+                    <td class="row-total" id="rowTotal-${i}" style="color:#28a745;font-weight:700;">৳ ${fmt(soldQty * parseFloat(item.SellingUnitPrice))}</td>
+                </tr>`);
+            });
+        }
+
+        // -- Load accounts into select -----------------------------------------
+        function loadAccounts(accounts) {
+            const $sel = $('#inAccount').empty();
+            const noAccLabel = window.currentLang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া';
+            $sel.append('<option value="0" data-bn="অ্যাকাউন্ট ছাড়া" data-en="Without Account">অ্যাকাউন্ট ছাড়া</option>');
+            (accounts || []).forEach(function (a) {
+                const isDefault = a.IsDefault || a.isDefault;
+                $sel.append(`<option value="${a.AccountID || a.accountID}" ${isDefault ? 'selected' : ''}>${esc(a.AccountName || a.accountName)}</option>`);
+            });
+        }
+
+        // -- Qty change --------------------------------------------------------
+        window.onQtyChange = function (inp) {
+            const sold   = parseFloat(inp.dataset.sold);
+            const retVal = parseFloat(inp.value);
+            const ret    = isNaN(retVal) ? 0 : Math.max(0, retVal);
+            const keep   = Math.max(0, sold - ret);
+            const idx    = inp.dataset.idx;
+            const up     = parseFloat(inp.dataset.uprice);
+
+            inp.classList.toggle('over', ret > sold);
+
+            $('#keepQtyDisplay-' + idx).text(keep.toFixed(2));
+            $('#rowTotal-' + idx).text('৳ ' + fmt(keep * up));
+            recalculate();
+        };
+
+        // -- Recalculate summary -----------------------------------------------
+        window.recalculate = function () {
+            if (!currentReceipt) return;
+
+            // keptTotal = sum of (kept qty � unit price)
+            let keptTotal = 0;
+            $('.ret-qty').each(function () {
+                const sold = parseFloat($(this).data('sold'));
+                const ret  = parseFloat($(this).val()) || 0;
+                const keep = Math.max(0, sold - ret);
+                const up   = parseFloat($(this).data('uprice'));
+                keptTotal += keep * up;
+            });
+
+            const discount  = parseFloat($('#inDiscount').val()) || 0;
+            const origTotal = parseFloat(currentReceipt.SellingTotalPrice) || 0;
+            const origPaid  = parseFloat(currentReceipt.SellingPaidAmount) || 0;
+            const newTotal  = Math.max(0, keptTotal - discount);
+
+            const newPaidRaw = $('#inNewPaid').val().trim();
+            const hasNewPaid = newPaidRaw !== '';
+            const newPaid    = hasNewPaid ? (parseFloat(newPaidRaw) || 0) : 0;
+
+            const totalPaid = origPaid + newPaid;
+            const due       = Math.max(0, newTotal - totalPaid);
+            const refund    = Math.max(0, totalPaid - newTotal);
+
+            $('#sumOriginal').text('৳ ' + fmt(origTotal));
+            $('#sumKeptAmt').text('৳ ' + fmt(keptTotal));
+            $('#sumDiscount').text('- ৳ ' + fmt(discount));
+            $('#sumNewTotal').text('৳ ' + fmt(newTotal));
+            $('#sumOldPaid').text('- ৳ ' + fmt(origPaid));
+
+            if (hasNewPaid && newPaid > 0) {
+                $('#sumNewPaidRow').show();
+                $('#sumNewPaid').text('- ৳ ' + fmt(newPaid));
+            } else {
+                $('#sumNewPaidRow').hide();
+            }
+
+            $('#sumDue').text('৳ ' + fmt(due));
+            $('#paidHint').text('(বাকি: ৳ ' + fmt(due) + ')');
+
+            // refund note
+            const $note = $('#refundNote');
+            if (refund > 0) {
+                $note.removeClass('hidden');
+                $note.html('<i class="fas fa-arrow-circle-left me-1"></i> কাস্টমারকে ফেরত দিন: ৳ ' + fmt(refund));
+                $note.css('color', '#28a745');
+            } else {
+                $note.addClass('hidden');
+            }
+        };
+
+        // -- Submit Return -----------------------------------------------------
+        window.submitReturn = function () {
+            getSession();
+            if (!institutionId) { showToast('প্রতিষ্ঠান লোড হয়নি', 'error'); return; }
+            if (!currentReceipt) { showToast('প্রথমে রিসিট খুঁজুন', 'error'); return; }
+
+            // Build return items � only items where return qty > 0
+            let hasOver = false;
+            const returnItems = [];
+
+            $('.ret-qty').each(function (i) {
+                const sold = parseFloat($(this).data('sold'));
+                const ret  = parseFloat($(this).val()) || 0;
+
+                if (ret > sold) { hasOver = true; return false; }
+                if (ret > 0) {
+                    const item = currentItems[i];
+                    returnItems.push({
+                        fabricId:         item.FabricID || item.fabricID,
+                        returnQuantity:   ret,
+                        sellingUnitPrice: parseFloat(item.SellingUnitPrice)
+                    });
+                }
+            });
+
+            if (hasOver) { showToast('ফেরতের পরিমাণ বিক্রিত পরিমাণের বেশি হতে পারবে না', 'error'); return; }
+            if (!returnItems.length) { showToast('অন্তত একটি আইটেমের ফেরত পরিমাণ দিন', 'error'); return; }
+
+            const returnDate = document.getElementById('inReturnDate').value;
+            if (!returnDate) { showToast('ফেরতের তারিখ দিন', 'error'); return; }
+
+            // Read newPaidAmount directly here
+            const newPaidRaw   = $('#inNewPaid').val().trim();
+            const newPaidAmount = newPaidRaw !== '' ? (parseFloat(newPaidRaw) || 0) : -1;
+
+            const payload = {
+                institutionID:  institutionId,
+                registrationID: registrationId,
+                sellingId:      parseInt(currentReceipt.SellingId || currentReceipt.sellingId),
+                returnDate:     returnDate,
+                discountAmount: parseFloat($('#inDiscount').val()) || 0,
+                accountId:      parseInt($('#inAccount').val()) || 0,
+                addToStock:     document.getElementById('inAddToStock').checked,
+                newPaidAmount:  newPaidAmount,
+                returnItems:    returnItems
+            };
+
+            const $btn = $('#btnSubmit').prop('disabled', true)
+                .html('<span class="spin" style="width:18px;height:18px;border-width:2px;margin-right:6px;"></span>প্রসেস হচ্ছে...');
+
+            $.ajax({
+                url:         '/api/ItemSell/submit-return',
+                type:        'POST',
+                contentType: 'application/json',
+                data:        JSON.stringify(payload),
+                success: function (res) {
+                    if (res.success) {
+                        showToast('ফেরত সফলভাবে সম্পন্ন হয়েছে!', 'success');
+                        setTimeout(function () {
+                            window.location.replace('/item-sell-invoice.html?id=' + res.sellingId);
+                        }, 1200);
+                    } else {
+                        $btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> ফেরত সম্পন্ন করুন');
+                        showToast(res.message || 'সার্ভার এরর', 'error');
+                    }
+                },
+                error: function (xhr) {
+                    $btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> ফেরত সম্পন্ন করুন');
+                    const msg = xhr.responseJSON && xhr.responseJSON.message
+                        ? xhr.responseJSON.message : 'সার্ভার এরর';
+                    showToast(msg, 'error');
+                }
+            });
+        };
+
+        // -- Helpers -----------------------------------------------------------
+        function fmt(v)  { return parseFloat(v || 0).toFixed(2); }
+        function esc(s)  { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        window.showToast = function (msg, type) {
+            const t = document.createElement('div');
+            t.className = 'toast-item ' + (type || 'info');
+            t.textContent = msg;
+            document.getElementById('toastWrap').appendChild(t);
+            setTimeout(function () { t.style.opacity = 0; setTimeout(function () { t.remove(); }, 300); }, 3500);
+        };
+
+    })();
+    </script>
+</body>
+</html>

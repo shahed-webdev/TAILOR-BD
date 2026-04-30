@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Sell Item - TailorBD" data-bn="আইটেম বিক্রি - TailorBD">আইটেম বিক্রি - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-wrap   { width:100%; padding:16px 22px; max-width:1400px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-wrap{padding:10px;} }
+
+        /* Search box */
+        .search-box { position:relative; }
+        .search-box input { width:100%; padding:12px 16px 12px 44px; border:2px solid #e0e3f7; border-radius:10px; font-size:14px; font-family:inherit; transition:border-color .2s; background:#fafbff; }
+        .search-box input:focus { outline:none; border-color:#6c7ae0; background:#fff; }
+        .search-box .si { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#aaa; font-size:16px; }
+        .search-badge { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:10.5px; color:#888; background:#f0f0f0; padding:2px 8px; border-radius:99px; }
+
+        /* Autocomplete dropdown */
+        .ac-dropdown { position:absolute; top:100%; left:0; right:0; background:#fff; border:1.5px solid #e0e3f7; border-radius:10px; box-shadow:0 6px 24px rgba(108,122,224,.15); z-index:999; overflow:hidden; margin-top:4px; }
+        .ac-item { padding:10px 14px; cursor:pointer; border-bottom:1px solid #f5f5f5; display:flex; align-items:center; gap:10px; transition:background .15s; }
+        .ac-item:last-child { border-bottom:none; }
+        .ac-item:hover, .ac-item.active { background:#f4f5ff; }
+        .ac-code  { font-weight:700; color:#6c7ae0; min-width:60px; font-size:13px; }
+        .ac-name  { flex:1; font-size:13px; color:#333; }
+        .ac-stock { font-size:11.5px; color:#28a745; font-weight:600; white-space:nowrap; }
+        .ac-stock.low { color:#fd7e14; }
+        .ac-stock.out { color:#dc3545; }
+
+        /* Cart table */
+        .cart-card { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.07); overflow:hidden; }
+        .cart-head { background:linear-gradient(135deg,#6c7ae0,#764ba2); color:#fff; padding:12px 18px; font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px; }
+        .tbl { width:100%; border-collapse:collapse; }
+        .tbl thead th { background:#f8f9ff; padding:10px 12px; font-size:11.5px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; text-align:center; }
+        .tbl tbody tr { border-bottom:1px solid #f5f5f5; }
+        .tbl tbody tr:hover { background:#fafbff; }
+        .tbl td { padding:10px 12px; font-size:13px; text-align:center; vertical-align:middle; }
+        .td-left { text-align:left !important; }
+        .qty-input, .price-input { width:90px; padding:6px 8px; border:1.5px solid #ddd; border-radius:7px; font-size:13px; text-align:center; font-family:inherit; }
+        .qty-input:focus, .price-input:focus { outline:none; border-color:#6c7ae0; }
+        .qty-input.err { border-color:#dc3545; }
+        .rem-btn { background:none; border:none; color:#dc3545; cursor:pointer; font-size:15px; padding:4px 8px; border-radius:6px; }
+        .rem-btn:hover { background:#fff0f0; }
+        .line-total { font-weight:700; color:#6c7ae0; }
+        .stock-hint { font-size:10.5px; color:#aaa; margin-top:2px; }
+
+        /* Summary card */
+        .sum-card { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.07); padding:20px; }
+        .sum-head { font-size:14px; font-weight:700; color:#444; margin-bottom:14px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; }
+        .sum-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; }
+        .sum-lbl  { font-size:13px; color:#666; }
+        .sum-val  { font-size:14px; font-weight:700; }
+        .sum-total-row { border-top:2px solid #e0e3f7; margin-top:8px; padding-top:10px; }
+        .sum-total-row .sum-val { font-size:18px; color:#6c7ae0; }
+        .due-row  .sum-val { color:#dc3545; }
+
+        .f-label  { font-size:11.5px; font-weight:600; color:#555; margin-bottom:4px; }
+        .f-input  { width:100%; padding:9px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:13px; font-family:inherit; margin-bottom:10px; }
+        .f-input:focus { outline:none; border-color:#6c7ae0; }
+        .f-select { width:100%; padding:9px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:13px; font-family:inherit; background:#fff; margin-bottom:10px; }
+
+        /* Customer strip */
+        .cust-strip { background:#f0fff4; border:1.5px solid #b7ebc4; border-radius:8px; padding:8px 12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+        .cust-strip .cname { font-weight:700; color:#155724; font-size:13px; }
+        .cust-strip .cphone{ font-size:12px; color:#888; }
+
+        /* Buttons */
+        .btn-submit { width:100%; padding:13px; background:linear-gradient(135deg,#6c7ae0,#764ba2); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:.3px; margin-top:8px; }
+        .btn-submit:disabled { opacity:.5; cursor:not-allowed; }
+        .btn-cust { width:100%; padding:9px; background:#f0f4ff; color:#6c7ae0; border:1.5px dashed #6c7ae0; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-bottom:10px; }
+        .btn-cust:hover { background:#e8ecff; }
+
+        /* Empty state */
+        .empty-cart { text-align:center; padding:40px 20px; color:#ccc; }
+        .empty-cart i { font-size:40px; display:block; margin-bottom:10px; }
+
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1050; align-items:center; justify-content:center; }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:#fff; border-radius:14px; padding:24px; width:95%; max-width:440px; box-shadow:0 12px 40px rgba(0,0,0,.2); position:relative; max-height:90vh; overflow-y:auto; }
+        .modal-title { font-size:15px; font-weight:700; color:#444; margin-bottom:16px; display:flex; justify-content:space-between; }
+        .modal-close { background:none; border:none; font-size:20px; color:#aaa; cursor:pointer; }
+        .modal-close:hover { color:#333; }
+
+        /* AC cust results */
+        .cust-results { border:1.5px solid #e0e3f7; border-radius:8px; overflow:hidden; margin-bottom:10px; display:none; }
+        .cust-row { padding:9px 12px; cursor:pointer; border-bottom:1px solid #f5f5f5; font-size:13px; }
+        .cust-row:hover { background:#f4f5ff; }
+        .cust-row:last-child { border-bottom:none; }
+
+        /* Toast */
+        .toast-wrap { position:fixed; top:18px; right:18px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+        .toast-item { padding:11px 18px; border-radius:8px; color:#fff; font-size:13px; font-weight:600; box-shadow:0 4px 16px rgba(0,0,0,.15); animation:slideIn .25s ease; min-width:220px; max-width:320px; }
+        .toast-item.success { background:#28a745; }
+        .toast-item.error   { background:#dc3545; }
+        .toast-item.info    { background:#6c7ae0; }
+        @keyframes slideIn { from{transform:translateX(40px);opacity:0;} to{transform:translateX(0);opacity:1;} }
+    </style>
+</head>
+<body>
+    <div id="app-navbar"></div>
+    <div id="app-sidebar"></div>
+    <div id="app-modals"></div>
+
+    <!-- Toast -->
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <!-- Customer Modal -->
+    <div class="modal-overlay" id="custModal">
+        <div class="modal-box">
+            <div class="modal-title">
+                <span><i class="fas fa-user-plus me-2" style="color:#6c7ae0;"></i>
+                    <span data-en="Add Customer" data-bn="কাস্টমার যুক্ত করুন">কাস্টমার যুক্ত করুন</span>
+                </span>
+                <button class="modal-close" onclick="closeCustModal()">&times;</button>
+            </div>
+            <div class="mb-2">
+                <label class="f-label" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                <input type="text" id="cPhone" class="f-input" placeholder="01XXXXXXXXX" oninput="searchCustomer()">
+                <div class="cust-results" id="custResults"></div>
+            </div>
+            <div class="mb-2">
+                <label class="f-label" data-en="Customer Name" data-bn="নাম">নাম</label>
+                <input type="text" id="cName" class="f-input" oninput="searchCustomer()" placeholder="">
+            </div>
+            <div class="mb-2">
+                <label class="f-label" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                <input type="text" id="cAddress" class="f-input">
+            </div>
+            <div class="mb-2">
+                <label class="f-label" data-en="Gender" data-bn="লিঙ্গ">লিঙ্গ</label>
+                <select id="cGender" class="f-select">
+                    <option value="1">পুরুষ</option>
+                    <option value="2">মহিলা</option>
+                    <option value="3">বাচ্চা</option>
+                </select>
+            </div>
+            <button class="btn-submit" onclick="saveCustomer()" id="saveCustBtn">
+                <i class="fas fa-check me-1"></i>
+                <span data-en="Save Customer" data-bn="সেভ করুন">সেভ করুন</span>
+            </button>
+        </div>
+    </div>
+
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-content">
+            <div class="page-wrap">
+
+                <!-- Title -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                        <i class="fas fa-tags me-2"></i>
+                        <span data-en="Sell Item" data-bn="আইটেম বিক্রি করুন">আইটেম বিক্রি করুন</span>
+                    </h5>
+                    <a href="/item-sell-record.html" style="font-size:13px;color:#6c7ae0;">
+                        <i class="fas fa-history me-1"></i>
+                        <span data-en="View Records" data-bn="রেকর্ড দেখুন">রেকর্ড দেখুন</span>
+                    </a>
+                </div>
+
+                <div class="row g-3">
+                    <!-- LEFT: Search + Cart -->
+                    <div class="col-lg-8">
+
+                        <!-- Search -->
+                        <div class="search-box mb-3" style="position:relative;">
+                            <i class="fas fa-search si"></i>
+                            <input type="text" id="searchInput" autocomplete="off"
+                                data-en-placeholder="Type item code or name and press Enter..."
+                                data-bn-placeholder="কোড বা আইটেমের নাম লিখুন..."
+                                placeholder="কোড বা আইটেমের নাম লিখুন...">
+                            <span class="search-badge">Enter ↵</span>
+                            <div class="ac-dropdown" id="acDropdown" style="display:none;"></div>
+                        </div>
+
+                        <!-- Cart -->
+                        <div class="cart-card">
+                            <div class="cart-head">
+                                <i class="fas fa-shopping-basket"></i>
+                                <span data-en="Cart" data-bn="বিক্রির তালিকা">বিক্রির তালিকা</span>
+                                <span id="cartCount" style="margin-left:auto;background:rgba(255,255,255,.25);border-radius:99px;padding:2px 10px;font-size:12px;">0</span>
+                            </div>
+                            <div id="cartBody">
+                                <div class="empty-cart" id="emptyCart">
+                                    <i class="fas fa-shopping-basket"></i>
+                                    <span data-en="No items added. Search and add items." data-bn="কোনো আইটেম নেই। উপরে খুঁজে যুক্ত করুন।">কোনো আইটেম নেই। উপরে খুঁজে যুক্ত করুন।</span>
+                                </div>
+                                <div id="cartTable" style="display:none;overflow-x:auto;">
+                                    <table class="tbl">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th class="td-left" style="min-width:140px;"><span data-en="Item" data-bn="আইটেম">আইটেম</span></th>
+                                                <th><span data-en="Stock" data-bn="স্টক">স্টক</span></th>
+                                                <th><span data-en="Qty" data-bn="পরিমান">পরিমান</span></th>
+                                                <th><span data-en="Unit Price" data-bn="দর">দর</span></th>
+                                                <th><span data-en="Total" data-bn="মোট">মোট</span></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="cartRows"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT: Summary -->
+                    <div class="col-lg-4">
+                        <div class="sum-card">
+                            <div class="sum-head">
+                                <i class="fas fa-calculator me-2" style="color:#6c7ae0;"></i>
+                                <span data-en="Summary" data-bn="হিসাব">হিসাব</span>
+                            </div>
+
+                            <!-- Customer -->
+                            <button class="btn-cust" onclick="openCustModal()">
+                                <i class="fas fa-user-plus me-2"></i>
+                                <span data-en="Add Customer (optional)" data-bn="কাস্টমার যুক্ত করুন (ঐচ্ছিক)">কাস্টমার যুক্ত করুন (ঐচ্ছিক)</span>
+                            </button>
+                            <div id="custStrip" style="display:none;"></div>
+
+                            <!-- Account -->
+                            <div class="mb-2">
+                                <div class="f-label"><span data-en="Payment Method" data-bn="পেমেন্ট পদ্ধতি">পেমেন্ট পদ্ধতি</span></div>
+                                <select id="fAccount" class="f-select" style="margin-bottom:6px;"></select>
+                            </div>
+
+                            <!-- Totals -->
+                            <div class="sum-row">
+                                <span class="sum-lbl" data-en="Subtotal" data-bn="মোট">মোট</span>
+                                <span class="sum-val" id="sSubtotal">৳0.00</span>
+                            </div>
+                            <div class="mb-2 mt-1">
+                                <div class="f-label" data-en="Discount" data-bn="ছাড়">ছাড়</div>
+                                <input type="number" id="fDiscount" class="f-input" min="0" step="0.01" value="0" oninput="updateSummary()">
+                            </div>
+                            <div class="sum-row">
+                                <span class="sum-lbl" data-en="After Discount" data-bn="ছাড়ের পরে">ছাড়ের পরে</span>
+                                <span class="sum-val" id="sAfterDisc">৳0.00</span>
+                            </div>
+                            <div class="mb-2 mt-1">
+                                <div class="f-label" data-en="Paid Amount" data-bn="পরিশোধ">পরিশোধ</div>
+                                <input type="number" id="fPaid" class="f-input" min="0" step="0.01" value="0" oninput="updateSummary()">
+                            </div>
+                            <div class="sum-row due-row sum-total-row">
+                                <span class="sum-lbl" data-en="Due Amount" data-bn="বাকি">বাকি</span>
+                                <span class="sum-val" id="sDue">৳0.00</span>
+                            </div>
+
+                            <button class="btn-submit" id="submitBtn" onclick="submitSale()" disabled>
+                                <i class="fas fa-check-circle me-2"></i>
+                                <span data-en="Complete Sale" data-bn="বিক্রি সম্পন্ন করুন">বিক্রি সম্পন্ন করুন</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app-components.js"></script>
+    <script src="/js/item-sell.js"></script>
+</body>
+</html>

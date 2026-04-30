@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Order & Delivery Report - TailorBD" data-bn="অর্ডার ও ডেলিভারি রিপোর্ট - TailorBD">অর্ডার ও ডেলিভারি রিপোর্ট - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+
+        /* Filter */
+        .filter-card { background:#fff; border-radius:10px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:18px; }
+        .f-label  { font-size:12px; font-weight:600; color:#555; margin-bottom:3px; display:block; }
+        .f-control{ width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:6px; font-size:13px; font-family:inherit; }
+        .f-control:focus{ outline:none; border-color:#6c7ae0; box-shadow:0 0 0 3px rgba(108,122,224,.1); }
+        .btn-load   { padding:8px 20px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-load:hover{ background:#5a68c9; }
+        .btn-outline{ padding:8px 14px; background:#fff; color:#6c7ae0; border:1.5px solid #6c7ae0; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-outline:hover{ background:#f0f1fc; }
+
+        /* Summary Cards */
+        .sum-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+        @media(max-width:900px){ .sum-grid{ grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:480px){ .sum-grid{ grid-template-columns:1fr 1fr; } }
+        .s-card { background:#fff; border-radius:10px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,.07); text-align:center; border-top:4px solid #6c7ae0; }
+        .s-card.blue  { border-top-color:#6c7ae0; }
+        .s-card.green { border-top-color:#28a745; }
+        .s-card.red   { border-top-color:#dc3545; }
+        .s-card.teal  { border-top-color:#17a2b8; }
+        .s-card.orange{ border-top-color:#fd7e14; }
+        .s-card.purple{ border-top-color:#6f42c1; }
+        .s-lbl { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:6px; }
+        .s-val { font-size:22px; font-weight:800; color:#333; }
+        .s-val.green  { color:#28a745; }
+        .s-val.red    { color:#dc3545; }
+        .s-val.teal   { color:#17a2b8; }
+        .s-val.orange { color:#fd7e14; }
+        .s-val.purple { color:#6f42c1; }
+        .s-val.blue   { color:#6c7ae0; }
+        .s-sub { font-size:11px; color:#aaa; margin-top:4px; }
+
+        /* Section */
+        .section-card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); overflow:hidden; margin-bottom:18px; }
+        .section-head { padding:12px 18px; font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #f0f0f0; }
+        .section-head.order    { color:#6c7ae0; }
+        .section-head.delivery { color:#28a745; }
+        .section-head.payment  { color:#fd7e14; }
+        .section-head.customer { color:#17a2b8; }
+        .section-body { padding:16px 18px; }
+
+        /* Dress breakdown */
+        .dress-grid { display:flex; flex-wrap:wrap; gap:10px; }
+        .dress-chip { background:#f0f1fc; border-radius:8px; padding:8px 14px; text-align:center; min-width:90px; }
+        .dress-chip.delivery-chip { background:#e8fdf0; }
+        .dress-chip .d-name { font-size:12px; color:#666; font-weight:600; }
+        .dress-chip .d-qty  { font-size:20px; font-weight:800; color:#6c7ae0; }
+        .dress-chip.delivery-chip .d-qty { color:#28a745; }
+
+        /* Order Table */
+        .o-table { width:100%; border-collapse:collapse; font-size:12px; }
+        .o-table thead th { background:#f8f9ff; padding:8px 10px; font-size:11px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap; }
+        .o-table tbody td { padding:7px 10px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+        .o-table tbody tr:hover { background:#fafbff; }
+        .badge-d   { background:#e8fdf0; color:#28a745; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700; }
+        .badge-p   { background:#fff8e1; color:#e67e00; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700; }
+        .badge-prt { background:#ffe8e8; color:#dc3545; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700; }
+        .due-amt   { color:#dc3545; font-weight:700; }
+        .paid-amt  { color:#28a745; font-weight:700; }
+
+        /* Pager */
+        .pager { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+        .pager button { padding:5px 11px; border:1px solid #ddd; border-radius:6px; background:#fff; font-size:12px; cursor:pointer; }
+        .pager button.active { background:#6c7ae0; color:#fff; border-color:#6c7ae0; }
+        .pager button:disabled { opacity:.4; cursor:not-allowed; }
+        .pager-info { font-size:12px; color:#888; margin-left:auto; }
+
+        /* Spinner */
+        .spin-wrap { text-align:center; padding:40px; color:#aaa; }
+        .spin { width:30px; height:30px; border:3px solid #e0e3f7; border-top-color:#6c7ae0; border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+
+        /* Print */
+        @media print {
+            #app-navbar, #app-sidebar, .filter-card, .no-print { display:none !important; }
+            .main-content { margin-left:0 !important; }
+            .page-container { padding:0 !important; }
+            .section-card { box-shadow:none; border:1px solid #ddd !important; page-break-inside:avoid; }
+            .print-header { display:block !important; }
+        }
+        .print-header { display:none; text-align:center; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #333; }
+        .print-header .ins-name  { font-size:20px; font-weight:800; }
+        .print-header .ins-meta  { font-size:12px; color:#444; margin:2px 0; }
+        .print-header .rep-title { font-size:15px; font-weight:700; margin:8px 0 2px; }
+        .print-header .rep-date  { font-size:12px; color:#666; }
+    </style>
+</head>
+<body>
+<div id="app-navbar"></div>
+<div id="app-sidebar"></div>
+
+<main class="main-content" id="mainContent">
+    <div class="dashboard-content">
+        <div class="page-container">
+
+            <!-- Title -->
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    <span data-en="Order & Delivery Report" data-bn="অর্ডার ও ডেলিভারি রিপোর্ট">অর্ডার ও ডেলিভারি রিপোর্ট</span>
+                </h5>
+                <button class="btn-outline" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    <span data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+                </button>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-card no-print">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date From" data-bn="তারিখ থেকে">তারিখ থেকে</label>
+                        <input type="date" id="dateFrom" class="f-control">
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <label class="f-label" data-en="Date To" data-bn="তারিখ পর্যন্ত">তারিখ পর্যন্ত</label>
+                        <input type="date" id="dateTo" class="f-control">
+                    </div>
+                    <div class="col-md-8 d-flex gap-2 flex-wrap align-items-end">
+                        <button class="btn-load" onclick="loadReport()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            <span data-en="Load Report" data-bn="রিপোর্ট দেখুন">রিপোর্ট দেখুন</span>
+                        </button>
+                        <button class="btn-outline" onclick="setToday()">
+                            <i class="fas fa-calendar-day me-1"></i>
+                            <span data-en="Today" data-bn="আজ">আজ</span>
+                        </button>
+                        <button class="btn-outline" onclick="setThisMonth()">
+                            <i class="fas fa-calendar me-1"></i>
+                            <span data-en="This Month" data-bn="এই মাস">এই মাস</span>
+                        </button>
+                        <button class="btn-outline" onclick="clearFilter()">
+                            <i class="fas fa-times me-1"></i>
+                            <span data-en="All Time" data-bn="সব সময়">সব সময়</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="dateLabel" style="font-size:12px;color:#888;margin-top:6px;"></div>
+            </div>
+
+            <!-- Print Header -->
+            <div class="print-header">
+                <div class="ins-name" id="printInsName"></div>
+                <div class="ins-meta" id="printInsPhone"></div>
+                <div class="ins-meta" id="printInsAddress"></div>
+                <div class="rep-title" data-en="Order & Delivery Report" data-bn="অর্ডার ও ডেলিভারি রিপোর্ট">অর্ডার ও ডেলিভারি রিপোর্ট</div>
+                <div class="rep-date" id="printDateRange"></div>
+            </div>
+
+            <!-- Spinner -->
+            <div id="spinner" class="spin-wrap"><div class="spin"></div></div>
+
+            <!-- Content -->
+            <div id="content" style="display:none;">
+
+                <!-- ── Order Summary Cards ───────────────────────────────── -->
+                <div class="sum-grid">
+                    <div class="s-card blue">
+                        <div class="s-lbl" data-en="Total Orders" data-bn="মোট অর্ডার">মোট অর্ডার</div>
+                        <div class="s-val blue" id="sTotalOrders">0</div>
+                        <div class="s-sub" id="sDeliveredPending"></div>
+                    </div>
+                    <div class="s-card green">
+                        <div class="s-lbl" data-en="Total Dresses" data-bn="মোট পোষাক">মোট পোষাক</div>
+                        <div class="s-val green" id="sTotalDresses">0</div>
+                    </div>
+                    <div class="s-card orange">
+                        <div class="s-lbl" data-en="Order Amount" data-bn="অর্ডার মোট">অর্ডার মোট</div>
+                        <div class="s-val orange" id="sTotalAmount">৳0</div>
+                        <div class="s-sub" id="sDiscount"></div>
+                    </div>
+                    <div class="s-card green">
+                        <div class="s-lbl" data-en="Received" data-bn="নগত প্রাপ্ত">নগত প্রাপ্ত</div>
+                        <div class="s-val green" id="sTotalPaid">৳0</div>
+                    </div>
+                    <div class="s-card red">
+                        <div class="s-lbl" data-en="Due" data-bn="বাকি">বাকি</div>
+                        <div class="s-val red" id="sTotalDue">৳0</div>
+                    </div>
+                    <div class="s-card teal">
+                        <div class="s-lbl" data-en="Delivered" data-bn="ডেলিভারি দেওয়া">ডেলিভারি দেওয়া</div>
+                        <div class="s-val teal" id="sTotalDelivered">0 টি</div>
+                        <div class="s-sub" id="sDeliveryPayment"></div>
+                    </div>
+                    <div class="s-card purple">
+                        <div class="s-lbl" data-en="New Customers" data-bn="নতুন কাস্টমার">নতুন কাস্টমার</div>
+                        <div class="s-val purple" id="sNewCustomers">0</div>
+                    </div>
+                    <div class="s-card blue">
+                        <div class="s-lbl" data-en="Returning Customers" data-bn="পুরাতন কাস্টমার">পুরাতন কাস্টমার</div>
+                        <div class="s-val blue" id="sOldCustomers">0</div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- ── Ordered Dresses ───────────────────────────────── -->
+                    <div class="col-md-6">
+                        <div class="section-card">
+                            <div class="section-head order">
+                                <i class="fas fa-tshirt"></i>
+                                <span data-en="Ordered Dresses" data-bn="অর্ডারকৃত পোষাক">অর্ডারকৃত পোষাক</span>
+                            </div>
+                            <div class="section-body">
+                                <div class="dress-grid" id="orderDressGrid">
+                                    <div class="text-muted" style="font-size:13px;">লোড হচ্ছে...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Delivered Dresses ─────────────────────────────── -->
+                    <div class="col-md-6">
+                        <div class="section-card">
+                            <div class="section-head delivery">
+                                <i class="fas fa-check-circle"></i>
+                                <span data-en="Delivered Dresses" data-bn="ডেলিভারিকৃত পোষাক">ডেলিভারিকৃত পোষাক</span>
+                            </div>
+                            <div class="section-body">
+                                <div class="dress-grid" id="deliveryDressGrid">
+                                    <div class="text-muted" style="font-size:13px;">লোড হচ্ছে...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Order Details Table ───────────────────────────────── -->
+                <div class="section-card mt-3">
+                    <div class="section-head order no-print" style="justify-content:space-between;">
+                        <span><i class="fas fa-list me-2"></i>
+                            <span data-en="Order Details" data-bn="অর্ডার বিবরণ">অর্ডার বিবরণ</span>
+                        </span>
+                        <span id="orderCount" style="font-size:12px;color:#888;"></span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="o-table">
+                            <thead>
+                                <tr>
+                                    <th data-en="Order#" data-bn="অর্ডার নং">অর্ডার নং</th>
+                                    <th data-en="Customer" data-bn="কাস্টমার">কাস্টমার</th>
+                                    <th data-en="Phone" data-bn="মোবাইল">মোবাইল</th>
+                                    <th data-en="Items" data-bn="পোষাক">পোষাক</th>
+                                    <th data-en="Order Date" data-bn="অর্ডার তারিখ">অর্ডার তারিখ</th>
+                                    <th data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</th>
+                                    <th data-en="Amount" data-bn="মোট">মোট</th>
+                                    <th data-en="Paid" data-bn="পরিশোধ">পরিশোধ</th>
+                                    <th data-en="Due" data-bn="বাকি">বাকি</th>
+                                    <th data-en="Status" data-bn="অবস্থা">অবস্থা</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="px-3 pb-3 no-print" id="pagerWrap"></div>
+                </div>
+
+            </div><!-- content -->
+        </div>
+    </div>
+</main>
+
+<div id="app-modals"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js"></script>
+<script src="/js/order-delivery-report.js"></script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Management - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+    <script src="/js/auth.js?v=2.1.4"></script>
+    <!-- Shared sidebar + navbar component -->
+    <script src="/js/authority-layout.js?v=2.1.4" data-page="roles"></script>
+    <style>
+        :root {
+            --indigo-grad: linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
+            --green-grad:  linear-gradient(135deg,#10b981 0%,#059669 100%);
+            --red-grad:    linear-gradient(135deg,#ef4444 0%,#dc2626 100%);
+            --blue-grad:   linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);
+            --orange-grad: linear-gradient(135deg,#f97316 0%,#ea580c 100%);
+        }
+
+        /* -- Page header -- */
+        .page-header {
+            background: var(--indigo-grad);
+            border-radius:14px; padding:22px 28px; color:#fff;
+            display:flex; align-items:center; gap:18px;
+            box-shadow:0 8px 32px rgba(99,102,241,.3);
+            margin-bottom:22px; position:relative; overflow:hidden;
+        }
+        .page-header::before {
+            content:''; position:absolute; width:200px; height:200px;
+            border-radius:50%; background:rgba(255,255,255,.07); top:-70px; right:-40px;
+        }
+        .ph-icon { width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;z-index:1; }
+        .ph-text { z-index:1;flex:1; }
+        .ph-text h2 { font-size:1.25rem;font-weight:700;margin:0 0 3px; }
+        .ph-text p  { font-size:.84rem;opacity:.85;margin:0; }
+
+        /* -- Tab navigation -- */
+        .tab-nav {
+            display:flex; gap:0; background:#fff; border-radius:14px;
+            box-shadow:0 4px 20px rgba(0,0,0,.07);
+            border:1.5px solid #e2e8f0; overflow:hidden; margin-bottom:22px;
+        }
+        .tab-btn {
+            flex:1; padding:14px 12px; border:none; background:transparent;
+            font-size:.88rem; font-weight:600; color:#64748b;
+            cursor:pointer; transition:all .2s; display:flex; align-items:center;
+            justify-content:center; gap:8px; border-right:1px solid #e2e8f0;
+        }
+        .tab-btn:last-child { border-right:none; }
+        .tab-btn:hover  { background:#f8fafc; color:#6366f1; }
+        .tab-btn.active {
+            background:var(--indigo-grad); color:#fff;
+            box-shadow:inset 0 2px 8px rgba(99,102,241,.2);
+        }
+        .tab-btn .tab-badge {
+            background:rgba(255,255,255,.25); color:#fff;
+            font-size:.68rem; font-weight:700; padding:1px 7px;
+            border-radius:20px; min-width:20px; text-align:center;
+        }
+        .tab-btn:not(.active) .tab-badge {
+            background:#e2e8f0; color:#64748b;
+        }
+
+        /* -- Tab panels -- */
+        .tab-panel { display:none; }
+        .tab-panel.active { display:block; }
+
+        /* -- Section card -- */
+        .section-card {
+            background:#fff; border-radius:14px;
+            box-shadow:0 4px 20px rgba(0,0,0,.07);
+            border:1.5px solid #e2e8f0;
+            padding:20px 22px; margin-bottom:16px;
+        }
+        .section-card-title {
+            font-size:.95rem; font-weight:700; color:#1e293b;
+            display:flex; align-items:center; gap:10px; margin-bottom:18px;
+            padding-bottom:12px; border-bottom:1px solid #f1f5f9;
+        }
+        .sct-icon {
+            width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+            justify-content:center;color:#fff;font-size:.9rem;flex-shrink:0;
+        }
+
+        /* -- Role pill list -- */
+        .role-list { display:flex; flex-wrap:wrap; gap:10px; min-height:48px; }
+        .role-pill {
+            display:inline-flex; align-items:center; gap:8px;
+            background:#f1f5f9; border:1.5px solid #e2e8f0;
+            border-radius:40px; padding:6px 14px;
+            font-size:.84rem; font-weight:600; color:#334155;
+            transition:all .15s;
+        }
+        .role-pill:hover { border-color:#c7d2fe; background:#eef2ff; }
+        .role-pill .rp-count {
+            background:#e2e8f0; color:#64748b; border-radius:20px;
+            padding:1px 8px; font-size:.7rem; font-weight:700;
+        }
+        .role-pill .rp-del {
+            width:20px;height:20px;border-radius:50%;border:none;background:#fecaca;
+            color:#dc2626;font-size:.72rem;cursor:pointer;display:flex;
+            align-items:center;justify-content:center;transition:all .15s;padding:0;
+        }
+        .role-pill .rp-del:hover { background:#ef4444; color:#fff; }
+        .role-pill.selected { background:var(--indigo-grad); border-color:transparent; color:#fff; }
+        .role-pill.selected .rp-count { background:rgba(255,255,255,.25); color:#fff; }
+
+        /* -- User table -- */
+        .user-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+        .user-table th {
+            background:#f8fafc; padding:10px 14px; text-align:left;
+            font-size:.75rem; font-weight:700; color:#64748b;
+            text-transform:uppercase; letter-spacing:.4px;
+            border-bottom:2px solid #e2e8f0;
+        }
+        .user-table td {
+            padding:11px 14px; border-bottom:1px solid #f1f5f9; vertical-align:middle;
+        }
+        .user-table tr:hover td { background:#fafbff; }
+        .user-table tr:last-child td { border-bottom:none; }
+
+        /* -- Avatars -- */
+        .u-avatar {
+            width:34px;height:34px;border-radius:9px;display:inline-flex;
+            align-items:center;justify-content:center;font-size:.85rem;
+            font-weight:700;color:#fff;flex-shrink:0;
+        }
+        .avatar-admin    { background:var(--indigo-grad); }
+        .avatar-subadmin { background:var(--blue-grad); }
+        .avatar-other    { background:var(--orange-grad); }
+
+        /* -- Badges -- */
+        .badge-role {
+            display:inline-block; background:#ede9fe; color:#6d28d9;
+            border-radius:20px; padding:2px 9px; font-size:.7rem; font-weight:700;
+            margin:1px 2px;
+        }
+        .badge-admin    { background:#dbeafe; color:#1d4ed8; }
+        .badge-subadmin { background:#d1fae5; color:#065f46; }
+        .badge-empty    { background:#f1f5f9; color:#94a3b8; font-style:italic; }
+
+        /* -- Role checkbox list -- */
+        .role-check-list { display:flex; flex-wrap:wrap; gap:8px; }
+        .role-check-item {
+            display:flex; align-items:center; gap:6px;
+            background:#f8fafc; border:1.5px solid #e2e8f0;
+            border-radius:30px; padding:5px 13px;
+            cursor:pointer; transition:all .15s; user-select:none;
+        }
+        .role-check-item:hover { border-color:#a5b4fc; background:#eef2ff; }
+        .role-check-item input[type=checkbox] { cursor:pointer; accent-color:#6366f1; width:15px; height:15px; }
+        .role-check-item.checked { background:#ede9fe; border-color:#a5b4fc; color:#4f46e5; }
+
+        /* -- Filter bar -- */
+        .filter-bar {
+            background:#fff; border-radius:12px;
+            box-shadow:0 4px 20px rgba(0,0,0,.07);
+            border:1.5px solid #e2e8f0;
+            padding:12px 16px; margin-bottom:14px;
+            display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+        }
+
+        /* -- Toast -- */
+        #toastWrap { position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
+        .toast-item { padding:12px 18px;border-radius:10px;font-size:.85rem;color:#fff;min-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.15);animation:slideIn .3s ease; }
+        .toast-item.success { background:#10b981; }
+        .toast-item.error   { background:#ef4444; }
+        .toast-item.info    { background:#3b82f6; }
+        @keyframes slideIn { from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1} }
+
+        /* -- Selected user highlight -- */
+        .user-table tr.row-selected td { background:#eef2ff !important; }
+
+        /* -- Stats -- */
+        .stat-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px; }
+        .stat-card { background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.07);display:flex;align-items:center;gap:10px; }
+        .sc-icon { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;flex-shrink:0; }
+        .sc-val  { font-size:1.3rem;font-weight:800;color:#1e293b;line-height:1; }
+        .sc-lbl  { font-size:.7rem;color:#94a3b8;font-weight:600;margin-top:2px; }
+
+        /* -- Empty state -- */
+        .empty-state { text-align:center; padding:40px 20px; color:#94a3b8; }
+        .empty-state i { font-size:2.5rem; opacity:.3; margin-bottom:12px; display:block; }
+
+        @media(max-width:600px) {
+            .tab-btn span.d-sm-none { display:none; }
+            .tab-btn { font-size:.8rem; padding:12px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- -- MAIN -- -->
+<div class="auth-main">
+    <div class="auth-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="ph-icon"><i class="fas fa-user-tag"></i></div>
+            <div class="ph-text">
+                <h2>রোল ম্যানেজমেন্ট</h2>
+                <p>নতুন রোল তৈরি করুন, রোল মুছুন এবং ব্যবহারকারীকে রোল নির্ধারণ করুন</p>
+            </div>
+            <button class="btn-sm-act"
+                style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.35);padding:7px 16px;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;z-index:1;"
+                onclick="refreshAll()">
+                <i class="fas fa-sync-alt" id="refreshIcon"></i> রিফ্রেশ
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--indigo-grad);"><i class="fas fa-shield-alt"></i></div>
+                <div><div class="sc-val" id="statRoles">&#8230;</div><div class="sc-lbl">মোট রোল</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
+                <div><div class="sc-val" id="statUsers">&#8230;</div><div class="sc-lbl">মোট ইউজার</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-user-tag"></i></div>
+                <div><div class="sc-val" id="statAssigned">&#8230;</div><div class="sc-lbl">রোল আছে</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-user-slash"></i></div>
+                <div><div class="sc-val" id="statUnassigned">&#8230;</div><div class="sc-lbl">রোল নেই</div></div>
+            </div>
+        </div>
+
+        <!-- -- Tabs -- -->
+        <div class="tab-nav">
+            <button class="tab-btn active" id="tab-btn-roles" onclick="switchTab('roles')">
+                <i class="fas fa-shield-alt"></i>
+                <span>রোল তৈরি / মুছুন</span>
+                <span class="tab-badge" id="tb-roles">0</span>
+            </button>
+            <button class="tab-btn" id="tab-btn-assign" onclick="switchTab('assign')">
+                <i class="fas fa-user-tag"></i>
+                <span>ইউজারকে রোল নির্ধারণ</span>
+                <span class="tab-badge" id="tb-assign">0</span>
+            </button>
+            <button class="tab-btn" id="tab-btn-byrole" onclick="switchTab('byrole')">
+                <i class="fas fa-users-cog"></i>
+                <span>রোল অনুযায়ী ইউজার</span>
+                <span class="tab-badge" id="tb-byrole">0</span>
+            </button>
+        </div>
+
+        <!-- ------------------------------
+             TAB 1: Create / Delete Role
+        ------------------------------ -->
+        <div class="tab-panel active" id="panel-roles">
+
+            <!-- Create new role -->
+            <div class="section-card">
+                <div class="section-card-title">
+                    <div class="sct-icon" style="background:var(--green-grad);"><i class="fas fa-plus"></i></div>
+                    নতুন রোল তৈরি করুন
+                </div>
+                <div class="row g-3 align-items-end">
+                    <div class="col-sm-8 col-md-6">
+                        <label class="form-label" style="font-size:.82rem;font-weight:600;color:#475569;">
+                        রোলের নাম <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="newRoleName" class="form-control" placeholder="যেমন: Manager, Supervisor..."
+                               maxlength="50" onkeydown="if(event.key==='Enter') createRole()">
+                    </div>
+                    <div class="col-sm-4 col-md-3">
+                        <button class="btn btn-primary w-100 rounded-pill fw-600" onclick="createRole()" id="btnCreateRole">
+                            <i class="fas fa-plus me-2"></i>রোল তৈরি করুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing roles -->
+            <div class="section-card">
+                <div class="section-card-title">
+                    <div class="sct-icon" style="background:var(--indigo-grad);"><i class="fas fa-list"></i></div>
+                    বিদ্যমান রোলসমূহ
+                    <span class="badge bg-secondary ms-1 fw-normal" id="roleCountBadge">0</span>
+                </div>
+                <div id="roleListWrap">
+                    <div class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div> লোড হচ্ছে...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ------------------------------
+             TAB 2: Assign Roles by User
+        ------------------------------ -->
+        <div class="tab-panel" id="panel-assign">
+            <div class="row g-3">
+                <!-- Left: user list -->
+                <div class="col-lg-5">
+                    <div class="section-card" style="height:100%;min-height:400px;">
+                        <div class="section-card-title">
+                        <div class="sct-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
+                            ইউজার নির্বাচন করুন
+                        </div>
+                        <!-- search -->
+                        <div class="input-group mb-3" style="max-width:100%;">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted" style="font-size:.8rem;"></i>
+                            </span>
+                            <input type="text" id="userSearchInput" class="form-control border-start-0 ps-0"
+                                   placeholder="নাম / ইউজারনেম..." oninput="filterUserList()">
+                        </div>
+                        <div id="assignUserList" style="max-height:360px;overflow-y:auto;">
+                            <div class="text-center py-4 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: role checkboxes for selected user -->
+                <div class="col-lg-7">
+                    <div class="section-card" style="height:100%;min-height:400px;">
+                        <div class="section-card-title">
+                            <div class="sct-icon" style="background:var(--indigo-grad);"><i class="fas fa-user-tag"></i></div>
+                            <span id="selectedUserTitle">ইউজার নির্বাচন করুন</span>
+                        </div>
+
+                        <div id="roleCheckWrap">
+                            <div class="empty-state">
+                                <i class="fas fa-hand-point-left"></i>
+                                <p style="font-size:.88rem;">বাম থেকে একজন ইউজার নির্বাচন করুন</p>
+                            </div>
+                        </div>
+
+                        <!-- ইউজার নির্বাচনের পরে দেখা যাবে -->
+                        <div id="assignActions" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid #f1f5f9;">
+                            <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="saveUserRoles()">
+                                <i class="fas fa-save me-2"></i>রোল সেভ করুন
+                            </button>
+                            <span id="assignStatusMsg" style="font-size:.8rem;color:#10b981;margin-left:12px;display:none;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ------------------------------
+             TAB 3: Users by Role
+        ------------------------------ -->
+        <div class="tab-panel" id="panel-byrole">
+            <div class="row g-3">
+                <!-- Left: role selector -->
+                <div class="col-lg-4">
+                    <div class="section-card">
+                        <div class="section-card-title">
+                        <div class="sct-icon" style="background:var(--indigo-grad);"><i class="fas fa-shield-alt"></i></div>
+                            রোল নির্বাচন করুন
+                        </div>
+                        <div id="byRoleSelector">
+                            <div class="text-center py-3 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: users in selected role -->
+                <div class="col-lg-8">
+                    <div class="section-card">
+                        <div class="section-card-title">
+                            <div class="sct-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
+                            <span id="byRoleTitle">রোল নির্বাচন করুন</span>
+                            <span class="badge bg-secondary ms-2 fw-normal" id="byRoleUserCount" style="display:none;"></span>
+                        </div>
+
+                        <!-- Add user to role -->
+                        <div id="addUserToRoleWrap" style="display:none;margin-bottom:14px;">
+                            <div class="input-group" style="max-width:380px;">
+                                <input type="text" id="addUserInput" class="form-control"
+                                       placeholder="ইউজার খুঁজুন..." list="userDatalist"
+                                       onkeydown="if(event.key==='Enter') addUserToRole()">
+                                <datalist id="userDatalist"></datalist>
+                                <button class="btn btn-primary" onclick="addUserToRole()">
+                                    <i class="fas fa-plus me-1"></i>যোগ করুন
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="byRoleUserList">
+                            <div class="empty-state">
+                                <i class="fas fa-hand-point-left"></i>
+                                <p style="font-size:.88rem;">বাম থেকে একটি রোল নির্বাচন করুন</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<!-- -- DELETE ROLE CONFIRM MODAL -- -->
+<div class="modal fade" id="deleteRoleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-body text-center p-4">
+                <div style="width:52px;height:52px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                    <i class="fas fa-trash-alt" style="color:#ef4444;font-size:1.2rem;"></i>
+                </div>
+                <h6 style="font-weight:700;margin-bottom:6px;">রোল মুছুন</h6>
+                <p class="text-muted small mb-0">
+                    <strong id="deleteRoleName" style="color:#1e293b;"></strong> &#8211; এই রোলটি মুছে ফেলবেন?
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2 justify-content-center">
+                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">বাতিল</button>
+                <button class="btn btn-danger px-4 rounded-pill" onclick="confirmDeleteRole()">
+                    <i class="fas fa-trash-alt me-1"></i>মুছুন
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastWrap"></div>
+
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/authority-roles.js?v=2.1.5"></script>
+</body>
+</html>

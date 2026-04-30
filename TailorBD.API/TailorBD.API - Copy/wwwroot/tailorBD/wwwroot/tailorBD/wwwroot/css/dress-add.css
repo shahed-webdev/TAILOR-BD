@@ -1,0 +1,358 @@
+/* Dress Add Page Styles */
+
+.dress-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.dress-thumbnail:hover {
+    transform: scale(1.1);
+    border-color: #667eea;
+}
+
+/* Placeholder for dresses without images */
+.dress-thumbnail-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 2px dashed #e0e0e0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.dress-thumbnail-placeholder:hover {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.05);
+}
+
+.dress-thumbnail-placeholder i {
+    animation: none;
+}
+
+.dress-name-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.dress-name-link:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+.dress-serial {
+    width: 80px !important;
+    text-align: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.table-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.table thead th {
+    border: none;
+    padding: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background: #f8f9ff;
+    transform: translateX(5px);
+}
+
+.table tbody td {
+    vertical-align: middle;
+    padding: 16px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+}
+
+.btn-sm i {
+    font-size: 0.9rem;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom: none;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    border-top: 1px solid #e0e0e0;
+    padding: 16px 24px;
+}
+
+/* Compact Measurement Modal Styles */
+#measurementModal .modal-body {
+    padding: 8px;
+}
+
+#measurementModal .card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+#measurementModal .card-header {
+    padding: 6px 12px;
+}
+
+#measurementModal .card-body {
+    padding: 8px;
+}
+
+#measurementModal .btn-group-sm .btn {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+}
+
+#measurementModal .badge {
+    padding: 2px 6px;
+    font-size: 0.7rem;
+}
+
+#measurementModal .form-control-sm {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+}
+
+#measurementModal .form-select-sm {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+}
+
+#measurementModal .measurement-types-container {
+    min-height: 30px;
+}
+
+#measurementModal .add-type-form {
+    border: 1px solid #dee2e6;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px 16px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Alert Styles */
+.alert {
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #3b82f6;
+}
+
+.alert i {
+    font-size: 1.2rem;
+}
+
+#alertContainer {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    margin-bottom: 20px;
+}
+
+/* Empty State */
+.table tbody td.text-center {
+    padding: 60px 20px;
+}
+
+.table tbody td.text-center i {
+    opacity: 0.3;
+}
+
+.table tbody td.text-center p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    color: white;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: none;
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+}
+
+/* Spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .dress-thumbnail,
+    .dress-thumbnail-placeholder {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .dress-thumbnail-placeholder {
+        font-size: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+    }
+    
+    #measurementModal .col-md-6 {
+        width: 100%;
+    }
+    
+    #measurementModal .col-md-4 {
+        width: 50%;
+    }
+}

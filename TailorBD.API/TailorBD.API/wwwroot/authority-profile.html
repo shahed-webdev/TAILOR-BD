@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authority Dashboard - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+    <script src="/js/auth.js?v=2.1.4"></script>
+    <script src="/js/authority-layout.js?v=2.1.4" data-page="profile"></script>
+    <style>
+        /* -- fix content overflow -- */
+        .auth-content { overflow-x: hidden; }
+
+        /* -- Dashboard header -- */
+        .dash-header {
+            background: var(--auth-grad);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 8px 32px rgba(99,102,241,.28);
+            position: relative;
+            overflow: hidden;
+        }
+        .dash-header::before {
+            content:''; position:absolute; width:220px; height:220px; border-radius:50%;
+            background:rgba(255,255,255,.07); top:-80px; right:-40px; pointer-events:none;
+        }
+        .dash-avatar {
+            width:60px; height:60px; border-radius:14px;
+            background:rgba(255,255,255,.2);
+            border:2px solid rgba(255,255,255,.35);
+            flex-shrink:0; z-index:1; overflow:hidden;
+        }
+        .dash-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+        .dash-title { z-index:1; flex:1; min-width:0; }
+        .dash-title h2 { font-size:1.2rem; font-weight:800; margin:0 0 3px; }
+        .dash-title p  { font-size:.82rem; opacity:.82; margin:0; }
+        .dash-refresh {
+            z-index:1; background:rgba(255,255,255,.18);
+            border:1.5px solid rgba(255,255,255,.3); color:#fff;
+            border-radius:10px; padding:7px 16px; font-size:.82rem;
+            font-weight:600; cursor:pointer; white-space:nowrap;
+            display:inline-flex; align-items:center; gap:6px;
+        }
+        .dash-refresh:hover { background:rgba(255,255,255,.3); }
+
+        /* -- Action cards row -- */
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .action-card-btn {
+            background:#fff; border-radius:var(--radius);
+            box-shadow:var(--shadow); padding:16px 18px;
+            display:flex; align-items:center; gap:12px; cursor:pointer;
+            border:1.5px solid #e2e8f0; transition:all .2s;
+            text-decoration:none; color:inherit;
+        }
+        .action-card-btn:hover { border-color:#6366f1; box-shadow:0 6px 24px rgba(99,102,241,.15); color:inherit; }
+        .acb-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+        .acb-name { font-size:.86rem; font-weight:700; color:#1e293b; }
+        .acb-desc { font-size:.71rem; color:#94a3b8; margin-top:1px; }
+
+        /* -- Month band -- */
+        .month-band {
+            background: linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);
+            border-radius:var(--radius); padding:20px 24px;
+            display:grid; grid-template-columns:repeat(3,1fr);
+            gap:0;
+            box-shadow:0 4px 24px rgba(14,165,233,.25);
+            margin-bottom:20px;
+        }
+        .mb-item { color:#fff; padding:0 16px; }
+        .mb-item:not(:last-child) { border-right:1px solid rgba(255,255,255,.25); }
+        .mb-val { font-size:1.5rem; font-weight:900; line-height:1; }
+        .mb-lbl { font-size:.74rem; opacity:.85; margin-top:5px; font-weight:600; }
+
+        /* -- Section heading -- */
+        .dash-section-title {
+            font-size:.74rem; font-weight:700; color:#94a3b8;
+            text-transform:uppercase; letter-spacing:.8px;
+            margin-bottom:12px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .dash-section-title::after { content:''; flex:1; height:1px; background:#e2e8f0; }
+
+        /* -- Big stat cards -- */
+        .stat-grid-main {
+            display:grid; grid-template-columns:repeat(3,1fr);
+            gap:16px; margin-bottom:16px;
+        }
+        .stat-card-big {
+            border-radius:var(--radius);
+            box-shadow:var(--shadow); padding:22px 22px;
+            display:flex; align-items:center; gap:16px;
+            transition:transform .18s, box-shadow .18s;
+            background:#fff; position:relative; overflow:hidden;
+        }
+        .stat-card-big:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,.12); }
+        .scb-icon {
+            width:54px; height:54px; border-radius:14px;
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:1.25rem; flex-shrink:0;
+        }
+        .scb-icon.green  { background:linear-gradient(135deg,#10b981,#059669); }
+        .scb-icon.orange { background:linear-gradient(135deg,#f97316,#ea580c); }
+        .scb-icon.indigo { background:linear-gradient(135deg,#6366f1,#8b5cf6); }
+        .scb-body { flex:1; min-width:0; }
+        .scb-val  { font-size:2rem; font-weight:900; color:#1e293b; line-height:1; }
+        .scb-lbl  { font-size:.76rem; color:#94a3b8; font-weight:600; margin-top:4px; }
+        .scb-sub  { font-size:.72rem; color:#64748b; margin-top:5px; }
+
+        /* -- Small stat cards -- */
+        .stat-grid-sub {
+            display:grid; grid-template-columns:repeat(4,1fr);
+            gap:14px; margin-bottom:20px;
+        }
+        .stat-card-sm {
+            background:#fff; border-radius:var(--radius);
+            box-shadow:var(--shadow); padding:16px 18px;
+            display:flex; align-items:center; gap:12px;
+            transition:transform .18s;
+        }
+        .stat-card-sm:hover { transform:translateY(-2px); }
+        .scs-icon { width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; flex-shrink:0; }
+        .scs-icon.green  { background:linear-gradient(135deg,#10b981,#059669); }
+        .scs-icon.red    { background:linear-gradient(135deg,#ef4444,#dc2626); }
+        .scs-icon.orange { background:linear-gradient(135deg,#f97316,#ea580c); }
+        .scs-icon.yellow { background:linear-gradient(135deg,#eab308,#ca8a04); }
+        .scs-val  { font-size:1.45rem; font-weight:800; color:#1e293b; line-height:1; }
+        .scs-lbl  { font-size:.71rem; color:#94a3b8; font-weight:600; margin-top:2px; }
+
+        /* -- Quick links -- */
+        .quick-links {
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr));
+            gap:12px; margin-bottom:24px;
+        }
+        .ql-card {
+            background:#fff; border-radius:var(--radius); box-shadow:var(--shadow);
+            padding:16px 18px; display:flex; align-items:center; gap:12px;
+            text-decoration:none; color:inherit;
+            border:1.5px solid #e2e8f0; transition:all .2s;
+        }
+        .ql-card:hover { border-color:#6366f1; transform:translateY(-2px); box-shadow:0 6px 22px rgba(99,102,241,.15); color:inherit; }
+        .ql-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.9rem; flex-shrink:0; }
+        .ql-name { font-size:.85rem; font-weight:700; color:#1e293b; }
+        .ql-desc { font-size:.71rem; color:#94a3b8; margin-top:1px; }
+
+        /* -- Responsive -- */
+        @media (max-width: 960px) {
+            .stat-grid-main  { grid-template-columns: repeat(2, 1fr); }
+            .stat-grid-sub   { grid-template-columns: repeat(2, 1fr); }
+            .month-band      { grid-template-columns: 1fr; gap: 14px; }
+            .mb-item:not(:last-child) {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,.25);
+                padding-bottom: 14px;
+            }
+            .mb-item { text-align: left !important; }
+        }
+        @media (max-width: 640px) {
+            .stat-grid-main  { grid-template-columns: 1fr; }
+            .stat-grid-sub   { grid-template-columns: repeat(2, 1fr); }
+            .action-cards    { grid-template-columns: 1fr; }
+            .dash-header     { flex-wrap: wrap; padding: 18px 20px; gap: 14px; }
+            .dash-title h2   { font-size: 1.05rem; }
+            .dash-refresh    { order: 3; width: 100%; justify-content: center; }
+            .scb-val         { font-size: 1.6rem; }
+            .quick-links     { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 400px) {
+            .stat-grid-sub   { grid-template-columns: 1fr; }
+            .quick-links     { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+<body>
+<div class="auth-main">
+<div class="auth-content">
+
+    <!-- -- Header -- -->
+    <div class="dash-header">
+        <div class="dash-avatar">
+            <img id="dashAvatar" src="https://ui-avatars.com/api/?name=A&background=6366f1&color=fff&size=100&bold=true" alt="avatar">
+        </div>
+        <div class="dash-title">
+        <h2>স্বাগতম, <span id="dashName">Authority</span>!</h2>
+            <p id="dashDate">তারিখ লোড হচ্ছে...</p>
+        </div>
+        <button class="dash-refresh" onclick="loadDashboard()">
+            <i class="fas fa-sync-alt" id="refreshIcon"></i> রিফ্রেশ
+        </button>
+    </div>
+
+    <!-- -- Action Cards -- -->
+    <div class="action-cards">
+        <div class="action-card-btn" onclick="showEditForm()">
+            <div class="acb-icon" style="background:#ede9fe;"><i class="fas fa-user-edit" style="color:#6366f1;"></i></div>
+            <div><div class="acb-name">Edit Profile</div><div class="acb-desc">নাম, মোবাইল, ছবি পরিবর্তন</div></div>
+        </div>
+        <div class="action-card-btn" onclick="togglePwdSection()">
+            <div class="acb-icon" style="background:#fef3c7;"><i class="fas fa-key" style="color:#d97706;"></i></div>
+            <div><div class="acb-name">Change Password</div><div class="acb-desc">পাসওয়ার্ড পরিবর্তন করুন</div></div>
+        </div>
+        <a href="/authority-institution-details.html" class="action-card-btn">
+            <div class="acb-icon" style="background:#d1fae5;"><i class="fas fa-store" style="color:#059669;"></i></div>
+            <div><div class="acb-name">Institution Details</div><div class="acb-desc">সব প্রতিষ্ঠানের তালিকা</div></div>
+        </a>
+    </div>
+
+    <!-- -- This Month -- -->
+    <div class="dash-section-title"><i class="fas fa-calendar-alt"></i> এই মাস</div>
+    <div class="month-band">
+        <div class="mb-item" style="padding-left:0;">
+            <div class="mb-val" id="mNewIns">�</div>
+            <div class="mb-lbl">নতুন প্রতিষ্ঠান যুক্ত</div>
+        </div>
+        <div class="mb-item" style="text-align:center;">
+            <div class="mb-val" id="mPaid">�</div>
+            <div class="mb-lbl">মাসিক আয়  (৳)</div>
+        </div>
+        <div class="mb-item" style="text-align:right; padding-right:0;">
+            <div class="mb-val" id="mDueCount">�</div>
+            <div class="mb-lbl">বকেয়া Invoice সংখ্যা</div>
+        </div>
+    </div>
+
+    <!-- -- Institution Stats -- -->
+    <div class="dash-section-title"><i class="fas fa-building"></i> প্রতিষ্ঠান পরিসংখ্যান</div>
+    <div class="stat-grid-main">
+        <div class="stat-card-big">
+            <div class="scb-icon green"><i class="fas fa-toggle-on"></i></div>
+            <div class="scb-body">
+                <div class="scb-val" id="statActive">�</div>
+                <div class="scb-lbl">সক্রিয় প্রতিষ্ঠান</div>
+                <div class="scb-sub" id="statActiveNote"> </div>
+            </div>
+        </div>
+        <div class="stat-card-big">
+            <div class="scb-icon orange"><i class="fas fa-toggle-off"></i></div>
+            <div class="scb-body">
+                <div class="scb-val" id="statInactive">�</div>
+                <div class="scb-lbl">নিষ্ক্রিয় প্রতিষ্ঠান</div>
+                <div class="scb-sub" id="statInactiveNote"> </div>
+            </div>
+        </div>
+        <div class="stat-card-big">
+            <div class="scb-icon indigo"><i class="fas fa-store"></i></div>
+            <div class="scb-body">
+                <div class="scb-val" id="statTotal">�</div>
+                <div class="scb-lbl">মোট প্রতিষ্ঠান</div>
+                <div class="scb-sub" id="statExpiredNote"> </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- -- Sub Cards -- -->
+    <div class="stat-grid-sub">
+        <div class="stat-card-sm">
+            <div class="scs-icon green"><i class="fas fa-money-bill-wave"></i></div>
+            <div><div class="scs-val" id="statTotalPaid">�</div><div class="scs-lbl">মোট আয় (৳)</div></div>
+        </div>
+        <div class="stat-card-sm">
+            <div class="scs-icon red"><i class="fas fa-hourglass-half"></i></div>
+            <div><div class="scs-val" id="statTotalDue">�</div><div class="scs-lbl">মোট বকেয়া (৳)</div></div>
+        </div>
+        <div class="stat-card-sm">
+            <div class="scs-icon orange"><i class="fas fa-clock"></i></div>
+            <div><div class="scs-val" id="statExpired">�</div><div class="scs-lbl">মেয়াদ শেষ</div></div>
+        </div>
+        <div class="stat-card-sm">
+            <div class="scs-icon yellow"><i class="fas fa-exclamation-triangle"></i></div>
+            <div><div class="scs-val" id="statExpiringSoon">�</div><div class="scs-lbl">শীঘ্রই মেয়াদ শেষ</div></div>
+        </div>
+    </div>
+
+    <!-- -- Quick Links -- -->
+    <div class="dash-section-title"><i class="fas fa-bolt"></i> দ্রুত নেভিগেশন</div>
+    <div class="quick-links">
+        <a href="/authority-signup.html" class="ql-card">
+            <div class="ql-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"><i class="fas fa-building"></i></div>
+            <div><div class="ql-name">নতুন যোগ করুন</div><div class="ql-desc">নতুন প্রতিষ্ঠান নিবন্ধন করুন</div></div>
+        </a>
+        <a href="/authority-invoice.html" class="ql-card">
+            <div class="ql-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);"><i class="fas fa-file-invoice-dollar"></i></div>
+            <div><div class="ql-name">Invoice তৈরি করুন</div><div class="ql-desc">বিল তৈরি ও ব্যবস্থাপনা</div></div>
+        </a>
+        <a href="/authority-collect-payment.html" class="ql-card">
+            <div class="ql-icon" style="background:linear-gradient(135deg,#10b981,#059669);"><i class="fas fa-hand-holding-usd"></i></div>
+            <div><div class="ql-name">Collect Payment</div><div class="ql-desc">পেমেন্ট গ্রহণ করুন</div></div>
+        </a>
+        <a href="/authority-users.html" class="ql-card">
+            <div class="ql-icon" style="background:linear-gradient(135deg,#06b6d4,#0284c7);"><i class="fas fa-user-check"></i></div>
+            <div><div class="ql-name">User Approve</div><div class="ql-desc">ব্যবহারকারী অনুমোদন করুন</div></div>
+        </a>
+        <a href="/authority-institution-details.html" class="ql-card">
+            <div class="ql-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);"><i class="fas fa-store"></i></div>
+            <div><div class="ql-name">প্রতিষ্ঠান তালিকা</div><div class="ql-desc">সব প্রতিষ্ঠান দেখুন</div></div>
+        </a>
+        <a href="/authority-marketing.html" class="ql-card">
+            <div class="ql-icon" style="background:linear-gradient(135deg,#ec4899,#db2777);"><i class="fas fa-chart-line"></i></div>
+            <div><div class="ql-name">Marketing</div><div class="ql-desc">মার্কেটিং কার্যক্রম</div></div>
+        </a>
+    </div>
+
+    <!-- -- Edit Profile (hidden) -- -->
+    <div class="section-card" id="editCard" style="display:none;">
+        <div class="section-title"><div class="st-icon"><i class="fas fa-user-edit"></i></div>Edit Profile</div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text" id="editName" class="form-control" placeholder="Full name">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Father's Name</label>
+                <input type="text" id="editFatherName" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Designation</label>
+                <input type="text" id="editDesignation" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Gender</label>
+                <select id="editGender" class="form-select">
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                <input type="text" id="editPhone" class="form-control" placeholder="01XXXXXXXXX">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" id="editEmail" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">City</label>
+                <input type="text" id="editCity" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Postal Code</label>
+                <input type="text" id="editPostalCode" class="form-control">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Address</label>
+                <textarea id="editAddress" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Profile Photo</label>
+                <input type="file" id="editImage" class="form-control" accept="image/*">
+            </div>
+            <div class="col-12 d-flex gap-2 mt-2">
+                <button class="btn btn-primary px-4 rounded-pill" onclick="saveProfile()">
+                    <i class="fas fa-save me-2"></i>Save
+                </button>
+                <button class="btn btn-light border px-4 rounded-pill" onclick="cancelEdit()">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- -- Change Password (hidden) -- -->
+    <div class="pwd-card" id="pwdSection" style="display:none;">
+        <div class="section-title"><div class="st-icon"><i class="fas fa-lock"></i></div>Change Password</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Current Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="password" id="currentPwd" class="form-control">
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePwd('currentPwd',this)"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">New Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="password" id="newPwd" class="form-control">
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePwd('newPwd',this)"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="password" id="confirmPwd" class="form-control">
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePwd('confirmPwd',this)"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+            <div class="col-12">
+                <div id="pwdError" class="text-danger small mb-2" style="display:none;"></div>
+                <button class="btn-pwd" id="pwdBtn" onclick="changePassword()"><i class="fas fa-key"></i> Change Password</button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<div id="toastWrap"></div>
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/authority-profile.js?v=2.1.5"></script>
+<script>
+// -- Dashboard logic -----------------------------------------------------------
+function fmtNum(n) {
+    var v = parseFloat(n || 0);
+    if (v >= 10000000) return (v / 10000000).toFixed(1) + ' কোটি';
+    if (v >= 100000)   return (v / 100000).toFixed(1) + ' লাখ';
+    if (v >= 1000)     return (v / 1000).toFixed(1) + 'K';
+    return Math.round(v).toLocaleString();
+}
+
+window.loadDashboard = function () {
+    var icon = document.getElementById('refreshIcon');
+    icon.classList.add('fa-spin');
+
+    // Profile for header
+    var username = sessionStorage.getItem('username');
+    if (username) {
+        $.get('/api/profile/by-username/' + encodeURIComponent(username), function (res) {
+            if (!res.success || !res.data) return;
+            var d = res.data;
+            $('#dashName').text(d.name || 'Authority');
+            var avatarUrl = (d.image && d.image.length > 0)
+                ? '/api/profile/' + d.registrationID + '/image'
+                : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(d.name || 'A') + '&background=6366f1&color=fff&size=100&bold=true';
+            $('#dashAvatar').attr('src', avatarUrl);
+        });
+    }
+
+    // Today's date
+    var now = new Date();
+    var days   = ['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+    var months = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+    $('#dashDate').text(days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear());
+
+    // Stats
+    $.get('/api/institution/authority/dashboard', function (res) {
+        icon.classList.remove('fa-spin');
+        if (!res.success || !res.data) return;
+        var d = res.data;
+
+        $('#statActive').text(d.active);
+        $('#statInactive').text(d.inactive);
+        $('#statTotal').text(d.total);
+        $('#statActiveNote').text('মোট ' + d.total + ' এর মধ্যে সক্রিয়');
+        $('#statInactiveNote').text(d.inactive + ' টি প্রতিষ্ঠান নিষ্ক্রিয়');
+        $('#statExpiredNote').text(d.expired + ' মেয়াদ শেষ – ' + d.expiringSoon + ' শীঘ্রই শেষ');
+
+        $('#statTotalPaid').text('৳' + fmtNum(d.totalPaid));
+        $('#statTotalDue').text('৳' + fmtNum(d.totalDue));
+        $('#statExpired').text(d.expired);
+        $('#statExpiringSoon').text(d.expiringSoon);
+
+        $('#mNewIns').text(d.newThisMonth);
+        $('#mPaid').text('৳' + fmtNum(d.monthPaid));
+        $('#mDueCount').text(d.monthDueCount);
+    }).fail(function (xhr) {
+        icon.classList.remove('fa-spin');
+        console.error('Dashboard load failed', xhr.status, xhr.responseText);
+    });
+};
+
+$(document).ready(function () {
+    if (!TailorAuth.guard('Authority')) return;
+    loadDashboard();
+});
+</script>
+</body>
+</html>
