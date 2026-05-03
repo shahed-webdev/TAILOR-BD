@@ -153,7 +153,7 @@ body {
 }
 
 .institution-subtitle {
-    font-size: 12px;
+    font-size: var(--print-font-size, 12px);
     font-style: italic;
     color: #666 !important;
     margin: 0;
@@ -162,7 +162,7 @@ body {
 }
 
 .institution-contact {
-    font-size: 12px;
+    font-size: var(--print-font-size, 12px);
     color: #444 !important;
     margin: 1px 0 0 0;
     padding: 0;
@@ -241,7 +241,7 @@ body {
 
 .customer-info p {
     margin: 5px 0;
-    font-size: 14px;
+    font-size: var(--print-font-size, 14px);
 }
 
 .customer-info-grid p {
