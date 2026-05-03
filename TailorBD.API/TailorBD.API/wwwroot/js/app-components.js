@@ -45,6 +45,16 @@
     // ─── Expose globally for pages that build their own fetch/ajax ────────
     window.TokenHelper = TokenHelper;
 
+    // ─── bfcache fix: browser back/forward cache থেকে page restore হলে reload ──
+    // যখন user অন্য page এ গিয়ে back করে ফিরে আসে, browser cached page দেখায়।
+    // এই fix টি সব page এ কাজ করবে — page টি force reload করবে।
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+    // ─────────────────────────────────────────────────────────────────────
+
     // ─── Restore session immediately on script load (before DOM ready) ────
     // sessionStorage is tab-specific; copy from localStorage when a new tab opens
     if (!sessionStorage.getItem('username') && localStorage.getItem('session_isLoggedIn') === 'true') {

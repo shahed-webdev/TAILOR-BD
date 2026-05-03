@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ডেলিভারিকৃত অর্ডার - TailorBD</title>
+    <title>??????????? ?????? - TailorBD</title>
     
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -121,17 +121,17 @@
         <div class="dashboard-content">
             <div class="container">
                 <div class="content">
-                    <h2 data-en="Delivered Orders" data-bn="ডেলিভারি হয়েছে">ডেলিভারি হয়েছে</h2>
+                    <h2 data-en="Delivered Orders" data-bn="???????? ??????">???????? ??????</h2>
 
                     <!-- Stats Cards -->
                     <div class="stats-cards">
                         <div class="stat-card green">
                             <div class="stat-value" id="totalDelivered">0</div>
-                            <div class="stat-label" data-en="Total Delivered" data-bn="মোট ডেলিভার">মোট ডেলিভার</div>
+                            <div class="stat-label" data-en="Total Delivered" data-bn="??? ???????">??? ???????</div>
                         </div>
                         <div class="stat-card red">
-                            <div class="stat-value" id="totalDue">৳0.00</div>
-                            <div class="stat-label" data-en="Total Due" data-bn="মোট বাকি">মোট বাকি</div>
+                            <div class="stat-value" id="totalDue">?0.00</div>
+                            <div class="stat-label" data-en="Total Due" data-bn="??? ????">??? ????</div>
                         </div>
                     </div>
 
@@ -139,15 +139,15 @@
                     <div class="search-mode-group">
                         <label class="radio-order">
                             <input type="radio" name="searchMode" value="orderNo" checked>
-                            <span data-en="Order No. And Mobile No." data-bn="অর্ডার নম্বর ও মোবাইল নম্বর">অর্ডার নম্বর ও মোবাইল নম্বর</span>
+                            <span data-en="Order No. And Mobile No." data-bn="?????? ????? ? ?????? ?????">?????? ????? ? ?????? ?????</span>
                         </label>
                         <label class="radio-date">
                             <input type="radio" name="searchMode" value="date">
-                            <span data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
+                            <span data-en="Delivery Date" data-bn="???????? ?????">???????? ?????</span>
                         </label>
                         <label class="radio-due" style="color:#dc3545;">
                             <input type="radio" name="searchMode" value="dueOnly">
-                            <span data-en="With Due Only" data-bn="শুধু বাকি আছে">শুধু বাকি আছে</span>
+                            <span data-en="With Due Only" data-bn="???? ???? ???">???? ???? ???</span>
                         </label>
                     </div>
 
@@ -156,37 +156,37 @@
                         <div class="search-panel">
                             <div class="search-grid">
                                 <div class="form-group autocomplete-wrapper">
-                                    <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                    <label data-en="Mobile Number" data-bn="?????? ?????">?????? ?????</label>
                                     <input type="text" id="mobileNo"
                                         data-en-placeholder="Mobile Number"
-                                        data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নাম্বার"
+                                        data-bn-placeholder="?????? ?????" placeholder="?????? ???????"
                                         autocomplete="off">
                                     <div class="autocomplete-list" id="mobileNoSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group autocomplete-wrapper">
-                                    <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                                    <label data-en="Customer Name" data-bn="?????????? ???">?????????? ???</label>
                                     <input type="text" id="customerName"
                                         data-en-placeholder="Customer Name"
-                                        data-bn-placeholder="কাস্টমারের নাম" placeholder="কাস্টমারের নাম"
+                                        data-bn-placeholder="?????????? ???" placeholder="?????????? ???"
                                         autocomplete="off">
                                     <div class="autocomplete-list" id="customerNameSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="Order Number (one or multiple)" data-bn="অর্ডার নাম্বার (এক বা একাধিক)">অর্ডার নাম্বার (এক বা একাধিক)</label>
+                                    <label data-en="Order Number (one or multiple)" data-bn="?????? ??????? (?? ?? ??????)">?????? ??????? (?? ?? ??????)</label>
                                     <textarea id="orderNo"
                                         data-en-placeholder="e.g. Order numbers: 10,20,30"
-                                        data-bn-placeholder="উদাহরণস্বরূপ: অর্ডার নাম্বার 10,20,30" placeholder="উদাহরণস্বরূপ: অর্ডার নাম্বার 10,20,30"></textarea>
+                                        data-bn-placeholder="????????????: ?????? ??????? 10,20,30" placeholder="????????????: ?????? ??????? 10,20,30"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                                    <label data-en="Address" data-bn="??????">??????</label>
                                     <textarea id="address"
                                         data-en-placeholder="Address"
-                                        data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা"></textarea>
+                                        data-bn-placeholder="??????" placeholder="??????"></textarea>
                                 </div>
                                 <div>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
                                         <i class="fas fa-search"></i>
-                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                                        <span data-en="Search" data-bn="?????????">?????????</span>
                                     </button>
                                 </div>
                             </div>
@@ -198,17 +198,17 @@
                         <div class="search-panel">
                             <div class="search-grid-date">
                                 <div class="form-group">
-                                    <label data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                                    <label data-en="From Date" data-bn="????? ?????">????? ?????</label>
                                     <input type="date" id="startDate">
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
+                                    <label data-en="To Date" data-bn="????? ?????">????? ?????</label>
                                     <input type="date" id="endDate">
                                 </div>
                                 <div>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
                                         <i class="fas fa-search"></i>
-                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                                        <span data-en="Search" data-bn="?????????">?????????</span>
                                     </button>
                                 </div>
                             </div>
@@ -222,7 +222,7 @@
                     <div class="table-wrapper">
                         <div id="ordersTableContainer">
                             <div class="loading">
-                                <span data-en="Loading delivered orders..." data-bn="ডেলিভারিকৃত অর্ডার লোড হচ্ছে...">ডেলিভারিকৃত অর্ডার লোড হচ্ছে...</span>
+                                <span data-en="Loading delivered orders..." data-bn="??????????? ?????? ??? ?????...">??????????? ?????? ??? ?????...</span>
                             </div>
                         </div>
                     </div>
@@ -238,7 +238,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js?v=2.1.4"></script>
-    <script src="/js/delivered-orders.js?v=2.1.4"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/delivered-orders.js?v=2.1.6"></script>
 </body>
 </html>

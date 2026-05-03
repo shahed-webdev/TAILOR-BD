@@ -110,7 +110,7 @@
         const rs = settings.moneyReceipt;
         $('#showShopName').prop('checked', rs.showShopName);
         $('#showServedBy').prop('checked', rs.showServedBy);
-        $('#showReceiptBarcode').prop('checked', rs.showReceiptBarcode || true);
+        $('#showReceiptBarcode').prop('checked', rs.showReceiptBarcode !== false);
         $('#receiptTopSpace').val(rs.topSpace);
         $('#receiptFontSize').val(rs.fontSize);
         $('#poweredByInfo').val(rs.poweredByInfo || '');

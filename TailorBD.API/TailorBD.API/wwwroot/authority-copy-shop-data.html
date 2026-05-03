@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/authority-profile.css">
-    <script src="/js/auth.js?v=2.1.4"></script>
-    <script src="/js/authority-layout.js?v=2.1.4" data-page="copy-shop-data"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="copy-shop-data"></script>
     <style>
         .copy-card {
             background:#fff; border-radius:16px; box-shadow:0 4px 24px rgba(0,0,0,.07);
@@ -110,7 +110,7 @@
 
     <!-- Loading -->
     <div class="text-center py-4" id="pageLoading">
-        <span class="spin-load"></span> <span style="font-size:.88rem;color:#94a3b8;margin-left:8px;">প্রতিষ্ঠান লোড হচ্ছে...</span>
+        <span class="spin-load"></span> <span style="font-size:.88rem;color:#94a3b8;margin-left:8px;">?????????? ??? ?????...</span>
     </div>
 
     <div id="pageBody" style="display:none;">
@@ -118,21 +118,21 @@
         <!-- Source -->
         <div class="copy-card">
             <div class="copy-title">
-                <i class="fas fa-store"></i> উৎস প্রতিষ্ঠান (যেখান থেকে কপি হবে)
-                <span class="badge bg-primary">নির্বাচন করুন</span>
+                <i class="fas fa-store"></i> ??? ?????????? (????? ???? ??? ???)
+                <span class="badge bg-primary">???????? ????</span>
             </div>
             <div class="inst-picker" id="sourcePicker">
                 <i class="fas fa-search inst-search-icon"></i>
-                <input type="text" class="inst-search" id="sourceSearch" placeholder="প্রতিষ্ঠান নাম / ID / মোবাইল দিয়ে খুঁজুন..." autocomplete="off">
+                <input type="text" class="inst-search" id="sourceSearch" placeholder="?????????? ??? / ID / ?????? ????? ??????..." autocomplete="off">
                 <div class="inst-list" id="sourceList"></div>
             </div>
             <div class="info-box" id="sourceInfo">
                 <div class="row g-3">
-                    <div class="col-sm-4"><div class="info-label">প্রতিষ্ঠান</div><div class="info-val" id="srcName">&#65533;</div></div>
+                    <div class="col-sm-4"><div class="info-label">??????????</div><div class="info-val" id="srcName">&#65533;</div></div>
                     <div class="col-sm-2"><div class="info-label">Admin</div><div class="info-val sm" id="srcAdmin">&#65533;</div></div>
-                    <div class="col-sm-2"><div class="info-label">মোবাইল</div><div class="info-val sm" id="srcPhone">&#65533;</div></div>
-                    <div class="col-sm-2"><div class="info-label">পোশাক</div><div class="info-val" id="srcDress">0</div></div>
-                    <div class="col-sm-2"><div class="info-label">মাপ</div><div class="info-val" id="srcMeasure">0</div></div>
+                    <div class="col-sm-2"><div class="info-label">??????</div><div class="info-val sm" id="srcPhone">&#65533;</div></div>
+                    <div class="col-sm-2"><div class="info-label">?????</div><div class="info-val" id="srcDress">0</div></div>
+                    <div class="col-sm-2"><div class="info-label">???</div><div class="info-val" id="srcMeasure">0</div></div>
                 </div>
             </div>
         </div>
@@ -143,28 +143,28 @@
         <!-- Target -->
         <div class="copy-card">
             <div class="copy-title">
-                <i class="fas fa-building"></i> উদ্দিষ্ট প্রতিষ্ঠান (যেখানে কপি যাবে)
-                <span class="badge bg-success">নির্বাচন করুন</span>
+                <i class="fas fa-building"></i> ???????? ?????????? (?????? ??? ????)
+                <span class="badge bg-success">???????? ????</span>
             </div>
             <div class="inst-picker" id="targetPicker">
                 <i class="fas fa-search inst-search-icon"></i>
-                <input type="text" class="inst-search" id="targetSearch" placeholder="প্রতিষ্ঠান নাম / ID / মোবাইল দিয়ে খুঁজুন..." autocomplete="off">
+                <input type="text" class="inst-search" id="targetSearch" placeholder="?????????? ??? / ID / ?????? ????? ??????..." autocomplete="off">
                 <div class="inst-list" id="targetList"></div>
             </div>
             <div class="info-box" id="targetInfo">
                 <div class="row g-3">
-                    <div class="col-sm-4"><div class="info-label">প্রতিষ্ঠান</div><div class="info-val" id="tgtName">&#65533;</div></div>
+                    <div class="col-sm-4"><div class="info-label">??????????</div><div class="info-val" id="tgtName">&#65533;</div></div>
                     <div class="col-sm-2"><div class="info-label">Admin</div><div class="info-val sm" id="tgtAdmin">&#65533;</div></div>
-                    <div class="col-sm-2"><div class="info-label">মোবাইল</div><div class="info-val sm" id="tgtPhone">&#65533;</div></div>
-                    <div class="col-sm-2"><div class="info-label">পোশাক</div><div class="info-val" id="tgtDress">0</div></div>
-                    <div class="col-sm-2"><div class="info-label">মাপ</div><div class="info-val" id="tgtMeasure">0</div></div>
+                    <div class="col-sm-2"><div class="info-label">??????</div><div class="info-val sm" id="tgtPhone">&#65533;</div></div>
+                    <div class="col-sm-2"><div class="info-label">?????</div><div class="info-val" id="tgtDress">0</div></div>
+                    <div class="col-sm-2"><div class="info-label">???</div><div class="info-val" id="tgtMeasure">0</div></div>
                 </div>
             </div>
             <div class="warn-box" id="warnBox">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span id="warnMsg"></span>
                 <label style="margin-left:auto;cursor:pointer;font-weight:700;white-space:nowrap;">
-                    <input type="checkbox" id="forceCheck" style="margin-right:4px;"> Force কপি
+                    <input type="checkbox" id="forceCheck" style="margin-right:4px;"> Force ???
                 </label>
             </div>
         </div>
@@ -172,18 +172,18 @@
         <!-- Copy Button -->
         <div class="text-center" style="padding:10px 0 20px;">
             <button class="btn btn-lg btn-primary rounded-pill px-5 shadow" id="copyBtn" onclick="executeCopy()" disabled>
-                <i class="fas fa-copy me-2"></i> ডাটা কপি করুন
+                <i class="fas fa-copy me-2"></i> ???? ??? ????
             </button>
         </div>
 
         <!-- Result -->
         <div class="result-card" id="resultCard">
-            <div style="font-size:1rem;font-weight:800;"><i class="fas fa-check-circle me-2"></i> কপি সফল হয়েছে!</div>
+            <div style="font-size:1rem;font-weight:800;"><i class="fas fa-check-circle me-2"></i> ??? ??? ??????!</div>
             <div class="result-grid">
-                <div class="result-item"><div class="rv" id="resDress">0</div><div class="rl">পোশাক</div></div>
-                <div class="result-item"><div class="rv" id="resMeasurement">0</div><div class="rl">মাপ</div></div>
-                <div class="result-item"><div class="rv" id="resCategory">0</div><div class="rl">স্টাইল ক্যাটাগরি</div></div>
-                <div class="result-item"><div class="rv" id="resStyle">0</div><div class="rl">স্টাইল</div></div>
+                <div class="result-item"><div class="rv" id="resDress">0</div><div class="rl">?????</div></div>
+                <div class="result-item"><div class="rv" id="resMeasurement">0</div><div class="rl">???</div></div>
+                <div class="result-item"><div class="rv" id="resCategory">0</div><div class="rl">?????? ?????????</div></div>
+                <div class="result-item"><div class="rv" id="resStyle">0</div><div class="rl">??????</div></div>
             </div>
         </div>
 
@@ -213,11 +213,11 @@
     function loadInstitutions() {
         $.get('/api/Migration/institutions-list', function (res) {
             $('#pageLoading').hide();
-            if (!res.success || !res.data) { showToast('ডাটা লোড হয়নি', 'error'); return; }
+            if (!res.success || !res.data) { showToast('???? ??? ?????', 'error'); return; }
             allInstitutions = res.data;
             $('#pageBody').show();
         }).fail(function () {
-            $('#pageLoading').html('<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ডাটা লোড ব্যর্থ হয়েছে</span>');
+            $('#pageLoading').html('<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ???? ??? ?????? ??????</span>');
         });
     }
 
@@ -237,7 +237,7 @@
         });
 
         if (!filtered.length) {
-            $list.html('<div style="padding:14px;text-align:center;color:#94a3b8;font-size:.85rem;">কিছু পাওয়া যায়নি</div>');
+            $list.html('<div style="padding:14px;text-align:center;color:#94a3b8;font-size:.85rem;">???? ?????? ??????</div>');
         } else {
             var h = '';
             filtered.forEach(function (inst) {
@@ -249,7 +249,7 @@
                     '</div>' +
                     '<div class="io-right">' +
                         '<div class="io-id">ID: ' + inst.InstitutionID + '</div>' +
-                        '<div class="io-stats">পোশাক: ' + (inst.DressCount || 0) + ' &bull; মাপ: ' + (inst.MeasurementCount || 0) + '</div>' +
+                        '<div class="io-stats">?????: ' + (inst.DressCount || 0) + ' &bull; ???: ' + (inst.MeasurementCount || 0) + '</div>' +
                     '</div>' +
                 '</div>';
             });
@@ -279,7 +279,7 @@
 
         if (type === 'target') {
             if ((inst.DressCount || 0) > 0) {
-                $('#warnMsg').text('সতর্কতা: তারগেট প্রতিষ্ঠানে ইতিমধ্যে ' + inst.DressCount + ' টি পোশাক আছে!');
+                $('#warnMsg').text('???????: ?????? ??????????? ???????? ' + inst.DressCount + ' ?? ????? ???!');
                 $('#warnBox').addClass('show');
             } else {
                 $('#warnBox').removeClass('show');
@@ -331,7 +331,7 @@
         showInfo('target', inst);
 
         if (!inst.AdminRegistrationId) {
-            showToast('তারগেট প্রতিষ্ঠানের Admin Registration পাওয়া যায়নি!', 'error');
+            showToast('?????? ???????????? Admin Registration ?????? ??????!', 'error');
         }
         updateBtn();
     });
@@ -346,17 +346,17 @@
 
     // -- Execute Copy --
     window.executeCopy = function () {
-        if (!selectedSource || !selectedTarget) { showToast('উৎস ও উদ্দিষ্ট প্রতিষ্ঠান নির্বাচন করুন', 'error'); return; }
-        if (selectedSource.InstitutionID === selectedTarget.InstitutionID) { showToast('উৎস ও উদ্দিষ্ট প্রতিষ্ঠান একটি হতে পারবে না', 'error'); return; }
-        if (!selectedTarget.AdminRegistrationId) { showToast('তারগেট প্রতিষ্ঠানের Admin Registration পাওয়া যায়নি', 'error'); return; }
+        if (!selectedSource || !selectedTarget) { showToast('??? ? ???????? ?????????? ???????? ????', 'error'); return; }
+        if (selectedSource.InstitutionID === selectedTarget.InstitutionID) { showToast('??? ? ???????? ?????????? ???? ??? ????? ??', 'error'); return; }
+        if (!selectedTarget.AdminRegistrationId) { showToast('?????? ???????????? Admin Registration ?????? ??????', 'error'); return; }
 
         var srcName = selectedSource.InstitutionName;
         var tgtName = selectedTarget.InstitutionName;
-        if (!confirm('"' + srcName + '" থেকে "' + tgtName + '"-এ ডাটা কপি করবেন?')) return;
+        if (!confirm('"' + srcName + '" ???? "' + tgtName + '"-? ???? ??? ??????')) return;
 
         var $btn = $('#copyBtn').prop('disabled', true);
         var origHtml = $btn.html();
-        $btn.html('<span class="spin-sm"></span> লোড হচ্ছে...');
+        $btn.html('<span class="spin-sm"></span> ??? ?????...');
         $('#resultCard').removeClass('show');
 
         $.ajax({
@@ -389,13 +389,13 @@
                         }
                     });
                 } else {
-                    showToast(res.message || 'কপি ব্যর্থ হয়েছে', 'error');
+                    showToast(res.message || '??? ?????? ??????', 'error');
                 }
                 updateBtn();
             },
             error: function (xhr) {
                 $btn.prop('disabled', false).html(origHtml);
-                var msg = 'সার্ভার এরর, পুনরায় চেষ্টা করুন';
+                var msg = '??????? ???, ??????? ?????? ????';
                 try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
                 showToast(msg, 'error');
                 updateBtn();

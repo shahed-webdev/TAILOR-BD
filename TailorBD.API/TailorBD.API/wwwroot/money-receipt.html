@@ -18,6 +18,27 @@
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
     <link href="/css/money-receipt.css" rel="stylesheet">
+
+    <!-- bfcache & stale-tab fix: inline so it always runs regardless of JS file cache -->
+    <script>
+        // bfcache fix: Chrome-compatible — setTimeout + href assignment
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                setTimeout(function() {
+                    window.location.href = window.location.href;
+                }, 0);
+            }
+        });
+        // stale-tab fix: অন্য tab থেকে ফিরে এলে data reload
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && window._mrNeedsReload) {
+                window._mrNeedsReload = false;
+                setTimeout(function() {
+                    window.location.href = window.location.href;
+                }, 0);
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Loading Spinner -->
@@ -61,7 +82,7 @@
                         <button class="btn btn-success me-2" onclick="shareAsPDF()" title="Share as PDF">
                             <i class="fas fa-share-alt me-2"></i><span class="lang-content" data-en="Share PDF" data-bn="পিডিএফ শেয়ার">পিডিএফ শেয়ার</span>
                         </button>
-                        <a href="/print-settings.html" class="btn btn-outline-primary">
+                        <a href="/print-settings.html" class="btn btn-outline-primary" onclick="window._mrNeedsReload=true;">
                             <i class="fas fa-cog me-2"></i><span class="lang-content" data-en="Print Settings" data-bn="প্রিন্ট সেটিংস">প্রিন্ট সেটিংস</span>
                         </a>
                     </div>
@@ -249,9 +270,9 @@
     <script src="/js/auth.js"></script>
 
     <!-- App Components -->
-    <script src="/js/app-components.js?v=2.1.5"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
 
     <!-- Money Receipt JS -->
-    <script src="/js/money-receipt.js?v=2.1.5"></script>
+    <script src="/js/money-receipt.js?v=2.1.6"></script>
 </body>
 </html>

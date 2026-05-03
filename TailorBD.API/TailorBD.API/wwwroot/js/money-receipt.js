@@ -2,6 +2,9 @@
 (function() {
     'use strict';
 
+    // print-settings থেকে ফিরে এলে reload flag set করো
+    window._mrNeedsReload = false;
+
     // Global variables
     let orderData = null;
     let printSettings = null;
@@ -37,7 +40,7 @@
             return;
         }
 
-        // Load data
+        // Load print settings first, then load receipt data to avoid race condition
         loadPrintSettings();
         loadMoneyReceiptData();
 
@@ -439,11 +442,16 @@
         $.ajax({
             url: `/api/institution/${institutionId}/print-settings`,
             method: 'GET',
+            cache: false,
             success: function(response) {
                 if (response.success && response.data) {
                     printSettings = response.data;
                     console.log('Print settings loaded:', printSettings);
                     applyPrintSettings();
+                    // Re-apply to receipt if already rendered (race condition fix)
+                    if (orderData && orderData.header) {
+                        displayMoneyReceipt();
+                    }
                 }
             },
             error: function(xhr) {
@@ -514,6 +522,7 @@
         $.ajax({
             url: `/api/orders/money-receipt-details?orderId=${orderId}&institutionId=${institutionId}`,
             method: 'GET',
+            cache: false,
             success: function(response) {
                 console.log('API Response received:', response);
                 

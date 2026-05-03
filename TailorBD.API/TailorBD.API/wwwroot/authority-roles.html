@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/authority-profile.css">
-    <script src="/js/auth.js?v=2.1.4"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
     <!-- Shared sidebar + navbar component -->
-    <script src="/js/authority-layout.js?v=2.1.4" data-page="roles"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="roles"></script>
     <style>
         :root {
             --indigo-grad: linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
@@ -202,13 +202,13 @@
         <div class="page-header">
             <div class="ph-icon"><i class="fas fa-user-tag"></i></div>
             <div class="ph-text">
-                <h2>রোল ম্যানেজমেন্ট</h2>
-                <p>নতুন রোল তৈরি করুন, রোল মুছুন এবং ব্যবহারকারীকে রোল নির্ধারণ করুন</p>
+                <h2>??? ????????????</h2>
+                <p>???? ??? ???? ????, ??? ????? ??? ????????????? ??? ???????? ????</p>
             </div>
             <button class="btn-sm-act"
                 style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.35);padding:7px 16px;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;z-index:1;"
                 onclick="refreshAll()">
-                <i class="fas fa-sync-alt" id="refreshIcon"></i> রিফ্রেশ
+                <i class="fas fa-sync-alt" id="refreshIcon"></i> ???????
             </button>
         </div>
 
@@ -216,19 +216,19 @@
         <div class="stat-grid">
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--indigo-grad);"><i class="fas fa-shield-alt"></i></div>
-                <div><div class="sc-val" id="statRoles">&#8230;</div><div class="sc-lbl">মোট রোল</div></div>
+                <div><div class="sc-val" id="statRoles">&#8230;</div><div class="sc-lbl">??? ???</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
-                <div><div class="sc-val" id="statUsers">&#8230;</div><div class="sc-lbl">মোট ইউজার</div></div>
+                <div><div class="sc-val" id="statUsers">&#8230;</div><div class="sc-lbl">??? ?????</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-user-tag"></i></div>
-                <div><div class="sc-val" id="statAssigned">&#8230;</div><div class="sc-lbl">রোল আছে</div></div>
+                <div><div class="sc-val" id="statAssigned">&#8230;</div><div class="sc-lbl">??? ???</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-user-slash"></i></div>
-                <div><div class="sc-val" id="statUnassigned">&#8230;</div><div class="sc-lbl">রোল নেই</div></div>
+                <div><div class="sc-val" id="statUnassigned">&#8230;</div><div class="sc-lbl">??? ???</div></div>
             </div>
         </div>
 
@@ -236,17 +236,17 @@
         <div class="tab-nav">
             <button class="tab-btn active" id="tab-btn-roles" onclick="switchTab('roles')">
                 <i class="fas fa-shield-alt"></i>
-                <span>রোল তৈরি / মুছুন</span>
+                <span>??? ???? / ?????</span>
                 <span class="tab-badge" id="tb-roles">0</span>
             </button>
             <button class="tab-btn" id="tab-btn-assign" onclick="switchTab('assign')">
                 <i class="fas fa-user-tag"></i>
-                <span>ইউজারকে রোল নির্ধারণ</span>
+                <span>??????? ??? ????????</span>
                 <span class="tab-badge" id="tb-assign">0</span>
             </button>
             <button class="tab-btn" id="tab-btn-byrole" onclick="switchTab('byrole')">
                 <i class="fas fa-users-cog"></i>
-                <span>রোল অনুযায়ী ইউজার</span>
+                <span>??? ???????? ?????</span>
                 <span class="tab-badge" id="tb-byrole">0</span>
             </button>
         </div>
@@ -260,19 +260,19 @@
             <div class="section-card">
                 <div class="section-card-title">
                     <div class="sct-icon" style="background:var(--green-grad);"><i class="fas fa-plus"></i></div>
-                    নতুন রোল তৈরি করুন
+                    ???? ??? ???? ????
                 </div>
                 <div class="row g-3 align-items-end">
                     <div class="col-sm-8 col-md-6">
                         <label class="form-label" style="font-size:.82rem;font-weight:600;color:#475569;">
-                        রোলের নাম <span class="text-danger">*</span>
+                        ????? ??? <span class="text-danger">*</span>
                         </label>
-                        <input type="text" id="newRoleName" class="form-control" placeholder="যেমন: Manager, Supervisor..."
+                        <input type="text" id="newRoleName" class="form-control" placeholder="????: Manager, Supervisor..."
                                maxlength="50" onkeydown="if(event.key==='Enter') createRole()">
                     </div>
                     <div class="col-sm-4 col-md-3">
                         <button class="btn btn-primary w-100 rounded-pill fw-600" onclick="createRole()" id="btnCreateRole">
-                            <i class="fas fa-plus me-2"></i>রোল তৈরি করুন
+                            <i class="fas fa-plus me-2"></i>??? ???? ????
                         </button>
                     </div>
                 </div>
@@ -282,12 +282,12 @@
             <div class="section-card">
                 <div class="section-card-title">
                     <div class="sct-icon" style="background:var(--indigo-grad);"><i class="fas fa-list"></i></div>
-                    বিদ্যমান রোলসমূহ
+                    ???????? ???????
                     <span class="badge bg-secondary ms-1 fw-normal" id="roleCountBadge">0</span>
                 </div>
                 <div id="roleListWrap">
                     <div class="text-center py-4 text-muted">
-                        <div class="spinner-border spinner-border-sm me-2"></div> লোড হচ্ছে...
+                        <div class="spinner-border spinner-border-sm me-2"></div> ??? ?????...
                     </div>
                 </div>
             </div>
@@ -303,7 +303,7 @@
                     <div class="section-card" style="height:100%;min-height:400px;">
                         <div class="section-card-title">
                         <div class="sct-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
-                            ইউজার নির্বাচন করুন
+                            ????? ???????? ????
                         </div>
                         <!-- search -->
                         <div class="input-group mb-3" style="max-width:100%;">
@@ -311,7 +311,7 @@
                                 <i class="fas fa-search text-muted" style="font-size:.8rem;"></i>
                             </span>
                             <input type="text" id="userSearchInput" class="form-control border-start-0 ps-0"
-                                   placeholder="নাম / ইউজারনেম..." oninput="filterUserList()">
+                                   placeholder="??? / ????????..." oninput="filterUserList()">
                         </div>
                         <div id="assignUserList" style="max-height:360px;overflow-y:auto;">
                             <div class="text-center py-4 text-muted">
@@ -326,20 +326,20 @@
                     <div class="section-card" style="height:100%;min-height:400px;">
                         <div class="section-card-title">
                             <div class="sct-icon" style="background:var(--indigo-grad);"><i class="fas fa-user-tag"></i></div>
-                            <span id="selectedUserTitle">ইউজার নির্বাচন করুন</span>
+                            <span id="selectedUserTitle">????? ???????? ????</span>
                         </div>
 
                         <div id="roleCheckWrap">
                             <div class="empty-state">
                                 <i class="fas fa-hand-point-left"></i>
-                                <p style="font-size:.88rem;">বাম থেকে একজন ইউজার নির্বাচন করুন</p>
+                                <p style="font-size:.88rem;">??? ???? ???? ????? ???????? ????</p>
                             </div>
                         </div>
 
-                        <!-- ইউজার নির্বাচনের পরে দেখা যাবে -->
+                        <!-- ????? ?????????? ??? ???? ???? -->
                         <div id="assignActions" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid #f1f5f9;">
                             <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="saveUserRoles()">
-                                <i class="fas fa-save me-2"></i>রোল সেভ করুন
+                                <i class="fas fa-save me-2"></i>??? ??? ????
                             </button>
                             <span id="assignStatusMsg" style="font-size:.8rem;color:#10b981;margin-left:12px;display:none;"></span>
                         </div>
@@ -358,7 +358,7 @@
                     <div class="section-card">
                         <div class="section-card-title">
                         <div class="sct-icon" style="background:var(--indigo-grad);"><i class="fas fa-shield-alt"></i></div>
-                            রোল নির্বাচন করুন
+                            ??? ???????? ????
                         </div>
                         <div id="byRoleSelector">
                             <div class="text-center py-3 text-muted">
@@ -373,7 +373,7 @@
                     <div class="section-card">
                         <div class="section-card-title">
                             <div class="sct-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
-                            <span id="byRoleTitle">রোল নির্বাচন করুন</span>
+                            <span id="byRoleTitle">??? ???????? ????</span>
                             <span class="badge bg-secondary ms-2 fw-normal" id="byRoleUserCount" style="display:none;"></span>
                         </div>
 
@@ -381,11 +381,11 @@
                         <div id="addUserToRoleWrap" style="display:none;margin-bottom:14px;">
                             <div class="input-group" style="max-width:380px;">
                                 <input type="text" id="addUserInput" class="form-control"
-                                       placeholder="ইউজার খুঁজুন..." list="userDatalist"
+                                       placeholder="????? ??????..." list="userDatalist"
                                        onkeydown="if(event.key==='Enter') addUserToRole()">
                                 <datalist id="userDatalist"></datalist>
                                 <button class="btn btn-primary" onclick="addUserToRole()">
-                                    <i class="fas fa-plus me-1"></i>যোগ করুন
+                                    <i class="fas fa-plus me-1"></i>??? ????
                                 </button>
                             </div>
                         </div>
@@ -393,7 +393,7 @@
                         <div id="byRoleUserList">
                             <div class="empty-state">
                                 <i class="fas fa-hand-point-left"></i>
-                                <p style="font-size:.88rem;">বাম থেকে একটি রোল নির্বাচন করুন</p>
+                                <p style="font-size:.88rem;">??? ???? ???? ??? ???????? ????</p>
                             </div>
                         </div>
                     </div>
@@ -412,15 +412,15 @@
                 <div style="width:52px;height:52px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
                     <i class="fas fa-trash-alt" style="color:#ef4444;font-size:1.2rem;"></i>
                 </div>
-                <h6 style="font-weight:700;margin-bottom:6px;">রোল মুছুন</h6>
+                <h6 style="font-weight:700;margin-bottom:6px;">??? ?????</h6>
                 <p class="text-muted small mb-0">
-                    <strong id="deleteRoleName" style="color:#1e293b;"></strong> &#8211; এই রোলটি মুছে ফেলবেন?
+                    <strong id="deleteRoleName" style="color:#1e293b;"></strong> &#8211; ?? ????? ???? ???????
                 </p>
             </div>
             <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2 justify-content-center">
-                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">বাতিল</button>
+                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">?????</button>
                 <button class="btn btn-danger px-4 rounded-pill" onclick="confirmDeleteRole()">
-                    <i class="fas fa-trash-alt me-1"></i>মুছুন
+                    <i class="fas fa-trash-alt me-1"></i>?????
                 </button>
             </div>
         </div>
@@ -431,6 +431,6 @@
 
 <script src="/lib/jquery/jquery.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/js/authority-roles.js?v=2.1.5"></script>
+<script src="/js/authority-roles.js?v=2.1.6"></script>
 </body>
 </html>

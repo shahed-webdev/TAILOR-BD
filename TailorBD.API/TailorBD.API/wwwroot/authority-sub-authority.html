@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/authority-profile.css">
-    <script src="/js/auth.js?v=2.1.4"></script>
-    <script src="/js/authority-layout.js?v=2.1.4" data-page="sub-authority"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="sub-authority"></script>
     <style>
         :root {
             --indigo-grad: linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
@@ -242,12 +242,12 @@
         <div class="page-header">
             <div class="ph-icon"><i class="fas fa-user-plus"></i></div>
             <div class="ph-text">
-                <h2>Sub Authority ম্যানেজমেন্ট</h2>
-                <p>Sub Authority তৈরি, অ্যাক্সেস নিয়ন্ত্রণ ও ব্যবস্থাপনা</p>
+                <h2>Sub Authority ????????????</h2>
+                <p>Sub Authority ????, ????????? ?????????? ? ???????????</p>
             </div>
             <div style="z-index:1;margin-left:auto;">
                 <button class="btn-act btn-act-approve" onclick="refreshAll()" style="font-size:.82rem;padding:7px 16px;border-radius:9px;">
-                    <i class="fas fa-sync-alt" id="refreshIcon"></i> রিফ্রেশ
+                    <i class="fas fa-sync-alt" id="refreshIcon"></i> ???????
                 </button>
             </div>
         </div>
@@ -256,19 +256,19 @@
         <div class="stat-grid">
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
-                <div><div class="sc-val" id="statTotal">-</div><div class="sc-lbl">মোট</div></div>
+                <div><div class="sc-val" id="statTotal">-</div><div class="sc-lbl">???</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-check-circle"></i></div>
-                <div><div class="sc-val" id="statApproved">-</div><div class="sc-lbl">অনুমোদিত</div></div>
+                <div><div class="sc-val" id="statApproved">-</div><div class="sc-lbl">????????</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-clock"></i></div>
-                <div><div class="sc-val" id="statPending">-</div><div class="sc-lbl">অপেক্ষমাণ</div></div>
+                <div><div class="sc-val" id="statPending">-</div><div class="sc-lbl">?????????</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-lock"></i></div>
-                <div><div class="sc-val" id="statLocked">-</div><div class="sc-lbl">লক</div></div>
+                <div><div class="sc-val" id="statLocked">-</div><div class="sc-lbl">??</div></div>
             </div>
         </div>
 
@@ -276,12 +276,12 @@
         <div class="tab-nav">
             <button class="tab-btn active" id="tab-btn-list" onclick="switchTab('list')">
                 <i class="fas fa-list"></i>
-                <span>Sub Authority তালিকা</span>
+                <span>Sub Authority ??????</span>
                 <span class="tab-badge" id="tb-list">0</span>
             </button>
             <button class="tab-btn" id="tab-btn-create" onclick="switchTab('create')">
                 <i class="fas fa-user-plus"></i>
-                <span>নতুন তৈরি</span>
+                <span>???? ????</span>
             </button>
         </div>
 
@@ -292,7 +292,7 @@
             <div class="section-card">
                 <div class="section-card-title">
                     <div class="sct-icon" style="background:var(--blue-grad);"><i class="fas fa-users"></i></div>
-                    সব Sub Authority
+                    ?? Sub Authority
                     <span class="badge bg-secondary ms-1 fw-normal" id="listCountBadge">0</span>
 
                     <!-- Search -->
@@ -300,14 +300,14 @@
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-white"><i class="fas fa-search text-muted" style="font-size:.75rem;"></i></span>
                             <input type="text" class="form-control border-start-0 ps-0 form-control-sm"
-                                   id="listSearch" placeholder="নাম / ইউজারনেম..." oninput="filterList()">
+                                   id="listSearch" placeholder="??? / ????????..." oninput="filterList()">
                         </div>
                     </div>
                 </div>
 
                 <div id="listWrap">
                     <div class="text-center py-4 text-muted">
-                        <div class="spinner-border spinner-border-sm me-2"></div> লোড হচ্ছে...
+                        <div class="spinner-border spinner-border-sm me-2"></div> ??? ?????...
                     </div>
                 </div>
             </div>
@@ -322,55 +322,55 @@
                     <div class="section-card">
                         <div class="section-card-title">
                             <div class="sct-icon" style="background:var(--green-grad);"><i class="fas fa-user-plus"></i></div>
-                            নতুন Sub Authority তৈরি
+                            ???? Sub Authority ????
                         </div>
 
                         <form id="createForm" onsubmit="return false;">
                             <div class="row g-3">
                                 <div class="col-sm-6">
-                                    <label class="form-label-sm">ইউজার নাম <span class="text-danger">*</span></label>
-                                    <input type="text" id="f-name" class="form-control form-control-sm" placeholder="যেমন: admin2">
+                                    <label class="form-label-sm">????? ??? <span class="text-danger">*</span></label>
+                                    <input type="text" id="f-name" class="form-control form-control-sm" placeholder="????: admin2">
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="form-label-sm">পদবী <span class="text-danger">*</span></label>
-                                        <input type="text" id="f-designation" class="form-control form-control-sm" placeholder="যেমন: Manager">
+                                    <label class="form-label-sm">???? <span class="text-danger">*</span></label>
+                                        <input type="text" id="f-designation" class="form-control form-control-sm" placeholder="????: Manager">
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="form-label-sm">ইউজারনেম <span class="text-danger">*</span></label>
-                                    <input type="text" id="f-username" class="form-control form-control-sm" placeholder="username দিন">
+                                    <label class="form-label-sm">???????? <span class="text-danger">*</span></label>
+                                    <input type="text" id="f-username" class="form-control form-control-sm" placeholder="username ???">
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="form-label-sm">ইমেইল</label>
+                                    <label class="form-label-sm">?????</label>
                                         <input type="email" id="f-email" class="form-control form-control-sm" placeholder="email@example.com">
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="form-label-sm">পাসওয়ার্ড <span class="text-danger">*</span></label>
+                                    <label class="form-label-sm">?????????? <span class="text-danger">*</span></label>
                                         <div class="input-group input-group-sm">
-                                            <input type="password" id="f-password" class="form-control form-control-sm" placeholder="পাসওয়ার্ড দিন">
+                                            <input type="password" id="f-password" class="form-control form-control-sm" placeholder="?????????? ???">
                                         <button class="btn btn-outline-secondary btn-sm" type="button" onclick="togglePwd('f-password')">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="form-label-sm">পাসওয়ার্ড নিশ্চিত করুন <span class="text-danger">*</span></label>
+                                    <label class="form-label-sm">?????????? ??????? ???? <span class="text-danger">*</span></label>
                                         <div class="input-group input-group-sm">
-                                            <input type="password" id="f-confirm-password" class="form-control form-control-sm" placeholder="পাসওয়ার্ড নিশ্চিত করুন">
+                                            <input type="password" id="f-confirm-password" class="form-control form-control-sm" placeholder="?????????? ??????? ????">
                                         <button class="btn btn-outline-secondary btn-sm" type="button" onclick="togglePwd('f-confirm-password')">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="form-label-sm">নিরাপত্তা উত্তর <span class="text-danger">*</span></label>
-                                        <input type="text" id="f-security-answer" class="form-control form-control-sm" placeholder="উত্তর দিন">
+                                    <label class="form-label-sm">????????? ????? <span class="text-danger">*</span></label>
+                                        <input type="text" id="f-security-answer" class="form-control form-control-sm" placeholder="????? ???">
                                 </div>
                                 <div class="col-12">
                                     <button class="btn btn-primary rounded-pill px-4 fw-bold" id="btnCreate" onclick="createSubAuthority()">
-                                        <i class="fas fa-save me-2"></i>Sub Authority তৈরি করুন
+                                        <i class="fas fa-save me-2"></i>Sub Authority ???? ????
                                     </button>
                                     <button class="btn btn-light border rounded-pill px-4 ms-2" onclick="resetCreateForm()">
-                                        <i class="fas fa-times me-1"></i>বাতিল
+                                        <i class="fas fa-times me-1"></i>?????
                                     </button>
                                 </div>
                             </div>
@@ -382,14 +382,14 @@
                     <div class="section-card" style="background: linear-gradient(135deg,#f0f4ff 0%,#faf5ff 100%);border-color:#c7d2fe;">
                         <div class="section-card-title">
                             <div class="sct-icon" style="background:var(--indigo-grad);"><i class="fas fa-info-circle"></i></div>
-                            নির্দেশিকা
+                            ??????????
                         </div>
                         <ul style="font-size:.83rem;color:#475569;line-height:1.9;padding-left:18px;margin:0;">
-                            <li>প্রতিটি Sub Authority <strong>একটি নির্দিষ্ট প্রতিষ্ঠানে</strong> যুক্ত থাকে</li>
-                            <li>আপনি যেকোনো সময় <strong>অ্যাক্সেস</strong> enable/disable করতে পারবেন</li>
-                            <li>প্রতিটি Sub Authority-দের <strong>পেজ অ্যাক্সেস</strong> আলাদাভাবে নিয়ন্ত্রণ করতে পারবেন</li>
-                            <li><strong>সিস্টেম</strong> সর্বদা Sub Authority-দের অ্যাক্সেস লগ রাখে</li>
-                            <li><strong>ডিলিট</strong> করলে Sub Authority সরানো যাবে না</li>
+                            <li>??????? Sub Authority <strong>???? ????????? ???????????</strong> ????? ????</li>
+                            <li>???? ?????? ???? <strong>?????????</strong> enable/disable ???? ??????</li>
+                            <li>??????? Sub Authority-??? <strong>??? ?????????</strong> ????????? ????????? ???? ??????</li>
+                            <li><strong>???????</strong> ?????? Sub Authority-??? ????????? ?? ????</li>
+                            <li><strong>?????</strong> ???? Sub Authority ????? ???? ??</li>
                         </ul>
                     </div>
                 </div>
@@ -406,22 +406,22 @@
         <div style="width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <i class="fas fa-key"></i>
         </div>
-        <h5 id="drawerTitle">অ্যাক্সেস নিয়ন্ত্রণ</h5>
+        <h5 id="drawerTitle">????????? ?????????</h5>
         <button onclick="closeAccessDrawer()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:.9rem;">
             <i class="fas fa-times"></i>
         </button>
     </div>
     <div class="access-drawer-body" id="drawerBody">
         <div class="text-center py-5 text-muted">
-            <div class="spinner-border spinner-border-sm me-2"></div> লোড হচ্ছে...
+            <div class="spinner-border spinner-border-sm me-2"></div> ??? ?????...
         </div>
     </div>
     <div class="access-drawer-footer">
         <button class="btn btn-primary rounded-pill px-4 fw-bold" id="btnSaveAccess" onclick="saveAccess()">
-            <i class="fas fa-save me-2"></i>অ্যাক্সেস সেভ করুন
+            <i class="fas fa-save me-2"></i>????????? ??? ????
         </button>
         <button class="btn btn-light border rounded-pill px-4" onclick="closeAccessDrawer()">
-            পয়সা
+            ?????
         </button>
         <span id="accessSaveStatus" style="font-size:.8rem;color:#10b981;margin-left:10px;display:none;"></span>
     </div>
@@ -435,15 +435,15 @@
                 <div style="width:52px;height:52px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
                     <i class="fas fa-trash-alt" style="color:#ef4444;font-size:1.2rem;"></i>
                 </div>
-                <h6 style="font-weight:700;margin-bottom:6px;">Sub Authority তালিকা</h6>
+                <h6 style="font-weight:700;margin-bottom:6px;">Sub Authority ??????</h6>
                 <p class="text-muted small mb-0">
-                    <strong id="deleteUserName" style="color:#1e293b;"></strong> এই Sub Authority ডিলিট করতে চান?
+                    <strong id="deleteUserName" style="color:#1e293b;"></strong> ?? Sub Authority ????? ???? ????
                 </p>
             </div>
             <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2 justify-content-center">
-                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">বাতিল</button>
+                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">?????</button>
                 <button class="btn btn-danger px-4 rounded-pill" onclick="confirmDelete()">
-                    <i class="fas fa-trash-alt me-1"></i>ডিলিট করুন
+                    <i class="fas fa-trash-alt me-1"></i>????? ????
                 </button>
             </div>
         </div>
@@ -454,6 +454,6 @@
 
 <script src="/lib/jquery/jquery.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/js/authority-sub-authority.js?v=2.1.4"></script>
+<script src="/js/authority-sub-authority.js?v=2.1.6"></script>
 </body>
 </html>
