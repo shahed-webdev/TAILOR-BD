@@ -696,12 +696,7 @@ namespace TailorBD.API.Controllers
                         Institution.InstitutionName,
                         Institution.Phone           AS InstitutionPhone,
                         Institution.Address         AS InstitutionAddress,
-                        Institution.Dialog_Title    AS DialogTitle,
-                        Institution.M_Receipt_ShopName,
-                        Institution.M_Receipt_TopSpace,
-                        Institution.M_Receipt_FontSize,
-                        Institution.M_Receipt_ServedBy,
-                        Institution.PoweredByInfo
+                        Institution.Dialog_Title    AS DialogTitle
                     FROM [Order]
                     INNER JOIN Customer    ON [Order].CustomerID    = Customer.CustomerID
                     INNER JOIN Institution ON [Order].InstitutionID = Institution.InstitutionID
@@ -735,8 +730,7 @@ namespace TailorBD.API.Controllers
                         institutionName    = r.IsDBNull(r.GetOrdinal("InstitutionName")) ? "" : r.GetString(r.GetOrdinal("InstitutionName")),
                         institutionPhone   = r.IsDBNull(r.GetOrdinal("InstitutionPhone"))? "" : r.GetString(r.GetOrdinal("InstitutionPhone")),
                         institutionAddress = r.IsDBNull(r.GetOrdinal("InstitutionAddress")) ? "" : r.GetString(r.GetOrdinal("InstitutionAddress")),
-                        dialogTitle        = r.IsDBNull(r.GetOrdinal("DialogTitle"))      ? "" : r.GetString(r.GetOrdinal("DialogTitle")),
-                        poweredByInfo      = r.IsDBNull(r.GetOrdinal("PoweredByInfo"))    ? "" : r.GetString(r.GetOrdinal("PoweredByInfo"))
+                        dialogTitle        = r.IsDBNull(r.GetOrdinal("DialogTitle"))      ? "" : r.GetString(r.GetOrdinal("DialogTitle"))
                     };
                 }
 
@@ -787,12 +781,13 @@ namespace TailorBD.API.Controllers
                         MT.MeasurementTypeID,
                         MT.MeasurementType           AS measureType,
                         OM.Measurement               AS measureValue,
-                        ISNULL(MT.Ascending, 99999)  AS groupAscending,
+                        ISNULL(MT_GRP.Ascending, 99999)  AS groupAscending,
                         ISNULL(MT.Measurement_Group_SerialNo, 99999) AS groupSerial
                     FROM OrderList OL
                     INNER JOIN Dress             ON OL.DressID              = Dress.DressID
-                    LEFT  JOIN Ordered_Measurement OM ON OL.OrderListID    = OM.OrderListID
+                    LEFT  JOIN Ordered_Measurement OM ON OL.OrderListID    = OM.OrderListID AND OM.InstitutionID = @InstitutionID
                     LEFT  JOIN Measurement_Type MT    ON OM.MeasurementTypeID = MT.MeasurementTypeID
+                    LEFT  JOIN Measurement_Type MT_GRP ON MT.Measurement_GroupID = MT_GRP.MeasurementTypeID
                     WHERE OL.OrderID = @OrderID AND OL.InstitutionID = @InstitutionID
                     ORDER BY OL.OrderList_SN, groupAscending, groupSerial";
 
@@ -814,6 +809,7 @@ namespace TailorBD.API.Controllers
 
                 // Build measurement groups per OrderListID
                 var measByList  = new Dictionary<int, (string dressName, int dressQty, int sn, string details, List<object> items)>();
+                var seenMeasurementTypes = new Dictionary<int, HashSet<int>>(); // olId -> set of seen MeasurementTypeIDs
                 using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(measQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@OrderID", orderId);
@@ -828,18 +824,25 @@ namespace TailorBD.API.Controllers
                         var details   = r.IsDBNull(r.GetOrdinal("orderDetails")) ? "" : r.GetString(r.GetOrdinal("orderDetails"));
 
                         if (!measByList.ContainsKey(olId))
+                        {
                             measByList[olId] = (dressName, qty, sn, details, new List<object>());
+                            seenMeasurementTypes[olId] = new HashSet<int>();
+                        }
 
-                        // Only add measurement row if there's a value
+                        // Only add measurement row if there's a value and not already added (dedup by MeasurementTypeID)
                         if (!r.IsDBNull(r.GetOrdinal("MeasurementTypeID")))
                         {
-                            measByList[olId].items.Add(new
+                            var measurementTypeId = r.GetInt32(r.GetOrdinal("MeasurementTypeID"));
+                            if (seenMeasurementTypes[olId].Add(measurementTypeId))
                             {
-                                groupID           = r.IsDBNull(r.GetOrdinal("groupID"))      ? 0  : r.GetInt32(r.GetOrdinal("groupID")),
-                                measurementTypeID = r.GetInt32(r.GetOrdinal("MeasurementTypeID")),
-                                type              = r.IsDBNull(r.GetOrdinal("measureType"))  ? "" : r.GetString(r.GetOrdinal("measureType")),
-                                value             = r.IsDBNull(r.GetOrdinal("measureValue")) ? "" : r.GetString(r.GetOrdinal("measureValue"))
-                            });
+                                measByList[olId].items.Add(new
+                                {
+                                    groupID           = r.IsDBNull(r.GetOrdinal("groupID"))      ? 0  : r.GetInt32(r.GetOrdinal("groupID")),
+                                    measurementTypeID = measurementTypeId,
+                                    type              = r.IsDBNull(r.GetOrdinal("measureType"))  ? "" : r.GetString(r.GetOrdinal("measureType")),
+                                    value             = r.IsDBNull(r.GetOrdinal("measureValue")) ? "" : r.GetString(r.GetOrdinal("measureValue"))
+                                });
+                            }
                         }
                     }
                 }

@@ -44,6 +44,7 @@ namespace TailorBD.API.Controllers
                         l.Password,
                         l.Category,
                         r.Name,
+                        r.Phone,
                         r.Validation,
                         i.InstitutionName
                     FROM LIU l
@@ -99,6 +100,7 @@ namespace TailorBD.API.Controllers
                             institutionId  = user.InstitutionID,
                             institutionName= user.InstitutionName ?? "",
                             name           = user.Name ?? user.UserName,
+                            phone          = user.Phone ?? "",
                             category       = user.Category ?? "User"
                         }
                     });
@@ -273,6 +275,7 @@ namespace TailorBD.API.Controllers
         public string Password       { get; set; } = string.Empty;
         public string? Category      { get; set; }
         public string? Name          { get; set; }
+        public string? Phone         { get; set; }
         public string? Validation    { get; set; }
         public string? InstitutionName { get; set; }
     }

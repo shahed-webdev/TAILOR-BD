@@ -357,12 +357,13 @@ namespace TailorBD.API.Controllers
 
                 // Get measurement groups
                 var measurementGroupsQuery = @"
-                    SELECT DISTINCT 
+                    SELECT 
                         Measurement_GroupID as MeasurementGroupId, 
-                        ISNULL(Ascending, 99999) AS Ascending 
+                        MIN(ISNULL(Ascending, 99999)) AS Ascending 
                     FROM Measurement_Type 
                     WHERE InstitutionID = @InstitutionId 
                     AND DressID = @DressId 
+                    GROUP BY Measurement_GroupID
                     ORDER BY Ascending";
                 
                 var groups = connection.Query<dynamic>(measurementGroupsQuery, 
@@ -382,13 +383,13 @@ namespace TailorBD.API.Controllers
                         LEFT OUTER JOIN (
                             SELECT Measurement, MeasurementTypeID 
                             FROM Customer_Measurement 
-                            WHERE CustomerID = @CustomerId
+                            WHERE CustomerID = @CustomerId AND InstitutionID = @InstitutionId
                         ) AS cm ON mt.MeasurementTypeID = cm.MeasurementTypeID 
                         WHERE mt.Measurement_GroupID = @GroupId 
                         ORDER BY ISNULL(mt.Measurement_Group_SerialNo, 99999)";
-                    
+
                     var measurements = connection.Query<dynamic>(measurementsQuery, 
-                        new { GroupId = (int)group.MeasurementGroupId, CustomerId = customerId }).ToList();
+                        new { GroupId = (int)group.MeasurementGroupId, CustomerId = customerId, InstitutionId = institutionId }).ToList();
                     
                     measurementGroups.Add(new
                     {

@@ -192,6 +192,7 @@
 
                         TailorAuth.set('username',       response.data.username);
                         TailorAuth.set('name',           response.data.name || response.data.username);
+                        TailorAuth.set('phone',          response.data.phone || '');
                         TailorAuth.set('registrationId', response.data.registrationId);
                         TailorAuth.set('institutionId',  response.data.institutionId);
                         TailorAuth.set('institutionName',response.data.institutionName);

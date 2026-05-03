@@ -268,7 +268,9 @@
     }
 
     function formatNumber(num) {
-        return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        const n = parseFloat(num);
+        const formatted = Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
+        return formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     function showAlert(type, message) {
@@ -658,7 +660,25 @@
 
         // Display payment summary
         displayPaymentSummary();
-        
+
+        // Served By
+        const showServedBy = printSettings && printSettings.moneyReceipt && printSettings.moneyReceipt.showServedBy;
+        const servedByName = sessionStorage.getItem('name') || sessionStorage.getItem('username') || '';
+        const servedByPhone = sessionStorage.getItem('phone') || '';
+        if (showServedBy && servedByName) {
+            const displayText = servedByPhone ? `${servedByName}(${servedByPhone})` : servedByName;
+            $('#servedByName').text(displayText);
+            $('#servedBySection').show();
+        } else {
+            $('#servedBySection').hide();
+        }
+
+        // Re-apply font size to screen view after content is rendered
+        if (printSettings && printSettings.moneyReceipt && printSettings.moneyReceipt.fontSize) {
+            const fs = printSettings.moneyReceipt.fontSize + 'px';
+            document.documentElement.style.setProperty('--print-font-size', fs);
+        }
+
         console.log('Money receipt display completed');
     }
 
@@ -963,15 +983,38 @@
             // Styles
             console.log('Styles data for item:', item.dressName, item.styles);
             if (item.styles && item.styles.length > 0) {
-                let stylesText = item.styles.map(s => {
-                    if (mSettings.printStyleCategory && s.measurement) {
-                        return `${s.name} = ${s.measurement}`;
+                // Group styles by category (preserving order)
+                const catMap = new Map();
+                const catOrder = [];
+                item.styles.forEach(s => {
+                    const cat = s.categoryName || '';
+                    if (!catMap.has(cat)) {
+                        catMap.set(cat, []);
+                        catOrder.push(cat);
                     }
-                    return s.measurement ? `${s.measurement}` : s.name;
-                }).join(', ');
+                    catMap.get(cat).push(s);
+                });
+
+                // Build style text grouped by category (same format as old project)
+                const catParts = catOrder.map(cat => {
+                    const styleItems = catMap.get(cat).map(s => {
+                        let part = s.name;
+                        if (s.measurement && s.measurement.trim()) {
+                            part += ` = ${s.measurement}`;
+                        }
+                        return part;
+                    }).join(', ');
+
+                    if (mSettings.printStyleCategory && cat) {
+                        return `${cat}(${styleItems})`;
+                    }
+                    return `(${styleItems})`;
+                });
+
+                let stylesText = catParts.join(' ');
 
                 console.log('Generated styles text:', stylesText);
-                
+
                 if (stylesText) {
                     $detailsSection.append(`
                         <div class="styles-section">

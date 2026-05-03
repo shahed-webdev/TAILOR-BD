@@ -27,6 +27,7 @@
         'isLoggedIn',
         'username',
         'name',
+        'phone',
         'category',
         'registrationId',
         'institutionId',

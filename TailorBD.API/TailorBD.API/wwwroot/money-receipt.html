@@ -139,7 +139,7 @@
                             <thead>
                                 <tr>
                                     <th class="lang-content" data-en="Dress" data-bn="ড্রেস">ড্রেস</th>
-                                    <th class="lang-content" data-en="Description" data-bn="বিবরণ">বিবরণ</th>
+                                    <th class="lang-content" data-en="For" data-bn="বিবরণ">বিবরণ</th>
                                     <th class="text-center lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</th>
                                     <th class="text-end lang-content" data-en="Price" data-bn="মূল্য">মূল্য</th>
                                     <th class="text-end lang-content" data-en="Total" data-bn="মোট">মোট</th>
@@ -182,9 +182,15 @@
                             </table>
                         </div>
 
-                        <!-- Footer -->
+                        <!-- Footer: Served By + Powered By on one line -->
                         <div class="receipt-footer">
-                            <p class="lang-content" data-en="Made with TailorBD" data-bn="TailorBD দিয়ে তৈরি">TailorBD দিয়ে তৈরি</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                                <span id="servedBySection" style="display:none; font-size:var(--print-font-size,11px); color:#444;">
+                                    <span class="lang-content" data-en="Served by:" data-bn="সার্ভ করেছেন:">সার্ভ করেছেন:</span>
+                                    <strong id="servedByName"></strong>
+                                </span>
+                                <span class="lang-content" data-en="Made with TailorBD" data-bn="TailorBD দিয়ে তৈরি" style="font-size:11px; color:#666;">TailorBD দিয়ে তৈরি</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -239,9 +245,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
+    <!-- Auth (must load before app-components to restore session data) -->
+    <script src="/js/auth.js"></script>
+
     <!-- App Components -->
     <script src="/js/app-components.js?v=2.1.5"></script>
-    
+
     <!-- Money Receipt JS -->
     <script src="/js/money-receipt.js?v=2.1.5"></script>
 </body>

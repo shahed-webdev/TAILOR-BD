@@ -156,15 +156,15 @@ body {
     font-size: 12px;
     font-style: italic;
     color: #666 !important;
-    margin: 5px 0 0 0;
+    margin: 0;
     padding: 0;
     background-color: transparent !important;
 }
 
 .institution-contact {
-    font-size: 13px;
+    font-size: 12px;
     color: #444 !important;
-    margin: 5px 0 0 0;
+    margin: 1px 0 0 0;
     padding: 0;
     background-color: transparent !important;
 }
@@ -176,7 +176,7 @@ body {
 /* Customer Section */
 .customer-section {
     margin: 0px 0;
-    padding: 10px;
+    padding: 4px;
     border-bottom: 1px solid #ddd;
     background-color: white !important;
 }
@@ -184,7 +184,7 @@ body {
 .customer-order-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 4px;
     margin-bottom: 0;
     background-color: white !important;
 }
@@ -192,15 +192,16 @@ body {
 .customer-info-box,
 .order-info-box {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 3px 5px;
+    font-size: var(--print-font-size, 12px);
     background-color: white !important;
 }
 
 .info-title {
-    font-size: 12px;
+    font-size: var(--print-font-size, 12px);
     font-weight: bold;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
+    margin-bottom: 2px;
+    padding-bottom: 2px;
     border-bottom: 1px solid #ddd;
     color: #333;
     background-color: white !important;
@@ -208,9 +209,9 @@ body {
 
 .customer-info-box p,
 .order-info-box p {
-    margin: 4px 0;
-    font-size: 12px;
-    line-height: 1.4;
+    margin: 1px 0;
+    font-size: var(--print-font-size, 12px);
+    line-height: 1.3;
     background-color: transparent;
 }
 
@@ -283,41 +284,46 @@ body {
 /* Receipt Table */
 .receipt-table {
     width: 100%;
-    margin: 10px 0;
+    margin: 6px 0;
     border-collapse: collapse;
-    font-size: 10px;
+    font-size: var(--print-font-size, 10px);
+    table-layout: fixed;
 }
 
 .receipt-table thead th {
     background: #000000;
     color: #ffffff;
-    padding: 6px 4px;
+    padding: 3px 3px;
     font-weight: 600;
     border-bottom: 2px solid #dee2e6;
-    font-size: 9px;
+    font-size: var(--print-font-size, 8px);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: 0;
+    vertical-align: middle;
 }
 
 .receipt-table tbody td {
-    padding: 6px 4px;
+    padding: 4px 4px;
     border-bottom: 1px solid #dee2e6;
-    vertical-align: top;
-    font-size: 9px;
+    vertical-align: middle !important;
+    font-size: var(--print-font-size, 9px);
     line-height: 1.3;
 }
 
 /* Column specific widths */
 .receipt-table thead th:nth-child(1), /* Dress */
 .receipt-table tbody td:nth-child(1) {
-    width: 20%;
+    width: 30%;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .receipt-table thead th:nth-child(2), /* Description */
 .receipt-table tbody td:nth-child(2) {
-    width: 35%;
+    width: 15%;
     word-wrap: break-word;
     white-space: normal;
 }
@@ -325,19 +331,19 @@ body {
 .receipt-table thead th:nth-child(3), /* Quantity */
 .receipt-table tbody td:nth-child(3) {
     width: 15%;
-    text-align: center;
+    text-align: center !important;
 }
 
 .receipt-table thead th:nth-child(4), /* Price */
 .receipt-table tbody td:nth-child(4) {
-    width: 15%;
+    width: 20%;
     text-align: right;
     white-space: nowrap;
 }
 
 .receipt-table thead th:nth-child(5), /* Total */
 .receipt-table tbody td:nth-child(5) {
-    width: 15%;
+    width: 20%;
     text-align: right;
     white-space: nowrap;
     font-weight: 600;
@@ -345,7 +351,7 @@ body {
 
 /* Payment Summary */
 .payment-summary {
-    margin-top: 20px;
+    margin-top: 8px;
 }
 
 .summary-table {
@@ -355,24 +361,33 @@ body {
 }
 
 .summary-table td {
-    padding: 5px 0;
-    font-size: 14px;
+    padding: 3px 0;
+    font-size: var(--print-font-size, 12px);
 }
 
 .summary-table .total-row {
     border-top: 2px solid #333;
-    padding-top: 10px;
-    font-size: 16px;
+    padding-top: 5px;
+    font-size: var(--print-font-size, 14px);
 }
 
 /* Receipt Footer */
 .receipt-footer {
     text-align: center;
-    margin-top: 30px;
-    padding-top: 15px;
+    margin-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid #ddd;
     font-size: 11px;
     color: #666;
+}
+
+.served-by-section {
+    text-align: right;
+    font-size: var(--print-font-size, 11px);
+    color: #444;
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px dashed #ccc;
 }
 
 /* Measurements Container */
