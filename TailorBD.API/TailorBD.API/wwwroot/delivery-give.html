@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>???????? ??? - TailorBD</title>
+    <title>ডেলিভারি দিন - TailorBD</title>
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -103,18 +103,18 @@
         <div class="dashboard-content">
             <div class="container">
                 <div class="content">
-                    <h2><span class="lang-content" data-en="Delivery Give" data-bn="???????? ???">???????? ???</span></h2>
+                    <h2><span class="lang-content" data-en="Delivery Give" data-bn="ডেলিভারি দিন">ডেলিভারি দিন</span></h2>
 
                     <!-- Search Section -->
                     <div class="search-section">
                         <div class="search-tabs">
                             <label>
                                 <input type="radio" name="searchType" value="number" checked>
-                                <span class="lang-content" data-en="Mobile No. & Order No." data-bn="?????? ?? ? ?????? ??">?????? ?? ? ?????? ??</span>
+                                <span class="lang-content" data-en="Mobile No. & Order No." data-bn="মোবাইল নং ও অর্ডার নং">মোবাইল নং ও অর্ডার নং</span>
                             </label>
                             <label>
                                 <input type="radio" name="searchType" value="date">
-                                <span class="lang-content" data-en="Delivery Date" data-bn="???????? ?????">???????? ?????</span>
+                                <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
                             </label>
                         </div>
 
@@ -122,17 +122,17 @@
                         <div class="search-by-number active">
                             <div class="search-form">
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="Mobile Number" data-bn="?????? ?????">?????? ?????</label>
-                                    <input type="text" id="mobileNo" placeholder="?????? ???????">
+                                    <label class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                    <input type="text" id="mobileNo" placeholder="মোবাইল নাম্বার">
                                 </div>
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="Order Number" data-bn="?????? ?????">?????? ?????</label>
-                                    <input type="text" id="orderNo" placeholder="?????? ???????">
+                                    <label class="lang-content" data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</label>
+                                    <input type="text" id="orderNo" placeholder="অর্ডার নাম্বার">
                                 </div>
                                 <div class="form-group" style="flex:0;">
                                     <label>&nbsp;</label>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
-                                        <span class="lang-content" data-en="Search" data-bn="?????????">?????????</span>
+                                        <span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
                             </div>
@@ -142,17 +142,17 @@
                         <div class="search-by-date">
                             <div class="search-form">
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="From Date" data-bn="????? ?????">????? ?????</label>
+                                    <label class="lang-content" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
                                     <input type="date" id="startDate">
                                 </div>
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="To Date" data-bn="????? ?????">????? ?????</label>
+                                    <label class="lang-content" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
                                     <input type="date" id="endDate">
                                 </div>
                                 <div class="form-group" style="flex:0;">
                                     <label>&nbsp;</label>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
-                                        <span class="lang-content" data-en="Search" data-bn="?????????">?????????</span>
+                                        <span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
                             </div>
@@ -165,13 +165,13 @@
                             <span style="font-size:14px; color:#004085;">
                                 <i class="fas fa-sms me-1" style="color:#6c7ae0;"></i>
                                 <strong><span id="smsSendCount">0</span></strong>
-                                <span class="lang-content" data-en=" order(s) selected for SMS" data-bn=" ?? ?????? ????????? (SMS ?????? ???)"> ?? ?????? ????????? (SMS ?????? ???)</span>
+                                <span class="lang-content" data-en=" order(s) selected for SMS" data-bn=" টি অর্ডার নির্বাচিত (SMS পাঠানো হবে)"> টি অর্ডার নির্বাচিত (SMS পাঠানো হবে)</span>
                             </span>
                             <button id="smsSendBtn"
                                     style="padding:7px 18px; background:#6c7ae0; color:white; border:none; border-radius:5px; cursor:pointer; font-size:13px; font-weight:500;"
                                     onclick="sendReadySms()">
                                 <i class="fas fa-paper-plane me-1"></i>
-                                <span class="lang-content" data-en="Send SMS" data-bn="SMS ?????">SMS ?????</span>
+                                <span class="lang-content" data-en="Send SMS" data-bn="SMS পাঠান">SMS পাঠান</span>
                             </button>
                         </div>
                         <div id="smsStatusMsg" style="display:none; margin-top:8px; font-size:13px;"></div>
@@ -182,7 +182,7 @@
                         <div id="ordersTableContainer">
                             <div class="loading">
                                 <i class="fas fa-spinner fa-spin me-2"></i>
-                                <span class="lang-content" data-en="Loading ready-to-deliver orders..." data-bn="????????? ???? ???????? ?????? ??? ?????...">????????? ???? ???????? ?????? ??? ?????...</span>
+                                <span class="lang-content" data-en="Loading ready-to-deliver orders..." data-bn="ডেলিভারির জন্য প্রস্তুত অর্ডার লোড হচ্ছে...">ডেলিভারির জন্য প্রস্তুত অর্ডার লোড হচ্ছে...</span>
                             </div>
                         </div>
                     </div>
@@ -201,7 +201,7 @@
             <div class="modal-content">
                 <div class="modal-header" style="background:#6c7ae0; color:white;">
                     <h5 class="modal-title"><i class="fas fa-clipboard-list me-2"></i>
-                        <span class="lang-content" data-en="Order Details" data-bn="?????? ?????????">?????? ?????????</span>
+                        <span class="lang-content" data-en="Order Details" data-bn="অর্ডার বিস্তারিত">অর্ডার বিস্তারিত</span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:invert(1);"></button>
                 </div>
@@ -220,8 +220,8 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- App Components (sidebar, navbar, modals, session) -->
-    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/app-components.js?v=2.1.4"></script>
     <!-- Delivery Give Page Logic -->
-    <script src="/js/delivery-give.js?v=2.1.6"></script>
+    <script src="/js/delivery-give.js?v=2.1.4"></script>
 </body>
 </html>
