@@ -4,15 +4,15 @@
  */
 
 :root {
-    --primary-color: #6366f1;
-    --secondary-color: #8b5cf6;
-    --accent-color: #ec4899;
-    --dark-color: #1e293b;
+    --primary-color: #1e3a5f;
+    --secondary-color: #2d4f7c;
+    --accent-color: #38bdf8;
+    --dark-color: #0f172a;
     --light-color: #f8fafc;
     --text-color: #334155;
-    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-1: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    --gradient-2: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+    --gradient-3: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
 }
 
 * {
@@ -33,15 +33,15 @@ body {
 
 /* Navbar */
 .navbar {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(15, 23, 42, 0.97);
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
 
 .navbar.scrolled {
     padding: 0.5rem 0;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
 
 .navbar-brand {
@@ -55,10 +55,14 @@ body {
 
 .nav-link {
     font-weight: 500;
-    color: var(--text-color) !important;
+    color: rgba(255,255,255,0.85) !important;
     margin: 0 0.5rem;
     transition: all 0.3s ease;
     position: relative;
+}
+
+.nav-link:hover {
+    color: #fff !important;
 }
 
 .nav-link::after {
@@ -69,7 +73,7 @@ body {
     transform: translateX(-50%);
     width: 0;
     height: 2px;
-    background: var(--gradient-1);
+    background: var(--gradient-3);
     transition: width 0.3s ease;
 }
 
@@ -78,9 +82,9 @@ body {
 }
 
 .lang-switch {
-    background: var(--gradient-1);
+    background: linear-gradient(135deg, #1e3a5f, #0f172a);
     color: white;
-    border: none;
+    border: 1px solid rgba(255,255,255,0.2);
     padding: 0.5rem 1.5rem;
     border-radius: 50px;
     font-weight: 600;
@@ -90,13 +94,20 @@ body {
 
 .lang-switch:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 102, 241, 0.3);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
+}
+
+.navbar-toggler {
+    border-color: rgba(255,255,255,0.4);
+}
+.navbar-toggler-icon {
+    filter: invert(1);
 }
 
 /* Hero Section */
 .hero {
     min-height: 100svh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f2342 100%);
     position: relative;
     overflow: hidden;
     padding-top: 80px;
@@ -133,18 +144,19 @@ body {
 
 .btn-primary-custom {
     background: white;
-    color: var(--primary-color);
+    color: #0f172a;
     padding: 1rem 3rem;
     border-radius: 50px;
     font-weight: 600;
     border: none;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary-custom:hover {
+    background: #e2e8f0;
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
 .btn-outline-custom {

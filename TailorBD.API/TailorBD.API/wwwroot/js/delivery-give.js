@@ -4,6 +4,9 @@
 
     let institutionId = null;
     let registrationId = null;
+    let allOrders = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 100;
 
     // Initialize page
     $(document).ready(function() {
@@ -102,7 +105,9 @@
             method: 'GET',
             success: function(response) {
                 if (response.success && response.data && response.data.orders.length > 0) {
-                    renderOrdersTable(response.data.orders);
+                    allOrders = response.data.orders;
+                    currentPage = 1;
+                    renderOrdersTable(allOrders, currentPage);
                 } else {
                     container.html('<div class="empty-message">No orders found</div>');
                 }
@@ -114,7 +119,37 @@
         });
     }
 
-    function renderOrdersTable(orders) {
+    function renderPagination(total, page) {
+        const totalPages = Math.ceil(total / PAGE_SIZE);
+        const lang = window.currentLang === 'en';
+        const from = (page - 1) * PAGE_SIZE + 1;
+        const to = Math.min(page * PAGE_SIZE, total);
+        const countInfo = `<small class="text-muted ms-2">${lang ? `Showing ${from}-${to} of ${total}` : `মোট ${total} টি অর্ডার, দেখানো হচ্ছে ${from}-${to}`}</small>`;
+
+        if (totalPages <= 1) {
+            return `<div class="d-flex align-items-center py-2">${countInfo}</div>`;
+        }
+
+        let html = '<nav aria-label="Page navigation"><ul class="pagination pagination-sm mb-0 flex-wrap">';
+        html += `<li class="page-item${page === 1 ? ' disabled' : ''}"><a class="page-link" href="#" onclick="goToPage(${page - 1}); return false;">${lang ? 'Prev' : '« আগের'}</a></li>`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<li class="page-item${i === page ? ' active' : ''}"><a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a></li>`;
+        }
+        html += `<li class="page-item${page === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" onclick="goToPage(${page + 1}); return false;">${lang ? 'Next »' : 'পরের »'}</a></li>`;
+        html += `</ul></nav>`;
+        return `<div class="d-flex align-items-center gap-2 py-2 flex-wrap">${html}${countInfo}</div>`;
+    }
+
+    window.goToPage = function(page) {
+        const totalPages = Math.ceil(allOrders.length / PAGE_SIZE);
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        renderOrdersTable(allOrders, currentPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    function renderOrdersTable(orders, page) {
+        page = page || 1;
         const container = $('#ordersTableContainer');
 
         if (!orders || orders.length === 0) {
@@ -122,7 +157,13 @@
             return;
         }
 
-        let html = `
+        const totalOrders = orders.length;
+        const start = (page - 1) * PAGE_SIZE;
+        const pageOrders = orders.slice(start, start + PAGE_SIZE);
+
+        const paginationHtml = renderPagination(totalOrders, page);
+
+        let html = paginationHtml + `
             <table>
                 <thead>
                     <tr>
@@ -150,7 +191,7 @@
                 <tbody>
         `;
 
-        orders.forEach(order => {
+        pageOrders.forEach(order => {
             const orderDate    = new Date(order.orderDate).toLocaleDateString('en-GB');
             const deliveryDate = order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString('en-GB') : '-';
             const isFullyCompleted = order.workStatus === 'completed';
@@ -192,15 +233,16 @@
                         </button>
                     </td>
                     <td style="text-align:center;">
-                        <a href="/finish-order.html?orderId=${order.orderId}&delivery=true" class="btn-deliver-link" title="Deliver">
+                        <button onclick="openPartialDeliveryModal(${order.orderId}, '${order.orderSerialNumber}')" class="btn-deliver-link btn" style="padding:2px 6px;" title="ডেলিভারি দিন">
                             <i class="fas fa-check-circle" style="font-size:24px; color:#28a745;"></i>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             `;
         });
 
         html += '</tbody></table>';
+        html += paginationHtml;
         container.html(html);
 
         // Select All — sync SMS checkboxes too
@@ -421,5 +463,183 @@
 
         $('#orderDetailsModalBody').html(html);
     }
+
+    // ===================== Partial Delivery Modal =====================
+    let pdCurrentOrderId = null;
+    let pdOrderData = null;
+
+    window.openPartialDeliveryModal = function(orderId, orderSerial) {
+        pdCurrentOrderId = orderId;
+        $('#pdOrderNo').text('(অর্ডার #' + orderSerial + ')');
+        $('#partialDeliveryModalBody').html('<div class="text-center p-4"><div class="spinner-border text-success" role="status"></div></div>');
+        $('#pdSubmitBtn').prop('disabled', false);
+        $('#partialDeliveryModal').modal('show');
+
+        $.ajax({
+            url: `/api/delivery/order-items/${orderId}?institutionId=${institutionId}`,
+            method: 'GET',
+            success: function(res) {
+                if (res.success) {
+                    pdOrderData = res.data;
+                    renderPartialDeliveryModal(res.data);
+                } else {
+                    $('#partialDeliveryModalBody').html('<div class="alert alert-danger">ডেটা লোড ব্যর্থ হয়েছে</div>');
+                }
+            },
+            error: function() {
+                $('#partialDeliveryModalBody').html('<div class="alert alert-danger">ডেটা লোড ব্যর্থ হয়েছে</div>');
+            }
+        });
+    };
+
+    function renderPartialDeliveryModal(data) {
+        const today = new Date().toISOString().split('T')[0];
+        const deliveryDateVal = data.deliveryDate || today;
+        const dueAmount = (data.orderAmount - data.previousPaid - data.discount).toFixed(2);
+
+        let accountOptions = '<option value="">অ্যাকাউন্ট ছাড়া</option>';
+        (data.accounts || []).forEach(a => {
+            accountOptions += `<option value="${a.accountId}" ${a.isDefault ? 'selected' : ''}>${a.accountName}</option>`;
+        });
+        const showAccount = data.accounts && data.accounts.length > 0;
+
+        let itemsHtml = '';
+        (data.items || []).forEach(item => {
+            const maxDeliver = item.remainingQty;
+            const defaultQty = Math.min(item.readyQty > 0 ? item.readyQty : item.remainingQty, maxDeliver);
+            itemsHtml += `
+            <tr>
+                <td><strong>${item.dressName}</strong></td>
+                <td class="text-center">${item.totalQty}</td>
+                <td class="text-center text-success">${item.deliveredQty}</td>
+                <td class="text-center text-warning">${item.remainingQty}</td>
+                <td class="text-center">
+                    ${maxDeliver > 0
+                        ? `<input type="number" class="form-control form-control-sm pd-qty-input text-center"
+                                data-orderlist-id="${item.orderListId}"
+                                data-max="${maxDeliver}"
+                                value="${defaultQty}" min="0" max="${maxDeliver}"
+                                style="width:70px; display:inline-block;">`
+                        : '<span class="text-muted">-</span>'
+                    }
+                </td>
+            </tr>`;
+        });
+
+        const html = `
+        <div class="table-responsive mb-3">
+            <table class="table table-sm table-bordered mb-0" style="min-width:500px;">
+                <thead class="table-success">
+                    <tr>
+                        <th>পোশাক</th>
+                        <th class="text-center">মোট</th>
+                        <th class="text-center">পূর্বে ডেলিভারি</th>
+                        <th class="text-center">বাকি</th>
+                        <th class="text-center">এখন দিন</th>
+                    </tr>
+                </thead>
+                <tbody>${itemsHtml}</tbody>
+            </table>
+        </div>
+        <div class="row g-2">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold"><i class="fas fa-calendar me-1"></i>ডেলিভারি তারিখ <span class="text-danger">*</span></label>
+                <input type="date" id="pdDeliveryDate" class="form-control" value="${deliveryDateVal}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold"><i class="fas fa-percentage me-1"></i>ছাড় (টাকা)</label>
+                <input type="number" id="pdDiscount" class="form-control" value="0" min="0" step="0.01">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold d-flex justify-content-between">
+                    <span><i class="fas fa-money-bill me-1"></i>নগদ পরিশোধ</span>
+                    <small class="text-muted">বাকি: <span id="pdDueDisplay">${dueAmount}</span></small>
+                </label>
+                <input type="number" id="pdPaidAmount" class="form-control" value="${dueAmount}" min="0" step="0.01">
+            </div>
+            ${showAccount ? `
+            <div class="col-md-4">
+                <label class="form-label fw-semibold"><i class="fas fa-university me-1"></i>অ্যাকাউন্ট</label>
+                <select id="pdAccount" class="form-select">${accountOptions}</select>
+            </div>` : '<input type="hidden" id="pdAccount" value="">'}
+        </div>
+        <div id="pdAlertMsg" class="mt-2" style="display:none;"></div>`;
+
+        $('#partialDeliveryModalBody').html(html);
+
+        // recalculate due on discount change
+        $('#pdDiscount').on('input', function() {
+            const due = Math.max(0, (pdOrderData.orderAmount - pdOrderData.previousPaid - pdOrderData.discount) - (parseFloat($(this).val()) || 0));
+            $('#pdDueDisplay').text(due.toFixed(2));
+            $('#pdPaidAmount').val(due.toFixed(2));
+        });
+    }
+
+    window.submitPartialDelivery = function() {
+        const deliveryDate = $('#pdDeliveryDate').val();
+        if (!deliveryDate) {
+            $('#pdAlertMsg').removeClass('alert-success').addClass('alert alert-warning').text('ডেলিভারি তারিখ দিন').show();
+            return;
+        }
+
+        const items = [];
+        let anySelected = false;
+        $('.pd-qty-input').each(function() {
+            const qty = parseInt($(this).val()) || 0;
+            const max = parseInt($(this).data('max')) || 0;
+            if (qty > max) {
+                $(this).addClass('is-invalid');
+                return;
+            }
+            $(this).removeClass('is-invalid');
+            if (qty > 0) {
+                anySelected = true;
+                items.push({ orderListId: parseInt($(this).data('orderlist-id')), deliverQty: qty });
+            }
+        });
+
+        if (!anySelected) {
+            $('#pdAlertMsg').removeClass('alert-success').addClass('alert alert-warning').text('কমপক্ষে একটি পোশাক ডেলিভারির পরিমাণ দিন').show();
+            return;
+        }
+
+        $('#pdAlertMsg').hide();
+        $('#pdSubmitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>অপেক্ষা করুন...');
+
+        const payload = {
+            orderId: pdCurrentOrderId,
+            institutionId: institutionId,
+            registrationId: registrationId,
+            deliveryDate: deliveryDate,
+            discount: parseFloat($('#pdDiscount').val()) || 0,
+            paidAmount: parseFloat($('#pdPaidAmount').val()) || 0,
+            accountId: parseInt($('#pdAccount').val()) || null,
+            items: items
+        };
+
+        $.ajax({
+            url: '/api/delivery/partial-delivery',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function(res) {
+                $('#pdSubmitBtn').prop('disabled', false).html('<i class="fas fa-check me-1"></i> ডেলিভারি নিশ্চিত করুন');
+                if (res.success) {
+                    $('#pdAlertMsg').removeClass('alert-warning alert-danger').addClass('alert alert-success').text(res.message).show();
+                    setTimeout(function() {
+                        $('#partialDeliveryModal').modal('hide');
+                        window.location.href = `/money-receipt.html?orderId=${pdCurrentOrderId}`;
+                    }, 1000);
+                } else {
+                    $('#pdAlertMsg').removeClass('alert-success').addClass('alert alert-danger').text(res.message || 'ব্যর্থ হয়েছে').show();
+                }
+            },
+            error: function(xhr) {
+                $('#pdSubmitBtn').prop('disabled', false).html('<i class="fas fa-check me-1"></i> ডেলিভারি নিশ্চিত করুন');
+                const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'সার্ভার ত্রুটি হয়েছে';
+                $('#pdAlertMsg').removeClass('alert-success').addClass('alert alert-danger').text(msg).show();
+            }
+        });
+    };
 
 })();

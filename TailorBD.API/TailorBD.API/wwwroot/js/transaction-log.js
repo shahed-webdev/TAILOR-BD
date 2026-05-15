@@ -11,6 +11,18 @@
 
     const fmt = v => '৳' + parseFloat(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    // Convert HH:MM:SS (24h) to h:MM:SS AM/PM (12h)
+    function to12h(timeStr) {
+        if (!timeStr) return '';
+        const parts = timeStr.split(':');
+        let h = parseInt(parts[0], 10);
+        const m = parts[1] || '00';
+        const s = parts[2] || '00';
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return h + ':' + m + ':' + s + ' ' + ampm;
+    }
+
     // section config
     const SECTIONS = {
         inNormal:  { type: 'in',  inExType: 'In',  amtCls: 'amt-in',  chipCls: 'in-chip'   },
@@ -205,7 +217,7 @@
                     '<td style="max-width:180px;font-size:11px;">' + (r.Details || '—') + '</td>' +
                     '<td class="t-muted">' + (r.AccountName || '—') + '</td>' +
                     '<td style="white-space:nowrap;">' + (r.InsertDate || '') +
-                        ' <span class="t-muted">' + (r.InsertTime || '') + '</span></td>' +
+                        ' <span class="t-muted">' + to12h(r.InsertTime) + '</span></td>' +
                     '<td class="t-muted">' + (r.UserName || '—') + '</td>' +
                     '</tr>');
             });

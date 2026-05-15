@@ -246,7 +246,8 @@ namespace TailorBD.API.Controllers
                         Print_MasterCopy, 
                         Print_WorkmanCopy, 
                         Print_ShopCopy,
-                        Print_Customer_Name, 
+                        Print_Customer_Name,
+                        Print_Customer_Phone,
                         Print_Customer_Address,
                         Print_Measurement_Name, 
                         Print_S_Category,
@@ -319,6 +320,7 @@ namespace TailorBD.API.Controllers
                             printWorkmanCopy = SafeGetBoolean("Print_WorkmanCopy"),
                             printShopCopy = SafeGetBoolean("Print_ShopCopy"),
                             printCustomerName = SafeGetBoolean("Print_Customer_Name"),
+                            printCustomerPhone = SafeGetBoolean("Print_Customer_Phone"),
                             printCustomerAddress = SafeGetBoolean("Print_Customer_Address"),
                             printMeasurementName = SafeGetBoolean("Print_Measurement_Name"),
                             printStyleCategory = SafeGetBoolean("Print_S_Category"),
@@ -385,6 +387,7 @@ namespace TailorBD.API.Controllers
                         Print_WorkmanCopy = @Print_WorkmanCopy,
                         Print_ShopCopy = @Print_ShopCopy,
                         Print_Customer_Name = @Print_Customer_Name,
+                        Print_Customer_Phone = @Print_Customer_Phone,
                         Print_Customer_Address = @Print_Customer_Address,
                         Print_Measurement_Name = @Print_Measurement_Name,
                         Print_S_Category = @Print_S_Category,
@@ -400,6 +403,7 @@ namespace TailorBD.API.Controllers
                 command.Parameters.AddWithValue("@Print_WorkmanCopy", settings.PrintWorkmanCopy);
                 command.Parameters.AddWithValue("@Print_ShopCopy", settings.PrintShopCopy);
                 command.Parameters.AddWithValue("@Print_Customer_Name", settings.PrintCustomerName);
+                command.Parameters.AddWithValue("@Print_Customer_Phone", settings.PrintCustomerPhone);
                 command.Parameters.AddWithValue("@Print_Customer_Address", settings.PrintCustomerAddress);
                 command.Parameters.AddWithValue("@Print_Measurement_Name", settings.PrintMeasurementName);
                 command.Parameters.AddWithValue("@Print_S_Category", settings.PrintStyleCategory);
@@ -1394,6 +1398,7 @@ namespace TailorBD.API.Controllers
         public bool PrintWorkmanCopy { get; set; }
         public bool PrintShopCopy { get; set; }
         public bool PrintCustomerName { get; set; }
+        public bool PrintCustomerPhone { get; set; }
         public bool PrintCustomerAddress { get; set; }
         public bool PrintMeasurementName { get; set; }
         public bool PrintStyleCategory { get; set; }

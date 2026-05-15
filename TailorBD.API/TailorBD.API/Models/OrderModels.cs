@@ -104,4 +104,22 @@ namespace TailorBD.API.Models
         public int? AccountId { get; set; }
         public bool IsDelivery { get; set; }
     }
+
+    public class PartialDeliveryModel
+    {
+        public int OrderId { get; set; }
+        public int InstitutionId { get; set; }
+        public int RegistrationId { get; set; }
+        public string? DeliveryDate { get; set; }
+        public double Discount { get; set; }
+        public double PaidAmount { get; set; }
+        public int? AccountId { get; set; }
+        public List<PartialDeliveryItem> Items { get; set; } = new();
+    }
+
+    public class PartialDeliveryItem
+    {
+        public int OrderListId { get; set; }
+        public int DeliverQty { get; set; }
+    }
 }

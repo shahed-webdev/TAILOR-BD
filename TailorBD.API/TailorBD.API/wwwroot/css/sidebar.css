@@ -5,7 +5,7 @@
     top: 0;
     width: 260px;
     height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
     overflow-y: auto;
     z-index: 1000;
     transition: transform 0.3s ease;
@@ -24,7 +24,7 @@
 }
 
 .sidebar-brand {
-    padding: 20px;
+    padding: 10px 14px;
     text-align: center;
     background: rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -44,26 +44,26 @@
 }
 
 .sidebar-profile {
-    padding: 20px;
+    padding: 10px 14px;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .profile-image-wrapper {
-    margin-bottom: 15px;
+    margin-bottom: 8px;
 }
 
 .profile-image {
-    width: 80px;
-    height: 80px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.2);
 }
 
 .profile-info h4 {
     color: #fff;
-    font-size: 16px;
-    margin: 0 0 10px 0;
+    font-size: 13px;
+    margin: 0 0 6px 0;
     font-weight: 500;
 }
 
@@ -133,24 +133,26 @@
 .sidebar-menu li a {
     display: flex;
     align-items: center;
-    padding: 15px 20px;
+    padding: 11px 14px;
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     transition: all 0.3s;
     position: relative;
+    font-size: 14px;
 }
 
 .sidebar-menu li a:hover {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    padding-left: 25px;
+    padding-left: 18px;
 }
 
 .sidebar-menu li a i {
-    margin-right: 12px;
-    font-size: 18px;
-    width: 24px;
+    margin-right: 9px;
+    font-size: 16px;
+    width: 20px;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .sidebar-menu li.active > a {
@@ -165,8 +167,33 @@
 
 .menu-item-has-children > a .arrow {
     position: absolute;
-    right: 20px;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
     transition: transform 0.3s;
+    font-size: 11px !important;
+    width: auto !important;
+    margin: 0 !important;
+    opacity: 0.8;
+}
+
+.menu-item-has-children.open > a .arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Submenu nested arrow — same style, just ensure right alignment */
+.submenu .menu-item-has-children > a .arrow {
+    right: 10px;
+    font-size: .6rem !important;
+    width: auto !important;
+    min-width: auto !important;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.submenu .menu-item-has-children.open > a .arrow {
+    transform: translateY(-50%) rotate(180deg);
 }
 
 .menu-item-has-children.open > a .arrow {
@@ -177,7 +204,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    background: rgba(0, 0, 0, 0.1);
+    background: #1a2540;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
@@ -188,22 +215,32 @@
 }
 
 .submenu li a {
-    padding: 12px 20px 12px 60px;
-    font-size: 14px;
+    padding: 8px 26px 8px 14px;
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .submenu li a:hover {
-    padding-left: 65px;
+    padding-left: 32px;
 }
 
 /* Nested submenu (submenu inside submenu) */
 .submenu .menu-item-has-children > a {
-    padding: 12px 20px 12px 60px;
-    font-size: 14px;
+    padding: 8px 26px 8px 14px;
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .submenu .submenu {
-    background: rgba(0, 0, 0, 0.12);
+    background: #151f36;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
@@ -215,12 +252,15 @@
 }
 
 .submenu .submenu li a {
-    padding: 10px 20px 10px 80px;
-    font-size: 13px;
+    padding: 7px 26px 7px 20px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .submenu .submenu li a:hover {
-    padding-left: 85px;
+    padding-left: 40px;
 }
 
 /* Increase parent submenu max-height to fit nested items */
@@ -231,7 +271,7 @@
 
 /* Collapsed Sidebar (desktop) */
 .sidebar.collapsed {
-    width: 70px;
+    width: 70px !important;
     overflow: visible;
 }
 
@@ -248,10 +288,10 @@
 }
 
 .sidebar.collapsed .sidebar-brand img {
-    height: 36px;
-    width: 36px;
-    max-width: 36px;
-    object-fit: contain;
+    height: 36px !important;
+    width: 36px !important;
+    max-width: 36px !important;
+    object-fit: contain !important;
     border-radius: 6px;
 }
 
@@ -270,44 +310,111 @@
     padding-left: 15px;
 }
 
-/* Collapsed state এ menu-toggle click disable */
+/* Collapsed state এ menu-toggle click enable */
 .sidebar.collapsed .menu-toggle {
-    pointer-events: none;
+    pointer-events: auto;
 }
 
-/* Collapsed state এ submenu সম্পূর্ণ লুকাও */
+/* Collapsed state এ submenu লুকাও (flyout JS দিয়ে দেখাবে) */
 .sidebar.collapsed .submenu {
     display: none !important;
     max-height: 0 !important;
 }
 
-/* Collapsed sidebar — CSS tooltip */
+/* Collapsed sidebar — flyout position anchor */
 .sidebar.collapsed .sidebar-menu > li {
     position: relative;
 }
 
-.sidebar.collapsed .sidebar-menu > li > a::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 75px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(30, 30, 50, 0.95);
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
+/* Collapsed sidebar — flyout submenu popup */
+.sidebar-flyout {
+    position: fixed;
+    left: 70px;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    border-left: 3px solid #6366f1;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.4);
     z-index: 9999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    min-width: 200px;
+    padding: 6px 0;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
 }
 
-.sidebar.collapsed .sidebar-menu > li:hover > a::after {
+.sidebar-flyout.show {
     opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+}
+
+.sidebar-flyout-title {
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 4px;
+}
+
+.sidebar-flyout a {
+    display: block;
+    padding: 8px 16px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 13px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+}
+
+.sidebar-flyout a:hover {
+    background: rgba(99, 102, 241, 0.2);
+    color: #ffffff;
+    padding-left: 22px;
+}
+
+.sidebar-flyout a.flyout-toggle {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255,255,255,.05);
+    border-radius: 4px;
+    margin: 1px 4px;
+    padding-right: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-flyout a.flyout-toggle:hover {
+    background: rgba(99, 102, 241, 0.25);
+    padding-left: 16px;
+}
+
+.sidebar-flyout .flyout-arrow {
+    position: static;
+    transform: none;
+    font-size: .6rem;
+    transition: transform .25s;
     pointer-events: none;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.sidebar-flyout .flyout-nested a {
+    background: rgba(0,0,0,.15);
+    font-size: 12px;
+}
+
+/* Collapsed sidebar — main content adjust */
+body:not(.mobile-view) .sidebar.collapsed ~ * .main-content,
+.sidebar.collapsed + .main-content,
+.sidebar.collapsed ~ .main-content {
+    margin-left: 70px !important;
 }
 
 /* Mobile Sidebar */

@@ -24,12 +24,12 @@
     <div id="app-sidebar"></div>
 
     <!-- Main Content -->
-    <main class="main-content" id="mainContent">
+    <main class="main-content" id="mainContent" style="display:flex; flex-direction:column; height:100vh; overflow:hidden;">
         <!-- Navbar Container (Auto-loads from component) -->
-        <div id="app-navbar"></div>
+        <div id="app-navbar" style="flex-shrink:0;"></div>
 
         <!-- Dashboard Content -->
-        <div class="dashboard-content">
+        <div class="dashboard-content" style="padding:0; overflow:hidden; height:calc(100vh - 64px); display:flex; flex-direction:column;">
             <div class="shop-info-container">
                 <!-- Alert Messages -->
                 <div id="alertContainer"></div>

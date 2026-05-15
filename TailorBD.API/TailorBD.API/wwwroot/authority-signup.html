@@ -171,8 +171,8 @@
         <div class="page-header">
             <div class="ph-icon"><i class="fas fa-building"></i></div>
             <div class="ph-text">
-                <h2>নতুন প্রতিষ্ঠান রেজিস্ট্রেশন করুন</h2>
-                <p>নতুন দোকান যোগ করুন এবং তাদের প্যাকেজ/সাবস্ক্রিপশন সেটআপ করুন</p>
+                <h2 data-lang-key="নতুন প্রতিষ্ঠান রেজিস্ট্রেশন করুন">নতুন প্রতিষ্ঠান রেজিস্ট্রেশন করুন</h2>
+                <p data-lang-key="নতুন দোকান যোগ করুন এবং তাদের প্যাকেজ/সাবস্ক্রিপশন সেটআপ করুন">নতুন দোকান যোগ করুন এবং তাদের প্যাকেজ/সাবস্ক্রিপশন সেটআপ করুন</p>
             </div>
         </div>
 
@@ -180,15 +180,15 @@
         <div class="stepper" id="stepper">
             <div class="step active" id="step-indicator-1">
                 <div class="step-num">1</div>
-                <div class="step-label">অ্যাকাউন্ট তথ্য</div>
+                <div class="step-label" data-lang-key="অ্যাকাউন্ট তথ্য">অ্যাকাউন্ট তথ্য</div>
             </div>
             <div class="step" id="step-indicator-2">
                 <div class="step-num">2</div>
-                <div class="step-label">প্রতিষ্ঠানের তথ্য</div>
+                <div class="step-label" data-lang-key="প্রতিষ্ঠানের তথ্য">প্রতিষ্ঠানের তথ্য</div>
             </div>
             <div class="step" id="step-indicator-3">
                 <div class="step-num">3</div>
-                <div class="step-label">প্যাকেজ ও SMS</div>
+                <div class="step-label" data-lang-key="প্যাকেজ ও SMS">প্যাকেজ ও SMS</div>
             </div>
         </div>
 
@@ -210,7 +210,7 @@
                         <div class="invalid-feedback" id="err-userName"></div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">ইমেইল</label>
+                        <label class="form-label" data-lang-key="ইমেইল">ইমেইল</label>
                         <div class="input-icon-wrap">
                             <i class="fas fa-envelope field-icon"></i>
                             <input type="email" id="userEmail" class="form-control" placeholder="ইমেইল (ঐচ্ছিক)">
@@ -245,7 +245,7 @@
                         <div class="invalid-feedback" id="err-confirmPassword"></div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">নিরাপত্তা প্রশ্ন</label>
+                        <label class="form-label" data-lang-key="নিরাপত্তা প্রশ্ন">নিরাপত্তা প্রশ্ন</label>
                         <div class="input-icon-wrap">
                             <i class="fas fa-question-circle field-icon"></i>
                             <input type="text" id="securityQuestion" class="form-control"
@@ -253,7 +253,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">নিরাপত্তার উত্তর</label>
+                        <label class="form-label" data-lang-key="নিরাপত্তার উত্তর">নিরাপত্তার উত্তর</label>
                         <div class="input-icon-wrap">
                             <i class="fas fa-key field-icon"></i>
                             <input type="text" id="securityAnswer" class="form-control"
@@ -302,7 +302,7 @@
                         <div class="invalid-feedback" id="err-established"></div>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">স্টাফ সংখ্যা</label>
+                        <label class="form-label" data-lang-key="স্টাফ সংখ্যা">স্টাফ সংখ্যা</label>
                         <div class="input-icon-wrap">
                             <i class="fas fa-users field-icon"></i>
                             <input type="number" id="staff" class="form-control" placeholder="কর্মী সংখ্যা" min="0">
@@ -317,14 +317,14 @@
                         <div class="invalid-feedback" id="err-phone"></div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">ইমেইল</label>
+                        <label class="form-label" data-lang-key="ইমেইল">ইমেইল</label>
                         <div class="input-icon-wrap">
                             <i class="fas fa-envelope field-icon"></i>
                             <input type="email" id="insEmail" class="form-control" placeholder="দোকান ইমেইল">
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">ওয়েবসাইট</label>
+                        <label class="form-label" data-lang-key="ওয়েবসাইট">ওয়েবসাইট</label>
                         <div class="input-icon-wrap">
                             <i class="fas fa-globe field-icon"></i>
                             <input type="text" id="website" class="form-control" placeholder="https://example.com">
@@ -356,7 +356,7 @@
                 </div>
                 <div class="form-nav">
                     <button class="btn-back" onclick="goStep(1)">
-                        <i class="fas fa-arrow-left"></i> পূর্ববর্তী ধাপ
+                        <i class="fas fa-arrow-left"></i> <span data-lang-key="পূর্ববর্তী ধাপ">পূর্ববর্তী ধাপ</span>
                     </button>
                     <button class="btn-next" onclick="goStep(3)">
                         পরবর্তী ধাপ <i class="fas fa-arrow-right"></i>
@@ -389,7 +389,7 @@
                     <div class="col-md-6">
                         <label class="form-label">
                             Masking Name <span class="required-star">*</span>
-                            <small class="text-muted ms-1">(৩-১১ অক্ষর, ইংরেজি/সংখ্যা/ডট/স্পেস)</small>
+                            <small class="text-muted ms-1" data-lang-key="(৩-১১ অক্ষর, ইংরেজি/সংখ্যা/ডট/স্পেস)">(৩-১১ অক্ষর, ইংরেজি/সংখ্যা/ডট/স্পেস)</small>
                         </label>
                         <div class="input-icon-wrap">
                             <i class="fas fa-tag field-icon"></i>
@@ -401,7 +401,7 @@
                     </div>
                     <div class="col-md-6 d-flex align-items-end">
                         <div class="p-3 rounded-3" style="background:#f0fdf4;border:1.5px solid #bbf7d0;width:100%;">
-                            <div style="font-size:.78rem;color:#64748b;margin-bottom:4px;">বিনামূল্যে SMS ব্যালেন্স</div>
+                            <div style="font-size:.78rem;color:#64748b;margin-bottom:4px;" data-lang-key="বিনামূল্যে SMS ব্যালেন্স">বিনামূল্যে SMS ব্যালেন্স</div>
                             <div style="font-size:1.3rem;font-weight:700;color:#10b981;">
                                 <i class="fas fa-comments me-1"></i>10 SMS
                             </div>
@@ -410,10 +410,10 @@
                 </div>
                 <div class="form-nav">
                     <button class="btn-back" onclick="goStep(2)">
-                        <i class="fas fa-arrow-left"></i> পূর্ববর্তী ধাপ
+                        <i class="fas fa-arrow-left"></i> <span data-lang-key="পূর্ববর্তী ধাপ">পূর্ববর্তী ধাপ</span>
                     </button>
                     <button class="btn-next" id="submitBtn" onclick="submitSignUp()">
-                        <i class="fas fa-paper-plane"></i> নিবন্ধন সম্পন্ন করুন
+                        <i class="fas fa-paper-plane"></i> <span data-lang-key="নিবন্ধন সম্পন্ন করুন">নিবন্ধন সম্পন্ন করুন</span>
                     </button>
                 </div>
             </div>
@@ -424,15 +424,15 @@
             <div class="section-card">
                 <div class="success-screen">
                     <div class="success-icon"><i class="fas fa-check"></i></div>
-                    <h3>নিবন্ধন সফল হয়েছে!</h3>
-                    <p>নতুন প্রতিষ্ঠানটি সফলভাবে যোগ করা হয়েছে</p>
+                    <h3 data-lang-key="নিবন্ধন সফল হয়েছে!">নিবন্ধন সফল হয়েছে!</h3>
+                    <p data-lang-key="নতুন প্রতিষ্ঠানটি সফলভাবে যোগ করা হয়েছে">নতুন প্রতিষ্ঠানটি সফলভাবে যোগ করা হয়েছে</p>
                     <div class="success-info" id="successInfo"></div>
                     <div class="d-flex gap-3 justify-content-center mt-4 flex-wrap">
                         <a href="/authority-signup.html" class="btn-next text-decoration-none">
-                            <i class="fas fa-plus"></i> আরেকটি যোগ করুন
+                            <i class="fas fa-plus"></i> <span data-lang-key="আরেকটি যোগ করুন">আরেকটি যোগ করুন</span>
                         </a>
                         <a href="/authority-profile.html" class="btn-back text-decoration-none">
-                            <i class="fas fa-list"></i> সব প্রতিষ্ঠান দেখুন
+                            <i class="fas fa-list"></i> <span data-lang-key="সব প্রতিষ্ঠান দেখুন">সব প্রতিষ্ঠান দেখুন</span>
                         </a>
                     </div>
                 </div>
@@ -569,7 +569,7 @@ async function loadPackages() {
 
 function renderPackages() {
     const grid = document.getElementById('packageGrid');
-    if (!packages.length) { grid.innerHTML = '<div class="text-muted">কোনো প্যাকেজ পাওয়া যায়নি</div>'; return; }
+    if (!packages.length) { grid.innerHTML = '<div class="text-muted" data-lang-key="কোনো প্যাকেজ পাওয়া যায়নি">কোনো প্যাকেজ পাওয়া যায়নি</div>'; return; }
     grid.innerHTML = packages.map(p => `
         <div class="pkg-card" onclick="selectPackage(${p.packageID}, this)" data-id="${p.packageID}">
             <div class="pkg-check"><i class="fas fa-check"></i></div>
@@ -630,10 +630,10 @@ async function submitSignUp() {
         if (data.success) {
             const pkg = packages.find(p => p.packageID === selectedPackageId);
             document.getElementById('successInfo').innerHTML = `
-                <div class="si-row"><span>দোকান নাম</span><span>${esc(val('insName'))}</span></div>
-                <div class="si-row"><span>ইউজার নাম</span><span>${esc(val('userName'))}</span></div>
-                <div class="si-row"><span>মোবাইল</span><span>${esc(val('phone'))}</span></div>
-                <div class="si-row"><span>প্যাকেজ</span><span>${esc(pkg?.packageName || '')}</span></div>
+                <div class="si-row"><span data-lang-key="দোকান নাম">দোকান নাম</span><span>${esc(val('insName'))}</span></div>
+                <div class="si-row"><span data-lang-key="ইউজার নাম">ইউজার নাম</span><span>${esc(val('userName'))}</span></div>
+                <div class="si-row"><span data-lang-key="মোবাইল">মোবাইল</span><span>${esc(val('phone'))}</span></div>
+                <div class="si-row"><span data-lang-key="প্যাকেজ">প্যাকেজ</span><span>${esc(pkg?.packageName || '')}</span></div>
                 <div class="si-row"><span>Masking</span><span>${esc(masking)}</span></div>
                 <div class="si-row"><span>Institution ID</span><span>#${data.institutionId}</span></div>`;
             document.getElementById('panel-3').classList.remove('active');

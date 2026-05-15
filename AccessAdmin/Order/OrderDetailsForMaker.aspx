@@ -157,9 +157,10 @@ ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)">
                             <br />
                         </ItemTemplate>
                     </asp:DataList>
-                    <asp:SqlDataSource ID="MoreSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending
+                    <asp:SqlDataSource ID="MoreSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>" SelectCommand="SELECT Measurement_GroupID, MIN(ISNULL(Ascending, 99999)) AS Ascending
 FROM            Measurement_Type
 WHERE        (InstitutionID = @InstitutionID) AND (DressID = @DressID)
+GROUP BY Measurement_GroupID
 ORDER BY Ascending">
                         <SelectParameters>
                             <asp:CookieParameter CookieName="InstitutionID" Name="InstitutionID" />

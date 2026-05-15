@@ -47,14 +47,13 @@
         // Auto-switch to measurement tab if tab=measurement is in URL
         const tabParam = urlParams.get('tab');
         if (tabParam === 'measurement') {
-            // Wait for Bootstrap to initialize, then switch tab and increment count
+            // Wait for Bootstrap to initialize, then switch tab
             setTimeout(function() {
                 const measurementTabEl = document.querySelector('button[data-bs-target="#measurementTab"]');
                 if (measurementTabEl) {
                     const tab = new bootstrap.Tab(measurementTabEl);
                     tab.show();
-                    // Directly increment count when coming from order-list print button
-                    incrementMeasurementPrintCount();
+                    // Count is NOT incremented here - only increments when Print button is clicked
                 }
             }, 500);
         }
@@ -420,11 +419,6 @@
         }
     }
     
-    // Increment count when measurement tab is shown (Bootstrap tab event)
-    $(document).on('shown.bs.tab', 'button[data-bs-target="#measurementTab"]', function() {
-        incrementMeasurementPrintCount();
-    });
-
     // Override window.print to also increment count if measurement tab is active
     const originalPrint = window.print;
     window.print = function() {
@@ -637,9 +631,7 @@
         
         // Display dates
         $('#orderDate').text(formatShortDate(header.orderDate));
-        $('#deliveryDate').text(header.updateDeliveryDate 
-            ? formatShortDate(header.updateDeliveryDate) 
-            : formatShortDate(header.deliveryDate));
+        $('#deliveryDate').text(formatShortDate(header.deliveryDate));
 
         // Generate barcode only if setting is enabled
         if (printSettings && printSettings.moneyReceipt && printSettings.moneyReceipt.showReceiptBarcode !== false) {
@@ -899,16 +891,21 @@
             // PART 2: After all copy headers, show measurements and styles ONCE at the end
             const $detailsSection = $('<div class="measurement-details-section"></div>');
 
-            // Customer name AND phone (if enabled) - name and phone on same line separated by comma
+            // Customer name AND phone (if enabled separately)
             if (mSettings.printCustomerName) {
                 let customerLine = `<strong>${header.customerName}</strong>`;
-                if (header.phone) {
+                const showPhone = mSettings.printCustomerPhone !== false;
+                if (showPhone && header.phone) {
                     customerLine += `, ${header.phone}`;
-                    if (mSettings.printCustomerAddress && header.address) {
-                        customerLine += `, ${header.address}`;
-                    }
+                }
+                if (mSettings.printCustomerAddress && header.address) {
+                    customerLine += `, ${header.address}`;
                 }
                 let customerHtml = `<div class="customer-name-section">${customerLine}</div>`;
+                $detailsSection.append(customerHtml);
+            } else if (mSettings.printCustomerPhone !== false && header.phone) {
+                // শুধু phone দেখানো (নাম ছাড়া)
+                let customerHtml = `<div class="customer-name-section">${header.phone}</div>`;
                 $detailsSection.append(customerHtml);
             }
 

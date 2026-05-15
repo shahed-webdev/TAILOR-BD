@@ -317,7 +317,8 @@
     // ── Due Notice JS — সব পেজে dynamically load করি ────────────────
     function loadDueNotice() {
         var currentPage = ('/' + window.location.pathname.replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
-        var skipPages = ['/login.html', '/login', '/access-denied.html', '/access-denied'];
+        var skipPages = ['/login.html', '/login', '/access-denied.html', '/access-denied',
+                         '/due-invoice.html', '/due-invoice', '/paid-invoice.html', '/paid-invoice'];
         if (skipPages.indexOf(currentPage) !== -1) return;
 
         // institutionId না থাকলে (Authority পেজ) due-notice দরকার নেই
@@ -494,9 +495,11 @@
                 if ($sidebar.hasClass('collapsed')) {
                     $main.css('margin-left', '70px');
                     localStorage.setItem('sidebarCollapsed', 'true');
+                    $('.sidebar-flyout').remove();
                 } else {
                     $main.css('margin-left', '');
                     localStorage.setItem('sidebarCollapsed', 'false');
+                    $('.sidebar-flyout').remove();
                 }
             }
         });
@@ -507,11 +510,110 @@
             $('#sidebarOverlay').removeClass('show');
         });
 
-        // Submenu Toggle
+        // Collapsed sidebar flyout
+        $(document).on('click', '#sidebar.collapsed .sidebar-menu > li > a', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const $li = $(this).parent();
+            const tooltip = $(this).attr('data-tooltip') || '';
+            const $submenu = $li.children('.submenu');
+
+            // Remove existing flyout
+            $('.sidebar-flyout').remove();
+
+            // If no submenu, just navigate
+            if (!$submenu.length) {
+                const href = $(this).attr('href');
+                if (href && href !== '#') window.location.href = href;
+                return;
+            }
+
+            // Build flyout with collapsible nested submenus
+            const $flyout = $('<div class="sidebar-flyout"></div>');
+            if (tooltip) {
+                $flyout.append('<div class="sidebar-flyout-title">' + tooltip + '</div>');
+            }
+
+            // Build items recursively
+            function buildFlyoutItems($src, $target, depth) {
+                $src.children('li').each(function() {
+                    const $item      = $(this);
+                    const $childLink = $item.children('a').first();
+                    const $childSub  = $item.children('.submenu');
+                    const $linkClone = $childLink.clone();
+                    // Remove any existing arrow icons carried over from the sidebar
+                    $linkClone.find('.arrow, .flyout-arrow').remove();
+
+                    if (depth > 0) {
+                        $linkClone.css('padding-left', (16 + depth * 14) + 'px');
+                    }
+
+                    if ($childSub.length) {
+                        // Has nested submenu — make it a toggle
+                        $linkClone.addClass('flyout-toggle');
+                        $linkClone.attr('href', '#');
+                        // Ensure arrow icon present
+                        if (!$linkClone.find('.flyout-arrow').length) {
+                            $linkClone.append('<i class="fas fa-chevron-right flyout-arrow"></i>');
+                        }
+                        $target.append($linkClone);
+
+                        // Nested items wrapper — collapsed by default
+                        const $nestedWrap = $('<div class="flyout-nested" style="overflow:hidden;max-height:0;transition:max-height .3s ease;"></div>');
+                        buildFlyoutItems($childSub, $nestedWrap, depth + 1);
+                        $target.append($nestedWrap);
+                    } else {
+                        $target.append($linkClone);
+                    }
+                });
+            }
+
+            buildFlyoutItems($submenu, $flyout, 0);
+
+            // Toggle nested on click
+            $flyout.on('click', '.flyout-toggle', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const $btn    = $(this);
+                const $nested = $btn.next('.flyout-nested');
+                const isOpen  = $nested.css('max-height') !== '0px';
+                // Close others at same level
+                $btn.parent().find('.flyout-nested').each(function() {
+                    $(this).css('max-height', '0');
+                    $(this).prev('.flyout-toggle').find('.flyout-arrow').css('transform', 'rotate(0deg)');
+                });
+                if (!isOpen) {
+                    $nested.css('max-height', $nested[0].scrollHeight + 400 + 'px');
+                    $btn.find('.flyout-arrow').css('transform', 'rotate(90deg)');
+                }
+            });
+
+            // Position flyout — keep within viewport
+            const offset    = $li.offset();
+            const flyoutH   = 400; // estimated max
+            const winH      = $(window).height();
+            let topPos      = offset.top;
+            if (topPos + flyoutH > winH) {
+                topPos = Math.max(10, winH - flyoutH - 10);
+            }
+            $flyout.css({ top: topPos, 'max-height': (winH - topPos - 10) + 'px', 'overflow-y': 'auto' });
+            $('body').append($flyout);
+            $flyout.addClass('show');
+
+            // Close flyout on outside click
+            setTimeout(function() {
+                $(document).one('click.flyout', function() {
+                    $('.sidebar-flyout').remove();
+                });
+            }, 10);
+        });
+
+        // Submenu Toggle (normal, non-collapsed)
         $(document).on('click', '.menu-toggle', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            // Collapsed sidebar এ submenu toggle করা যাবে না
+            // Collapsed sidebar এ submenu toggle এখন flyout দিয়ে হবে
             if ($('#sidebar').hasClass('collapsed')) return;
             const $this = $(this);
             const $parent = $this.parent();

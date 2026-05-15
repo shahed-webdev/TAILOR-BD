@@ -6,7 +6,7 @@ function orderListData() {
         orders: [],
         totalCount: 0,
         currentPage: 1,
-        pageSize: 25,
+        pageSize: 100,
         totalPages: 0,
         currentLang: window.currentLang || 'bn',
         filters: {
@@ -313,8 +313,18 @@ function orderListData() {
         },
 
         showNotification(message, type = 'info') {
-            // Simple notification (you can enhance this)
-            alert(message);
+            // Show toast notification instead of alert (alert can block browsers)
+            const existing = document.getElementById('order-list-toast');
+            if (existing) existing.remove();
+
+            const color = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#6c7ae0';
+            const toast = document.createElement('div');
+            toast.id = 'order-list-toast';
+            toast.style.cssText = `position:fixed;top:70px;right:20px;z-index:9999;background:${color};color:#fff;
+                padding:10px 18px;border-radius:6px;font-size:13px;max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,0.2);`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
         }
     };
 }

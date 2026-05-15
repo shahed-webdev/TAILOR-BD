@@ -165,11 +165,11 @@ ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 9999)">
                                                 </ItemTemplate>
                                             </asp:DataList>
                                             <asp:SqlDataSource ID="OrderedMeasurmentSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-                                                SelectCommand="SELECT DISTINCT Measurement_Type.Measurement_GroupID,ISNULL(Measurement_Type.Ascending,9999) AS Ascending
+                                                SelectCommand="SELECT Measurement_Type.Measurement_GroupID, MIN(ISNULL(Measurement_Type.Ascending,9999)) AS Ascending
 FROM Customer_Measurement INNER JOIN
                          Measurement_Type ON Customer_Measurement.MeasurementTypeID = Measurement_Type.MeasurementTypeID
 WHERE        (Customer_Measurement.CustomerID = @CustomerID) AND (Measurement_Type.DressID = @DressID)
-ORDER BY Ascending">
+GROUP BY Measurement_Type.Measurement_GroupID ORDER BY Ascending">
                                                 <SelectParameters>
                                                     <asp:QueryStringParameter Name="CustomerID" QueryStringField="CustomerID" />
                                                     <asp:QueryStringParameter Name="DressID" QueryStringField="DressID" />

@@ -15,58 +15,82 @@
 }
 
 .dashboard-content {
-    padding: 1.2rem 2rem;
+    padding: 0.5rem 0.8rem;
 }
 
 .page-title {
     text-align: center;
     color: #333;
-    margin-bottom: 2rem;
-    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
     font-weight: 600;
 }
 
 /* Search Type Selector */
 .search-type-selector {
     display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    padding: 1rem;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.3rem;
+    padding: 0.3rem 0.5rem;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .radio-option {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 500;
 }
 
 .radio-option input[type="radio"] {
     cursor: pointer;
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
 }
 
 /* Search Section */
 .search-section {
     background: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.4rem;
 }
 
-.search-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
+/* Single-line inline search */
+.search-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+}
+
+.form-group-inline {
+    flex: 1;
+    min-width: 0;
+}
+
+.form-group-inline .form-control {
+    font-size: 0.78rem;
+    padding: 3px 7px;
+    height: 28px;
+    width: 100%;
+}
+
+.btn-search-inline {
+    white-space: nowrap;
+    flex-shrink: 0;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .search-grid.date-search {
@@ -83,7 +107,13 @@
 .form-group label {
     font-weight: 500;
     color: #555;
-    font-size: 0.95rem;
+    font-size: 0.78rem;
+}
+
+.form-group .form-control {
+    font-size: 0.8rem;
+    padding: 3px 7px;
+    height: 28px;
 }
 
 /* Results Summary */
@@ -91,15 +121,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.6rem;
-    padding: 0.6rem 1rem;
+    margin-bottom: 0.3rem;
+    padding: 0.3rem 0.7rem;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .total-count {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
 }
 
 .legend {
@@ -144,25 +174,92 @@
     border-radius: 8px;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    font-size: 14px;
 }
 
-/* Table Header - Single Line */
+/* Remove Bootstrap table-responsive horizontal scroll */
+.table-card .table-responsive {
+    overflow-x: visible;
+}
+
+/* Fixed layout table - force fit in screen */
+.table-card .table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.72rem;
+}
+
+/* Column widths - total ~960px fits 17" monitor */
+.table-card .table th:nth-child(1),
+.table-card .table td:nth-child(1) { width: 34px; overflow: visible; }  /* Print */
+.table-card .table th:nth-child(2),
+.table-card .table td:nth-child(2) { width: 48px; }  /* Order No */
+.table-card .table th:nth-child(3),
+.table-card .table td:nth-child(3) { width: 150px; } /* Name */
+.table-card .table th:nth-child(4),
+.table-card .table td:nth-child(4) { width: 100px; } /* Mobile */
+.table-card .table th:nth-child(5),
+.table-card .table td:nth-child(5) { width: 80px; }  /* Address */
+.table-card .table th:nth-child(6),
+.table-card .table td:nth-child(6) { width: 130px; } /* Dress */
+.table-card .table th:nth-child(7),
+.table-card .table td:nth-child(7) { width: 70px; }  /* Order Date */
+.table-card .table th:nth-child(8),
+.table-card .table td:nth-child(8) { width: 75px; }  /* Delivery Date */
+.table-card .table th:nth-child(9),
+.table-card .table td:nth-child(9) { width: 34px; }  /* Edit */
+.table-card .table th:nth-child(10),
+.table-card .table td:nth-child(10) { width: 34px; } /* Add Dress */
+.table-card .table th:nth-child(11),
+.table-card .table td:nth-child(11) { width: 34px; } /* Measurement */
+.table-card .table th:nth-child(12),
+.table-card .table td:nth-child(12) { width: 34px; } /* Receipt */
+
+/* Table Header */
 .table thead th {
     white-space: nowrap;
-    font-size: 0.82rem;
-    padding: 0.5rem 0.4rem;
+    font-size: 0.7rem;
+    padding: 0.28rem 0.2rem;
     vertical-align: middle;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Table Cell Styling */
+/* Gap between header and first row */
+.table tbody tr:first-child td {
+    padding-top: 0.5rem;
+}
+
+/* Table Cell */
 .table tbody td {
     white-space: nowrap;
     vertical-align: middle;
-    padding: 0.25rem 0.4rem;
-    font-size: 0.82rem;
+    padding: 0.5rem 0.2rem;
+    font-size: 0.72rem;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Truncate long text columns */
+.table tbody td.col-address,
+.table tbody td.col-dress,
+.table tbody td.col-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Compact action buttons - icon only */
+.table tbody td .btn-sm {
+    padding: 1px 4px;
+    font-size: 0.68rem;
+    line-height: 1.2;
+}
+
+/* Compact table card */
+.table-card {
+    font-size: 0.72rem;
 }
 
 /* Today's order highlighting */
@@ -330,5 +427,6 @@
     padding: 0;
     min-width: 16px;
     pointer-events: none;
-    z-index: 1;
+    z-index: 10;
+    overflow: visible;
 }

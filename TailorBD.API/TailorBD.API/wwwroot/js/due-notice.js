@@ -132,21 +132,50 @@
         });
     }
 
+    // যে পেইজগুলোতে warning popup দেখানো হবে (access block না হলে)
+    var NOTICE_PAGES = [
+        '/dashboard', '/dashboard.html',
+        '/profile', '/profile.html',
+        '/index', '/index.html',
+        '/'
+    ];
+
+    function isNoticePage() {
+        var path = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+        for (var i = 0; i < NOTICE_PAGES.length; i++) {
+            var p = NOTICE_PAGES[i].replace(/\/$/, '') || '/';
+            if (path === p || path.endsWith(p)) return true;
+        }
+        return false;
+    }
+
     function processData(d, institutionId) {
-        var hasServiceDue = !!d.showPopup || !!d.accessBlocked;
-        var hasSmsDue    = !!d.smsShowPopup;
+        var serviceBlocked = !!d.accessBlocked;
+        var hasServiceDue  = !!d.showPopup || serviceBlocked;
+        var hasSmsDue      = !!d.smsShowPopup;
+        var smsBlocked     = !!d.smsAccessBlocked;
+
+        var onNoticePage   = isNoticePage();
 
         if (hasServiceDue && hasSmsDue) {
-            // উভয় বিল বকেয়া — একটি মার্জড পপআপে দেখাও
-            // app-components.js accessBlocked overlay দেখিয়ে থাকলেও remove করে merged দেখাও
+            // উভয় বিল বকেয়া
             $('#globalDueBlockOverlay').remove();
-            showMergedDuePopup(d, institutionId);
+            // blocked হলে সব পেইজে, না হলে শুধু notice page এ
+            if (serviceBlocked || smsBlocked || onNoticePage) {
+                showMergedDuePopup(d, institutionId);
+            }
         } else if (hasServiceDue) {
-            // accessBlocked হলে app-components.js আগেই overlay দেখিয়েছে — এখানে skip
-            if (d.accessBlocked) return;
-            showDuePopup(d, institutionId);
+            if (serviceBlocked) {
+                // access বন্ধ — সব পেইজে দেখাও (app-components.js আগেই overlay দিলে skip)
+                if (!d.accessBlocked) showDuePopup(d, institutionId);
+            } else if (onNoticePage) {
+                // শুধু warning — শুধু dashboard/profile এ দেখাও
+                showDuePopup(d, institutionId);
+            }
         } else if (hasSmsDue) {
-            showSmsDuePopup(d, institutionId);
+            if (smsBlocked || onNoticePage) {
+                showSmsDuePopup(d, institutionId);
+            }
         }
     }
 

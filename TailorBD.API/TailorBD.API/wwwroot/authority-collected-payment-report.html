@@ -109,12 +109,12 @@
         <div class="page-header">
             <div class="ph-icon"><i class="fas fa-receipt"></i></div>
             <div class="ph-text">
-                <h2>সংগৃহীত পেমেন্ট রিপোর্ট</h2>
-                <p>তারিখ অনুসারে পেমেন্ট দেখুন ও বকেয়া তালিকা — সহজে হিসাব মেলান করুন</p>
+                <h2 data-lang-key="সংগৃহীত পেমেন্ট রিপোর্ট">সংগৃহীত পেমেন্ট রিপোর্ট</h2>
+                <p data-lang-key="তারিখ অনুসারে পেমেন্ট দেখুন ও বকেয়া তালিকা — সহজে হিসাব মেলান করুন">তারিখ অনুসারে পেমেন্ট দেখুন ও বকেয়া তালিকা — সহজে হিসাব মেলান করুন</p>
             </div>
             <div style="z-index:1;margin-left:auto;">
                 <a href="/authority-collect-payment.html" class="btn-sm-act" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.4);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:9px;font-size:.82rem;font-weight:600;">
-                    <i class="fas fa-arrow-left"></i> ফিরে যান
+                    <i class="fas fa-arrow-left"></i> <span data-lang-key="ফিরে যান">ফিরে যান</span>
                 </a>
             </div>
         </div>
@@ -123,52 +123,52 @@
         <div class="stat-grid" id="summaryCards">
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-taka-sign"></i></div>
-                <div><div class="sc-val" id="scMonthCollected">�</div><div class="sc-lbl">এই মাসে সংগৃহীত (৳)</div></div>
+                <div><div class="sc-val" id="scMonthCollected">�</div><div class="sc-lbl" data-lang-key="এই মাসে সংগৃহীত (৳)">এই মাসে সংগৃহীত (৳)</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--indigo-grad);"><i class="fas fa-building"></i></div>
-                <div><div class="sc-val" id="scInsPaid">�</div><div class="sc-lbl">প্রতিষ্ঠান প্রদান</div></div>
+                <div><div class="sc-val" id="scInsPaid">�</div><div class="sc-lbl" data-lang-key="প্রতিষ্ঠান প্রদান">প্রতিষ্ঠান প্রদান</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-file-invoice-dollar"></i></div>
-                <div><div class="sc-val" id="scPayCount">�</div><div class="sc-lbl">পেমেন্ট সংখ্যা</div></div>
+                <div><div class="sc-val" id="scPayCount">�</div><div class="sc-lbl" data-lang-key="পেমেন্ট সংখ্যা">পেমেন্ট সংখ্যা</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-exclamation-circle"></i></div>
-                <div><div class="sc-val" id="scTotalDue">�</div><div class="sc-lbl">মোট বকেয়া (৳)</div></div>
+                <div><div class="sc-val" id="scTotalDue">�</div><div class="sc-lbl" data-lang-key="মোট বকেয়া (৳)">মোট বকেয়া (৳)</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--indigo-grad);"><i class="fas fa-calendar-check"></i></div>
-                <div><div class="sc-val" id="scRangeCollected">�</div><div class="sc-lbl">নির্বাচিত সময়ে সংগৃহীত (৳)</div></div>
+                <div><div class="sc-val" id="scRangeCollected">�</div><div class="sc-lbl" data-lang-key="নির্বাচিত সময়ে সংগৃহীত (৳)">নির্বাচিত সময়ে সংগৃহীত (৳)</div></div>
             </div>
         </div>
 
         <!-- Date Filter -->
         <div class="filter-bar">
             <div>
-                <label>তারিখ থেকে</label>
+                <label data-lang-key="তারিখ থেকে">তারিখ থেকে</label>
                 <input type="date" id="fromDate" class="form-control" style="min-width:150px;">
             </div>
             <div>
-                <label>তারিখ পর্যন্ত</label>
+                <label data-lang-key="তারিখ পর্যন্ত">তারিখ পর্যন্ত</label>
                 <input type="date" id="toDate" class="form-control" style="min-width:150px;">
             </div>
             <div style="display:flex;gap:8px;align-items:flex-end;">
                 <button class="btn-search" onclick="loadReport()">
-                    <i class="fas fa-search"></i> তথ্য দেখুন
+                    <i class="fas fa-search"></i> <span data-lang-key="তথ্য দেখুন">তথ্য দেখুন</span>
                 </button>
                 <button class="btn-reset" onclick="resetFilter()">
-                    <i class="fas fa-undo me-1"></i>রিসেট
+                    <i class="fas fa-undo me-1"></i><span data-lang-key="রিসেট">রিসেট</span>
                 </button>
             </div>
             <div style="margin-left:auto;">
-                <label style="margin-bottom:3px;">দ্রুত নির্বাচন</label>
+                <label style="margin-bottom:3px;" data-lang-key="দ্রুত নির্বাচন">দ্রুত নির্বাচন</label>
                 <div class="quick-range">
-                    <button class="qr-btn active" onclick="setRange('month', this)">এই মাস</button>
-                    <button class="qr-btn" onclick="setRange('last7', this)">শেষ ৭ দিন</button>
-                    <button class="qr-btn" onclick="setRange('last30', this)">শেষ ৩০ দিন</button>
-                    <button class="qr-btn" onclick="setRange('lastmonth', this)">গত মাস</button>
-                    <button class="qr-btn" onclick="setRange('year', this)">এই বছর</button>
+                    <button class="qr-btn active" onclick="setRange('month', this)" data-lang-key="এই মাস">এই মাস</button>
+                    <button class="qr-btn" onclick="setRange('last7', this)" data-lang-key="শেষ ৭ দিন">শেষ ৭ দিন</button>
+                    <button class="qr-btn" onclick="setRange('last30', this)" data-lang-key="শেষ ৩০ দিন">শেষ ৩০ দিন</button>
+                    <button class="qr-btn" onclick="setRange('lastmonth', this)" data-lang-key="গত মাস">গত মাস</button>
+                    <button class="qr-btn" onclick="setRange('year', this)" data-lang-key="এই বছর">এই বছর</button>
                 </div>
             </div>
         </div>
@@ -193,13 +193,13 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>তারিখ</th>
-                                <th>প্রতিষ্ঠান</th>
-                                <th>Invoice বিবরণ</th>
-                                <th>মাধ্যম</th>
-                                <th>সংগ্রাহক</th>
-                                <th style="text-align:right;">ছাড় (৳)</th>
-                                <th style="text-align:right;">পায়না (৳)</th>
+                                <th data-lang-key="তারিখ">তারিখ</th>
+                                <th data-lang-key="প্রতিষ্ঠান">প্রতিষ্ঠান</th>
+                                <th data-lang-key="Invoice বিবরণ">Invoice বিবরণ</th>
+                                <th data-lang-key="মাধ্যম">মাধ্যম</th>
+                                <th data-lang-key="সংগ্রাহক">সংগ্রাহক</th>
+                                <th style="text-align:right;" data-lang-key="ছাড় (৳)">ছাড় (৳)</th>
+                                <th style="text-align:right;" data-lang-key="পায়না (৳)">পায়না (৳)</th>
                             </tr>
                         </thead>
                         <tbody id="payTbody">
@@ -231,13 +231,13 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>প্রতিষ্ঠান</th>
-                                <th>নাম</th>
-                                <th>মোট</th>
-                                <th>স্ট্যাটাস</th>
-                                <th>বকেয়া Invoice</th>
-                                <th style="text-align:right;">মোট বকেয়া (৳)</th>
-                                <th>কার্যক্রম</th>
+                                <th data-lang-key="প্রতিষ্ঠান">প্রতিষ্ঠান</th>
+                                <th data-lang-key="নাম">নাম</th>
+                                <th data-lang-key="মোট">মোট</th>
+                                <th data-lang-key="স্ট্যাটাস">স্ট্যাটাস</th>
+                                <th data-lang-key="বকেয়া Invoice">বকেয়া Invoice</th>
+                                <th style="text-align:right;" data-lang-key="মোট বকেয়া (৳)">মোট বকেয়া (৳)</th>
+                                <th data-lang-key="কার্যক্রম">কার্যক্রম</th>
                             </tr>
                         </thead>
                         <tbody id="dueTbody"></tbody>
@@ -359,8 +359,8 @@
             },
             error: function() {
                 showToast('সার্ভার থেকে তথ্য আনা সম্ভব হয়নি', 'danger');
-                $('#payTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted">তথ্য পাওয়া যায়নি</td></tr>');
-                $('#dueTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted">তথ্য পাওয়া যায়নি</td></tr>');
+                $('#payTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted" data-lang-key="তথ্য পাওয়া যায়নি">তথ্য পাওয়া যায়নি</td></tr>');
+                $('#dueTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted" data-lang-key="তথ্য পাওয়া যায়নি">তথ্য পাওয়া যায়নি</td></tr>');
             }
         });
     }
@@ -370,7 +370,7 @@
         var $tbody = $('#payTbody');
         $tbody.empty();
         if (!rows || rows.length === 0) {
-            $tbody.html('<tr><td colspan="8" class="empty-state"><i class="fas fa-file-invoice-dollar d-block mb-2"></i>নির্বাচিত সময়ে কোনো পেমেন্ট পাওয়া যায়নি</td></tr>');
+            $tbody.html('<tr><td colspan="8" class="empty-state"><i class="fas fa-file-invoice-dollar d-block mb-2"></i><span data-lang-key="নির্বাচিত সময়ে কোনো পেমেন্ট পাওয়া যায়নি">নির্বাচিত সময়ে কোনো পেমেন্ট পাওয়া যায়নি</span></td></tr>');
             return;
         }
 
@@ -410,7 +410,7 @@
                 '<tr class="group-date-row">' +
                 '<td colspan="6"><i class="fas fa-calendar-day me-1"></i>' + fmtDate(dk) + '</td>' +
                 '<td style="text-align:right;color:#f97316;font-weight:800;">' + (dayDiscount > 0 ? '৳' + fmt(dayDiscount) : '<span style="color:#cbd5e1;">—</span>') + '</td>' +
-                '<td style="text-align:right;color:#10b981;font-weight:800;">৳' + fmt(dayTotal) + '</td>' +
+                '<td style="text-align:right;color:#10b981;font-weight:800;" data-lang-key="৳' + fmt(dayTotal) + '">৳' + fmt(dayTotal) + '</td>' +
                 '</tr>'
             );
 
@@ -429,7 +429,7 @@
                     '<td>' + (r.payment_Method || '<span style="color:#cbd5e1;">�</span>') + '</td>' +
                     '<td>' + (r.collected_By   || '<span style="color:#cbd5e1;">�</span>') + '</td>' +
                 '<td style="text-align:right;font-weight:700;color:#f97316;">' + (showDiscount ? '৳' + fmt(r.discount) : '<span style="color:#cbd5e1;">—</span>') + '</td>' +
-                    '<td style="text-align:right;font-weight:700;color:#10b981;">৳' + fmt(r.paidAmount) + '</td>' +
+                    '<td style="text-align:right;font-weight:700;color:#10b981;" data-lang-key="৳' + fmt(r.paidAmount) + '">৳' + fmt(r.paidAmount) + '</td>' +
                     '</tr>'
                 );
             });
@@ -438,9 +438,9 @@
         // Grand total row
         $tbody.append(
             '<tr class="total-row">' +
-            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i>সার্বিক সংগৃহীত মোট টাকা</td>' +
+            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i><span data-lang-key="সার্বিক সংগৃহীত মোট টাকা">সার্বিক সংগৃহীত মোট টাকা</span></td>' +
             '<td style="text-align:right;font-size:1.05rem;color:#f97316;">' + (totalDiscountAll > 0 ? '৳' + fmt(totalDiscountAll) : '<span style="color:#cbd5e1;">—</span>') + '</td>' +
-            '<td style="text-align:right;font-size:1.05rem;">৳' + fmt(totalAll) + '</td>' +
+            '<td style="text-align:right;font-size:1.05rem;" data-lang-key="৳' + fmt(totalAll) + '">৳' + fmt(totalAll) + '</td>' +
             '</tr>'
         );
     }
@@ -452,7 +452,7 @@
         $('#dueResultInfo').text(rows.length + ' টি প্রতিষ্ঠান');
 
         if (!rows || rows.length === 0) {
-            $tbody.html('<tr><td colspan="8"><div class="empty-state"><i class="fas fa-check-circle" style="color:#10b981;opacity:1;"></i><p>বাহ! কোনো বকেয়া নেই</p></div></td></tr>');
+            $tbody.html('<tr><td colspan="8"><div class="empty-state"><i class="fas fa-check-circle" style="color:#10b981;opacity:1;"></i><p data-lang-key="বাহ! কোনো বকেয়া নেই">বাহ! কোনো বকেয়া নেই</p></div></td></tr>');
             return;
         }
 
@@ -469,11 +469,11 @@
                 '<td style="color:#64748b;">' + (r.userName || '�') + '</td>' +
                 '<td>' + (r.phone || '�') + '</td>' +
                 '<td>' + statusBadge + '</td>' +
-                '<td><span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;">' + r.dueInvoiceCount + ' টি</span></td>' +
-                '<td style="text-align:right;"><span class="due-badge">৳' + fmt(r.totalDue) + '</span></td>' +
+                '<td><span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;" data-lang-key="' + r.dueInvoiceCount + ' টি">' + r.dueInvoiceCount + ' টি</span></td>' +
+                '<td style="text-align:right;"><span class="due-badge" data-lang-key="৳' + fmt(r.totalDue) + '">৳' + fmt(r.totalDue) + '</span></td>' +
                 '<td>' +
                 '<a href="/authority-collect-payment.html" class="btn btn-sm btn-success rounded-pill px-3" style="font-size:.76rem;font-weight:600;">' +
-                '<i class="fas fa-hand-holding-usd me-1"></i>পেমেন্ট করুন</a>' +
+                '<i class="fas fa-hand-holding-usd me-1"></i><span data-lang-key="পেমেন্ট করুন">পেমেন্ট করুন</span></a>' +
                 '</td>' +
                 '</tr>'
             );
@@ -482,8 +482,8 @@
         // Total row
         $tbody.append(
             '<tr class="total-row">' +
-            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i>মোট বকেয়া</td>' +
-            '<td style="text-align:right;font-size:1.05rem;color:#ef4444;">৳' + fmt(totalDue) + '</td>' +
+            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i><span data-lang-key="মোট বকেয়া">মোট বকেয়া</span></td>' +
+            '<td style="text-align:right;font-size:1.05rem;color:#ef4444;" data-lang-key="৳' + fmt(totalDue) + '">৳' + fmt(totalDue) + '</td>' +
             '<td></td>' +
             '</tr>'
         );

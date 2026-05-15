@@ -84,6 +84,12 @@
         .order-details-bottom { margin-top: 20px; padding-top: 15px; border-top: 2px solid #e9ecef; }
         .order-details-bottom .alert { background: #e7f3ff; border: 1px solid #b3d9ff; color: #004085; font-size: 14px; }
 
+        /* Pagination */
+        .pagination .page-link { color: #6c7ae0; font-size: 13px; padding: 4px 10px; }
+        .pagination .page-item.active .page-link { background-color: #6c7ae0; border-color: #6c7ae0; color: white; }
+        .pagination .page-item.disabled .page-link { color: #aaa; }
+        .pagination .page-link:hover { background-color: #ebebff; color: #5a68c9; }
+
         /* jQuery UI Autocomplete */
         .ui-autocomplete { max-height: 200px; overflow-y: auto; overflow-x: hidden; z-index: 9999 !important; font-size: 13px; border: 1px solid #6c7ae0; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .ui-menu-item { padding: 8px 12px; cursor: pointer; }
@@ -214,6 +220,32 @@
         </div>
     </div>
 
+    <!-- Partial Delivery Modal -->
+    <div class="modal fade" id="partialDeliveryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#28a745; color:white;">
+                    <h5 class="modal-title"><i class="fas fa-truck me-2"></i>
+                        <span class="lang-content" data-en="Give Delivery" data-bn="ডেলিভারি দিন">ডেলিভারি দিন</span>
+                        <small id="pdOrderNo" class="ms-2 fw-normal"></small>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:invert(1);"></button>
+                </div>
+                <div class="modal-body" id="partialDeliveryModalBody" style="overflow-x:auto; overflow-y:auto; max-height:65vh;">
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-success" role="status"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+                    <button type="button" class="btn btn-success" id="pdSubmitBtn" onclick="submitPartialDelivery()">
+                        <i class="fas fa-check me-1"></i> ডেলিভারি নিশ্চিত করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- jQuery + jQuery UI (autocomplete) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
@@ -222,6 +254,6 @@
     <!-- App Components (sidebar, navbar, modals, session) -->
     <script src="/js/app-components.js?v=2.1.4"></script>
     <!-- Delivery Give Page Logic -->
-    <script src="/js/delivery-give.js?v=2.1.4"></script>
+    <script src="/js/delivery-give.js?v=2.2.0"></script>
 </body>
 </html>

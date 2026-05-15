@@ -268,8 +268,8 @@ WHERE(Measurement_Type.Measurement_GroupID = @Measurement_GroupID) AND (Ordered_
                                         </ItemTemplate>
                                     </asp:DataList>
                                     <asp:SqlDataSource ID="OrderedMeasurmentSQL" runat="server" ConnectionString="<%$ ConnectionStrings:TailorBDConnectionString %>"
-                                        SelectCommand="SELECT DISTINCT Measurement_Type.Measurement_GroupID,ISNULL(Measurement_Type.Ascending,9999) AS Ascending FROM Ordered_Measurement INNER JOIN
-Measurement_Type ON Ordered_Measurement.MeasurementTypeID = Measurement_Type.MeasurementTypeID WHERE (Ordered_Measurement.OrderListID = @OrderListID) ORDER BY Ascending">
+                                        SelectCommand="SELECT Measurement_Type.Measurement_GroupID, MIN(ISNULL(Measurement_Type.Ascending,9999)) AS Ascending FROM Ordered_Measurement INNER JOIN
+Measurement_Type ON Ordered_Measurement.MeasurementTypeID = Measurement_Type.MeasurementTypeID WHERE (Ordered_Measurement.OrderListID = @OrderListID) GROUP BY Measurement_Type.Measurement_GroupID ORDER BY Ascending">
                                         <SelectParameters>
                                             <asp:ControlParameter ControlID="OrderListIDHiddenField" Name="OrderListID" PropertyName="Value" />
                                         </SelectParameters>

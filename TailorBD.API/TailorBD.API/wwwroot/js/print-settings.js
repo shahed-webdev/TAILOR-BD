@@ -99,6 +99,7 @@
         $('#printWorkmanCopy').prop('checked', ms.printWorkmanCopy);
         $('#printShopCopy').prop('checked', ms.printShopCopy);
         $('#printCustomerName').prop('checked', ms.printCustomerName);
+        $('#printCustomerPhone').prop('checked', ms.printCustomerPhone !== false);
         $('#printCustomerAddress').prop('checked', ms.printCustomerAddress);
         $('#printMeasurementName').prop('checked', ms.printMeasurementName);
         $('#printStyleCategory').prop('checked', ms.printStyleCategory);
@@ -128,6 +129,7 @@
             printWorkmanCopy: $('#printWorkmanCopy').is(':checked'),
             printShopCopy: $('#printShopCopy').is(':checked'),
             printCustomerName: $('#printCustomerName').is(':checked'),
+            printCustomerPhone: $('#printCustomerPhone').is(':checked'),
             printCustomerAddress: $('#printCustomerAddress').is(':checked'),
             printMeasurementName: $('#printMeasurementName').is(':checked'),
             printStyleCategory: $('#printStyleCategory').is(':checked'),

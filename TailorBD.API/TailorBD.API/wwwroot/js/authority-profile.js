@@ -111,7 +111,7 @@
                 : '<span class="badge" style="background:#fee2e2;color:#dc2626;font-size:.75rem;">Due</span>';
 
             const expireText = s.expireDate
-                ? '<span style="color:' + (isExpired ? '#dc2626' : '#475569') + '">' + fmtDate(s.expireDate) + (isExpired ? ' <i class="fas fa-exclamation-triangle"></i>' : '') + '</span>'
+                ? '<span style="color:' + (isExpired ? '#dc2626' : '#475569') + ';white-space:nowrap;">' + fmtDate(s.expireDate) + (isExpired ? ' <i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i>' : '') + '</span>'
                 : '—';
 
             const dueText = s.totalDue > 0

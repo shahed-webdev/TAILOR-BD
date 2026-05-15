@@ -594,7 +594,9 @@ namespace TailorBD.API.Controllers
                         paidAmount = reader.IsDBNull(reader.GetOrdinal("PaidAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("PaidAmount"))),
                         discount = reader.IsDBNull(reader.GetOrdinal("Discount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("Discount"))),
                         dueAmount = reader.IsDBNull(reader.GetOrdinal("DueAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("DueAmount"))),
-                        deliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")).ToString("yyyy-MM-dd"),
+                        deliveryDate = reader.IsDBNull(reader.GetOrdinal("Update_DeliveryDate"))
+                            ? (reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")).ToString("yyyy-MM-dd"))
+                            : reader.GetDateTime(reader.GetOrdinal("Update_DeliveryDate")).ToString("yyyy-MM-dd"),
                         customerId = reader.GetInt32(reader.GetOrdinal("CustomerID")),
                         customerNumber = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerNumber")),
                         customerName = reader.IsDBNull(reader.GetOrdinal("CustomerName")) ? "" : reader.GetString(reader.GetOrdinal("CustomerName")),

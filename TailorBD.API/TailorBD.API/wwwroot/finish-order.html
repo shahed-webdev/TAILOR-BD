@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>?????? ??????? ???? - TailorBD</title>
+    <title>অর্ডার সম্পন্ন করুন - TailorBD</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -39,15 +39,15 @@
             <!-- Page Header -->
             <div class="page-header mb-4">
                 <div>
-                    <h1 class="lang-content" data-en="Finish Order" data-bn="?????? ??????? ????">?????? ??????? ????</h1>
-                    <p class="text-muted lang-content" data-en="Complete order with payment and delivery date" data-bn="??????? ??? ???????? ????? ?? ?????? ??????? ????">
-                        ??????? ??? ???????? ????? ?? ?????? ??????? ????
+                    <h1 class="lang-content" data-en="Finish Order" data-bn="অর্ডার সম্পন্ন করুন">অর্ডার সম্পন্ন করুন</h1>
+                    <p class="text-muted lang-content" data-en="Complete order with payment and delivery date" data-bn="পেমেন্ট এবং ডেলিভারি তারিখ দিয়ে অর্ডার সম্পন্ন করুন">
+                        পেমেন্ট এবং ডেলিভারি তারিখ দিয়ে অর্ডার সম্পন্ন করুন
                     </p>
                 </div>
                 <div>
                     <button class="btn btn-outline-primary" onclick="addMoreDress()">
                         <i class="fas fa-plus me-2"></i>
-                        <span class="lang-content" data-en="Add More Dress" data-bn="??? ????? ????? ????">??? ????? ????? ????</span>
+                        <span class="lang-content" data-en="Add More Dress" data-bn="আরও পোশাক যোগ করুন">আরও পোশাক যোগ করুন</span>
                     </button>
                 </div>
             </div>
@@ -63,12 +63,12 @@
                         <div class="customer-badges">
                             <span class="badge badge-order">
                                 <i class="fas fa-shopping-bag me-1"></i>
-                                <span class="lang-content" data-en="Order No" data-bn="?????? ??">?????? ??</span>: 
+                                <span class="lang-content" data-en="Order No" data-bn="অর্ডার নং">অর্ডার নং</span>
                                 <span id="orderNumberDisplay">-</span>
                             </span>
                             <span class="badge badge-customer">
                                 <i class="fas fa-user me-1"></i>
-                                <span class="lang-content" data-en="Customer No" data-bn="???????? ??">???????? ??</span>: 
+                                <span class="lang-content" data-en="Customer No" data-bn="কাস্টমার নং">কাস্টমার নং</span>
                                 <span id="customerNumberDisplay">-</span>
                             </span>
                             <span class="badge badge-phone">
@@ -88,18 +88,18 @@
             <div class="order-details-card mb-4">
                 <div class="card-header">
                     <i class="fas fa-list-alt me-2"></i>
-                    <span class="lang-content" data-en="Order Details" data-bn="???????? ?????????">???????? ?????????</span>
+                    <span class="lang-content" data-en="Order Details" data-bn="অর্ডার বিবরণ">অর্ডার বিবরণ</span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th class="lang-content" data-en="Dress" data-bn="?????">?????</th>
-                                    <th class="lang-content" data-en="Details" data-bn="?????????">?????????</th>
-                                    <th class="lang-content" data-en="Quantity" data-bn="??????">??????</th>
-                                    <th class="lang-content" data-en="Unit Price" data-bn="??? ?????">??? ?????</th>
-                                    <th class="text-end lang-content" data-en="Total" data-bn="???">???</th>
+                                    <th class="lang-content" data-en="Dress" data-bn="পোশাক">পোশাক</th>
+                                    <th class="lang-content" data-en="Details" data-bn="বিবরণ">বিবরণ</th>
+                                    <th class="lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</th>
+                                    <th class="lang-content" data-en="Unit Price" data-bn="একক মূল্য">একক মূল্য</th>
+                                    <th class="text-end lang-content" data-en="Total" data-bn="মোট">মোট</th>
                                 </tr>
                             </thead>
                             <tbody id="orderDetailsBody">
@@ -113,8 +113,8 @@
                             </tbody>
                             <tfoot>
                                 <tr class="table-primary">
-                                    <td colspan="4" class="text-end"><strong class="lang-content" data-en="Total Amount:" data-bn="??????? ????:">??????? ????:</strong></td>
-                                    <td class="text-end"><strong id="orderTotalAmount">?0.00</strong></td>
+                                    <td colspan="4" class="text-end"><strong class="lang-content" data-en="Total Amount:" data-bn="মোট পরিমাণ:">মোট পরিমাণ:</strong></td>
+                                    <td class="text-end"><strong id="orderTotalAmount">৳ 0.00</strong></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -126,7 +126,7 @@
             <div class="payment-card mb-4">
                 <div class="card-header">
                     <i class="fas fa-money-bill-wave me-2"></i>
-                    <span class="lang-content" data-en="Payment & Delivery" data-bn="??????? ? ????????">??????? ? ????????</span>
+                    <span class="lang-content" data-en="Payment & Delivery" data-bn="পেমেন্ট ও ডেলিভারি">পেমেন্ট ও ডেলিভারি</span>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
@@ -134,10 +134,10 @@
                         <div class="col-md-3 mb-3" id="accountSection" style="display: none;">
                             <label class="form-label">
                                 <i class="fas fa-university me-1"></i>
-                                <span class="lang-content" data-en="Account" data-bn="?????">?????</span>
+                                <span class="lang-content" data-en="Account" data-bn="অ্যাকাউন্ট">অ্যাকাউন্ট</span>
                             </label>
                             <select class="form-select" id="accountSelect">
-                                <option value="" class="lang-content" data-en="Select Account" data-bn="?????????? ???????? ????">?????????? ???????? ????</option>
+                                <option value="" class="lang-content" data-en="Select Account" data-bn="অ্যাকাউন্ট নির্বাচন করুন">অ্যাকাউন্ট নির্বাচন করুন</option>
                             </select>
                         </div>
 
@@ -146,15 +146,15 @@
                             <label class="form-label d-flex justify-content-between align-items-center">
                                 <span>
                                     <i class="fas fa-percentage me-1"></i>
-                                    <span class="lang-content" data-en="Discount" data-bn="???">???</span>
+                                    <span class="lang-content" data-en="Discount" data-bn="ছাড়">ছাড়</span>
                                 </span>
                                 <span class="previous-amount-label" id="previousDiscountLabel" style="display: none;">
-                                    <span class="lang-content" data-en="Previous Discount:" data-bn="??????? ?????????:">??????? ?????????:</span> 
+                                    <span class="lang-content" data-en="Previous Discount:" data-bn="পূর্ববর্তী ছাড়:">পূর্ববর্তী ছাড়:</span>
                                     <strong class="text-primary" id="previousDiscountAmount">?0.00</strong>
                                 </span>
                             </label>
                             <input type="number" class="form-control" id="discountAmount" 
-                                   placeholder="???? ?????????" min="0" step="0.01" value="0">
+                                   placeholder="ছাড় লিখুন" min="0" step="0.01" value="0">
                             <small class="text-muted" id="discountLimitText"></small>
                         </div>
 
@@ -163,33 +163,33 @@
                             <label class="form-label d-flex justify-content-between align-items-center">
                                 <span>
                                     <i class="fas fa-money-bill me-1"></i>
-                                    <span class="lang-content" data-en="Paid Amount" data-bn="???????? ??????">???????? ??????</span>
+                                    <span class="lang-content" data-en="Paid Amount" data-bn="পরিশোধিত পরিমাণ">পরিশোধিত পরিমাণ</span>
                                 </span>
                                 <span class="previous-amount-label" id="previousPaidLabel" style="display: none;">
-                                    <span class="lang-content" data-en="Previous Paid:" data-bn="??????? ????:">??????? ????:</span> 
+                                    <span class="lang-content" data-en="Previous Paid:" data-bn="পূর্বে পরিশোধ:">পূর্বে পরিশোধ:</span>
                                     <strong class="text-success" id="previousPaidAmount">?0.00</strong>
                                 </span>
                             </label>
                             <input type="number" class="form-control" id="paidAmount" 
-                                   placeholder="???? ???????" min="0" step="0.01" value="0">
+                                   placeholder="পরিমাণ লিখুন" min="0" step="0.01" value="0">
                         </div>
 
                         <!-- Delivery Date -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">
                                 <i class="fas fa-calendar me-1"></i>
-                                <span class="lang-content" data-en="Delivery Date" data-bn="???????? ?????">???????? ?????</span>
+                                <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" class="form-control" id="deliveryDate" 
-                                   placeholder="???????? ????? ???????? ????" readonly required>
+                                   placeholder="ডেলিভারি তারিখ নির্বাচন করুন" readonly required>
                         </div>
                     </div>
 
                     <!-- Due Amount Display -->
                     <div class="due-amount-display mb-3">
                         <h5 class="mb-0">
-                            <span id="dueAmountLabel">???? ????? ?0.00 ????</span>
+                            <span id="dueAmountLabel">বাকি পরিমাণ হিসাব হচ্ছে...</span>
                         </h5>
                         <small class="text-danger" id="errorMessage"></small>
                     </div>
@@ -197,7 +197,7 @@
                     <!-- Submit Button -->
                     <button class="btn btn-success btn-lg w-100" id="submitButton" onclick="submitOrder()">
                         <i class="fas fa-check-circle me-2"></i>
-                        <span class="lang-content" data-en="Complete Order" data-bn="?????? ??????? ????">?????? ??????? ????</span>
+                        <span class="lang-content" data-en="Complete Order" data-bn="অর্ডার সম্পন্ন করুন">অর্ডার সম্পন্ন করুন</span>
                     </button>
                 </div>
             </div>

@@ -213,6 +213,7 @@
             totalPaid += o.paidAmount;
             totalDue += o.dueAmount;
             rows += `<tr data-order-id="${o.orderId}" data-delivery-status="${o.deliveryStatus}" data-due="${o.dueAmount}">
+                <td><input type="checkbox" class="order-row-chk" style="width:16px;height:16px;cursor:pointer;accent-color:#6c7ae0;"></td>
                 <td><strong>${o.orderSerialNumber}</strong></td>
                 <td>${formatDate(o.orderDate)}</td>
                 <td>${o.deliveryDate ? formatDate(o.deliveryDate) : '-'}</td>
@@ -221,12 +222,14 @@
                 <td>${o.paidAmount.toFixed(2)}</td>
                 <td class="due-paid-col">${o.dueAmount.toFixed(2)} /-</td>
                 <td>${o.discount.toFixed(2)} /-</td>
+                <td><input type="number" class="row-collect-input due-input" min="0" max="${o.dueAmount.toFixed(2)}" step="0.01" placeholder="0" value="" style="display:none;"></td>
                 <td><span class="badge ${o.deliveryStatus === 'Delivered' ? 'bg-success' : 'bg-warning text-dark'}">${o.deliveryStatus}</span></td>
             </tr>`;
         });
 
         const html = `<table>
             <thead><tr>
+                <th style="width:36px;"><input type="checkbox" id="checkAllOrders" style="width:16px;height:16px;cursor:pointer;accent-color:#fff;" title="সব সিলেক্ট করুন"></th>
                 <th data-en="Order No" data-bn="অর্ডার নং">অর্ডার নং</th>
                 <th data-en="Order" data-bn="অর্ডার">অর্ডার</th>
                 <th data-en="Delivery" data-bn="ডেলিভারী">ডেলিভারী</th>
@@ -235,18 +238,51 @@
                 <th data-en="Paid" data-bn="পেইড">পেইড</th>
                 <th data-en="Due" data-bn="বাকি">বাকি</th>
                 <th data-en="Discount" data-bn="ডিসকাউন্ট">ডিসকাউন্ট</th>
+                <th data-en="Collecting" data-bn="কত নিচ্ছেন?">কত নিচ্ছেন?</th>
                 <th data-en="Status" data-bn="অবস্থা">অবস্থা</th>
             </tr></thead>
             <tbody>${rows}</tbody>
             <tfoot><tr>
+                <td></td>
                 <td colspan="4" style="text-align:right;padding-right:8px;font-weight:700;" data-en="Total:" data-bn="মোট:">মোট:</td>
                 <td>${totalAmt.toFixed(2)}</td>
                 <td>${totalPaid.toFixed(2)}</td>
                 <td class="due-paid-col">${totalDue.toFixed(2)} /-</td>
-                <td></td><td></td>
+                <td></td><td></td><td></td>
             </tr></tfoot>
         </table>`;
         $('#dueTableContainer').html(html);
+
+        // Check-all toggle
+        $(document).off('change.checkall').on('change.checkall', '#checkAllOrders', function () {
+            const checked = $(this).is(':checked');
+            $('#dueTableContainer tbody .order-row-chk').each(function () {
+                $(this).prop('checked', checked).trigger('change');
+            });
+        });
+
+        // Per-row checkbox: show/hide collect input and auto-fill due amount
+        $(document).off('change.rowchk').on('change.rowchk', '.order-row-chk', function () {
+            const $tr = $(this).closest('tr');
+            const $input = $tr.find('.row-collect-input');
+            if ($(this).is(':checked')) {
+                const due = parseFloat($tr.data('due')) || 0;
+                $input.val(due.toFixed(2)).show();
+            } else {
+                $input.val('').hide();
+            }
+            updateCollectPanelFromRows();
+        });
+
+        // Per-row collect input change → update panel total
+        $(document).off('input.rowcollect').on('input.rowcollect', '.row-collect-input', function () {
+            const $tr = $(this).closest('tr');
+            const due = parseFloat($tr.data('due')) || 0;
+            let val = parseFloat($(this).val()) || 0;
+            if (val > due) { $(this).val(due.toFixed(2)); val = due; }
+            if (val < 0) { $(this).val(0); }
+            updateCollectPanelFromRows();
+        });
 
         // Update total due display
         $('#totalDueDisplay').text(totalDue.toFixed(2) + ' /-');
@@ -259,51 +295,45 @@
         if (typeof window.updateLanguage === 'function') window.updateLanguage();
     }
 
+    function updateCollectPanelFromRows() {
+        let total = 0;
+        $('#dueTableContainer tbody tr').each(function () {
+            const $chk = $(this).find('.order-row-chk');
+            if ($chk.is(':checked')) {
+                total += parseFloat($(this).find('.row-collect-input').val()) || 0;
+            }
+        });
+        // Sync to the main collect input
+        $('#collectAmountInput').val(total > 0 ? total.toFixed(2) : '');
+    }
+
     window.collectDue = function () {
-        const inputVal = $('#collectAmountInput').val().trim();
         const discountVal = $('#collectDiscountInput').val().trim();
-        const totalInput = parseFloat(inputVal) || 0;
         const discountInput = parseFloat(discountVal) || 0;
-
-        if (!inputVal && !discountVal) {
-            $('#collectAmountInput').addClass('error-input');
-            showMsg('#dueMsg', 'error', 'কত টাকা দিচ্ছেন সেটি লিখুন');
-            return;
-        }
-        $('#collectAmountInput').removeClass('error-input');
-
-        // Total due check
-        const totalDue = parseFloat($('#dueTableContainer tfoot td.due-paid-col').text()) || 0;
-        if ((totalInput + discountInput) > totalDue) {
-            showMsg('#dueMsg', 'error', `পেইড + ডিসকাউন্ট মোট বাকি (${totalDue.toFixed(2)}) এর চেয়ে বেশি হতে পারবে না`);
-            return;
-        }
-
-        // Distribute top-to-bottom across orders
-        const payments = [];
-        let remainingPaid = totalInput;
-        let remainingDiscount = discountInput;
         const accountId = parseInt($('#accountSelect').val()) || null;
 
+        // Collect from checked rows using per-row amounts
+        const payments = [];
+        let anyChecked = false;
+        let remainingDiscount = discountInput;
+
         $('#dueTableContainer tbody tr').each(function () {
-            if (remainingPaid <= 0 && remainingDiscount <= 0) return false;
+            const $chk = $(this).find('.order-row-chk');
+            if (!$chk.is(':checked')) return;
+            anyChecked = true;
+
             const orderId = parseInt($(this).data('order-id'));
             const deliveryStatus = $(this).data('delivery-status');
             const due = parseFloat($(this).data('due')) || 0;
+            const collectVal = parseFloat($(this).find('.row-collect-input').val()) || 0;
 
-            if (due <= 0) return;
-
-            const applyPaid = Math.min(remainingPaid, due);
-            remainingPaid = parseFloat((remainingPaid - applyPaid).toFixed(2));
-
-            const dueAfterPaid = due - applyPaid;
-            const applyDiscount = Math.min(remainingDiscount, dueAfterPaid);
+            const applyDiscount = Math.min(remainingDiscount, due - collectVal);
             remainingDiscount = parseFloat((remainingDiscount - applyDiscount).toFixed(2));
 
-            if (applyPaid > 0 || applyDiscount > 0) {
+            if (collectVal > 0 || applyDiscount > 0) {
                 payments.push({
                     orderId,
-                    paidAmount: applyPaid,
+                    paidAmount: collectVal,
                     discountAmount: applyDiscount,
                     deliveryStatus,
                     accountId
@@ -311,8 +341,13 @@
             }
         });
 
+        if (!anyChecked) {
+            showMsg('#dueMsg', 'error', 'অন্তত একটি অর্ডার চেকবক্সে টিক দিন');
+            return;
+        }
+
         if (!payments.length) {
-            showMsg('#dueMsg', 'error', 'কোনো বাকি অর্ডার পাওয়া যায়নি');
+            showMsg('#dueMsg', 'error', 'নির্বাচিত অর্ডারে কোনো পেমেন্ট দেওয়া হয়নি');
             return;
         }
 

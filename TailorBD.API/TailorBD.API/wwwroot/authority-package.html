@@ -320,8 +320,8 @@
         <div class="page-header">
             <div class="ph-icon"><i class="fas fa-box-open"></i></div>
             <div class="ph-text">
-                <h2>??????? ???? ????</h2>
-                <p>???? ??????? ??? ???? ??? ???????? ??????????? ???????? ????</p>
+                <h2 data-lang-key="প্যাকেজ তৈরি করুন">প্যাকেজ তৈরি করুন</h2>
+                <p data-lang-key="নতুন প্যাকেজ যোগ করুন এবং বিদ্যমান প্যাকেজগুলো পরিচালনা করুন">নতুন প্যাকেজ যোগ করুন এবং বিদ্যমান প্যাকেজগুলো পরিচালনা করুন</p>
             </div>
         </div>
 
@@ -329,30 +329,30 @@
         <div class="section-card">
             <div class="section-title">
                 <div class="st-icon"><i class="fas fa-plus"></i></div>
-            ???? ??????? ??? ????
+            নতুন প্যাকেজ যোগ করুন
             </div>
 
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label">????????? ??? <span class="text-danger">*</span></label>
+                    <label class="form-label">প্যাকেজের নাম <span class="text-danger">*</span></label>
                     <input type="text" id="pkgName" class="form-control"
-                           placeholder="????: Basic, Standard, Premium">
-                    <div class="invalid-feedback">????????? ??? ?????</div>
+                           placeholder="যেমন: Basic, Standard, Premium">
+                    <div class="invalid-feedback" data-lang-key="প্যাকেজের নাম দিন">প্যাকেজের নাম দিন</div>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">?????? (Interval) <span class="text-danger">*</span></label>
+                    <label class="form-label">মেয়াদ (Interval) <span class="text-danger">*</span></label>
                     <input type="text" id="pkgInterval" class="form-control"
-                           placeholder="????: 1 Year, 6 Month">
-                    <div class="invalid-feedback">?????? ?????</div>
+                           placeholder="যেমন: 1 Year, 6 Month">
+                    <div class="invalid-feedback" data-lang-key="মেয়াদ দিন">মেয়াদ দিন</div>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">????? (Details)</label>
+                    <label class="form-label" data-lang-key="বিবরণ (Details)">বিবরণ (Details)</label>
                     <textarea id="pkgDetails" class="form-control" rows="1"
-                              placeholder="????????? ????? ?????..."></textarea>
+                              placeholder="প্যাকেজের বিস্তারিত বিবরণ..."></textarea>
                 </div>
                 <div class="col-12 d-flex gap-2 mt-1">
                     <button class="btn-add" id="addBtn" onclick="addPackage()">
-                        <i class="fas fa-plus-circle"></i> ??????? ??? ????
+                        <i class="fas fa-plus-circle"></i> <span data-lang-key="প্যাকেজ যোগ করুন">প্যাকেজ যোগ করুন</span>
                     </button>
                 </div>
             </div>
@@ -363,7 +363,7 @@
             <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                 <div class="section-title mb-0" style="border:none;padding:0;">
                     <div class="st-icon"><i class="fas fa-list"></i></div>
-                    ??????? ??????
+                    প্যাকেজ তালিকা
                     <span class="badge bg-secondary ms-2 fw-normal" id="pkgCount">0</span>
                 </div>
                 <!-- Search -->
@@ -372,7 +372,7 @@
                         <i class="fas fa-search text-muted" style="font-size:.8rem;"></i>
                     </span>
                     <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
-                           placeholder="??? ?? ?????? ??????..." oninput="filterTable()">
+                           placeholder="নাম বা মেয়াদ খুঁজুন..." oninput="filterTable()">
                 </div>
             </div>
 
@@ -381,16 +381,16 @@
                     <thead>
                         <tr>
                             <th style="width:42px;">#</th>
-                            <th>????????? ???</th>
-                            <th style="width:160px;">??????</th>
-                            <th>?????</th>
-                            <th style="width:130px;">???????</th>
+                            <th data-lang-key="প্যাকেজের নাম">প্যাকেজের নাম</th>
+                            <th style="width:160px;" data-lang-key="মেয়াদ">মেয়াদ</th>
+                            <th data-lang-key="বিবরণ">বিবরণ</th>
+                            <th style="width:130px;" data-lang-key="কার্যক্রম">কার্যক্রম</th>
                         </tr>
                     </thead>
                     <tbody id="pkgTableBody">
                         <tr>
                             <td colspan="5" class="text-center py-4 text-muted">
-                                <div class="spinner-border spinner-border-sm me-2"></div>??? ?????...
+                                <div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...
                             </td>
                         </tr>
                     </tbody>
@@ -399,7 +399,7 @@
 
             <div class="mt-2 pt-2 border-top" style="font-size:.82rem;color:#64748b;">
                 <i class="fas fa-box-open me-1 text-primary"></i>
-                ??? ???????: <strong id="summTotal">0</strong>
+                মোট প্যাকেজ: <strong id="summTotal">0</strong>
             </div>
         </div>
 
@@ -415,12 +415,12 @@
                             display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
                     <i class="fas fa-trash-alt" style="color:#ef4444;font-size:1.3rem;"></i>
                 </div>
-                <h5 style="font-weight:700;margin-bottom:6px;">?????? ????????</h5>
-                <p class="text-muted small mb-0" id="deleteModalMsg">?? ????????? ??????????? ???? ???? ???</p>
+                <h5 style="font-weight:700;margin-bottom:6px;" data-lang-key="ডিলিট নিশ্চিত করুন">ডিলিট নিশ্চিত করুন</h5>
+                <p class="text-muted small mb-0" id="deleteModalMsg" data-lang-key="এই প্যাকেজটি ডিলিট হয়ে যাবে">এই প্যাকেজটি ডিলিট হয়ে যাবে</p>
             </div>
             <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2 justify-content-center">
-                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">?????</button>
-                <button class="btn btn-danger px-4 rounded-pill" id="confirmDeleteBtn">?????</button>
+                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal" data-lang-key="বাতিল">বাতিল</button>
+                <button class="btn btn-danger px-4 rounded-pill" id="confirmDeleteBtn" data-lang-key="ডিলিট">ডিলিট</button>
             </div>
         </div>
     </div>
@@ -466,17 +466,17 @@
     function loadPackages() {
         $('#pkgTableBody').html(
             '<tr><td colspan="5" class="text-center py-4 text-muted">' +
-            '<div class="spinner-border spinner-border-sm me-2"></div>??? ?????...</td></tr>');
+            '<div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</td></tr>');
 
         $.get('/api/package', function (res) {
-            if (!res.success) { toast('???? ??? ??????', 'error'); return; }
+            if (!res.success) { toast('ডাটা লোড হয়নি', 'error'); return; }
             allPackages = res.data || [];
             renderTable(allPackages);
         }).fail(function () {
-            toast('????? ??????', 'error');
+            toast('সার্ভার ত্রুটি', 'error');
             $('#pkgTableBody').html(
                 '<tr><td colspan="5" class="text-center text-danger py-3">' +
-                '<i class="fas fa-exclamation-triangle me-2"></i>???? ??? ?????? ??????</td></tr>');
+                '<i class="fas fa-exclamation-triangle me-2"></i><span data-lang-key="ডাটা লোড হয়নি">ডাটা লোড হয়নি</span></td></tr>');
         });
     }
 
@@ -491,7 +491,7 @@
                 '<tr><td colspan="5">' +
                 '<div class="empty-state">' +
                 '<i class="fas fa-box-open"></i>' +
-                '<p>???? ??????? ?????? ??????? ????? ???? ???? ???? ??????? ??? ?????</p>' +
+                '<p data-lang-key="কোনো প্যাকেজ পাওয়া যায়নি। উপরের ফরম থেকে নতুন প্যাকেজ যোগ করুন।">কোনো প্যাকেজ পাওয়া যায়নি। উপরের ফরম থেকে নতুন প্যাকেজ যোগ করুন।</p>' +
                 '</div></td></tr>');
             return;
         }
@@ -508,10 +508,10 @@
                 '<td><span class="pkg-details">' + esc(p.details || '-') + '</span></td>' +
                 '<td>' +
                   '<div class="d-flex gap-1">' +
-                    '<button class="btn-action btn-edit" onclick="startEdit(' + p.packageID + ')" title="????????">' +
+                    '<button class="btn-action btn-edit" onclick="startEdit(' + p.packageID + ')" title="সম্পাদন">' +
                       '<i class="fas fa-edit"></i> Edit' +
                     '</button>' +
-                    '<button class="btn-action btn-delete" onclick="askDelete(' + p.packageID + ',\'' + esc(p.packageName) + '\')" title="?????">' +
+                    '<button class="btn-action btn-delete" onclick="askDelete(' + p.packageID + ',\'' + esc(p.packageName) + '\')" title="ডিলিট">' +
                       '<i class="fas fa-trash-alt"></i>' +
                     '</button>' +
                   '</div>' +
@@ -556,23 +556,23 @@
         if (!valid) return;
 
         const $btn = $('#addBtn').prop('disabled', true);
-        $btn.html('<div class="spinner-border spinner-border-sm me-2"></div>??? ?????...');
+        $btn.html('<div class="spinner-border spinner-border-sm me-2"></div>তৈরি হচ্ছে...');
 
         $.ajax({
             url: '/api/package', method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ packageName: name, interval: interval, details: details }),
             success: function (res) {
-                $btn.prop('disabled', false).html('<i class="fas fa-plus-circle"></i> ??????? ??? ????');
-                if (!res.success) { toast(res.message || '??? ??????', 'error'); return; }
-                toast('??????? ??????? ??? ??????!', 'success');
+                $btn.prop('disabled', false).html('<i class="fas fa-plus-circle"></i> প্যাকেজ যোগ করুন');
+                if (!res.success) { toast(res.message || 'যোগ হয়নি', 'error'); return; }
+                toast('প্যাকেজ সফলভাবে যোগ হয়েছে!', 'success');
                 $('#pkgName, #pkgInterval, #pkgDetails').val('');
                 $('#pkgName, #pkgInterval').removeClass('is-invalid');
                 loadPackages();
             },
             error: function (xhr) {
-                $btn.prop('disabled', false).html('<i class="fas fa-plus-circle"></i> ??????? ??? ????');
-                const msg = xhr.responseJSON?.message || '??? ???? ??????';
+                $btn.prop('disabled', false).html('<i class="fas fa-plus-circle"></i> প্যাকেজ যোগ করুন');
+                const msg = xhr.responseJSON?.message || 'সার্ভার ত্রুটি';
                 toast(msg, 'error');
             }
         });
@@ -596,10 +596,10 @@
             '<td><textarea id="edit-details-' + id + '" rows="2">' + esc(pkg.details || '') + '</textarea></td>' +
             '<td>' +
               '<div class="d-flex gap-1 flex-wrap">' +
-                '<button class="btn-action btn-save" onclick="saveEdit(' + id + ')" title="??? ????">' +
+                '<button class="btn-action btn-save" onclick="saveEdit(' + id + ')" title="\u09b8\u09c7\u09ad">' +
                   '<i class="fas fa-check"></i> Save' +
                 '</button>' +
-                '<button class="btn-action btn-cancel" onclick="cancelEdit(' + id + ')" title="?????">' +
+                '<button class="btn-action btn-cancel" onclick="cancelEdit(' + id + ')" title="\u09ac\u09be\u09a4\u09bf\u09b2">' +
                   '<i class="fas fa-times"></i>' +
                 '</button>' +
               '</div>' +
@@ -614,7 +614,7 @@
         const details  = $('#edit-details-' + id).val().trim();
 
         if (!name || !interval) {
-            toast('??? ? ?????? ??????', 'error');
+            toast('নাম ও মেয়াদ দিন', 'error');
             return;
         }
 
@@ -623,12 +623,12 @@
             contentType: 'application/json',
             data: JSON.stringify({ packageName: name, interval: interval, details: details }),
             success: function (res) {
-                if (!res.success) { toast(res.message || '????? ??????', 'error'); return; }
-                toast('??????? ??????? ????? ??????', 'success');
+                if (!res.success) { toast(res.message || 'আপডেট হয়নি', 'error'); return; }
+                toast('প্যাকেজ সফলভাবে আপডেট হয়েছে', 'success');
                 loadPackages();
             },
             error: function (xhr) {
-                toast(xhr.responseJSON?.message || '????? ?????? ??????', 'error');
+                toast(xhr.responseJSON?.message || 'আপডেট ব্যর্থ হয়েছে', 'error');
             }
         });
     };
@@ -649,10 +649,10 @@
                 '<td><span class="pkg-details">' + esc(pkg.details || '-') + '</span></td>' +
                 '<td>' +
                   '<div class="d-flex gap-1">' +
-                    '<button class="btn-action btn-edit" onclick="startEdit(' + pkg.packageID + ')" title="????????">' +
+                    '<button class="btn-action btn-edit" onclick="startEdit(' + pkg.packageID + ')" title="সম্পাদন">' +
                       '<i class="fas fa-edit"></i> Edit' +
                     '</button>' +
-                    '<button class="btn-action btn-delete" onclick="askDelete(' + pkg.packageID + ',\'' + esc(pkg.packageName) + '\')" title="?????">' +
+                    '<button class="btn-action btn-delete" onclick="askDelete(' + pkg.packageID + ',\'' + esc(pkg.packageName) + '\')" title="ডিলিট">' +
                       '<i class="fas fa-trash-alt"></i>' +
                     '</button>' +
                   '</div>' +
@@ -665,7 +665,7 @@
     // -- Delete ----------------------------------------------------------------
     window.askDelete = function (id, name) {
         pendingDeleteId = id;
-        $('#deleteModalMsg').text('"' + name + '" ????????? ??????????? ???? ???? ???');
+        $('#deleteModalMsg').text('"' + name + '" প্যাকেজটি স্থায়ীভাবে ডিলিট হয়ে যাবে। নিশ্চিত?');
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     };
 
@@ -673,13 +673,13 @@
         $.ajax({
             url: '/api/package/' + id, method: 'DELETE',
             success: function (res) {
-                if (!res.success) { toast(res.message || '????? ??????', 'error'); return; }
-                toast('??????? ???? ???? ??????', 'success');
+                if (!res.success) { toast(res.message || 'ডিলিট হয়নি', 'error'); return; }
+                toast('প্যাকেজ ডিলিট সফল হয়েছে', 'success');
                 allPackages = allPackages.filter(function (p) { return p.packageID !== id; });
                 renderTable(allPackages);
             },
             error: function (xhr) {
-                toast(xhr.responseJSON?.message || '????? ?????? ??????', 'error');
+                toast(xhr.responseJSON?.message || 'ডিলিট ব্যর্থ হয়েছে', 'error');
             }
         });
     }

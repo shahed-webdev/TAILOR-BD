@@ -576,9 +576,7 @@ namespace TailorBD.API.Controllers
             [FromQuery] string? phone = null,
             [FromQuery] string? orderSerialNumbers = null,
             [FromQuery] DateTime? startDate = null,
-            [FromQuery] DateTime? endDate = null,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 25)
+            [FromQuery] DateTime? endDate = null)
         {
             try
             {
@@ -629,9 +627,7 @@ namespace TailorBD.API.Controllers
                     AND (Customer.Phone LIKE '%' + @Phone + '%')
                     AND (CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
                     AND ([Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
-                    ORDER BY [Order].DeliveryDate
-                    OFFSET @Offset ROWS
-                    FETCH NEXT @PageSize ROWS ONLY";
+                    ORDER BY [Order].DeliveryDate";
 
                 var orders = new List<ReadyOrderModel>();
                 using (var cmd = new SqlCommand(query, connection))
@@ -641,8 +637,6 @@ namespace TailorBD.API.Controllers
                     cmd.Parameters.AddWithValue("@OrderSerialNumber", orderSerialNumbers ?? "0");
                     cmd.Parameters.AddWithValue("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value);
                     cmd.Parameters.AddWithValue("@EndDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
-                    cmd.Parameters.AddWithValue("@PageSize", pageSize);
 
                     using var reader = await cmd.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
@@ -689,6 +683,212 @@ namespace TailorBD.API.Controllers
         /// Send SMS for ready-to-deliver orders (Ready For Delivery).
         /// Default: "Dear Sir, Your Dress {items} is Ready to Deliver. Order No. {orderNo}. {institutionName}"
         /// Template: TemplateFor = 'ReadyForDelivery', Placeholders: {items}, {orderNo}, {institutionName}
+        /// <summary>
+        /// Get order items for partial delivery modal
+        /// </summary>
+        [HttpGet("order-items/{orderId}")]
+        public async Task<ActionResult> GetOrderItems(int orderId, [FromQuery] int institutionId)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                // Get order + payment info
+                object? orderAmount = null, paidAmount = null, discountAmount = null, previousPaid = null;
+                string? deliveryDate = null;
+                using (var cmd = new SqlCommand(
+                    @"SELECT o.OrderAmount, o.PaidAmount, o.Discount, o.DueAmount, o.DeliveryDate,
+                             (SELECT ISNULL(SUM(Amount),0) FROM Payment_Record WHERE OrderID=o.OrderID) AS TotalPaid
+                      FROM [Order] o WHERE o.OrderID=@OrderID AND o.InstitutionID=@InstitutionID", connection))
+                {
+                    cmd.Parameters.AddWithValue("@OrderID", orderId);
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    using var r = await cmd.ExecuteReaderAsync();
+                    if (await r.ReadAsync())
+                    {
+                        orderAmount = r.GetValue(0);
+                        paidAmount = r.GetValue(1);
+                        discountAmount = r.GetValue(2);
+                        previousPaid = r.GetValue(5);
+                        deliveryDate = r.IsDBNull(4) ? null : r.GetDateTime(4).ToString("yyyy-MM-dd");
+                    }
+                }
+
+                // Get accounts
+                var accounts = new List<object>();
+                using (var cmd = new SqlCommand(
+                    "SELECT AccountID, AccountName, Default_Status FROM Account WHERE InstitutionID=@InstitutionID ORDER BY Default_Status DESC", connection))
+                {
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    using var r = await cmd.ExecuteReaderAsync();
+                    while (await r.ReadAsync())
+                        accounts.Add(new { accountId = r.GetInt32(0), accountName = r.GetString(1), isDefault = r.GetValue(2).ToString() == "True" });
+                }
+
+                // Get order list items with already delivered qty
+                var items = new List<object>();
+                using (var cmd = new SqlCommand(
+                    @"SELECT ol.OrderListID, d.Dress_Name, ol.DressQuantity,
+                             ISNULL(ol.ReadyForDeliveryQuantity,0) AS ReadyQty,
+                             ISNULL((SELECT SUM(DQuantity) FROM Order_Delivery_Date WHERE OrderListID=ol.OrderListID),0) AS DeliveredQty
+                      FROM OrderList ol
+                      INNER JOIN Dress d ON ol.DressID=d.DressID
+                      WHERE ol.OrderID=@OrderID AND ol.InstitutionID=@InstitutionID
+                      ORDER BY ol.OrderList_SN", connection))
+                {
+                    cmd.Parameters.AddWithValue("@OrderID", orderId);
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    using var r = await cmd.ExecuteReaderAsync();
+                    while (await r.ReadAsync())
+                    {
+                        int total = Convert.ToInt32(r.GetValue(2));
+                        int ready = Convert.ToInt32(r.GetValue(3));
+                        int delivered = Convert.ToInt32(r.GetValue(4));
+                        int remaining = total - delivered;
+                        items.Add(new
+                        {
+                            orderListId = r.GetInt32(0),
+                            dressName = r.GetString(1),
+                            totalQty = total,
+                            readyQty = ready,
+                            deliveredQty = delivered,
+                            remainingQty = remaining
+                        });
+                    }
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        orderAmount = Convert.ToDouble(orderAmount ?? 0),
+                        paidAmount = Convert.ToDouble(paidAmount ?? 0),
+                        discount = Convert.ToDouble(discountAmount ?? 0),
+                        previousPaid = Convert.ToDouble(previousPaid ?? 0),
+                        deliveryDate,
+                        accounts,
+                        items
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting order items for orderId {OrderId}", orderId);
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Save partial delivery
+        /// </summary>
+        [HttpPost("partial-delivery")]
+        public async Task<ActionResult> SavePartialDelivery([FromBody] TailorBD.API.Models.PartialDeliveryModel model)
+        {
+            try
+            {
+                if (model.OrderId <= 0)
+                    return BadRequest(new { success = false, message = "Invalid order ID" });
+                if (model.Items == null || model.Items.Count == 0)
+                    return BadRequest(new { success = false, message = "No items selected for delivery" });
+                if (string.IsNullOrWhiteSpace(model.DeliveryDate))
+                    return BadRequest(new { success = false, message = "Delivery date is required" });
+
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+                using var transaction = connection.BeginTransaction();
+
+                try
+                {
+                    // Update delivery date and discount
+                    using (var cmd = new SqlCommand(
+                        @"UPDATE [Order] SET DeliveryDate=@DeliveryDate, Update_DeliveryDate=GETDATE(), Discount=Discount+@Discount
+                          WHERE OrderID=@OrderID AND InstitutionID=@InstitutionID",
+                        connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@DeliveryDate", model.DeliveryDate);
+                        cmd.Parameters.AddWithValue("@Discount", model.Discount);
+                        cmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        cmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+
+                    // Insert delivery records for selected items
+                    foreach (var item in model.Items.Where(i => i.DeliverQty > 0))
+                    {
+                        using var insCmd = new SqlCommand(
+                            @"INSERT INTO Order_Delivery_Date (InstitutionID, RegistrationID, OrderID, OrderListID, DQuantity)
+                              VALUES (@InstitutionID, @RegistrationID, @OrderID, @OrderListID, @DQuantity)",
+                            connection, transaction);
+                        insCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                        insCmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
+                        insCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        insCmd.Parameters.AddWithValue("@OrderListID", item.OrderListId);
+                        insCmd.Parameters.AddWithValue("@DQuantity", item.DeliverQty);
+                        await insCmd.ExecuteNonQueryAsync();
+                    }
+
+                    // Check if all items are fully delivered now
+                    bool allDelivered = false;
+                    using (var checkCmd = new SqlCommand(
+                        @"SELECT COUNT(*) FROM OrderList ol
+                          WHERE ol.OrderID=@OrderID
+                          AND ol.DressQuantity > ISNULL((SELECT SUM(DQuantity) FROM Order_Delivery_Date WHERE OrderListID=ol.OrderListID),0)",
+                        connection, transaction))
+                    {
+                        checkCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        var remaining = Convert.ToInt32(await checkCmd.ExecuteScalarAsync());
+                        allDelivered = remaining == 0;
+                    }
+
+                    string newStatus = allDelivered ? "Delivered" : "PartlyDelivered";
+                    using (var statusCmd = new SqlCommand(
+                        @"UPDATE [Order] SET DeliveryStatus=@Status, Update_DeliveryDate=GETDATE()
+                          WHERE OrderID=@OrderID AND InstitutionID=@InstitutionID",
+                        connection, transaction))
+                    {
+                        statusCmd.Parameters.AddWithValue("@Status", newStatus);
+                        statusCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        statusCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                        await statusCmd.ExecuteNonQueryAsync();
+                    }
+
+                    // Insert payment if any
+                    if (model.PaidAmount > 0)
+                    {
+                        using var payCmd = new SqlCommand(
+                            @"INSERT INTO Payment_Record (OrderID, CustomerID, RegistrationID, InstitutionID, Amount, Payment_TimeStatus, AccountID)
+                              VALUES (@OrderID, (SELECT CustomerID FROM [Order] WHERE OrderID=@OrderID),
+                                      @RegistrationID, @InstitutionID, @Amount, @Status, @AccountID)",
+                            connection, transaction);
+                        payCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        payCmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
+                        payCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                        payCmd.Parameters.AddWithValue("@Amount", model.PaidAmount);
+                        payCmd.Parameters.AddWithValue("@Status", allDelivered ? "Order Delivered" : "Partial Delivery");
+                        payCmd.Parameters.AddWithValue("@AccountID", (object?)model.AccountId ?? DBNull.Value);
+                        await payCmd.ExecuteNonQueryAsync();
+                    }
+
+                    transaction.Commit();
+                    return Ok(new { success = true, message = allDelivered ? "সম্পূর্ণ ডেলিভারি সম্পন্ন হয়েছে!" : "আংশিক ডেলিভারি সম্পন্ন হয়েছে!", isFullyDelivered = allDelivered });
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving partial delivery for orderId {OrderId}", model?.OrderId);
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
         /// </summary>
         [HttpPost("send-ready-sms")]
         public async Task<ActionResult> SendReadySms([FromBody] SendReadySmsModel model)

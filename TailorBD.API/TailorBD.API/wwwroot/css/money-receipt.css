@@ -783,6 +783,14 @@ body {
         display: none !important;
     }
 
+    /* Reset main content layout for print - remove sidebar margin */
+    .main-content,
+    #mainContent {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        width: 100% !important;
+    }
+
     .tab-pane:not(.active) {
         display: none !important;
     }
