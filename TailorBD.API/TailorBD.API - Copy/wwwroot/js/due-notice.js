@@ -132,21 +132,50 @@
         });
     }
 
+    // যে পেইজগুলোতে warning popup দেখানো হবে (access block না হলে)
+    var NOTICE_PAGES = [
+        '/dashboard', '/dashboard.html',
+        '/profile', '/profile.html',
+        '/index', '/index.html',
+        '/'
+    ];
+
+    function isNoticePage() {
+        var path = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+        for (var i = 0; i < NOTICE_PAGES.length; i++) {
+            var p = NOTICE_PAGES[i].replace(/\/$/, '') || '/';
+            if (path === p || path.endsWith(p)) return true;
+        }
+        return false;
+    }
+
     function processData(d, institutionId) {
-        var hasServiceDue = !!d.showPopup || !!d.accessBlocked;
-        var hasSmsDue    = !!d.smsShowPopup;
+        var serviceBlocked = !!d.accessBlocked;
+        var hasServiceDue  = !!d.showPopup || serviceBlocked;
+        var hasSmsDue      = !!d.smsShowPopup;
+        var smsBlocked     = !!d.smsAccessBlocked;
+
+        var onNoticePage   = isNoticePage();
 
         if (hasServiceDue && hasSmsDue) {
-            // উভয় বিল বকেয়া — একটি মার্জড পপআপে দেখাও
-            // app-components.js accessBlocked overlay দেখিয়ে থাকলেও remove করে merged দেখাও
+            // উভয় বিল বকেয়া
             $('#globalDueBlockOverlay').remove();
-            showMergedDuePopup(d, institutionId);
+            // blocked হলে সব পেইজে, না হলে শুধু notice page এ
+            if (serviceBlocked || smsBlocked || onNoticePage) {
+                showMergedDuePopup(d, institutionId);
+            }
         } else if (hasServiceDue) {
-            // accessBlocked হলে app-components.js আগেই overlay দেখিয়েছে — এখানে skip
-            if (d.accessBlocked) return;
-            showDuePopup(d, institutionId);
+            if (serviceBlocked) {
+                // access বন্ধ — সব পেইজে দেখাও (app-components.js আগেই overlay দিলে skip)
+                if (!d.accessBlocked) showDuePopup(d, institutionId);
+            } else if (onNoticePage) {
+                // শুধু warning — শুধু dashboard/profile এ দেখাও
+                showDuePopup(d, institutionId);
+            }
         } else if (hasSmsDue) {
-            showSmsDuePopup(d, institutionId);
+            if (smsBlocked || onNoticePage) {
+                showSmsDuePopup(d, institutionId);
+            }
         }
     }
 
@@ -362,21 +391,21 @@
 
         // ── Footer ──
         html += '<div style="padding:14px 24px;background:#f8fafc;border-top:1px solid #e2e8f0;' +
-            'display:flex;gap:10px;justify-content:center;">';
+            'display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;align-items:center;">';
         html += '<button id="mergedDueInvoiceBtn" style="' +
-            'display:inline-flex;align-items:center;gap:6px;padding:10px 20px;' +
+            'display:inline-flex;align-items:center;gap:6px;padding:9px 14px;' +
             'background:linear-gradient(135deg,#6c7ae0,#5a68c9);color:#fff;' +
-            'border-radius:10px;font-size:.88rem;font-weight:700;border:none;cursor:pointer;">' +
+            'border-radius:10px;font-size:.84rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">' +
             '<i class="fas fa-file-invoice"></i> ইনভয়েস দেখুন</button>';
         html += '<button id="mergedDuePayOnlineBtn" style="' +
-            'display:inline-flex;align-items:center;gap:6px;padding:10px 20px;' +
+            'display:inline-flex;align-items:center;gap:6px;padding:9px 14px;' +
             'background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;' +
-            'border-radius:10px;font-size:.88rem;font-weight:700;border:none;cursor:pointer;">' +
+            'border-radius:10px;font-size:.84rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">' +
             '<i class="fas fa-credit-card"></i> অনলাইনে পরিশোধ করুন</button>';
         if (closeable) {
             html += '<button id="mergedDueCloseBtnFooter" style="' +
-                'padding:10px 20px;background:#e2e8f0;border:none;border-radius:10px;' +
-                'font-size:.88rem;font-weight:700;color:#475569;cursor:pointer;">পরে দেখব</button>';
+                'padding:9px 14px;background:#e2e8f0;border:none;border-radius:10px;' +
+                'font-size:.84rem;font-weight:700;color:#475569;cursor:pointer;white-space:nowrap;flex-shrink:0;">পরে দেখব</button>';
         }
         html += '</div>';
 
@@ -503,21 +532,21 @@
 
         // ── Footer ──
         html += '<div style="padding:14px 24px;background:#f8fafc;border-top:1px solid #e2e8f0;' +
-            'display:flex;gap:10px;justify-content:center;">';
+            'display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;align-items:center;">';
         html += '<button id="dueNoticeInvoiceBtn" style="' +
-            'display:inline-flex;align-items:center;gap:6px;padding:10px 20px;' +
+            'display:inline-flex;align-items:center;gap:6px;padding:9px 14px;' +
             'background:linear-gradient(135deg,#6c7ae0,#5a68c9);color:#fff;' +
-            'border-radius:10px;font-size:.88rem;font-weight:700;border:none;cursor:pointer;">' +
+            'border-radius:10px;font-size:.84rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">' +
             '<i class="fas fa-file-invoice"></i> ইনভয়েস দেখুন</button>';
         html += '<button id="dueNoticePayOnlineBtn" style="' +
-            'display:inline-flex;align-items:center;gap:6px;padding:10px 20px;' +
+            'display:inline-flex;align-items:center;gap:6px;padding:9px 14px;' +
             'background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;' +
-            'border-radius:10px;font-size:.88rem;font-weight:700;border:none;cursor:pointer;">' +
+            'border-radius:10px;font-size:.84rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">' +
             '<i class="fas fa-credit-card"></i> অনলাইনে পরিশোধ করুন</button>';
         if (closeable) {
             html += '<button id="dueNoticeCloseBtnFooter" style="' +
-                'padding:10px 20px;background:#e2e8f0;border:none;border-radius:10px;' +
-                'font-size:.88rem;font-weight:700;color:#475569;cursor:pointer;">পরে দেখব</button>';
+                'padding:9px 14px;background:#e2e8f0;border:none;border-radius:10px;' +
+                'font-size:.84rem;font-weight:700;color:#475569;cursor:pointer;white-space:nowrap;flex-shrink:0;">পরে দেখব</button>';
         }
         html += '</div>';
 
@@ -610,21 +639,21 @@
 
         // Footer
         html += '<div style="padding:12px 22px;background:#f8fafc;border-top:1px solid #e2e8f0;' +
-            'display:flex;gap:10px;justify-content:center;">';
+            'display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;align-items:center;">';
         html += '<button id="smsDueInvoiceBtn" style="' +
-            'display:inline-flex;align-items:center;gap:6px;padding:9px 18px;' +
+            'display:inline-flex;align-items:center;gap:6px;padding:9px 14px;' +
             'background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;' +
-            'border-radius:10px;font-size:.85rem;font-weight:700;border:none;cursor:pointer;">' +
+            'border-radius:10px;font-size:.84rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">' +
             '<i class="fas fa-file-invoice"></i> ইনভয়েস দেখুন</button>';
         html += '<button id="smsDuePayOnlineBtn" style="' +
-            'display:inline-flex;align-items:center;gap:6px;padding:9px 18px;' +
+            'display:inline-flex;align-items:center;gap:6px;padding:9px 14px;' +
             'background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;' +
-            'border-radius:10px;font-size:.85rem;font-weight:700;border:none;cursor:pointer;">' +
+            'border-radius:10px;font-size:.84rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">' +
             '<i class="fas fa-credit-card"></i> অনলাইনে পরিশোধ করুন</button>';
         if (closeable) {
             html += '<button id="smsDueCloseBtnFooter" style="' +
-                'padding:9px 18px;background:#e2e8f0;border:none;border-radius:10px;' +
-                'font-size:.85rem;font-weight:700;color:#475569;cursor:pointer;">পরে দেখব</button>';
+                'padding:9px 14px;background:#e2e8f0;border:none;border-radius:10px;' +
+                'font-size:.84rem;font-weight:700;color:#475569;cursor:pointer;white-space:nowrap;flex-shrink:0;">পরে দেখব</button>';
         }
         html += '</div>';
 

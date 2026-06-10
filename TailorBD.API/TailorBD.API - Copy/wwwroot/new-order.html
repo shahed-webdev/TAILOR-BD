@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -37,8 +37,8 @@
             <div class="page-header mb-4">
                 <div>
                     <h1 class="lang-content" data-en="New Order" data-bn="নতুন অর্ডার">নতুন অর্ডার</h1>
-                    <p class="text-muted lang-content" data-en="Create a new order by selecting or adding a customer" data-bn="একটি কাস্টমার নির্বাচন বা যুক্ত করে নতুন অর্ডার তৈরি করুন">
-                        একটি কাস্টমার নির্বাচন বা যুক্ত করে নতুন অর্ডার তৈরি করুন
+                    <p class="text-muted lang-content" data-en="Create a new order by selecting or adding a customer" data-bn="কাস্টমার নির্বাচন বা যোগ করে নতুন অর্ডার তৈরি করুন">
+                        কাস্টমার নির্বাচন বা যোগ করে নতুন অর্ডার তৈরি করুন
                     </p>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="existing-customer-tab" data-bs-toggle="tab" data-bs-target="#existing-customer" type="button">
                         <i class="fas fa-users me-2"></i>
-                        <span class="lang-content" data-en="Existing Customer" data-bn="পুরাতন কাস্টমার">পুরাতন কাস্টমার</span>
+                        <span class="lang-content" data-en="Existing Customer" data-bn="বিদ্যমান কাস্টমার">বিদ্যমান কাস্টমার</span>
                     </button>
                 </li>
             </ul>
@@ -77,7 +77,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">
                                             <i class="fas fa-venus-mars me-1"></i>
-                                            <span class="lang-content" data-en="Gender" data-bn="জেন্ডার">জেন্ডার</span>
+                                            <span class="lang-content" data-en="Gender" data-bn="লিঙ্গ">লিঙ্গ</span>
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select class="form-select" id="customerGender" required>
@@ -96,7 +96,7 @@
                                             <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control" id="customerName" 
-                                               placeholder="কাস্টমারের নাম লিখুন..." required autocomplete="off">
+                                               placeholder="কাস্টমারের নাম লিখুন" required autocomplete="off">
                                         <div id="nameAutocompleteList" class="autocomplete-list"></div>
                                     </div>
 
@@ -104,7 +104,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">
                                             <i class="fas fa-phone me-1"></i>
-                                            <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</span>
+                                            <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</span>
                                             <span class="text-danger">*</span>
                                         </label>
                                         <input type="tel" class="form-control" id="customerPhone" 
@@ -138,7 +138,7 @@
                                     </div>
 
                                     <!-- Photo Preview -->
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6 mb-3 d-flex align-items-center">
                                         <div id="photoPreview" class="photo-preview" style="display: none;">
                                             <img id="previewImage" src="" alt="Preview">
                                             <button type="button" class="btn-remove-photo" onclick="removePhoto()">
@@ -158,7 +158,7 @@
                                 <div class="d-flex justify-content-end mt-3">
                                     <button type="submit" class="btn btn-primary btn-lg" id="createCustomerBtn">
                                         <i class="fas fa-arrow-right me-2"></i>
-                                        <span class="lang-content" data-en="Continue to Order" data-bn="অর্ডারে যান">অর্ডারে যান</span>
+                                        <span class="lang-content" data-en="Continue to Order" data-bn="পরবর্তী ধাপ">পরবর্তী ধাপ</span>
                                     </button>
                                 </div>
                             </form>
@@ -172,7 +172,7 @@
                         <div class="card-header">
                             <h5 class="mb-0">
                                 <i class="fas fa-search me-2"></i>
-                                <span class="lang-content" data-en="Search Customer" data-bn="কাস্টমার খুঁজুন">কাস্টমার খুঁজুন</span>
+                                <span class="lang-content" data-en="Search Customer" data-bn="কাস্টমার অনুসন্ধান">কাস্টমার অনুসন্ধান</span>
                             </h5>
                         </div>
                         <div class="card-body">
@@ -206,7 +206,7 @@
                                     <div class="col-md-3 mb-3">
                                         <label class="form-label">
                                             <i class="fas fa-phone me-1"></i>
-                                            <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</span>
+                                            <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</span>
                                         </label>
                                         <div class="search-autocomplete-wrap">
                                             <input type="tel" class="form-control" id="searchCustomerPhone"
@@ -219,7 +219,7 @@
                                         <label class="form-label d-block">&nbsp;</label>
                                         <button type="submit" class="btn btn-primary w-100">
                                             <i class="fas fa-search me-1"></i>
-                                            <span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                            <span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                         </button>
                                     </div>
                                 </div>
@@ -240,7 +240,7 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th class="lang-content" data-en="Action" data-bn="অর্ডার">অর্ডার</th>
+                                            <th class="lang-content" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
                                             <th class="lang-content" data-en="Customer No." data-bn="কাস্টমার নং">কাস্টমার নং</th>
                                             <th class="lang-content" data-en="Name" data-bn="নাম">নাম</th>
                                             <th class="lang-content" data-en="Mobile" data-bn="মোবাইল">মোবাইল</th>
@@ -264,16 +264,16 @@
                             <div id="emptyState" class="text-center py-5" style="display: none;">
                                 <i class="fas fa-users fa-3x text-muted mb-3"></i>
                                 <h5 class="text-muted lang-content" data-en="No customers found" data-bn="কোনো কাস্টমার পাওয়া যায়নি">কোনো কাস্টমার পাওয়া যায়নি</h5>
-                                <p class="text-muted lang-content" data-en="Try searching with different criteria" data-bn="ভিন্ন শর্তে খুঁজে দেখুন">ভিন্ন শর্তে খুঁজে দেখুন</p>
+                                <p class="text-muted lang-content" data-en="Try searching with different criteria" data-bn="ভিন্ন মানদন্ড দিয়ে অনুসন্ধান করুন">ভিন্ন মানদন্ড দিয়ে অনুসন্ধান করুন</p>
                             </div>
 
                             <!-- Initial State -->
                             <div id="initialState" class="text-center py-5">
                                 <i class="fas fa-search fa-3x text-primary mb-3"></i>
-                                <h5 class="text-muted lang-content" data-en="Search for customers" data-bn="কাস্টমার খুঁজুন">কাস্টমার খুঁজুন</h5>
+                                <h5 class="text-muted lang-content" data-en="Search for customers" data-bn="কাস্টমার অনুসন্ধান করুন">কাস্টমার অনুসন্ধান করুন</h5>
                                 <p class="text-muted lang-content" data-en="Use customer number, name or mobile to find existing customers" 
-                                   data-bn="কাস্টমার নম্বর, নাম বা মোবাইল দিয়ে পুরাতন কাস্টমার খুঁজুন">
-                                    কাস্টমার নম্বর, নাম বা মোবাইল দিয়ে পুরাতন কাস্টমার খুঁজুন
+                                   data-bn="কাস্টমার নম্বর, নাম বা মোবাইল দিয়ে খুঁজুন">
+                                    কাস্টমার নম্বর, নাম বা মোবাইল দিয়ে খুঁজুন
                                 </p>
                             </div>
                         </div>
@@ -291,9 +291,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- App Components -->
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     
     <!-- New Order JS -->
-    <script src="/js/new-order.js"></script>
+    <script src="/js/new-order.js?v=2.1.6"></script>
 </body>
 </html>

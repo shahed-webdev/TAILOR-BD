@@ -226,7 +226,24 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseStaticFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = ctx =>
+        {
+            var path = ctx.Context.Request.Path.Value ?? "";
+            if (path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+            {
+                // HTML files: always revalidate so new JS/CSS versions are picked up
+                ctx.Context.Response.Headers["Cache-Control"] = "no-cache, must-revalidate";
+                ctx.Context.Response.Headers["Pragma"]  = "no-cache";
+            }
+            else if (ctx.Context.Request.QueryString.HasValue)
+            {
+                // Versioned JS/CSS (?v=x.x.x): cache for 30 days
+                ctx.Context.Response.Headers["Cache-Control"] = "public, max-age=2592000, immutable";
+            }
+        }
+    });
 }
 
 // ── Session → Authentication → Authorization ──────────────────────────────

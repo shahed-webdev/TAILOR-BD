@@ -52,6 +52,25 @@ namespace TailorBD.API.Middleware
             ".webp", ".avif", ".json", ".xml", ".txt",
         };
 
+        // Order-list row actions — inherit access from order entry pages (legacy behaviour)
+        private static readonly HashSet<string> _orderWorkflowPages = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "update-order.html",
+            "add-more-dress.html",
+            "order-edit.html",
+            "money-receipt.html",
+            "finish-order.html",
+            "dress-measurements.html"
+        };
+
+        // Customer-list row actions — inherit access from customer pages (legacy behaviour)
+        private static readonly HashSet<string> _customerWorkflowPages = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "customer-details.html",
+            "customer-measurement-print.html",
+            "dress-measurements.html"
+        };
+
         public PageAccessMiddleware(RequestDelegate next, TailorBdContext context, IMemoryCache cache)
         {
             _next = next;
@@ -149,21 +168,88 @@ namespace TailorBD.API.Middleware
                         LOWER(LP.PageURL) LIKE '%' + @PagePath + '%'
                         OR LOWER(LP.Location) LIKE '%' + @PagePath + '%'
                         OR @PagePath LIKE '%' + LOWER(LP.PageURL) + '%'
+                        OR LOWER(LP.PageURL) LIKE '%' + @PageKey + '%'
                     )";
+
+                var pageKey = pagePath
+                    .Replace(".html", "", StringComparison.OrdinalIgnoreCase)
+                    .Replace("-", "")
+                    .Replace("_", "");
 
                 var count = await connection.ExecuteScalarAsync<int>(query, new {
                     InstitutionID = institutionId,
                     RegistrationID = registrationId,
-                    PagePath = pagePath
+                    PagePath = pagePath,
+                    PageKey = pageKey
                 });
 
-                return count > 0;
+                if (count > 0) return true;
+
+                if (_orderWorkflowPages.Contains(pagePath))
+                {
+                    return await HasOrderEntryAccess(connection, institutionId, registrationId);
+                }
+
+                if (_customerWorkflowPages.Contains(pagePath))
+                {
+                    return await HasCustomerEntryAccess(connection, institutionId, registrationId);
+                }
+
+                return false;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error checking page access: {ex.Message}");
                 return false;
             }
+        }
+
+        private static async Task<bool> HasOrderEntryAccess(System.Data.IDbConnection connection, int institutionId, int registrationId)
+        {
+            const string orderEntryQuery = @"
+                SELECT COUNT(*)
+                FROM Link_Users LU
+                INNER JOIN Link_Pages LP ON LU.LinkID = LP.LinkID
+                WHERE LU.InstitutionID = @InstitutionID
+                  AND LU.RegistrationID = @RegistrationID
+                  AND (
+                      LOWER(LP.PageURL) LIKE '%ordrlist%'
+                      OR LOWER(LP.PageURL) LIKE '%order_list%'
+                      OR LOWER(LP.PageURL) LIKE '%new_order%'
+                      OR LOWER(LP.PageURL) LIKE '%quick_order%'
+                      OR LOWER(LP.PageURL) LIKE '%moneyreceipt%'
+                      OR LOWER(LP.PageURL) LIKE '%/order.aspx%'
+                  )";
+
+            var count = await connection.ExecuteScalarAsync<int>(orderEntryQuery, new {
+                InstitutionID = institutionId,
+                RegistrationID = registrationId
+            });
+
+            return count > 0;
+        }
+
+        private static async Task<bool> HasCustomerEntryAccess(System.Data.IDbConnection connection, int institutionId, int registrationId)
+        {
+            const string customerEntryQuery = @"
+                SELECT COUNT(*)
+                FROM Link_Users LU
+                INNER JOIN Link_Pages LP ON LU.LinkID = LP.LinkID
+                WHERE LU.InstitutionID = @InstitutionID
+                  AND LU.RegistrationID = @RegistrationID
+                  AND (
+                      LOWER(LP.PageURL) LIKE '%customerlist%'
+                      OR LOWER(LP.PageURL) LIKE '%customer_list%'
+                      OR LOWER(LP.PageURL) LIKE '%add_customer%'
+                      OR LOWER(LP.PageURL) LIKE '%addcustomermesurement%'
+                  )";
+
+            var count = await connection.ExecuteScalarAsync<int>(customerEntryQuery, new {
+                InstitutionID = institutionId,
+                RegistrationID = registrationId
+            });
+
+            return count > 0;
         }
     }
 }

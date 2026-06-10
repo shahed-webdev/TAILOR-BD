@@ -162,11 +162,21 @@ body {
 }
 
 .institution-contact {
-    font-size: var(--print-font-size, 12px);
+    font-size: var(--contact-fit-size, var(--print-font-size, 12px));
     color: #444 !important;
     margin: 1px 0 0 0;
     padding: 0;
     background-color: transparent !important;
+}
+
+.institution-contact.receipt-contact-fit {
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+    white-space: normal;
+    line-height: 1.15;
+    max-width: 100%;
+    font-size: var(--contact-fit-size, var(--print-font-size, 12px)) !important;
 }
 
 .institution-contact span {
@@ -314,7 +324,7 @@ body {
 /* Column specific widths */
 .receipt-table thead th:nth-child(1), /* Dress */
 .receipt-table tbody td:nth-child(1) {
-    width: 30%;
+    width: 24%;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -322,15 +332,20 @@ body {
 }
 
 .receipt-table thead th:nth-child(2), /* Description */
-.receipt-table tbody td:nth-child(2) {
-    width: 15%;
-    word-wrap: break-word;
+.receipt-table tbody td:nth-child(2),
+.receipt-table tbody td.receipt-desc-cell {
+    width: 24%;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
     white-space: normal;
+    line-height: 1.15;
+    vertical-align: middle !important;
 }
 
 .receipt-table thead th:nth-child(3), /* Quantity */
 .receipt-table tbody td:nth-child(3) {
-    width: 15%;
+    width: 10%;
     text-align: center !important;
 }
 
@@ -356,16 +371,31 @@ body {
 
 .summary-table {
     width: 100%;
-    max-width: 400px;
-    margin-left: auto;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: 0;
 }
 
 .summary-table td {
-    padding: 3px 0;
+    padding: 3px 4px;
     font-size: var(--print-font-size, 12px);
+    vertical-align: middle;
 }
 
-.summary-table .total-row {
+.summary-table .summary-label {
+    text-align: left;
+    white-space: nowrap;
+    word-break: keep-all;
+    padding-left: 4px;
+}
+
+.summary-table .summary-value {
+    text-align: right !important;
+    white-space: nowrap;
+    padding-right: 4px;
+}
+
+.summary-table .total-row td {
     border-top: 2px solid #333;
     padding-top: 5px;
     font-size: var(--print-font-size, 14px);
@@ -392,7 +422,7 @@ body {
 
 /* Measurements Container */
 .measurement-container {
-    padding: 5px 20px;
+    padding: 5px 8px;
     background: white;
     min-height: 0;
     height: auto;
@@ -400,11 +430,11 @@ body {
 
 /* Main container for all measurements */
 .measurements-main-container {
-    max-width: 380px;
+    max-width: var(--print-width, 4in);
     margin: 0 auto;
     margin-top: var(--measurement-top-space, 0px);
     height: auto;
-    padding: 6px 8px;
+    padding: 6px 4px;
     box-sizing: border-box;
 }
 
@@ -834,7 +864,34 @@ body {
     }
 
     .measurements-main-container {
-        padding: 6px 8px;
+        padding: 6px 4px;
+        max-width: var(--print-width) !important;
+        width: 100% !important;
+        overflow: visible;
+        box-sizing: border-box;
+    }
+
+    .measurement-container {
+        padding: 5px 4px !important;
+    }
+
+    .measurement-table-fit {
+        width: 100% !important;
+        overflow: visible;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .measurement-table-scale-box {
+        margin: 0 auto !important;
+        overflow: visible !important;
+    }
+
+    .measurement-groups-table .measurement-type-cell,
+    .measurement-groups-table .measurement-value-cell {
+        white-space: nowrap !important;
+        word-break: keep-all !important;
+        overflow-wrap: normal !important;
     }
 
     /* Apply top margin from settings - directly to receipt header */
@@ -913,8 +970,8 @@ body {
         padding: 0;
     }
     
-    [data-print-size="3"] .institution-contact {
-        font-size: 10px !important;
+    [data-print-size="3"] .institution-contact.receipt-contact-fit {
+        font-size: var(--contact-fit-size, 10px) !important;
         margin: 3px 0 0 0;
         padding: 0;
     }
@@ -935,13 +992,13 @@ body {
     }
     
     [data-print-size="3"] .receipt-table th:nth-child(1),
-    [data-print-size="3"] .receipt-table td:nth-child(1) { width: 24%; }
-    
+    [data-print-size="3"] .receipt-table td:nth-child(1) { width: 20%; }
+
     [data-print-size="3"] .receipt-table th:nth-child(2),
-    [data-print-size="3"] .receipt-table td:nth-child(2) { width: 18%; }
-    
+    [data-print-size="3"] .receipt-table td:nth-child(2) { width: 24%; }
+
     [data-print-size="3"] .receipt-table th:nth-child(3),
-    [data-print-size="3"] .receipt-table td:nth-child(3) { width: 10%; }
+    [data-print-size="3"] .receipt-table td:nth-child(3) { width: 9%; }
     
     [data-print-size="3"] .receipt-table th:nth-child(4),
     [data-print-size="3"] .receipt-table td:nth-child(4) { width: 24%; }
@@ -976,8 +1033,8 @@ body {
         padding: 0;
     }
     
-    [data-print-size="3.5"] .institution-contact {
-        font-size: 10px !important;
+    [data-print-size="3.5"] .institution-contact.receipt-contact-fit {
+        font-size: var(--contact-fit-size, 10px) !important;
         margin: 3px 0 0 0;
         padding: 0;
     }
@@ -998,13 +1055,13 @@ body {
     }
     
     [data-print-size="3.5"] .receipt-table th:nth-child(1),
-    [data-print-size="3.5"] .receipt-table td:nth-child(1) { width: 23%; }
-    
+    [data-print-size="3.5"] .receipt-table td:nth-child(1) { width: 19%; }
+
     [data-print-size="3.5"] .receipt-table th:nth-child(2),
-    [data-print-size="3.5"] .receipt-table td:nth-child(2) { width: 19%; }
-    
+    [data-print-size="3.5"] .receipt-table td:nth-child(2) { width: 25%; }
+
     [data-print-size="3.5"] .receipt-table th:nth-child(3),
-    [data-print-size="3.5"] .receipt-table td:nth-child(3) { width: 11%; }
+    [data-print-size="3.5"] .receipt-table td:nth-child(3) { width: 10%; }
     
     [data-print-size="3.5"] .receipt-table th:nth-child(4),
     [data-print-size="3.5"] .receipt-table td:nth-child(4) { width: 23.5%; }
@@ -1030,13 +1087,13 @@ body {
     }
     
     [data-print-size="4"] .receipt-table th:nth-child(1),
-    [data-print-size="4"] .receipt-table td:nth-child(1) { width: 22%; }
-    
+    [data-print-size="4"] .receipt-table td:nth-child(1) { width: 18%; }
+
     [data-print-size="4"] .receipt-table th:nth-child(2),
-    [data-print-size="4"] .receipt-table td:nth-child(2) { width: 20%; }
-    
+    [data-print-size="4"] .receipt-table td:nth-child(2) { width: 26%; }
+
     [data-print-size="4"] .receipt-table th:nth-child(3),
-    [data-print-size="4"] .receipt-table td:nth-child(3) { width: 12%; }
+    [data-print-size="4"] .receipt-table td:nth-child(3) { width: 10%; }
     
     [data-print-size="4"] .receipt-table th:nth-child(4),
     [data-print-size="4"] .receipt-table td:nth-child(4) { width: 23%; }
@@ -1062,13 +1119,13 @@ body {
     }
     
     [data-print-size="4.5"] .receipt-table th:nth-child(1),
-    [data-print-size="4.5"] .receipt-table td:nth-child(1) { width: 22%; }
-    
+    [data-print-size="4.5"] .receipt-table td:nth-child(1) { width: 18%; }
+
     [data-print-size="4.5"] .receipt-table th:nth-child(2),
-    [data-print-size="4.5"] .receipt-table td:nth-child(2) { width: 20%; }
-    
+    [data-print-size="4.5"] .receipt-table td:nth-child(2) { width: 26%; }
+
     [data-print-size="4.5"] .receipt-table th:nth-child(3),
-    [data-print-size="4.5"] .receipt-table td:nth-child(3) { width: 12%; }
+    [data-print-size="4.5"] .receipt-table td:nth-child(3) { width: 10%; }
     
     [data-print-size="4.5"] .receipt-table th:nth-child(4),
     [data-print-size="4.5"] .receipt-table td:nth-child(4) { width: 23%; }
@@ -1094,13 +1151,13 @@ body {
     }
     
     [data-print-size="5"] .receipt-table th:nth-child(1),
-    [data-print-size="5"] .receipt-table td:nth-child(1) { width: 22%; }
-    
+    [data-print-size="5"] .receipt-table td:nth-child(1) { width: 18%; }
+
     [data-print-size="5"] .receipt-table th:nth-child(2),
-    [data-print-size="5"] .receipt-table td:nth-child(2) { width: 20%; }
-    
+    [data-print-size="5"] .receipt-table td:nth-child(2) { width: 26%; }
+
     [data-print-size="5"] .receipt-table th:nth-child(3),
-    [data-print-size="5"] .receipt-table td:nth-child(3) { width: 12%; }
+    [data-print-size="5"] .receipt-table td:nth-child(3) { width: 10%; }
     
     [data-print-size="5"] .receipt-table th:nth-child(4),
     [data-print-size="5"] .receipt-table td:nth-child(4) { width: 23%; }
@@ -1172,14 +1229,44 @@ body.print-size-5 .receipt-table tbody td {
     overflow: visible;
 }
 
-/* For very long descriptions, allow wrapping but maintain alignment */
-.receipt-table tbody td:nth-child(2) {
-    word-break: break-word;
-    hyphens: auto;
+/* For long descriptions: auto-sized in JS; avoid breaking every character */
+.receipt-table tbody td.receipt-desc-cell {
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
 }
 
-.measurement-groups-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.measurement-groups-table > tbody > tr > td { padding: 0 3px; vertical-align: top; overflow: hidden; }
-.measurement-groups-table > tbody > tr > td table { border: 1px solid #666; border-collapse: collapse; }
-.measurement-groups-table > tbody > tr > td table tr td { padding: 2px 2px; text-align: center; border: none; word-break: break-all; overflow-wrap: break-word; }
+.measurement-table-fit {
+    width: 100%;
+    overflow: visible;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.measurement-table-scale-box {
+    margin: 0 auto;
+    overflow: visible;
+}
+
+.measurement-groups-table { border-collapse: collapse; table-layout: auto; width: auto; }
+.measurement-groups-table > tbody > tr > td { padding: 0 1px; vertical-align: top; width: auto; }
+.measurement-groups-table > tbody > tr > td table.measurement-group-inner { border: 1px solid #666; border-collapse: collapse; width: auto; table-layout: auto; }
+.measurement-groups-table .measurement-type-cell,
+.measurement-groups-table .measurement-value-cell {
+    padding: 2px 4px;
+    text-align: center;
+    border: none;
+    font-weight: bold;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+}
+.measurement-groups-table .measurement-type-cell { padding-top: 0; padding-bottom: 0; }
+.measurement-groups-table .measurement-separator {
+    padding: 0;
+    border: none;
+    border-top: 1px solid #000;
+    line-height: 0;
+    font-size: 0;
+}
 

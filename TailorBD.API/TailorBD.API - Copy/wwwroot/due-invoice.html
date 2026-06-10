@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-en="Due Invoices - TailorBD" data-bn="ডিউ ইনভয়েস - TailorBD">ডিউ ইনভয়েস - TailorBD</title>
+    <title data-en="Due Invoices - TailorBD" data-bn="আরও রিচার্জ করুন - TailorBD">আরও রিচার্জ করুন - TailorBD</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -407,23 +407,23 @@
             <div class="invoice-card">
                 <div class="card-title">
                     <i class="fas fa-file-invoice-dollar"></i>
-                    <span class="lang-content" data-en="Due Invoices" data-bn="ডিউ ইনভয়েস">ডিউ ইনভয়েস</span>
+                    <span class="lang-content" data-en="Due Invoices" data-bn=" বকেয়া ইনভয়েস">বকেয়া ইনভয়েস</span>
                 </div>
 
                 <!-- Summary -->
                 <div class="summary-bar">
                     <div class="summary-item">
-                        <label class="lang-content" data-en="Total Due Invoices" data-bn="মোট ডিউ ইনভয়েস">মোট ডিউ ইনভয়েস</label>
+                        <label class="lang-content" data-en="Total Due Invoices" data-bn=" বকেয়া ইনভয়েস">বকেয়া ইনভয়েস</label>
                         <span class="val" id="totalDueCount">0</span>
                     </div>
                     <div class="summary-item">
-                        <label class="lang-content" data-en="Total Due Amount" data-bn="মোট বাকি টাকা">মোট বাকি টাকা</label>
+                        <label class="lang-content" data-en="Total Due Amount" data-bn="মোট বাকি পরিমাণ">মোট বাকি পরিমাণ</label>
                         <span class="val" id="totalDueAmount">৳0</span>
                     </div>
-                    <div class="summary-item paid-bg">
-                        <label class="lang-content" data-en="Total Paid" data-bn="মোট পরিশোধিত">মোট পরিশোধিত</label>
-                        <span class="val" id="totalPaidAmount">৳0</span>
-                    </div>
+                    <!--<div class="summary-item paid-bg">
+                        <label class="lang-content" data-en="Total Paid" data-bn="মোট পরিষোধ">মোট পরিষোধ</label>
+                        <span class="val" id="totalPaidAmount">?0</span>
+                    </div>-->
                     <!-- Pay Online button -->
                     <div style="display:flex;align-items:center;">
                         <button id="btnPayAll" onclick="openPayModal()" style="
@@ -447,14 +447,14 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th><span class="lang-content" data-en="Invoice For" data-bn="ইনভয়েস বিবরণ">ইনভয়েস বিবরণ</span></th>
-                                <th><span class="lang-content" data-en="Issue Date" data-bn="ইস্যু তারিখ">ইস্যু তারিখ</span></th>
+                                <th><span class="lang-content" data-en="Invoice For" data-bn="ইনভয়েসের বিষয়">ইনভয়েসের বিষয়</span></th>
+                                <th><span class="lang-content" data-en="Issue Date" data-bn="ইসুয়ের তারিখ">ইসুয়ের তারিখ</span></th>
                                 <th><span class="lang-content" data-en="End Date" data-bn="শেষ তারিখ">শেষ তারিখ</span></th>
                                 <th><span class="lang-content" data-en="Total" data-bn="মোট">মোট</span></th>
-                                <th><span class="lang-content" data-en="Discount" data-bn="ছাড়">ছাড়</span></th>
-                                <th><span class="lang-content" data-en="Paid" data-bn="জমা">জমা</span></th>
+                                <th><span class="lang-content" data-en="Discount" data-bn="ছাড়">ছাড়</span></th>
+                                <th><span class="lang-content" data-en="Paid" data-bn="পরিশোধ">পরিশোধ</span></th>
                                 <th><span class="lang-content" data-en="Due" data-bn="বাকি">বাকি</span></th>
-                                <th><span class="lang-content" data-en="Status" data-bn="অবস্থা">অবস্থা</span></th>
+                                <th><span class="lang-content" data-en="Status" data-bn="স্টাটাস">স্টাটাস</span></th>
                                 <th><span class="lang-content" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</span></th>
                                 <th><span class="lang-content" data-en="Pay Online" data-bn="অনলাইন পেমেন্ট">অনলাইন পেমেন্ট</span></th>
                             </tr>
@@ -466,7 +466,7 @@
                 <!-- Empty state -->
                 <div class="empty-state" id="emptyState" style="display:none;">
                     <i class="fas fa-check-circle"></i>
-                    <p class="lang-content" data-en="No due invoices found. All payments are up to date!" data-bn="কোনো বাকি ইনভয়েস নেই। সব পেমেন্ট হয়ে গেছে!">কোনো বাকি ইনভয়েস নেই। সব পেমেন্ট হয়ে গেছে!</p>
+                    <p class="lang-content" data-en="No due invoices found. All payments are up to date!" data-bn="কোনো বাকি ইনভয়েস নেই। সব পেমেন্ট আপডেট আছে!">কোনো বাকি ইনভয়েস নেই। সব পেমেন্ট আপডেট আছে!</p>
                 </div>
             </div>
         </div>
@@ -480,24 +480,24 @@
             <div class="modal-content" style="border-radius:16px;overflow:hidden;">
                 <div class="modal-header border-0 px-4 py-3">
                     <h5 class="modal-title fw-bold" id="spPayModalLabel">
-                        <i class="fas fa-credit-card me-2"></i>অনলাইনে বিল পরিশোধ
+                        <i class="fas fa-credit-card me-2"></i>অনলাইনে পরিশোধ
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body px-4 pb-2">
-                    <p style="font-size:.83rem;color:#64748b;margin-bottom:10px;">নিচের ইনভয়েসগুলো ShurjoPay-এর মাধ্যমে পরিশোধ করুন</p>
+                    <p style="font-size:.83rem;color:#64748b;margin-bottom:10px;">বাকি পরিমাণ ShurjoPay-এর মাধ্যমে পরিশোধ করুন</p>
                     <div id="spInvoiceList"></div>
                     <div class="sp-total-row">
-                        <span>মোট পরিশোধযোগ্য:</span>
+                        <span>মোট বাকি:</span>
         <span id="spTotalDisplay" style="color:#dc2626;">৳0</span>
                     </div>
                     <hr class="my-2">
                     <div class="mb-3">
-                        <label class="form-label" style="font-size:.82rem;font-weight:600;">আপনার নাম <span class="text-danger">*</span></label>
-                        <input type="text" id="spCustomerName" class="form-control form-control-sm" placeholder="নাম লিখুন" maxlength="100">
+                        <label class="form-label" style="font-size:.82rem;font-weight:600;">গ্রাহকের নাম <span class="text-danger">*</span></label>
+                        <input type="text" id="spCustomerName" class="form-control form-control-sm" placeholder="নাম দিন" maxlength="100">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" style="font-size:.82rem;font-weight:600;">মোবাইল নম্বর <span class="text-danger">*</span></label>
+                        <label class="form-label" style="font-size:.82rem;font-weight:600;">ফোন নম্বর <span class="text-danger">*</span></label>
                         <input type="tel" id="spCustomerPhone" class="form-control form-control-sm" placeholder="01XXXXXXXXX" maxlength="20">
                     </div>
                     <div class="mb-2">
@@ -508,7 +508,7 @@
                 <div class="modal-footer border-0 px-4 pb-3 pt-1 d-flex gap-2 justify-content-end">
                     <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">বাতিল</button>
                     <button type="button" class="btn-pay-online" id="spConfirmBtn">
-                        <i class="fas fa-lock"></i> নিরাপদ পেমেন্ট করুন
+                        <i class="fas fa-lock"></i> অনলাইনে পরিশোধ করুন
                     </button>
                 </div>
             </div>
@@ -519,31 +519,31 @@
     <div class="sp-modal-overlay" id="spModalOverlay">
         <div class="sp-modal">
             <div class="sp-modal-header">
-                <h6><i class="fas fa-credit-card me-2"></i>অনলাইনে বিল পরিশোধ</h6>
+                <h6><i class="fas fa-credit-card me-2"></i>অনলাইনে পরিশোধ</h6>
                 <button class="sp-close" onclick="closePayModal()">&times;</button>
             </div>
             <div class="sp-modal-body">
                 <div class="sp-amount-box">
-                    <div class="lbl">মোট বকেয়া টাকা</div>
+                    <div class="lbl">মোট পরিশোধযোগ্য বাকি</div>
                     <div class="amt" id="spTotalAmt">৳0</div>
                 </div>
                 <div class="sp-field">
-                    <label><i class="fas fa-user me-1"></i> আপনার নাম</label>
-                    <input type="text" id="spName" placeholder="নাম লিখুন">
+                    <label><i class="fas fa-user me-1"></i> গ্রাহকের নাম</label>
+                    <input type="text" id="spName" placeholder="নাম দিন">
                 </div>
                 <div class="sp-field">
-                    <label><i class="fas fa-phone me-1"></i> মোবাইল নম্বর</label>
+                    <label><i class="fas fa-phone me-1"></i> ফোন নম্বর</label>
                     <input type="tel" id="spPhone" placeholder="01XXXXXXXXX">
                 </div>
                 <div class="sp-field">
-                    <label><i class="fas fa-envelope me-1"></i> ইমেইল (ঐচ্ছিক)</label>
+                    <label><i class="fas fa-envelope me-1"></i> Email (ঐচ্ছিক)</label>
                     <input type="email" id="spEmail" placeholder="email@example.com">
                 </div>
                 <button class="btn-pay-now" id="btnPayNow" onclick="startPayment()">
-                    <i class="fas fa-lock"></i> ShurjoPay দিয়ে নিরাপদ পেমেন্ট করুন
+                    <i class="fas fa-lock"></i> ShurjoPay দিয়ে পরিশোধ করুন
                 </button>
                 <div class="sp-secure-note">
-                    <i class="fas fa-shield-alt me-1"></i> SSL সুরক্ষিত &middot; বিকাশ &middot; নগদ &middot; রকেট &middot; সব ব্যাংক কার্ড সাপোর্টেড
+                    <i class="fas fa-shield-alt me-1"></i> SSL সুরক্ষিত &middot; bKash &middot; Nagad &middot; ভিসা &middot; মাস্টারকার্ড
                 </div>
             </div>
         </div>
@@ -551,7 +551,7 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     <script>
     var _allInvoiceIds = [];
     var _totalDueAmt   = 0;
@@ -609,7 +609,7 @@
             _allInvoiceIds.push(inv.invoiceID);
 
             var statusBadge = inv.paymentStatus === 'Due'
-                ? '<span class="badge-due">ডিউ</span>'
+                ? '<span class="badge-due">বাকি</span>'
                 : '<span class="badge-partial">আংশিক</span>';
 
             var row = '<tr>' +
@@ -622,7 +622,7 @@
                 '<td>৳' + fmt(paid) + '</td>' +
                 '<td><strong style="color:#dc2626;">৳' + fmt(due) + '</strong></td>' +
                 '<td>' + statusBadge + '</td>' +
-                '<td><button class="btn-detail" onclick="toggleDetail(this,' + inv.invoiceID + ')"><i class="fas fa-eye me-1"></i>দেখুন</button></td>' +
+                '<td><button class="btn-detail" onclick="toggleDetail(this,' + inv.invoiceID + ')"><i class="fas fa-eye me-1"></i>বিস্তারিত</button></td>' +
                 '</tr>';
             $body.append(row);
         });
@@ -664,10 +664,10 @@
         var phone = $('#spPhone').val().trim();
         var email = $('#spEmail').val().trim();
 
-        if (!phone) { alert('মোবাইল নম্বর দিন।'); return; }
+        if (!phone) { alert('ফোন নম্বর দিন'); return; }
 
         var $btn = $('#btnPayNow');
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> প্রসেস হচ্ছে...');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> প্রক্রিয়া হচ্ছে...');
 
         $.ajax({
             url: '/api/shurjopay/initiate',
@@ -686,13 +686,13 @@
                 if (r.success && r.checkoutUrl) {
                     window.location.href = r.checkoutUrl;
                 } else {
-                    alert('পেমেন্ট শুরু করতে সমস্যা: ' + (r.message || 'Unknown error'));
-                    $btn.prop('disabled', false).html('<i class="fas fa-lock me-2"></i> ShurjoPay দিয়ে নিরাপদ পেমেন্ট করুন');
+                    alert('পেমেন্ট শুরু হয়নি: ' + (r.message || 'Unknown error'));
+                    $btn.prop('disabled', false).html('<i class="fas fa-lock me-2"></i> ShurjoPay দিয়ে পরিশোধ করুন');
                 }
             },
             error: function() {
-                alert('সার্ভার এরর। আবার চেষ্টা করুন।');
-                $btn.prop('disabled', false).html('<i class="fas fa-lock me-2"></i> ShurjoPay দিয়ে নিরাপদ পেমেন্ট করুন');
+                alert('সার্ভার এররর, আবার চেষ্টা করুন');
+                $btn.prop('disabled', false).html('<i class="fas fa-lock me-2"></i> ShurjoPay দিয়ে পরিশোধ করুন');
             }
         });
     }
@@ -728,8 +728,8 @@
                 // Invoice Lines section
                 if (r.lines && r.lines.length) {
                     html += '<div class="detail-section">';
-                    html += '<div class="detail-section-title"><i class="fas fa-file-alt"></i> ইনভয়েস বিবরণ</div>';
-                    html += '<table class="detail-table"><thead><tr><th>বিবরণ</th><th>টাকা</th></tr></thead><tbody>';
+                    html += '<div class="detail-section-title"><i class="fas fa-file-alt"></i> ইনভয়েসের বিবরণ</div>';
+                    html += '<table class="detail-table"><thead><tr><th>বিদবরণ</th><th>পরিমাণ</th></tr></thead><tbody>';
                     r.lines.forEach(function(line) {
                         html += '<tr><td>' + (line.details || '-') + '</td><td>৳' + fmt(line.amount) + '</td></tr>';
                     });
@@ -740,8 +740,8 @@
                 if (r.payments && r.payments.length) {
                     var totalPaid = 0;
                     html += '<div class="detail-section">';
-                    html += '<div class="detail-section-title"><i class="fas fa-money-bill-wave"></i> পেমেন্ট রেকর্ড</div>';
-                    html += '<table class="detail-table"><thead><tr><th>তারিখ</th><th>টাকা</th><th>মাধ্যম</th><th>আদায়কারী</th></tr></thead><tbody>';
+                    html += '<div class="detail-section-title"><i class="fas fa-money-bill-wave"></i> পেমেন্টের তথ্য</div>';
+                    html += '<table class="detail-table"><thead><tr><th>তারিখ</th><th>পরিমাণ</th><th>পদ্ধতি</th><th>গ্রহণকারী</th></tr></thead><tbody>';
                     r.payments.forEach(function(pay) {
                         totalPaid += (pay.amount || 0);
                         html += '<tr>' +
@@ -751,19 +751,19 @@
                             '<td>' + (pay.collected_By || '-') + '</td>' +
                             '</tr>';
                     });
-                    html += '<tr><td><strong>মোট পেইড</strong></td><td class="detail-total">৳' + fmt(totalPaid) + '</td><td></td><td></td></tr>';
+                    html += '<tr><td><strong>মোট পরিশোধ</strong></td><td class="detail-total">৳' + fmt(totalPaid) + '</td><td></td><td></td></tr>';
                     html += '</tbody></table></div>';
                 }
 
                 if ((!r.lines || !r.lines.length) && (!r.payments || !r.payments.length)) {
-                    html += '<div style="color:#94a3b8; font-size:.82rem;">কোনো বিবরণ নেই</div>';
+                    html += '<div style="color:#94a3b8; font-size:.82rem;">কোনো তথ্য পাওয়া যায়নি</div>';
                 }
 
                 html += '</div></td></tr>';
                 $tr.after(html);
             },
             error: function() {
-                var html = '<tr class="detail-row"><td colspan="10" style="color:#dc2626; font-size:.82rem;">ডাটা লোড করতে সমস্যা হয়েছে</td></tr>';
+                var html = '<tr class="detail-row"><td colspan="10" style="color:#dc2626; font-size:.82rem;">সার্ভার এররর, তথ্য লোড হয়নি</td></tr>';
                 $tr.after(html);
             }
         });

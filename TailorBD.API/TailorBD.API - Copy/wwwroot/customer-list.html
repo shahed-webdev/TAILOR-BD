@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>কাস্টমারের তালিকা - TailorBD</title>
+    <title>কাস্টমার তালিকা - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -77,6 +77,13 @@
         .due-badge { background: #f8d7da; color: #721c24; border-radius: 4px; padding: 2px 8px; font-weight: 700; font-size: 12px; }
         .due-zero { color: #aaa; }
 
+        /* Sortable columns */
+        th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+        th.sortable:hover { background: #5a68c9; }
+        .sort-icon { font-size: 10px; opacity: 0.5; margin-left: 2px; }
+        th.sortable:hover .sort-icon { opacity: 1; }
+        .sort-icon.asc, .sort-icon.desc { opacity: 1; color: #ffd700; }
+
         /* Action buttons */
         .btn-details { padding: 4px 10px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
         .btn-details:hover { background: #5a68c9; color: white; }
@@ -87,8 +94,38 @@
         .btn-delete { padding: 4px 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .btn-delete:hover { background: #c82333; }
 
+        /* Customer photo */
+        .cust-photo-wrap { display: inline-block; position: relative; cursor: pointer; vertical-align: middle; }
+        .cust-photo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e3f8; display: block; }
+        .cust-photo-placeholder { width: 38px; height: 38px; border-radius: 50%; background: #e8eaf6; display: flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 16px; border: 2px dashed #c5cae9; }
+        .cust-photo-wrap:hover::after {
+            content: '\f030';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            background: rgba(108,122,224,0.55);
+            color: white; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Photo modal */
+        .photo-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; }
+        .photo-modal-overlay.show { display: flex; }
+        .photo-modal-box { background: white; border-radius: 10px; padding: 24px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+        .photo-modal-box h5 { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 14px; }
+        .photo-preview { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #e0e3f8; margin-bottom: 14px; }
+        .photo-preview-placeholder { width: 120px; height: 120px; border-radius: 50%; background: #e8eaf6; display: inline-flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 48px; border: 3px dashed #c5cae9; margin-bottom: 14px; }
+        .photo-file-input { display: none; }
+        .btn-choose-photo { display: inline-block; padding: 7px 18px; background: #e8eaf6; color: #5a68c9; border: 1px solid #c5cae9; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .btn-choose-photo:hover { background: #d1d5f5; }
+        .btn-save-photo { padding: 7px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-save-photo:hover { background: #218838; }
+        .btn-close-photo { padding: 7px 16px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .photo-modal-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+
         /* Edit row */
-        .edit-input { width: 100%; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; font-family: inherit; }
+        .edit-input { width: 100%; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; font-family: inherit; box-sizing: border-box; }
         .edit-input:focus { outline: none; border-color: #6c7ae0; }
         .btn-save-row { padding: 4px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .btn-cancel-row { padding: 4px 8px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
@@ -130,15 +167,15 @@
             <div class="container">
                 <div class="card">
                     <h2><i class="fas fa-users me-2"></i>
-                        <span data-en="All Customer List" data-bn="সকল গ্রাহকদের তালিকা">সকল গ্রাহকদের তালিকা</span>
+                        <span data-en="All Customer List" data-bn="সকল কাস্টমার তালিকা">সকল কাস্টমার তালিকা</span>
                     </h2>
 
                     <!-- Search -->
                     <div class="search-grid" style="margin-bottom:14px;">
                         <div class="form-group">
-                            <label data-en="Customer No." data-bn="কাস্টমার নং">কাস্টমার নং</label>
+                            <label data-en="Customer No." data-bn="কাস্টমার নম্বর">কাস্টমার নম্বর</label>
                             <input type="text" id="searchCustomerNo" inputmode="numeric" autocomplete="off"
-                                data-en-placeholder="Customer No." data-bn-placeholder="কাস্টমার নং" placeholder="কাস্টমার নং">
+                                data-en-placeholder="Customer No." data-bn-placeholder="কাস্টমার নম্বর" placeholder="কাস্টমার নম্বর">
                         </div>
                         <div class="form-group">
                             <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
@@ -146,14 +183,14 @@
                                 data-en-placeholder="Customer Name" data-bn-placeholder="কাস্টমারের নাম" placeholder="কাস্টমারের নাম">
                         </div>
                         <div class="form-group">
-                            <label data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</label>
+                            <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
                             <input type="text" id="searchMobile" autocomplete="off"
-                                data-en-placeholder="Mobile Number" data-bn-placeholder="মোবাইল নাম্বার" placeholder="মোবাইল নাম্বার">
+                                data-en-placeholder="Mobile Number" data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নম্বর">
                         </div>
                         <div>
                             <button class="btn-search" onclick="searchCustomers()">
                                 <i class="fas fa-search"></i>
-                                <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                             </button>
                         </div>
                     </div>
@@ -166,7 +203,7 @@
                         </div>
                         <a href="/add-customer.html" class="btn-add">
                             <i class="fas fa-user-plus"></i>
-                            <span data-en="Add New Customer" data-bn="নতুন কাস্টমার যুক্ত করুন">নতুন কাস্টমার যুক্ত করুন</span>
+                            <span data-en="Add New Customer" data-bn="নতুন কাস্টমার যোগ করুন">নতুন কাস্টমার যোগ করুন</span>
                         </a>
                     </div>
 
@@ -187,14 +224,32 @@
         </div>
     </main>
 
+    <!-- Photo Upload Modal -->
+    <div class="photo-modal-overlay" id="photoModal">
+        <div class="photo-modal-box">
+            <h5><i class="fas fa-camera me-2"></i>ছবি আপলোড করুন</h5>
+            <div id="photoPreviewWrap">
+                <div class="photo-preview-placeholder" id="photoPlaceholder"><i class="fas fa-user"></i></div>
+                <img id="photoPreviewImg" class="photo-preview" src="" style="display:none;" alt="preview">
+            </div>
+            <br>
+            <label class="btn-choose-photo" for="photoFileInput"><i class="fas fa-folder-open me-1"></i>ছবি বেছে নিন</label>
+            <input type="file" id="photoFileInput" class="photo-file-input" accept="image/*">
+            <div class="photo-modal-btns">
+                <button class="btn-save-photo" id="btnSavePhoto" onclick="saveCustomerPhoto()"><i class="fas fa-save me-1"></i>সংরক্ষণ করুন</button>
+                <button class="btn-close-photo" onclick="closePhotoModal()">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirm Modal -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-box">
             <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <h5 data-en="Confirm Delete" data-bn="ডিলেট নিশ্চিত করুন">ডিলেট নিশ্চিত করুন</h5>
-            <p data-en="Are you sure you want to delete this customer?" data-bn="আপনি কি এই কাস্টমারকে ডিলেট করতে চান?">আপনি কি এই কাস্টমারকে ডিলেট করতে চান?</p>
+            <h5 data-en="Confirm Delete" data-bn="মুছে ফেলার নিশ্চিতকরণ">মুছে ফেলার নিশ্চিতকরণ</h5>
+            <p data-en="Are you sure you want to delete this customer?" data-bn="আপনি কি এই কাস্টমার মুছে ফেলতে চান?">আপনি কি এই কাস্টমার মুছে ফেলতে চান?</p>
             <div class="modal-btn-row">
-                <button class="btn-yes" onclick="confirmDeleteCustomer()" data-en="Yes, Delete" data-bn="হ্যাঁ">হ্যাঁ</button>
+                <button class="btn-yes" onclick="confirmDeleteCustomer()" data-en="Yes, Delete" data-bn="হ্যাঁ, মুছুন">হ্যাঁ, মুছুন</button>
                 <button class="btn-no" onclick="closeDeleteModal()" data-en="Cancel" data-bn="বাতিল">বাতিল</button>
             </div>
         </div>
@@ -203,7 +258,7 @@
     <div id="app-modals"></div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/customer-list.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/customer-list.js?v=2.1.6"></script>
 </body>
 </html>

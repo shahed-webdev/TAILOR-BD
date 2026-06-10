@@ -135,6 +135,7 @@
     // যে পেইজগুলোতে warning popup দেখানো হবে (access block না হলে)
     var NOTICE_PAGES = [
         '/dashboard', '/dashboard.html',
+        '/sub-admin-dashboard', '/sub-admin-dashboard.html',
         '/profile', '/profile.html',
         '/index', '/index.html',
         '/'
@@ -166,10 +167,12 @@
             }
         } else if (hasServiceDue) {
             if (serviceBlocked) {
-                // access বন্ধ — সব পেইজে দেখাও (app-components.js আগেই overlay দিলে skip)
-                if (!d.accessBlocked) showDuePopup(d, institutionId);
+                // access বন্ধ — app-components global overlay দেখালে popup skip, না হলে blocked popup
+                if (!$('#globalDueBlockOverlay').length) {
+                    showDuePopup(d, institutionId);
+                }
             } else if (onNoticePage) {
-                // শুধু warning — শুধু dashboard/profile এ দেখাও
+                // শুধু warning — dashboard / sub-admin-dashboard এ দেখাও
                 showDuePopup(d, institutionId);
             }
         } else if (hasSmsDue) {

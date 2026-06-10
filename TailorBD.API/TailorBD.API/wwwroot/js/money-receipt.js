@@ -60,10 +60,10 @@
 
         // Setup print size selector
         $('#printSizeSelect').on('change', function() {
-            const size = $(this).val();
+            const size = window.TailorBD && window.TailorBD.printSizePref
+                ? window.TailorBD.printSizePref.save($(this).val())
+                : $(this).val();
             $('body').attr('data-print-size', size);
-            
-            // Apply width to receipt container for on-screen preview
             applyPrintSizeToScreen(size);
         });
 
@@ -111,10 +111,12 @@
             }
         });
 
-        // Set default print size
-        const defaultSize = '4';
-        $('body').attr('data-print-size', defaultSize);
-        applyPrintSizeToScreen(defaultSize);
+        // Restore user's saved print size (default 4 inch)
+        const savedPrintSize = window.TailorBD && window.TailorBD.printSizePref
+            ? window.TailorBD.printSizePref.applyToSelect($('#printSizeSelect'))
+            : '4';
+        $('body').attr('data-print-size', savedPrintSize);
+        applyPrintSizeToScreen(savedPrintSize);
         
         // Update language content after components are loaded
         setTimeout(function() {
@@ -356,6 +358,8 @@
         };
         
         const widthInPixels = inchToPixel[size] || 384; // Default to 4 inch
+        const widthInInches = parseFloat(size) || 4;
+        document.documentElement.style.setProperty('--print-width', widthInInches + 'in');
         
         // Apply width to receipt container
         $('.receipt-container').css({
@@ -368,8 +372,179 @@
             'max-width': widthInPixels + 'px',
             'width': '100%'
         });
+
+        fitMeasurementTablesToPaper();
+        autoFitReceiptTextBlocks();
         
         console.log('Applied print size:', size, 'inch =', widthInPixels, 'pixels');
+    }
+
+    function autoFitReceiptTextBlocks() {
+        autoFitInstitutionContact();
+        autoFitReceiptDescriptionCells();
+    }
+
+    function fitTextBlockToLines(el, options) {
+        const baseSize = options.baseSize;
+        const minSize = options.minSize;
+        const maxLines = options.maxLines;
+        const text = (el.textContent || '').trim();
+
+        if (!text || text === '-') {
+            el.style.removeProperty('--contact-fit-size');
+            el.style.fontSize = '';
+            return;
+        }
+
+        el.style.wordBreak = 'normal';
+        el.style.overflowWrap = 'break-word';
+        el.style.hyphens = 'none';
+        el.style.whiteSpace = 'normal';
+        el.style.lineHeight = '1.15';
+
+        let size = baseSize;
+        const len = text.length;
+        const scale = options.lengthScale || [
+            [12, 1],
+            [22, 0.94],
+            [35, 0.86],
+            [50, 0.76],
+            [Infinity, 0.66]
+        ];
+
+        for (let i = 0; i < scale.length; i++) {
+            if (len <= scale[i][0]) {
+                size = baseSize * scale[i][1];
+                break;
+            }
+        }
+
+        size = Math.max(minSize, size);
+        el.style.setProperty('--contact-fit-size', size + 'px');
+        el.style.fontSize = size + 'px';
+
+        let guard = 0;
+        while (guard++ < 24 && size > minSize) {
+            const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || size * 1.15;
+            const lines = Math.max(1, Math.round(el.getBoundingClientRect().height / lineHeight));
+            if (lines <= maxLines) break;
+            size -= 0.5;
+            el.style.setProperty('--contact-fit-size', size + 'px');
+            el.style.fontSize = size + 'px';
+        }
+    }
+
+    // Auto-scale shop address/contact: short text stays larger, long text fits in 2 lines
+    function autoFitInstitutionContact() {
+        const contactEl = document.querySelector('.institution-contact.receipt-contact-fit');
+        if (!contactEl || getComputedStyle(contactEl).display === 'none') return;
+
+        const printFs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--print-font-size')) || 12;
+        const baseSize = Math.max(printFs, 10);
+        const minSize = Math.max(5, baseSize * 0.5);
+
+        fitTextBlockToLines(contactEl, {
+            baseSize: baseSize,
+            minSize: minSize,
+            maxLines: 2,
+            lengthScale: [
+                [25, 1],
+                [45, 0.92],
+                [65, 0.82],
+                [90, 0.72],
+                [Infinity, 0.62]
+            ]
+        });
+    }
+
+    // Auto-scale description column: short text stays larger, long text shrinks to fit
+    function autoFitReceiptDescriptionCells() {
+        const baseSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--print-font-size')) || 9;
+        const minSize = Math.max(5, baseSize * 0.55);
+
+        document.querySelectorAll('#orderItemsBody .receipt-desc-cell').forEach(function(cell) {
+            fitTextBlockToLines(cell, {
+                baseSize: baseSize,
+                minSize: minSize,
+                maxLines: 3,
+                lengthScale: [
+                    [10, 1],
+                    [18, 0.94],
+                    [28, 0.86],
+                    [40, 0.76],
+                    [Infinity, 0.66]
+                ]
+            });
+        });
+    }
+
+    // Scale measurement tables to fit selected paper width (scale up or down)
+    function fitMeasurementTablesToPaper() {
+        const borderReserve = 4;
+        const $main = $('.measurements-main-container').first();
+        let availableWidth = $main.length ? ($main.innerWidth() - borderReserve) : 0;
+        if (!availableWidth || availableWidth < 80) {
+            availableWidth = getPrintWidthPixels() - 16;
+        }
+
+        $('.measurement-table-fit').each(function () {
+            const $wrap = $(this);
+            let $table = $wrap.find('.measurement-groups-table').first();
+            if (!$table.length) return;
+
+            const $existingBox = $table.parent('.measurement-table-scale-box');
+            if ($existingBox.length) {
+                $existingBox.replaceWith($table);
+            }
+
+            $table.css({ transform: 'none', width: 'auto', display: 'table' });
+            $wrap.css({ height: 'auto', width: '100%', padding: 0 });
+
+            const tableEl = $table[0];
+            const tableWidth = Math.ceil(Math.max(
+                tableEl.getBoundingClientRect().width,
+                tableEl.scrollWidth,
+                tableEl.offsetWidth,
+                1
+            ));
+            const tableHeight = Math.ceil(Math.max(
+                tableEl.getBoundingClientRect().height,
+                tableEl.scrollHeight,
+                tableEl.offsetHeight,
+                1
+            ));
+            const scale = (availableWidth - borderReserve) / tableWidth;
+            const scaledW = Math.ceil(tableWidth * scale) + borderReserve;
+            const scaledH = Math.ceil(tableHeight * scale) + 2;
+
+            $table.wrap('<div class="measurement-table-scale-box"></div>');
+            const $scaleBox = $table.parent();
+
+            $scaleBox.css({
+                width: scaledW + 'px',
+                height: scaledH + 'px',
+                margin: '0 auto',
+                overflow: 'visible'
+            });
+            $table.css({
+                transform: 'scale(' + scale + ')',
+                transformOrigin: 'top left',
+                width: tableWidth + 'px'
+            });
+            $wrap.css('height', scaledH + 'px');
+        });
+    }
+
+    function getPrintWidthPixels() {
+        const inchToPixel = {
+            '3': 288,
+            '3.5': 336,
+            '4': 384,
+            '4.5': 432,
+            '5': 480
+        };
+        const size = getSelectedPrintSize();
+        return inchToPixel[size] || 384;
     }
     
     // Track whether count was already incremented for this page load
@@ -425,9 +600,14 @@
         const activeTab = $('.tab-pane.active').attr('id');
         if (activeTab === 'measurementTab') {
             incrementMeasurementPrintCount();
+            applyPrintSizeToScreen(getSelectedPrintSize());
         }
         originalPrint.call(window);
     };
+
+    window.addEventListener('beforeprint', function() {
+        applyPrintSizeToScreen(getSelectedPrintSize());
+    });
 
     // Load print settings
     function loadPrintSettings() {
@@ -501,6 +681,8 @@
                 console.log('Set measurement top space:', mSettings.topSpace + 'px');
             }
         }
+
+        setTimeout(autoFitReceiptTextBlocks, 0);
     }
 
     // Load money receipt data
@@ -614,13 +796,25 @@
             $('.institution-contact').attr('style', 'display: none !important;');
         }
 
-        if (header.institutionPhone) {
-            $('#institutionPhone').text(header.institutionPhone);
-        }
-        
-        if (header.institutionAddress) {
-            $('#institutionAddress').text(header.institutionAddress);
-            $('#institutionSeparator').show();
+        const instPhone = normalizeText(header.institutionPhone ?? header.InstitutionPhone);
+        const instAddress = normalizeText(header.institutionAddress ?? header.InstitutionAddress);
+
+        $('#institutionPhone').text('');
+        $('#institutionAddress').text('');
+        $('#institutionSeparator').hide();
+
+        if (instPhone && instAddress) {
+            if (instAddress.includes(instPhone)) {
+                $('#institutionAddress').text(instAddress);
+            } else {
+                $('#institutionPhone').text(instPhone);
+                $('#institutionAddress').text(instAddress);
+                $('#institutionSeparator').show();
+            }
+        } else if (instPhone) {
+            $('#institutionPhone').text(instPhone);
+        } else if (instAddress) {
+            $('#institutionAddress').text(instAddress);
         }
 
         // Display customer info
@@ -680,6 +874,8 @@
             document.documentElement.style.setProperty('--print-font-size', fs);
         }
 
+        setTimeout(autoFitReceiptTextBlocks, 0);
+
         console.log('Money receipt display completed');
     }
 
@@ -699,17 +895,28 @@
             const unitPrice = item.unitPrice || 0;
             const quantity = item.unit || 1;
             const amount = item.amount || 0;
+            const details = item.details || '-';
 
             $tbody.append(`
                 <tr>
                     <td><strong>${dressInfo}</strong></td>
-                    <td>${item.details || '-'}</td>
+                    <td class="receipt-desc-cell">${escapeHtml(details)}</td>
                     <td class="text-center">${quantity}</td>
                     <td class="text-end">৳${formatNumber(unitPrice)}</td>
                     <td class="text-end"><strong>৳${formatNumber(amount)}</strong></td>
                 </tr>
             `);
         });
+
+        setTimeout(autoFitReceiptTextBlocks, 0);
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
     }
 
     function displayPaymentSummary() {
@@ -911,10 +1118,9 @@
 
             // Group measurements by groupID
             if (item.measurements && item.measurements.length > 0) {
-                // Group measurements by groupID while preserving order
                 const groupMap = new Map();
                 const groupOrder = [];
-                
+
                 item.measurements.forEach(m => {
                     const groupId = m.groupID || m.measurementTypeID;
                     if (!groupMap.has(groupId)) {
@@ -924,12 +1130,11 @@
                     groupMap.get(groupId).push(m);
                 });
 
-                // Build table with max 10 groups per row (like old ASPX - stays within page width)
                 const MAX_COLS_PER_ROW = 10;
-                const $outerTable = $('<table class="measurement-groups-table" style="width:100%; border-collapse:collapse; table-layout:fixed;"></table>');
+                const fontSize = mSettings.fontSize || 14;
+                const $outerTable = $('<table class="measurement-groups-table"></table>');
                 const $outerTbody = $('<tbody></tbody>');
 
-                // Collect valid groups first
                 const validGroups = [];
                 groupOrder.forEach(groupId => {
                     const group = groupMap.get(groupId);
@@ -941,34 +1146,32 @@
                     }
                 });
 
-                // Split into rows of max MAX_COLS_PER_ROW
                 for (let rowStart = 0; rowStart < validGroups.length; rowStart += MAX_COLS_PER_ROW) {
                     const rowGroups = validGroups.slice(rowStart, rowStart + MAX_COLS_PER_ROW);
                     const $outerTr = $('<tr></tr>');
 
                     rowGroups.forEach(({ validMeasurements }) => {
-                        const $td = $('<td style="padding:0 3px; vertical-align:top; overflow:hidden;"></td>');
+                        const $td = $('<td></td>');
 
-                        // Inner table for stacking multiple measurements - border on inner table, NOT td
-                        const $innerTable = $('<table style="width:100%; border:1px solid #666; border-collapse:collapse;"></table>');
+                        const $innerTable = $('<table class="measurement-group-inner"></table>');
                         const $innerTbody = $('<tbody></tbody>');
 
                         validMeasurements.forEach((m, idx) => {
                             if (mSettings.printMeasurementName) {
                                 const $typeRow = $('<tr></tr>');
-                                const $typeCell = $(`<td style="text-align:center; padding:0; border:none; font-size:${mSettings.fontSize || 14}px; font-weight:bold;">${m.type}</td>`);
+                                const $typeCell = $(`<td class="measurement-type-cell" style="font-size:${fontSize}px;">${m.type}</td>`);
                                 $typeRow.append($typeCell);
                                 $innerTbody.append($typeRow);
                             }
 
                             const $valRow = $('<tr></tr>');
-                            const $valCell = $(`<td style="text-align:center; padding:2px 2px; border:none; font-size:${mSettings.fontSize || 14}px; font-weight:bold; word-break:break-all; overflow-wrap:break-word;">${m.value}</td>`);
+                            const $valCell = $(`<td class="measurement-value-cell" style="font-size:${fontSize}px;">${m.value}</td>`);
                             $valRow.append($valCell);
                             $innerTbody.append($valRow);
 
                             if (idx < validMeasurements.length - 1) {
                                 const $sepRow = $('<tr></tr>');
-                                const $sepCell = $('<td class="measurement-separator" style="padding:0; border:none; border-top:1px solid #000; line-height:0; font-size:0;"></td>');
+                                const $sepCell = $('<td class="measurement-separator"></td>');
                                 $sepRow.append($sepCell);
                                 $innerTbody.append($sepRow);
                             }
@@ -983,7 +1186,9 @@
                 }
 
                 $outerTable.append($outerTbody);
-                $detailsSection.append($outerTable);
+                const $fitWrap = $('<div class="measurement-table-fit"></div>');
+                $fitWrap.append($outerTable);
+                $detailsSection.append($fitWrap);
             }
 
             // Styles
@@ -1064,6 +1269,8 @@
             $('.measurement-groups-table td table').css('border', 'none');
             $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', 'none');
         }
+
+        setTimeout(fitMeasurementTablesToPaper, 0);
 
         console.log('Measurements displayed successfully');
     }

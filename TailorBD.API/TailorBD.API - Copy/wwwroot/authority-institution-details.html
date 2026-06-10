@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/authority-profile.css">
-    <script src="/js/auth.js"></script>
-    <script src="/js/authority-layout.js" data-page="institution-details"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="institution-details"></script>
 </head>
 <body>
 <div class="auth-main">
@@ -22,12 +22,12 @@
         <div class="d-flex align-items-center flex-wrap gap-3 mb-3">
             <div class="section-title mb-0" style="border:none;padding:0;">
                 <div class="st-icon"><i class="fas fa-store"></i></div>
-                সকল শপ তালিকা
+                সব প্রতিষ্ঠান
                 <span class="badge bg-secondary ms-2 fw-normal" id="shopCount">0</span>
             </div>
             <div class="ms-auto d-flex gap-2 flex-wrap">
                 <a href="/authority-signup.html" class="btn btn-sm btn-primary rounded-pill px-3">
-                    <i class="fas fa-plus me-1"></i> নতুন শপ
+                    <i class="fas fa-plus me-1"></i> নতুন যোগ
                 </a>
             </div>
         </div>
@@ -37,7 +37,7 @@
             <div class="input-group" style="max-width:260px;">
                 <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                 <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
-                       placeholder="শপ নাম / ফোন / ইউজার..." oninput="applyFilters()">
+                       placeholder="নাম / মোট / পয়সা..." oninput="applyFilters()">
             </div>
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-sm btn-outline-secondary filter-btn active"
@@ -74,15 +74,15 @@
                 <thead style="background:#f8fafc;">
                     <tr>
                         <th style="width:40px;">#</th>
-                        <th>শপের নাম</th>
+                        <th>প্রতিষ্ঠান</th>
                         <th>ইউজারনেম</th>
-                        <th>ফোন</th>
+                        <th>মোট</th>
                         <th>প্যাকেজ</th>
                         <th>মেয়াদ</th>
-                        <th>বাকি</th>
+                        <th>মূল্য</th>
                         <th>পেমেন্ট</th>
                         <th>স্ট্যাটাস</th>
-                        <th style="width:110px;">অ্যাকশন</th>
+                        <th style="width:110px;">কার্যক্রম</th>
                     </tr>
                 </thead>
                 <tbody id="shopTableBody">
@@ -123,12 +123,12 @@
                 <div class="mb-3">
                     <label class="form-label" style="font-size:.82rem;font-weight:600;color:#475569;">নতুন প্যাকেজ নির্বাচন করুন</label>
                     <select id="pkgSelect" class="form-select" onchange="onPackageSelectChange()">
-                        <option value="">লোড হচ্ছে...</option>
+                        <option value="">বাছাই করুন...</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" style="font-size:.82rem;font-weight:600;color:#475569;">
-                        মাসিক বিল (টাকা) <span class="text-danger">*</span>
+                        পেমেন্ট রাখুন (৳) <span class="text-danger">*</span>
                     </label>
                     <div class="input-group">
                         <span class="input-group-text bg-white">৳</span>
@@ -137,13 +137,13 @@
                 </div>
                 <div class="alert alert-info small mb-0" style="font-size:.81rem;">
                     <i class="fas fa-info-circle me-1"></i>
-                    প্যাকেজ পরিবর্তন করলে মেয়াদ আজ থেকে নতুন প্যাকেজের Interval অনুযায়ী সেট হবে।
+                    প্যাকেজ পরিবর্তন হলে প্রতিষ্ঠানের বিদ্যমান Interval অপরিবর্তিত থাকবে
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">বাতিল</button>
                 <button class="btn btn-info text-white rounded-pill px-4" onclick="submitPackageChange()">
-                    <i class="fas fa-save me-1"></i>পরিবর্তন করুন
+                    <i class="fas fa-save me-1"></i>পরিবর্তন সেভ
                 </button>
             </div>
         </div>
@@ -153,6 +153,6 @@
 <div id="toastWrap"></div>
 <script src="/lib/jquery/jquery.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/js/authority-profile.js"></script>
+<script src="/js/authority-profile.js?v=2.1.6"></script>
 </body>
 </html>

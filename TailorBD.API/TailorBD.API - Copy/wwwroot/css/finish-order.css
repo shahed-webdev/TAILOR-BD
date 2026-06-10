@@ -2,10 +2,18 @@
 
 /* Customer Info Card */
 .customer-info-card {
-    background: white;
+    background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+    border: 1px solid #c7d2fe;
+    border-left: 5px solid #667eea;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
     padding: 25px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .customer-header {
@@ -26,7 +34,8 @@
     font-size: 32px;
     font-weight: 700;
     flex-shrink: 0;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45);
+    border: 3px solid rgba(255, 255, 255, 0.8);
 }
 
 .customer-avatar-large img {
@@ -42,7 +51,7 @@
 
 .customer-details h3 {
     margin: 0 0 10px 0;
-    color: #333;
+    color: #1e293b;
     font-weight: 700;
 }
 
@@ -63,21 +72,25 @@
 .badge-order {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     color: white;
+    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.35);
 }
 
 .badge-customer {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
 }
 
 .badge-phone {
     background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     color: white;
+    box-shadow: 0 2px 8px rgba(17, 153, 142, 0.35);
 }
 
 .customer-address {
-    color: #666;
+    color: #475569;
     font-size: 14px;
+    font-weight: 500;
 }
 
 /* Order Details Card */
@@ -120,7 +133,7 @@
 }
 
 .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 60%, #312e81 100%);
     color: white;
     padding: 15px 20px;
     font-weight: 600;
@@ -133,11 +146,11 @@
 
 /* Table Styles */
 .table-hover tbody tr:hover {
-    background: rgba(102, 126, 234, 0.05);
+    background: rgba(99, 102, 241, 0.06);
 }
 
 .table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
     color: white;
 }
 
@@ -231,7 +244,7 @@
 
 /* Buttons */
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
     border: none;
     padding: 12px 25px;
     font-weight: 600;
@@ -241,12 +254,12 @@
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
 }
 
 .btn-outline-primary {
-    border: 2px solid #667eea;
-    color: #667eea;
+    border: 2px solid #6366f1;
+    color: #6366f1;
     padding: 12px 25px;
     font-weight: 600;
     border-radius: 10px;
@@ -254,7 +267,7 @@
 }
 
 .btn-outline-primary:hover {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
     color: white;
     border-color: transparent;
     transform: translateY(-2px);
@@ -302,14 +315,14 @@
 }
 
 .ui-datepicker-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
     color: white;
     border-radius: 10px 10px 0 0;
 }
 
 .ui-state-active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: #667eea;
+    background: linear-gradient(135deg, #1e293b 0%, #6366f1 100%);
+    border-color: #6366f1;
 }
 
 /* Responsive */

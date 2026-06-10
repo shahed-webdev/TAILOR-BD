@@ -122,16 +122,20 @@ namespace TailorBD.API.Controllers
                         [Order].OrderSerialNumber,
                         [Order].OrderDate,
                         [Order].DeliveryDate,
+                        ISNULL([Order].Update_DeliveryDate, [Order].DeliveryDate) AS Update_DeliveryDate,
                         [Order].OrderAmount,
                         [Order].PaidAmount,
                         [Order].DueAmount,
                         [Order].PaymentStatus,
                         [Order].DeliveryStatus,
                         [Order].WorkStatus,
+                        ISNULL([Order].Is_Print, 0) AS Is_Print,
                         Customer.CustomerNumber,
                         Customer.CustomerName,
                         Customer.Phone,
                         Customer.Address,
+                        Customer.CustomerID,
+                        Customer.Cloth_For_ID,
                         STUFF((
                             SELECT '; ' + Dress.Dress_Name + ' ' + CAST(OrderList.DressQuantity AS NVARCHAR(50)) + ' Piece '
                             FROM OrderList 
@@ -169,16 +173,20 @@ namespace TailorBD.API.Controllers
                             orderSerialNumber = reader.GetInt32(reader.GetOrdinal("OrderSerialNumber")),
                             orderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
                             deliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")),
+                            updateDeliveryDate = reader.IsDBNull(reader.GetOrdinal("Update_DeliveryDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("Update_DeliveryDate")),
                             orderAmount = reader.IsDBNull(reader.GetOrdinal("OrderAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("OrderAmount"))),
                             paidAmount = reader.IsDBNull(reader.GetOrdinal("PaidAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("PaidAmount"))),
                             dueAmount = reader.IsDBNull(reader.GetOrdinal("DueAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("DueAmount"))),
                             paymentStatus = reader.IsDBNull(reader.GetOrdinal("PaymentStatus")) ? "" : reader.GetString(reader.GetOrdinal("PaymentStatus")),
                             deliveryStatus = reader.IsDBNull(reader.GetOrdinal("DeliveryStatus")) ? "" : reader.GetString(reader.GetOrdinal("DeliveryStatus")),
                             workStatus = reader.IsDBNull(reader.GetOrdinal("WorkStatus")) ? "" : reader.GetString(reader.GetOrdinal("WorkStatus")),
+                            measurementPrintCount = reader.GetInt32(reader.GetOrdinal("Is_Print")),
                             customerNumber = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerNumber")),
                             customerName = reader.IsDBNull(reader.GetOrdinal("CustomerName")) ? "" : reader.GetString(reader.GetOrdinal("CustomerName")),
                             phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? "" : reader.GetString(reader.GetOrdinal("Phone")),
                             address = reader.IsDBNull(reader.GetOrdinal("Address")) ? "" : reader.GetString(reader.GetOrdinal("Address")),
+                            customerId = reader.IsDBNull(reader.GetOrdinal("CustomerID")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerID")),
+                            clothForId = reader.IsDBNull(reader.GetOrdinal("Cloth_For_ID")) ? 0 : reader.GetInt32(reader.GetOrdinal("Cloth_For_ID")),
                             details = reader.IsDBNull(reader.GetOrdinal("Details")) ? "" : reader.GetString(reader.GetOrdinal("Details"))
                         });
                     }
@@ -259,7 +267,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get order by ID
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<ApiResponse<OrderDto>>> GetOrderById(Guid id, [FromQuery] int institutionId)
         {
             try
@@ -351,7 +359,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get order list items for an order
         /// </summary>
-        [HttpGet("{orderId}/items")]
+        [HttpGet("{orderId:int}/items")]
         public async Task<ActionResult> GetOrderListItems(int orderId, [FromQuery] int institutionId)
         {
             try
@@ -407,7 +415,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get payments for an order list item
         /// </summary>
-        [HttpGet("{orderId}/order-list/{orderListId}/payments")]
+        [HttpGet("{orderId:int}/order-list/{orderListId:int}/payments")]
         public async Task<ActionResult> GetOrderListPayments(int orderId, int orderListId, [FromQuery] int institutionId)
         {
             try
@@ -464,7 +472,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get money receipt details for an order
         /// </summary>
-        [HttpGet("{orderId}/money-receipt")]
+        [HttpGet("{orderId:int}/money-receipt")]
         public async Task<ActionResult> GetMoneyReceiptDetails(int orderId, [FromQuery] int institutionId)
         {
             try
@@ -478,17 +486,14 @@ namespace TailorBD.API.Controllers
 
                 var query = @"
                     SELECT 
-                        ReceiptID,
-                        Amount,
-                        ReceiveDate,
-                        PaymentMethod,
-                        ChequeNo,
-                        BankName,
-                        BranchName,
-                        Remarks
-                    FROM MoneyReceipt
-                    WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID
-                    ORDER BY ReceiveDate DESC";
+                        PR.Amount,
+                        PR.OrderPaid_Date AS ReceiveDate,
+                        PR.Payment_TimeStatus AS PaymentMethod,
+                        ISNULL(A.AccountName, '') AS AccountName
+                    FROM Payment_Record PR
+                    LEFT JOIN Account A ON PR.AccountID = A.AccountID
+                    WHERE PR.OrderID = @OrderID AND PR.InstitutionID = @InstitutionID
+                    ORDER BY PR.OrderPaid_Date DESC";
 
                 var receipts = new List<object>();
                 using var cmd = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
@@ -496,18 +501,17 @@ namespace TailorBD.API.Controllers
                 cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
 
                 using var reader = await cmd.ExecuteReaderAsync();
+                int rowNum = 0;
                 while (await reader.ReadAsync())
                 {
+                    rowNum++;
                     receipts.Add(new
                     {
-                        receiptID = reader.GetInt32(reader.GetOrdinal("ReceiptID")),
-                        amount = reader.GetDouble(reader.GetOrdinal("Amount")),
-                        receiveDate = reader.GetDateTime(reader.GetOrdinal("ReceiveDate")),
-                        paymentMethod = reader.GetString(reader.GetOrdinal("PaymentMethod")),
-                        chequeNo = reader.IsDBNull(reader.GetOrdinal("ChequeNo")) ? "" : reader.GetString(reader.GetOrdinal("ChequeNo")),
-                        bankName = reader.IsDBNull(reader.GetOrdinal("BankName")) ? "" : reader.GetString(reader.GetOrdinal("BankName")),
-                        branchName = reader.IsDBNull(reader.GetOrdinal("BranchName")) ? "" : reader.GetString(reader.GetOrdinal("BranchName")),
-                        remarks = reader.IsDBNull(reader.GetOrdinal("Remarks")) ? "" : reader.GetString(reader.GetOrdinal("Remarks"))
+                        receiptID = rowNum,
+                        amount = reader.IsDBNull(reader.GetOrdinal("Amount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("Amount"))),
+                        receiveDate = reader.IsDBNull(reader.GetOrdinal("ReceiveDate")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("ReceiveDate")),
+                        paymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod")) ? "" : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+                        accountName = reader.IsDBNull(reader.GetOrdinal("AccountName")) ? "" : reader.GetString(reader.GetOrdinal("AccountName"))
                     });
                 }
 
@@ -543,10 +547,10 @@ namespace TailorBD.API.Controllers
                     SELECT
                         [Order].OrderID,
                         [Order].OrderSerialNumber,
-                        [Order].OrderAmount,
-                        [Order].PaidAmount,
-                        [Order].Discount,
-                        [Order].DueAmount,
+                        ROUND(ISNULL([Order].OrderAmount, 0), 2) AS OrderAmount,
+                        ROUND(ISNULL([Order].PaidAmount, 0), 2) AS PaidAmount,
+                        ROUND(ISNULL([Order].Discount, 0), 2) AS Discount,
+                        ROUND(ISNULL([Order].DueAmount, 0), 2) AS DueAmount,
                         [Order].DeliveryDate,
                         [Order].Update_DeliveryDate,
                         Customer.CustomerID,
@@ -586,7 +590,9 @@ namespace TailorBD.API.Controllers
                         paidAmount = reader.IsDBNull(reader.GetOrdinal("PaidAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("PaidAmount"))),
                         discount = reader.IsDBNull(reader.GetOrdinal("Discount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("Discount"))),
                         dueAmount = reader.IsDBNull(reader.GetOrdinal("DueAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("DueAmount"))),
-                        deliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")).ToString("yyyy-MM-dd"),
+                        deliveryDate = reader.IsDBNull(reader.GetOrdinal("Update_DeliveryDate"))
+                            ? (reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")).ToString("yyyy-MM-dd"))
+                            : reader.GetDateTime(reader.GetOrdinal("Update_DeliveryDate")).ToString("yyyy-MM-dd"),
                         customerId = reader.GetInt32(reader.GetOrdinal("CustomerID")),
                         customerNumber = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerNumber")),
                         customerName = reader.IsDBNull(reader.GetOrdinal("CustomerName")) ? "" : reader.GetString(reader.GetOrdinal("CustomerName")),
@@ -688,12 +694,7 @@ namespace TailorBD.API.Controllers
                         Institution.InstitutionName,
                         Institution.Phone           AS InstitutionPhone,
                         Institution.Address         AS InstitutionAddress,
-                        Institution.Dialog_Title    AS DialogTitle,
-                        Institution.M_Receipt_ShopName,
-                        Institution.M_Receipt_TopSpace,
-                        Institution.M_Receipt_FontSize,
-                        Institution.M_Receipt_ServedBy,
-                        Institution.PoweredByInfo
+                        Institution.Dialog_Title    AS DialogTitle
                     FROM [Order]
                     INNER JOIN Customer    ON [Order].CustomerID    = Customer.CustomerID
                     INNER JOIN Institution ON [Order].InstitutionID = Institution.InstitutionID
@@ -727,8 +728,7 @@ namespace TailorBD.API.Controllers
                         institutionName    = r.IsDBNull(r.GetOrdinal("InstitutionName")) ? "" : r.GetString(r.GetOrdinal("InstitutionName")),
                         institutionPhone   = r.IsDBNull(r.GetOrdinal("InstitutionPhone"))? "" : r.GetString(r.GetOrdinal("InstitutionPhone")),
                         institutionAddress = r.IsDBNull(r.GetOrdinal("InstitutionAddress")) ? "" : r.GetString(r.GetOrdinal("InstitutionAddress")),
-                        dialogTitle        = r.IsDBNull(r.GetOrdinal("DialogTitle"))      ? "" : r.GetString(r.GetOrdinal("DialogTitle")),
-                        poweredByInfo      = r.IsDBNull(r.GetOrdinal("PoweredByInfo"))    ? "" : r.GetString(r.GetOrdinal("PoweredByInfo"))
+                        dialogTitle        = r.IsDBNull(r.GetOrdinal("DialogTitle"))      ? "" : r.GetString(r.GetOrdinal("DialogTitle"))
                     };
                 }
 
@@ -779,13 +779,15 @@ namespace TailorBD.API.Controllers
                         MT.MeasurementTypeID,
                         MT.MeasurementType           AS measureType,
                         OM.Measurement               AS measureValue,
+                        ISNULL(MT_GRP.Ascending, 99999)  AS groupAscending,
                         ISNULL(MT.Measurement_Group_SerialNo, 99999) AS groupSerial
                     FROM OrderList OL
                     INNER JOIN Dress             ON OL.DressID              = Dress.DressID
-                    LEFT  JOIN Ordered_Measurement OM ON OL.OrderListID    = OM.OrderListID
+                    LEFT  JOIN Ordered_Measurement OM ON OL.OrderListID    = OM.OrderListID AND OM.InstitutionID = @InstitutionID
                     LEFT  JOIN Measurement_Type MT    ON OM.MeasurementTypeID = MT.MeasurementTypeID
+                    LEFT  JOIN Measurement_Type MT_GRP ON MT.Measurement_GroupID = MT_GRP.MeasurementTypeID
                     WHERE OL.OrderID = @OrderID AND OL.InstitutionID = @InstitutionID
-                    ORDER BY OL.OrderList_SN, groupSerial, MT.Measurement_Group_SerialNo";
+                    ORDER BY OL.OrderList_SN, groupAscending, groupSerial";
 
                 // 4. Styles per OrderList item
                 var styleQuery = @"
@@ -805,6 +807,7 @@ namespace TailorBD.API.Controllers
 
                 // Build measurement groups per OrderListID
                 var measByList  = new Dictionary<int, (string dressName, int dressQty, int sn, string details, List<object> items)>();
+                var seenMeasurementTypes = new Dictionary<int, HashSet<int>>(); // olId -> set of seen MeasurementTypeIDs
                 using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(measQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@OrderID", orderId);
@@ -819,18 +822,25 @@ namespace TailorBD.API.Controllers
                         var details   = r.IsDBNull(r.GetOrdinal("orderDetails")) ? "" : r.GetString(r.GetOrdinal("orderDetails"));
 
                         if (!measByList.ContainsKey(olId))
+                        {
                             measByList[olId] = (dressName, qty, sn, details, new List<object>());
+                            seenMeasurementTypes[olId] = new HashSet<int>();
+                        }
 
-                        // Only add measurement row if there's a value
+                        // Only add measurement row if there's a value and not already added (dedup by MeasurementTypeID)
                         if (!r.IsDBNull(r.GetOrdinal("MeasurementTypeID")))
                         {
-                            measByList[olId].items.Add(new
+                            var measurementTypeId = r.GetInt32(r.GetOrdinal("MeasurementTypeID"));
+                            if (seenMeasurementTypes[olId].Add(measurementTypeId))
                             {
-                                groupID           = r.IsDBNull(r.GetOrdinal("groupID"))      ? 0  : r.GetInt32(r.GetOrdinal("groupID")),
-                                measurementTypeID = r.GetInt32(r.GetOrdinal("MeasurementTypeID")),
-                                type              = r.IsDBNull(r.GetOrdinal("measureType"))  ? "" : r.GetString(r.GetOrdinal("measureType")),
-                                value             = r.IsDBNull(r.GetOrdinal("measureValue")) ? "" : r.GetString(r.GetOrdinal("measureValue"))
-                            });
+                                measByList[olId].items.Add(new
+                                {
+                                    groupID           = r.IsDBNull(r.GetOrdinal("groupID"))      ? 0  : r.GetInt32(r.GetOrdinal("groupID")),
+                                    measurementTypeID = measurementTypeId,
+                                    type              = r.IsDBNull(r.GetOrdinal("measureType"))  ? "" : r.GetString(r.GetOrdinal("measureType")),
+                                    value             = r.IsDBNull(r.GetOrdinal("measureValue")) ? "" : r.GetString(r.GetOrdinal("measureValue"))
+                                });
+                            }
                         }
                     }
                 }
@@ -912,7 +922,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get measurements for an order list item
         /// </summary>
-        [HttpGet("{orderId}/order-list/{orderListId}/measurements")]
+        [HttpGet("{orderId:int}/order-list/{orderListId:int}/measurements")]
         public async Task<ActionResult> GetOrderListMeasurements(int orderId, int orderListId, [FromQuery] int institutionId)
         {
             try
@@ -961,7 +971,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get styles for an order list item
         /// </summary>
-        [HttpGet("{orderId}/order-list/{orderListId}/styles")]
+        [HttpGet("{orderId:int}/order-list/{orderListId:int}/styles")]
         public async Task<ActionResult> GetOrderListStyles(int orderId, int orderListId, [FromQuery] int institutionId)
         {
             try

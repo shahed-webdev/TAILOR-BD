@@ -171,6 +171,18 @@ body {
     color: #475569;
 }
 .btn-navbar-outline:hover { background: #e2e8f0; }
+#langSwitchBtn {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(99,102,241,.3);
+    font-size: .78rem;
+    padding: 7px 13px;
+}
+#langSwitchBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,.4);
+}
 .btn-navbar-danger {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: #fff;

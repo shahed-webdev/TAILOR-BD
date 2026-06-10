@@ -592,46 +592,46 @@ namespace TailorBD.API.Controllers
 
                 var query = @"
                     SELECT 
-                        [Order].OrderID, 
-                        [Order].OrderSerialNumber,
-                        [Order].OrderDate,
-                        [Order].DeliveryDate,
-                        [Order].OrderAmount,
-                        [Order].PaidAmount,
-                        [Order].DueAmount,
-                        [Order].StoreDatails,
-                        [Order].Details,
-                        Customer.CustomerID,
-                        Customer.CustomerName,
-                        Customer.Phone,
-                        Customer.Address,
-                        SMS.Masking,
-                        SMS.SMS_Balance,
-                        Institution.InstitutionName,
+                        o.OrderID, 
+                        o.OrderSerialNumber,
+                        o.OrderDate,
+                        o.DeliveryDate,
+                        o.OrderAmount,
+                        o.PaidAmount,
+                        o.DueAmount,
+                        o.StoreDatails,
+                        o.Details,
+                        c.CustomerID,
+                        c.CustomerName,
+                        c.Phone,
+                        c.Address,
+                        ISNULL(s.Masking, '') AS Masking,
+                        ISNULL(s.SMS_Balance, 0) AS SMS_Balance,
+                        i.InstitutionName,
                         CASE 
-                            WHEN EXISTS (SELECT 1 FROM OrderList WHERE OrderID = [Order].OrderID AND Pending_Work <> 0) 
+                            WHEN EXISTS (SELECT 1 FROM OrderList ol WITH (NOLOCK) WHERE ol.OrderID = o.OrderID AND ol.Pending_Work <> 0) 
                             THEN N'PartlyCompleted'
                             ELSE N'completed'
                         END AS WorkStatus
-                    FROM [Order]
-                    INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID
-                    INNER JOIN SMS ON [Order].InstitutionID = SMS.InstitutionID
-                    INNER JOIN Institution ON [Order].InstitutionID = Institution.InstitutionID
-                    WHERE ([Order].InstitutionID = @InstitutionID) 
-                    AND ([Order].DeliveryStatus IN (N'Pending', N'PartlyDelivered'))
+                    FROM [Order] o WITH (NOLOCK)
+                    INNER JOIN Customer c WITH (NOLOCK) ON o.CustomerID = c.CustomerID
+                    LEFT JOIN SMS s WITH (NOLOCK) ON o.InstitutionID = s.InstitutionID
+                    INNER JOIN Institution i WITH (NOLOCK) ON o.InstitutionID = i.InstitutionID
+                    WHERE o.InstitutionID = @InstitutionID
+                    AND o.DeliveryStatus IN (N'Pending', N'PartlyDelivered')
                     AND (
-                        ([Order].WorkStatus IN (N'completed', N'PartlyCompleted'))
-                        OR
-                        (NOT EXISTS (SELECT 1 FROM OrderList WHERE OrderID = [Order].OrderID AND Pending_Work <> 0))
+                        o.WorkStatus IN (N'completed', N'PartlyCompleted')
+                        OR NOT EXISTS (SELECT 1 FROM OrderList ol WITH (NOLOCK) WHERE ol.OrderID = o.OrderID AND ol.Pending_Work <> 0)
                     )
-                    AND (Customer.Phone LIKE '%' + @Phone + '%')
-                    AND (CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
-                    AND ([Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
-                    ORDER BY [Order].DeliveryDate";
+                    AND (@Phone = '' OR c.Phone LIKE @Phone + '%')
+                    AND (CAST(o.OrderSerialNumber AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
+                    AND (o.DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
+                    ORDER BY o.DeliveryDate";
 
                 var orders = new List<ReadyOrderModel>();
                 using (var cmd = new SqlCommand(query, connection))
                 {
+                    cmd.CommandTimeout = 60;
                     cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                     cmd.Parameters.AddWithValue("@Phone", phone ?? "");
                     cmd.Parameters.AddWithValue("@OrderSerialNumber", orderSerialNumbers ?? "0");
@@ -665,9 +665,11 @@ namespace TailorBD.API.Controllers
                     }
                 }
 
-                // Get dress details for each order
+                // Batch-load dress details (avoid N+1 connection opens per order)
+                var dressDetailsByOrder = await GetOrderDressDetailsBatchAsync(
+                    connection, orders.Select(o => o.OrderId).ToList());
                 foreach (var order in orders)
-                    order.DressDetails = await GetOrderDressDetailsBanglaAsync(connection, order.OrderId);
+                    order.DressDetails = dressDetailsByOrder.GetValueOrDefault(order.OrderId, "");
 
                 _logger.LogInformation("Found {Count} ready orders", orders.Count);
                 return Ok(new { success = true, data = new { orders = orders } });
@@ -1327,40 +1329,114 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get dress details for an order in Bangla format
         /// </summary>
-        private async Task<string> GetOrderDressDetailsBanglaAsync(SqlConnection parentConnection, int orderId)
+        private static string FormatDressDetailLine(string dressName, int quantity, int pending)
         {
-            var dressDetailsList = new List<string>();
-            var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
-            using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
+            string status;
+            if (pending == 0)
+                status = " টি (সম্পূর্ণ)";
+            else if (pending == quantity)
+                status = " টি (অর্ধসম্পূর্ণ)";
+            else
+                status = $" টি (আংশিক: {quantity - pending}/{quantity})";
+            return $"{dressName} {quantity}{status}";
+        }
 
-            var query = @"
-                SELECT Dress.Dress_Name, OrderList.DressQuantity, OrderList.Pending_Work
-                FROM OrderList 
-                INNER JOIN Dress ON OrderList.DressID = Dress.DressID 
-                WHERE OrderList.OrderID = @OrderID 
-                ORDER BY OrderList.OrderList_SN";
+        private async Task<Dictionary<int, string>> GetOrderDressDetailsBatchAsync(SqlConnection connection, List<int> orderIds)
+        {
+            var result = new Dictionary<int, string>();
+            if (orderIds.Count == 0) return result;
 
+            var idList = string.Join(",", orderIds);
+            var query = $@"
+                SELECT ol.OrderID, d.Dress_Name, ol.DressQuantity, ol.Pending_Work
+                FROM OrderList ol WITH (NOLOCK)
+                INNER JOIN Dress d WITH (NOLOCK) ON ol.DressID = d.DressID
+                WHERE ol.OrderID IN ({idList})
+                ORDER BY ol.OrderID, ol.OrderList_SN";
+
+            var linesByOrder = new Dictionary<int, List<string>>();
             using (var cmd = new SqlCommand(query, connection))
             {
-                cmd.Parameters.AddWithValue("@OrderID", orderId);
+                cmd.CommandTimeout = 30;
                 using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
-                    var dressName = reader.GetString(0);
-                    var quantity  = reader.GetInt32(1);
-                    var pending   = reader.GetInt32(2);
-                    string status;
-                    if (pending == 0)
-                        status = " টি (সম্পূর্ণ)";
-                    else if (pending == quantity)
-                        status = " টি (অর্ধসম্পূর্ণ)";
-                    else
-                        status = $" টি (আংশিক: {quantity - pending}/{quantity})";
-                    dressDetailsList.Add($"{dressName} {quantity}{status}");
+                    var orderId = reader.GetInt32(0);
+                    var line = FormatDressDetailLine(reader.GetString(1), reader.GetInt32(2), reader.GetInt32(3));
+                    if (!linesByOrder.TryGetValue(orderId, out var lines))
+                    {
+                        lines = new List<string>();
+                        linesByOrder[orderId] = lines;
+                    }
+                    lines.Add(line);
                 }
             }
-            return string.Join("; ", dressDetailsList);
+
+            foreach (var kv in linesByOrder)
+                result[kv.Key] = string.Join("; ", kv.Value);
+            return result;
+        }
+
+        private async Task<string> GetOrderDressDetailsBanglaAsync(SqlConnection connection, int orderId)
+        {
+            var map = await GetOrderDressDetailsBatchAsync(connection, new List<int> { orderId });
+            return map.GetValueOrDefault(orderId, "");
+        }
+
+        private static async Task<Dictionary<int, string>> GetDeliveredOrderDressDetailsAsync(
+            SqlConnection connection, int institutionId, List<int> orderIds)
+        {
+            var dressDetailsMap = new Dictionary<int, string>();
+            if (orderIds.Count == 0) return dressDetailsMap;
+
+            var idList = string.Join(",", orderIds);
+            var dressQuery = $@"
+                SELECT OL.OrderID, Dress.Dress_Name,
+                       COALESCE(
+                           NULLIF(delSum.DeliveredQty, 0),
+                           NULLIF(OL.DeliveryQuantity, 0),
+                           NULLIF(OL.WorkCompleteQuantity, 0),
+                           NULLIF(OL.ReadyForDeliveryQuantity, 0),
+                           NULLIF(OL.DressQuantity, 0),
+                           1) AS Qty
+                FROM OrderList OL WITH (NOLOCK)
+                INNER JOIN Dress WITH (NOLOCK) ON OL.DressID = Dress.DressID
+                LEFT JOIN (
+                    SELECT OrderListID, SUM(DQuantity) AS DeliveredQty
+                    FROM Order_Delivery_Date WITH (NOLOCK)
+                    GROUP BY OrderListID
+                ) delSum ON delSum.OrderListID = OL.OrderListID
+                WHERE OL.OrderID IN ({idList}) AND OL.InstitutionID = @InstitutionID
+                ORDER BY OL.OrderID, OL.OrderList_SN";
+
+            using var dCmd = new SqlCommand(dressQuery, connection);
+            dCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+            using var dReader = await dCmd.ExecuteReaderAsync();
+            while (await dReader.ReadAsync())
+            {
+                int oid = dReader.GetInt32(0);
+                string name = dReader.IsDBNull(1) ? "" : dReader.GetString(1);
+                int qty = dReader.GetInt32(2);
+                string entry = $"{name} {qty}টি";
+                if (dressDetailsMap.ContainsKey(oid))
+                    dressDetailsMap[oid] += ", " + entry;
+                else
+                    dressDetailsMap[oid] = entry;
+            }
+            return dressDetailsMap;
+        }
+
+        private static void AddDeliveredSearchParameters(
+            SqlCommand cmd, int institutionId, string? phone, string? orderSerialNumbers,
+            DateTime? startDate, DateTime? endDate, string? customerName, string? address)
+        {
+            cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+            cmd.Parameters.AddWithValue("@Phone", phone ?? "");
+            cmd.Parameters.AddWithValue("@OrderSerialNumber", orderSerialNumbers ?? "0");
+            cmd.Parameters.AddWithValue("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value);
+            cmd.Parameters.AddWithValue("@EndDate", endDate.HasValue ? (object)endDate.Value.AddDays(1).AddSeconds(-1) : DBNull.Value);
+            cmd.Parameters.AddWithValue("@CustomerName", customerName ?? "");
+            cmd.Parameters.AddWithValue("@Address", address ?? "");
         }
 
         /// <summary>
@@ -1377,18 +1453,70 @@ namespace TailorBD.API.Controllers
                 var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
                 using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
+                using var transaction = connection.BeginTransaction();
 
-                var query = @"UPDATE [Order] SET DeliveryStatus = N'Delivered', Update_DeliveryDate = GETDATE() 
-                              WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID";
+                try
+                {
+                    using (var cmd = new SqlCommand(
+                        @"UPDATE [Order] SET DeliveryStatus = N'Delivered', Update_DeliveryDate = GETDATE()
+                          WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID",
+                        connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        cmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                        var rows = await cmd.ExecuteNonQueryAsync();
+                        if (rows == 0)
+                        {
+                            transaction.Rollback();
+                            return NotFound(new { success = false, message = "Order not found" });
+                        }
+                    }
 
-                using var cmd = new SqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@OrderID", model.OrderId);
-                cmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
-                var rows = await cmd.ExecuteNonQueryAsync();
-                if (rows > 0)
+                    // Record delivery quantities (legacy DeliveryComplete.aspx behaviour)
+                    using (var listCmd = new SqlCommand(
+                        @"SELECT OrderListID,
+                                 CASE
+                                     WHEN ReadyForDeliveryQuantity > 0 THEN ReadyForDeliveryQuantity
+                                     WHEN DressQuantity > 0 THEN DressQuantity
+                                     WHEN WorkCompleteQuantity > 0 THEN WorkCompleteQuantity
+                                     WHEN DeliveryQuantity > 0 THEN DeliveryQuantity
+                                     ELSE 1
+                                 END AS DeliveryQty
+                          FROM OrderList
+                          WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID",
+                        connection, transaction))
+                    {
+                        listCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        listCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                        using var listReader = await listCmd.ExecuteReaderAsync();
+                        var deliveryItems = new List<(int OrderListId, int Qty)>();
+                        while (await listReader.ReadAsync())
+                            deliveryItems.Add((listReader.GetInt32(0), listReader.GetInt32(1)));
+                        listReader.Close();
+
+                        foreach (var (orderListId, qty) in deliveryItems.Where(i => i.Qty > 0))
+                        {
+                            using var insCmd = new SqlCommand(
+                                @"INSERT INTO Order_Delivery_Date (InstitutionID, RegistrationID, OrderID, OrderListID, DQuantity)
+                                  VALUES (@InstitutionID, @RegistrationID, @OrderID, @OrderListID, @DQuantity)",
+                                connection, transaction);
+                            insCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                            insCmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
+                            insCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                            insCmd.Parameters.AddWithValue("@OrderListID", orderListId);
+                            insCmd.Parameters.AddWithValue("@DQuantity", qty);
+                            await insCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+
+                    transaction.Commit();
                     return Ok(new { success = true, message = "অর্ডার সফলভাবে ডেলিভার করা হয়েছে" });
-                else
-                    return NotFound(new { success = false, message = "Order not found" });
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
             catch (Exception ex)
             {
@@ -1425,19 +1553,24 @@ namespace TailorBD.API.Controllers
                 var dueOnlyFilter = dueOnly ? " AND ([Order].DueAmount > 0)" : "";
 
                 var baseWhere = $@"
-                    FROM Customer INNER JOIN [Order] ON Customer.CustomerID = [Order].CustomerID 
-                    INNER JOIN Order_Delivery_Date ON [Order].OrderID = Order_Delivery_Date.OrderID 
-                    WHERE ([Order].InstitutionID = @InstitutionID) 
+                    FROM Customer WITH (NOLOCK)
+                    INNER JOIN [Order] WITH (NOLOCK) ON Customer.CustomerID = [Order].CustomerID
+                    OUTER APPLY (
+                        SELECT MAX(odd.DeliveryInsertDate) AS DeliveryInsertDate
+                        FROM Order_Delivery_Date odd WITH (NOLOCK)
+                        WHERE odd.OrderID = [Order].OrderID AND odd.InstitutionID = [Order].InstitutionID
+                    ) AS del
+                    WHERE ([Order].InstitutionID = @InstitutionID)
                     AND ([Order].DeliveryStatus = N'Delivered')
                     AND (Customer.Phone LIKE '%' + @Phone + '%')
                     AND (CAST([Order].OrderSerialNumber AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
-                    AND (Order_Delivery_Date.DeliveryInsertDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
+                    AND (COALESCE(del.DeliveryInsertDate, [Order].Update_DeliveryDate, [Order].DeliveryDate) BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
                     AND (ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
                     AND (ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')
                     {dueOnlyFilter}";
 
                 int totalCount = 0;
-                using (var countCmd = new SqlCommand($"SELECT COUNT(DISTINCT [Order].OrderID) {baseWhere}", connection))
+                using (var countCmd = new SqlCommand($"SELECT COUNT(*) {baseWhere}", connection))
                 {
                     countCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                     countCmd.Parameters.AddWithValue("@Phone", phone ?? "");
@@ -1450,7 +1583,7 @@ namespace TailorBD.API.Controllers
                 }
 
                 dynamic? stats = null;
-                using (var statsCmd = new SqlCommand($@"SELECT COUNT(DISTINCT [Order].OrderID) as TotalOrders, ISNULL(SUM(DISTINCT [Order].DueAmount), 0) as TotalDue {baseWhere}", connection))
+                using (var statsCmd = new SqlCommand($@"SELECT COUNT(*) AS TotalOrders, ISNULL(SUM(CASE WHEN [Order].DueAmount > 0 THEN [Order].DueAmount ELSE 0 END), 0) AS TotalDue {baseWhere}", connection))
                 {
                     statsCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                     statsCmd.Parameters.AddWithValue("@Phone", phone ?? "");
@@ -1466,8 +1599,8 @@ namespace TailorBD.API.Controllers
 
                 // Dress details built in C# to avoid FOR XML PATH Unicode (??) bug
                 var query = $@"
-                    SELECT DISTINCT 
-                        Order_Delivery_Date.OrderID,
+                    SELECT 
+                        [Order].OrderID,
                         [Order].Details AS OrderDetails,
                         [Order].OrderSerialNumber, 
                         Customer.CustomerNumber, 
@@ -1475,15 +1608,16 @@ namespace TailorBD.API.Controllers
                         Customer.Phone, 
                         Customer.Address, 
                         [Order].OrderDate, 
-                        Order_Delivery_Date.DeliveryInsertDate,   
+                        COALESCE(del.DeliveryInsertDate, [Order].Update_DeliveryDate, [Order].DeliveryDate) AS DeliveryInsertDate,   
                         [Order].DeliveryDate, 
                         [Order].DueAmount
                     {baseWhere}
-                    ORDER BY Order_Delivery_Date.DeliveryInsertDate, [Order].OrderSerialNumber
+                    ORDER BY COALESCE(del.DeliveryInsertDate, [Order].Update_DeliveryDate, [Order].DeliveryDate), [Order].OrderSerialNumber
                     OFFSET @Offset ROWS
                     FETCH NEXT @PageSize ROWS ONLY";
 
                 var orders = new List<dynamic>();
+                var orderIds = new List<int>();
                 using (var cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
@@ -1499,9 +1633,11 @@ namespace TailorBD.API.Controllers
                     using var reader = await cmd.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
+                        var oid = reader.GetInt32(reader.GetOrdinal("OrderID"));
+                        orderIds.Add(oid);
                         orders.Add(new
                         {
-                            orderId              = reader.GetInt32(reader.GetOrdinal("OrderID")),
+                            orderId              = oid,
                             orderSerialNumber    = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("OrderSerialNumber"))),
                             customerNumber       = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? "" : reader.GetValue(reader.GetOrdinal("CustomerNumber")).ToString(),
                             customerName         = reader.GetString(reader.GetOrdinal("CustomerName")),
@@ -1517,12 +1653,252 @@ namespace TailorBD.API.Controllers
                     }
                 }
 
-                return Ok(new { success = true, data = new { totalCount, stats, orders } });
+                // Fetch dress details for current page orders
+                var dressDetailsMap = await GetDeliveredOrderDressDetailsAsync(connection, institutionId, orderIds);
+
+                // Merge dress details into orders
+                var finalOrders = orders.Select(o => new
+                {
+                    o.orderId,
+                    o.orderSerialNumber,
+                    o.customerNumber,
+                    o.customerName,
+                    o.phone,
+                    o.address,
+                    o.orderDate,
+                    o.deliveryDate,
+                    o.deliveryInsertDate,
+                    o.dueAmount,
+                    dressDetails = dressDetailsMap.ContainsKey(o.orderId) ? dressDetailsMap[o.orderId] : "",
+                    o.orderDetails
+                }).ToList();
+
+                return Ok(new { success = true, data = new { totalCount, stats, orders = finalOrders } });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting delivered orders");
                 return StatusCode(500, new { success = false, message = "Error loading delivered orders: " + ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get delivered cut dress records (legacy Delivered_Works.aspx).
+        /// Shows each delivery batch from Order_Delivery_Date; falls back to completed
+        /// delivered orders that were never recorded in Order_Delivery_Date.
+        /// </summary>
+        [HttpGet("delivered-cut-dress")]
+        public async Task<ActionResult> GetDeliveredCutDress(
+            [FromQuery] int institutionId,
+            [FromQuery] string? phone = null,
+            [FromQuery] string? orderSerialNumbers = null,
+            [FromQuery] string? customerName = null,
+            [FromQuery] string? address = null,
+            [FromQuery] DateTime? startDate = null,
+            [FromQuery] DateTime? endDate = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 25)
+        {
+            try
+            {
+                if (institutionId <= 0)
+                    return BadRequest(new { success = false, message = "Invalid institution ID" });
+
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                const string customerFilters = @"
+                    AND (Customer.Phone LIKE '%' + @Phone + '%')
+                    AND (CAST([Order].OrderSerialNumber AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
+                    AND (ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
+                    AND (ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')";
+
+                var batchSource = $@"
+                    SELECT DISTINCT
+                        [Order].OrderID,
+                        [Order].Details AS OrderDetails,
+                        [Order].OrderSerialNumber,
+                        Customer.CustomerNumber,
+                        Customer.CustomerName,
+                        Customer.Phone,
+                        Customer.Address,
+                        [Order].OrderDate,
+                        odd.DeliveryInsertDate,
+                        [Order].DeliveryDate,
+                        [Order].DueAmount,
+                        CAST(0 AS bit) AS IsFallback
+                    FROM Customer WITH (NOLOCK)
+                    INNER JOIN [Order] WITH (NOLOCK) ON Customer.CustomerID = [Order].CustomerID
+                    INNER JOIN Order_Delivery_Date odd WITH (NOLOCK)
+                        ON [Order].OrderID = odd.OrderID AND odd.InstitutionID = [Order].InstitutionID
+                    WHERE ([Order].InstitutionID = @InstitutionID)
+                    AND ([Order].DeliveryStatus = N'Delivered')
+                    AND ([Order].WorkStatus = N'Completed')
+                    AND (odd.DeliveryInsertDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
+                    {customerFilters}";
+
+                var fallbackSource = $@"
+                    SELECT
+                        [Order].OrderID,
+                        [Order].Details AS OrderDetails,
+                        [Order].OrderSerialNumber,
+                        Customer.CustomerNumber,
+                        Customer.CustomerName,
+                        Customer.Phone,
+                        Customer.Address,
+                        [Order].OrderDate,
+                        COALESCE([Order].Update_DeliveryDate, [Order].DeliveryDate, [Order].OrderDate) AS DeliveryInsertDate,
+                        [Order].DeliveryDate,
+                        [Order].DueAmount,
+                        CAST(1 AS bit) AS IsFallback
+                    FROM Customer WITH (NOLOCK)
+                    INNER JOIN [Order] WITH (NOLOCK) ON Customer.CustomerID = [Order].CustomerID
+                    WHERE ([Order].InstitutionID = @InstitutionID)
+                    AND ([Order].DeliveryStatus = N'Delivered')
+                    AND ([Order].WorkStatus = N'Completed')
+                    AND NOT EXISTS (
+                        SELECT 1 FROM Order_Delivery_Date odd WITH (NOLOCK)
+                        WHERE odd.OrderID = [Order].OrderID AND odd.InstitutionID = [Order].InstitutionID)
+                    AND (COALESCE([Order].Update_DeliveryDate, [Order].DeliveryDate, [Order].OrderDate)
+                         BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
+                    {customerFilters}";
+
+                var combinedSource = $"SELECT * FROM ({batchSource} UNION ALL {fallbackSource}) AS src";
+
+                int totalCount = 0;
+                using (var countCmd = new SqlCommand($"SELECT COUNT(*) FROM ({combinedSource}) AS t", connection))
+                {
+                    AddDeliveredSearchParameters(countCmd, institutionId, phone, orderSerialNumbers, startDate, endDate, customerName, address);
+                    totalCount = (int)await countCmd.ExecuteScalarAsync();
+                }
+
+                dynamic? stats = null;
+                using (var statsCmd = new SqlCommand($@"
+                    SELECT COUNT(*) AS TotalOrders,
+                           ISNULL(SUM(CASE WHEN t.DueAmount > 0 THEN t.DueAmount ELSE 0 END), 0) AS TotalDue
+                    FROM ({combinedSource}) AS t", connection))
+                {
+                    AddDeliveredSearchParameters(statsCmd, institutionId, phone, orderSerialNumbers, startDate, endDate, customerName, address);
+                    using var r = await statsCmd.ExecuteReaderAsync();
+                    if (await r.ReadAsync())
+                        stats = new { totalOrders = r.GetInt32(0), totalDue = r.IsDBNull(1) ? 0.0 : r.GetDouble(1) };
+                }
+
+                var query = $@"
+                    {combinedSource}
+                    ORDER BY DeliveryInsertDate, OrderSerialNumber
+                    OFFSET @Offset ROWS
+                    FETCH NEXT @PageSize ROWS ONLY";
+
+                var orders = new List<dynamic>();
+                var batchKeys = new List<(int OrderId, DateTime DeliveryInsertDate)>();
+                var fallbackOrderIds = new List<int>();
+                using (var cmd = new SqlCommand(query, connection))
+                {
+                    AddDeliveredSearchParameters(cmd, institutionId, phone, orderSerialNumbers, startDate, endDate, customerName, address);
+                    cmd.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
+                    cmd.Parameters.AddWithValue("@PageSize", pageSize);
+
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        var oid = reader.GetInt32(reader.GetOrdinal("OrderID"));
+                        var deliveryInsertDate = reader.GetDateTime(reader.GetOrdinal("DeliveryInsertDate"));
+                        var isFallback = reader.GetBoolean(reader.GetOrdinal("IsFallback"));
+                        if (isFallback)
+                            fallbackOrderIds.Add(oid);
+                        else
+                            batchKeys.Add((oid, deliveryInsertDate));
+
+                        orders.Add(new
+                        {
+                            orderId = oid,
+                            orderSerialNumber = Convert.ToInt32(reader.GetValue(reader.GetOrdinal("OrderSerialNumber"))),
+                            customerNumber = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? "" : reader.GetValue(reader.GetOrdinal("CustomerNumber")).ToString(),
+                            customerName = reader.GetString(reader.GetOrdinal("CustomerName")),
+                            phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? "" : reader.GetString(reader.GetOrdinal("Phone")),
+                            address = reader.IsDBNull(reader.GetOrdinal("Address")) ? "" : reader.GetString(reader.GetOrdinal("Address")),
+                            orderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
+                            deliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")),
+                            deliveryInsertDate = deliveryInsertDate,
+                            dueAmount = reader.IsDBNull(reader.GetOrdinal("DueAmount")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("DueAmount")),
+                            isFallback = isFallback,
+                            dressDetails = "",
+                            orderDetails = reader.IsDBNull(reader.GetOrdinal("OrderDetails")) ? "" : reader.GetString(reader.GetOrdinal("OrderDetails"))
+                        });
+                    }
+                }
+
+                var dressDetailsMap = new Dictionary<string, string>();
+                if (batchKeys.Count > 0)
+                {
+                    var orderIds = batchKeys.Select(k => k.OrderId).Distinct().ToList();
+                    var idList = string.Join(",", orderIds);
+                    var dressQuery = $@"
+                        SELECT odd.OrderID, odd.DeliveryInsertDate, Dress.Dress_Name, odd.DQuantity
+                        FROM Order_Delivery_Date odd WITH (NOLOCK)
+                        INNER JOIN OrderList ol WITH (NOLOCK) ON odd.OrderListID = ol.OrderListID
+                        INNER JOIN Dress WITH (NOLOCK) ON ol.DressID = Dress.DressID
+                        WHERE odd.OrderID IN ({idList}) AND odd.InstitutionID = @InstitutionID
+                        ORDER BY odd.OrderID, odd.DeliveryInsertDate, ol.OrderList_SN";
+
+                    using var dCmd = new SqlCommand(dressQuery, connection);
+                    dCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    using var dReader = await dCmd.ExecuteReaderAsync();
+                    while (await dReader.ReadAsync())
+                    {
+                        int oid = dReader.GetInt32(0);
+                        var insertDate = dReader.GetDateTime(1);
+                        string key = $"{oid}|{insertDate:O}";
+                        string name = dReader.IsDBNull(2) ? "" : dReader.GetString(2);
+                        int qty = dReader.IsDBNull(3) ? 0 : dReader.GetInt32(3);
+                        string entry = $"{name} {qty}টি";
+                        if (dressDetailsMap.ContainsKey(key))
+                            dressDetailsMap[key] += ", " + entry;
+                        else
+                            dressDetailsMap[key] = entry;
+                    }
+                }
+
+                var fallbackDressMap = await GetDeliveredOrderDressDetailsAsync(
+                    connection, institutionId, fallbackOrderIds.Distinct().ToList());
+
+                var finalOrders = orders.Select(o =>
+                {
+                    int orderId = (int)o.orderId;
+                    string dressDetails;
+                    if (o.isFallback)
+                        dressDetails = fallbackDressMap.TryGetValue(orderId, out var fallbackDress) ? fallbackDress : "";
+                    else
+                    {
+                        string key = $"{orderId}|{((DateTime)o.deliveryInsertDate):O}";
+                        dressDetails = dressDetailsMap.ContainsKey(key) ? dressDetailsMap[key] : "";
+                    }
+
+                    return new
+                    {
+                        o.orderId,
+                        o.orderSerialNumber,
+                        o.customerNumber,
+                        o.customerName,
+                        o.phone,
+                        o.address,
+                        o.orderDate,
+                        o.deliveryDate,
+                        o.deliveryInsertDate,
+                        o.dueAmount,
+                        dressDetails,
+                        o.orderDetails
+                    };
+                }).ToList();
+
+                return Ok(new { success = true, data = new { totalCount, stats, orders = finalOrders } });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting delivered cut dress");
+                return StatusCode(500, new { success = false, message = "Error loading delivered cut dress: " + ex.Message });
             }
         }
 

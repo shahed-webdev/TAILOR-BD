@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -10,10 +10,10 @@
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Auth utility — MUST be first script, runs synchronously before any guard -->
-    <script src="/js/auth.js"></script>
+    <!-- Auth utility - MUST be first script, runs synchronously before any guard -->
+    <script src="/js/auth.js?v=2.1.6"></script>
     <!-- Shared sidebar + navbar component -->
-    <script src="/js/authority-layout.js" data-page="package"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="package"></script>
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,7 +38,7 @@
             overflow-x: hidden;
         }
 
-        /* ══════════ SIDEBAR ══════════ */
+        /* ---------- SIDEBAR ---------- */
         .auth-sidebar {
             width: var(--sidebar-w);
             background: var(--auth-primary);
@@ -98,7 +98,7 @@
         .nav-item.active { background: var(--auth-grad); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,.35); }
         .nav-item i { width: 18px; text-align: center; font-size: .9rem; }
 
-        /* ══════════ MAIN ══════════ */
+        /* ---------- MAIN ---------- */
         .auth-main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
         .auth-navbar {
@@ -130,7 +130,7 @@
         }
         .btn-navbar-danger:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239,68,68,.4); }
 
-        /* ══════════ CONTENT ══════════ */
+        /* ---------- CONTENT ---------- */
         .auth-content { padding: 28px; flex: 1; }
 
         /* Page header */
@@ -310,7 +310,7 @@
 </head>
 <body>
 
-<!-- ══════════ MAIN ══════════ -->
+<!-- ---------- MAIN ---------- -->
 <div class="auth-main">
 
     <!-- CONTENT -->
@@ -320,8 +320,8 @@
         <div class="page-header">
             <div class="ph-icon"><i class="fas fa-box-open"></i></div>
             <div class="ph-text">
-                <h2>প্যাকেজ তৈরি করুন</h2>
-                <p>নতুন প্যাকেজ যোগ করুন এবং বিদ্যমান প্যাকেজগুলো পরিচালনা করুন</p>
+                <h2 data-lang-key="প্যাকেজ তৈরি করুন">প্যাকেজ তৈরি করুন</h2>
+                <p data-lang-key="নতুন প্যাকেজ যোগ করুন এবং বিদ্যমান প্যাকেজগুলো পরিচালনা করুন">নতুন প্যাকেজ যোগ করুন এবং বিদ্যমান প্যাকেজগুলো পরিচালনা করুন</p>
             </div>
         </div>
 
@@ -329,7 +329,7 @@
         <div class="section-card">
             <div class="section-title">
                 <div class="st-icon"><i class="fas fa-plus"></i></div>
-                নতুন প্যাকেজ যোগ করুন
+            নতুন প্যাকেজ যোগ করুন
             </div>
 
             <div class="row g-3">
@@ -337,22 +337,22 @@
                     <label class="form-label">প্যাকেজের নাম <span class="text-danger">*</span></label>
                     <input type="text" id="pkgName" class="form-control"
                            placeholder="যেমন: Basic, Standard, Premium">
-                    <div class="invalid-feedback">প্যাকেজের নাম লিখুন</div>
+                    <div class="invalid-feedback" data-lang-key="প্যাকেজের নাম দিন">প্যাকেজের নাম দিন</div>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">মেয়াদ (Interval) <span class="text-danger">*</span></label>
                     <input type="text" id="pkgInterval" class="form-control"
                            placeholder="যেমন: 1 Year, 6 Month">
-                    <div class="invalid-feedback">মেয়াদ লিখুন</div>
+                    <div class="invalid-feedback" data-lang-key="মেয়াদ দিন">মেয়াদ দিন</div>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">বিবরণ (Details)</label>
+                    <label class="form-label" data-lang-key="বিবরণ (Details)">বিবরণ (Details)</label>
                     <textarea id="pkgDetails" class="form-control" rows="1"
-                              placeholder="প্যাকেজের বিবরণ লিখুন..."></textarea>
+                              placeholder="প্যাকেজের বিস্তারিত বিবরণ..."></textarea>
                 </div>
                 <div class="col-12 d-flex gap-2 mt-1">
                     <button class="btn-add" id="addBtn" onclick="addPackage()">
-                        <i class="fas fa-plus-circle"></i> প্যাকেজ যোগ করুন
+                        <i class="fas fa-plus-circle"></i> <span data-lang-key="প্যাকেজ যোগ করুন">প্যাকেজ যোগ করুন</span>
                     </button>
                 </div>
             </div>
@@ -381,10 +381,10 @@
                     <thead>
                         <tr>
                             <th style="width:42px;">#</th>
-                            <th>প্যাকেজের নাম</th>
-                            <th style="width:160px;">মেয়াদ</th>
-                            <th>বিবরণ</th>
-                            <th style="width:130px;">অ্যাকশন</th>
+                            <th data-lang-key="প্যাকেজের নাম">প্যাকেজের নাম</th>
+                            <th style="width:160px;" data-lang-key="মেয়াদ">মেয়াদ</th>
+                            <th data-lang-key="বিবরণ">বিবরণ</th>
+                            <th style="width:130px;" data-lang-key="কার্যক্রম">কার্যক্রম</th>
                         </tr>
                     </thead>
                     <tbody id="pkgTableBody">
@@ -415,12 +415,12 @@
                             display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
                     <i class="fas fa-trash-alt" style="color:#ef4444;font-size:1.3rem;"></i>
                 </div>
-                <h5 style="font-weight:700;margin-bottom:6px;">প্যাকেজ মুছবেন?</h5>
-                <p class="text-muted small mb-0" id="deleteModalMsg">এই প্যাকেজটি স্থায়ীভাবে মুছে ফেলা হবে।</p>
+                <h5 style="font-weight:700;margin-bottom:6px;" data-lang-key="ডিলিট নিশ্চিত করুন">ডিলিট নিশ্চিত করুন</h5>
+                <p class="text-muted small mb-0" id="deleteModalMsg" data-lang-key="এই প্যাকেজটি ডিলিট হয়ে যাবে">এই প্যাকেজটি ডিলিট হয়ে যাবে</p>
             </div>
             <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2 justify-content-center">
-                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">বাতিল</button>
-                <button class="btn btn-danger px-4 rounded-pill" id="confirmDeleteBtn">মুছুন</button>
+                <button class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal" data-lang-key="বাতিল">বাতিল</button>
+                <button class="btn btn-danger px-4 rounded-pill" id="confirmDeleteBtn" data-lang-key="ডিলিট">ডিলিট</button>
             </div>
         </div>
     </div>
@@ -438,7 +438,7 @@
     let allPackages = [];
     let pendingDeleteId = null;
 
-    // ── Init ──────────────────────────────────────────────────────────────────
+    // -- Init ------------------------------------------------------------------
     $(document).ready(function () {
         // Restore session from localStorage mirror, then guard Authority-only
         if (!TailorAuth.guard('Authority')) return;
@@ -462,25 +462,25 @@
         });
     });
 
-    // ── Load all packages ─────────────────────────────────────────────────────
+    // -- Load all packages -----------------------------------------------------
     function loadPackages() {
         $('#pkgTableBody').html(
             '<tr><td colspan="5" class="text-center py-4 text-muted">' +
             '<div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</td></tr>');
 
         $.get('/api/package', function (res) {
-            if (!res.success) { toast('লোড ব্যর্থ হয়েছে', 'error'); return; }
+            if (!res.success) { toast('ডাটা লোড হয়নি', 'error'); return; }
             allPackages = res.data || [];
             renderTable(allPackages);
         }).fail(function () {
             toast('সার্ভার ত্রুটি', 'error');
             $('#pkgTableBody').html(
                 '<tr><td colspan="5" class="text-center text-danger py-3">' +
-                '<i class="fas fa-exclamation-triangle me-2"></i>লোড ব্যর্থ হয়েছে</td></tr>');
+                '<i class="fas fa-exclamation-triangle me-2"></i><span data-lang-key="ডাটা লোড হয়নি">ডাটা লোড হয়নি</span></td></tr>');
         });
     }
 
-    // ── Render table ──────────────────────────────────────────────────────────
+    // -- Render table ----------------------------------------------------------
     function renderTable(list) {
         const $body = $('#pkgTableBody').empty();
         $('#pkgCount').text(list.length);
@@ -491,7 +491,7 @@
                 '<tr><td colspan="5">' +
                 '<div class="empty-state">' +
                 '<i class="fas fa-box-open"></i>' +
-                '<p>কোনো প্যাকেজ পাওয়া যায়নি। উপরের ফর্মে নতুন প্যাকেজ যোগ করুন।</p>' +
+                '<p data-lang-key="কোনো প্যাকেজ পাওয়া যায়নি। উপরের ফরম থেকে নতুন প্যাকেজ যোগ করুন।">কোনো প্যাকেজ পাওয়া যায়নি। উপরের ফরম থেকে নতুন প্যাকেজ যোগ করুন।</p>' +
                 '</div></td></tr>');
             return;
         }
@@ -503,15 +503,15 @@
                 '<td><span class="pkg-name">' + esc(p.packageName) + '</span></td>' +
                 '<td>' +
                   '<span class="pkg-interval"><i class="fas fa-clock me-1"></i>' +
-                  esc(p.interval || '—') + '</span>' +
+                  esc(p.interval || '-') + '</span>' +
                 '</td>' +
-                '<td><span class="pkg-details">' + esc(p.details || '—') + '</span></td>' +
+                '<td><span class="pkg-details">' + esc(p.details || '-') + '</span></td>' +
                 '<td>' +
                   '<div class="d-flex gap-1">' +
-                    '<button class="btn-action btn-edit" onclick="startEdit(' + p.packageID + ')" title="সম্পাদনা">' +
+                    '<button class="btn-action btn-edit" onclick="startEdit(' + p.packageID + ')" title="সম্পাদন">' +
                       '<i class="fas fa-edit"></i> Edit' +
                     '</button>' +
-                    '<button class="btn-action btn-delete" onclick="askDelete(' + p.packageID + ',\'' + esc(p.packageName) + '\')" title="মুছুন">' +
+                    '<button class="btn-action btn-delete" onclick="askDelete(' + p.packageID + ',\'' + esc(p.packageName) + '\')" title="ডিলিট">' +
                       '<i class="fas fa-trash-alt"></i>' +
                     '</button>' +
                   '</div>' +
@@ -521,7 +521,7 @@
         });
     }
 
-    // ── Filter ────────────────────────────────────────────────────────────────
+    // -- Filter ----------------------------------------------------------------
     window.filterTable = function () {
         const q = ($('#searchInput').val() || '').toLowerCase().trim();
         if (!q) { renderTable(allPackages); return; }
@@ -533,7 +533,7 @@
         renderTable(filtered);
     };
 
-    // ── Add package ───────────────────────────────────────────────────────────
+    // -- Add package -----------------------------------------------------------
     window.addPackage = function () {
         const name     = $('#pkgName').val().trim();
         const interval = $('#pkgInterval').val().trim();
@@ -556,7 +556,7 @@
         if (!valid) return;
 
         const $btn = $('#addBtn').prop('disabled', true);
-        $btn.html('<div class="spinner-border spinner-border-sm me-2"></div>যোগ হচ্ছে...');
+        $btn.html('<div class="spinner-border spinner-border-sm me-2"></div>তৈরি হচ্ছে...');
 
         $.ajax({
             url: '/api/package', method: 'POST',
@@ -564,7 +564,7 @@
             data: JSON.stringify({ packageName: name, interval: interval, details: details }),
             success: function (res) {
                 $btn.prop('disabled', false).html('<i class="fas fa-plus-circle"></i> প্যাকেজ যোগ করুন');
-                if (!res.success) { toast(res.message || 'যোগ ব্যর্থ', 'error'); return; }
+                if (!res.success) { toast(res.message || 'যোগ হয়নি', 'error'); return; }
                 toast('প্যাকেজ সফলভাবে যোগ হয়েছে!', 'success');
                 $('#pkgName, #pkgInterval, #pkgDetails').val('');
                 $('#pkgName, #pkgInterval').removeClass('is-invalid');
@@ -578,7 +578,7 @@
         });
     };
 
-    // ── Inline Edit ───────────────────────────────────────────────────────────
+    // -- Inline Edit -----------------------------------------------------------
     window.startEdit = function (id) {
         const pkg = allPackages.find(function (p) { return p.packageID === id; });
         if (!pkg) return;
@@ -596,10 +596,10 @@
             '<td><textarea id="edit-details-' + id + '" rows="2">' + esc(pkg.details || '') + '</textarea></td>' +
             '<td>' +
               '<div class="d-flex gap-1 flex-wrap">' +
-                '<button class="btn-action btn-save" onclick="saveEdit(' + id + ')" title="সংরক্ষণ">' +
+                '<button class="btn-action btn-save" onclick="saveEdit(' + id + ')" title="\u09b8\u09c7\u09ad">' +
                   '<i class="fas fa-check"></i> Save' +
                 '</button>' +
-                '<button class="btn-action btn-cancel" onclick="cancelEdit(' + id + ')" title="বাতিল">' +
+                '<button class="btn-action btn-cancel" onclick="cancelEdit(' + id + ')" title="\u09ac\u09be\u09a4\u09bf\u09b2">' +
                   '<i class="fas fa-times"></i>' +
                 '</button>' +
               '</div>' +
@@ -614,7 +614,7 @@
         const details  = $('#edit-details-' + id).val().trim();
 
         if (!name || !interval) {
-            toast('নাম ও মেয়াদ আবশ্যক', 'error');
+            toast('নাম ও মেয়াদ দিন', 'error');
             return;
         }
 
@@ -623,12 +623,12 @@
             contentType: 'application/json',
             data: JSON.stringify({ packageName: name, interval: interval, details: details }),
             success: function (res) {
-                if (!res.success) { toast(res.message || 'আপডেট ব্যর্থ', 'error'); return; }
-                toast('প্যাকেজ আপডেট হয়েছে', 'success');
+                if (!res.success) { toast(res.message || 'আপডেট হয়নি', 'error'); return; }
+                toast('প্যাকেজ সফলভাবে আপডেট হয়েছে', 'success');
                 loadPackages();
             },
             error: function (xhr) {
-                toast(xhr.responseJSON?.message || 'সার্ভার ত্রুটি', 'error');
+                toast(xhr.responseJSON?.message || 'আপডেট ব্যর্থ হয়েছে', 'error');
             }
         });
     };
@@ -645,14 +645,14 @@
             $(this).removeClass('edit-row').html(
                 '<td style="color:#94a3b8;">' + idx + '</td>' +
                 '<td><span class="pkg-name">' + esc(pkg.packageName) + '</span></td>' +
-                '<td><span class="pkg-interval"><i class="fas fa-clock me-1"></i>' + esc(pkg.interval || '—') + '</span></td>' +
-                '<td><span class="pkg-details">' + esc(pkg.details || '—') + '</span></td>' +
+                '<td><span class="pkg-interval"><i class="fas fa-clock me-1"></i>' + esc(pkg.interval || '-') + '</span></td>' +
+                '<td><span class="pkg-details">' + esc(pkg.details || '-') + '</span></td>' +
                 '<td>' +
                   '<div class="d-flex gap-1">' +
-                    '<button class="btn-action btn-edit" onclick="startEdit(' + pkg.packageID + ')">' +
+                    '<button class="btn-action btn-edit" onclick="startEdit(' + pkg.packageID + ')" title="সম্পাদন">' +
                       '<i class="fas fa-edit"></i> Edit' +
                     '</button>' +
-                    '<button class="btn-action btn-delete" onclick="askDelete(' + pkg.packageID + ',\'' + esc(pkg.packageName) + '\')">' +
+                    '<button class="btn-action btn-delete" onclick="askDelete(' + pkg.packageID + ',\'' + esc(pkg.packageName) + '\')" title="ডিলিট">' +
                       '<i class="fas fa-trash-alt"></i>' +
                     '</button>' +
                   '</div>' +
@@ -662,10 +662,10 @@
         });
     }
 
-    // ── Delete ────────────────────────────────────────────────────────────────
+    // -- Delete ----------------------------------------------------------------
     window.askDelete = function (id, name) {
         pendingDeleteId = id;
-        $('#deleteModalMsg').text('"' + name + '" প্যাকেজটি স্থায়ীভাবে মুছে ফেলা হবে।');
+        $('#deleteModalMsg').text('"' + name + '" প্যাকেজটি স্থায়ীভাবে ডিলিট হয়ে যাবে। নিশ্চিত?');
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     };
 
@@ -673,23 +673,23 @@
         $.ajax({
             url: '/api/package/' + id, method: 'DELETE',
             success: function (res) {
-                if (!res.success) { toast(res.message || 'মুছতে ব্যর্থ', 'error'); return; }
-                toast('প্যাকেজ মুছে ফেলা হয়েছে', 'success');
+                if (!res.success) { toast(res.message || 'ডিলিট হয়নি', 'error'); return; }
+                toast('প্যাকেজ ডিলিট সফল হয়েছে', 'success');
                 allPackages = allPackages.filter(function (p) { return p.packageID !== id; });
                 renderTable(allPackages);
             },
             error: function (xhr) {
-                toast(xhr.responseJSON?.message || 'সার্ভার ত্রুটি', 'error');
+                toast(xhr.responseJSON?.message || 'ডিলিট ব্যর্থ হয়েছে', 'error');
             }
         });
     }
 
-    // ── Enter key on form ─────────────────────────────────────────────────────
+    // -- Enter key on form -----------------------------------------------------
     $('#pkgName, #pkgInterval').on('keypress', function (e) {
         if (e.which === 13) addPackage();
     });
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // -- Helpers ---------------------------------------------------------------
     function esc(s) {
         return String(s || '')
             .replace(/&/g, '&amp;').replace(/</g, '&lt;')

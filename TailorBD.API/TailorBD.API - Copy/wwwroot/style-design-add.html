@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ডিজাইন যুক্ত করুন - TailorBD</title>
+    <title>স্টাইল ডিজাইন - TailorBD</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/dashboard.css" rel="stylesheet">
     <style>
-        /* ── Compact page overrides ── */
+        /* -- Compact page overrides -- */
         .page-header { margin-bottom: 16px !important; }
         .page-header h1 { font-size: 1.3rem; margin-bottom: 2px; }
         .page-header p   { font-size: .85rem; margin: 0; }
@@ -73,7 +73,7 @@
         }
         #designsTable tbody tr:hover { background: #f8f9ff; }
 
-        /* Thumbnail — compact */
+        /* Thumbnail � compact */
         .design-thumb {
             width: 42px;
             height: 42px;
@@ -124,18 +124,18 @@
             <!-- Page Header -->
             <div class="page-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h1>'<span id="categoryName"></span>' — ডিজাইন যুক্ত করুন</h1>
+                    <h1>'<span id="categoryName"></span>' এর স্টাইল ডিজাইন</h1>
                     <p class="text-muted" id="dressNameHeader"></p>
                 </div>
                 <a href="#" id="backButton" class="btn btn-sm btn-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> ফিরুন
+                    <i class="fas fa-arrow-left me-1"></i> ফিরে যান
                 </a>
             </div>
 
             <!-- Add Design Form -->
             <div class="add-form-card">
                 <div class="card-header">
-                    <i class="fas fa-plus-circle me-1"></i> নতুন ডিজাইন যুক্ত করুন
+                    <i class="fas fa-plus-circle me-1"></i> নতুন ডিজাইন যোগ করুন
                 </div>
                 <div class="card-body">
                     <form id="addDesignForm">
@@ -143,20 +143,20 @@
                             <div class="col-sm-4">
                                 <label class="form-label form-label-sm mb-1">ডিজাইনের নাম</label>
                                 <input type="text" class="form-control form-control-sm" id="designName"
-                                       placeholder="যেমন: নিচের পাট, টিকাইন..." required>
+                                       placeholder="যেমন: চাইনিজ, হাওয়াই..." required>
                             </div>
                             <div class="col-sm-2">
-                                <label class="form-label form-label-sm mb-1">সিরিয়াল</label>
+                                <label class="form-label form-label-sm mb-1">ক্রমিক নম্বর</label>
                                 <input type="number" class="form-control form-control-sm" id="designSerial"
                                        placeholder="১, ২..." min="1">
                             </div>
                             <div class="col-sm-3">
-                                <label class="form-label form-label-sm mb-1">ডিজাইনের ছবি</label>
+                                <label class="form-label form-label-sm mb-1">ছবি (ঐচ্ছিক)</label>
                                 <input type="file" class="form-control form-control-sm" id="designImage" accept="image/*">
                             </div>
                             <div class="col-sm-3">
                                 <button type="submit" class="btn btn-primary btn-sm w-100">
-                                    <i class="fas fa-plus me-1"></i> ডিজাইন যুক্ত করুন
+                                    <i class="fas fa-plus me-1"></i> ডিজাইন যোগ করুন
                                 </button>
                             </div>
                         </div>
@@ -167,20 +167,20 @@
             <!-- Designs Table -->
             <div class="table-card">
                 <div class="table-card-header">
-                    <h6><i class="fas fa-palette me-2 text-primary"></i>ডিজাইনের তালিকা</h6>
+                    <h6><i class="fas fa-palette me-2 text-primary"></i>ডিজাইন তালিকা</h6>
                     <button type="button" class="btn btn-success btn-sm" id="updateSerialsBtn" style="display:none;">
-                        <i class="fas fa-save me-1"></i> সিরিয়াল আপডেট করুন
+                        <i class="fas fa-save me-1"></i> ক্রমিক আপডেট করুন
                     </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="designsTable">
                         <thead>
                             <tr>
-                                <th style="width:60px;">ইডিট</th>
+                                <th style="width:60px;">নির্বাচন</th>
                                 <th>ডিজাইনের নাম</th>
                                 <th style="width:70px;">ছবি</th>
-                                <th style="width:90px;">সিরিয়াল</th>
-                                <th style="width:60px;">ডিলিট</th>
+                                <th style="width:90px;">ক্রমিক</th>
+                                <th style="width:60px;">মুছুন</th>
                             </tr>
                         </thead>
                         <tbody id="designsTableBody">
@@ -203,7 +203,7 @@
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header py-2" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;">
-                    <h6 class="modal-title mb-0"><i class="fas fa-edit me-1"></i> ডিজাইন এডিট</h6>
+                    <h6 class="modal-title mb-0"><i class="fas fa-edit me-1"></i> ডিজাইন সম্পাদনা</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -213,9 +213,9 @@
                         <input type="text" class="form-control" id="editDesignName" required>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label">ছবি আপডেট করুন</label>
+                        <label class="form-label">ছবি পরিবর্তন করুন</label>
                         <input type="file" class="form-control form-control-sm" id="editDesignImage" accept="image/*">
-                        <small class="text-muted">পুরাতন ছবি রাখতে খালি রাখুন</small>
+                        <small class="text-muted">খালি রাখলে আগের ছবি থাকবে</small>
                     </div>
                     <div class="text-center">
                         <img id="editDesignImagePreview" src="" alt="Current"
@@ -225,7 +225,7 @@
                 <div class="modal-footer py-2">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">বাতিল</button>
                     <button type="button" class="btn btn-primary btn-sm" onclick="updateDesign()">
-                        <i class="fas fa-save me-1"></i> সংরক্ষণ
+                        <i class="fas fa-save me-1"></i> সংরক্ষণ করুন
                     </button>
                 </div>
             </div>
@@ -234,7 +234,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/style-design-add.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/style-design-add.js?v=2.1.6"></script>
 </body>
 </html>

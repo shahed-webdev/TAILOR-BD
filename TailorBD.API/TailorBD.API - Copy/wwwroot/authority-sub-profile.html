@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -12,13 +12,13 @@
     <link rel="stylesheet" href="/css/authority-profile.css">
 
     <!-- Auth guard + shared sidebar/navbar (Sub-Authority mode) -->
-    <script src="/js/auth.js"></script>
-    <script src="/js/authority-layout.js" data-page="sub-dashboard"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="sub-dashboard"></script>
 
     <style>
         .auth-content { overflow-x: hidden; }
 
-        /* ── Welcome banner ── */
+        /* -- Welcome banner -- */
         .dash-header {
             background: var(--auth-grad);
             border-radius: var(--radius);
@@ -58,7 +58,7 @@
         }
         .dash-avatar-wrap { z-index:1; opacity:.2; flex-shrink:0; }
 
-        /* ── Section heading ── */
+        /* -- Section heading -- */
         .dash-section-title {
             font-size:.74rem; font-weight:700; color:#94a3b8;
             text-transform:uppercase; letter-spacing:.8px;
@@ -67,7 +67,7 @@
         }
         .dash-section-title::after { content:''; flex:1; height:1px; background:#e2e8f0; }
 
-        /* ── Page grid ── */
+        /* -- Page grid -- */
         .page-grid {
             display:grid;
             grid-template-columns:repeat(auto-fill, minmax(170px,1fr));
@@ -103,7 +103,7 @@
         .page-card .pc-label { font-size:.85rem; font-weight:700; color:#1e293b; }
         .page-card .pc-group { font-size:.71rem; color:#94a3b8; margin-top:3px; }
 
-        /* ── Shimmer loading ── */
+        /* -- Shimmer loading -- */
         .shimmer {
             background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);
             background-size:200% 100%;
@@ -112,7 +112,7 @@
         }
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-        /* ── No access ── */
+        /* -- No access -- */
         .no-access {
             text-align:center; padding:50px 20px;
             background:#fff; border-radius:var(--radius);
@@ -122,7 +122,7 @@
         .no-access h5 { color:#64748b; font-weight:700; }
         .no-access p  { color:#94a3b8; font-size:.85rem; }
 
-        /* ── Responsive ── */
+        /* -- Responsive -- */
         @media (max-width:640px) {
             .dash-header { flex-wrap:wrap; padding:18px 20px; }
             .dash-title h2 { font-size:1.05rem; }
@@ -138,17 +138,17 @@
 <div class="auth-main">
 <div class="auth-content">
 
-    <!-- ── Welcome Header ── -->
+    <!-- -- Welcome Header -- -->
     <div class="dash-header">
         <div class="dash-avatar" id="dashAvatar">
             <span id="dashInitials">SA</span>
         </div>
         <div class="dash-title">
-            <h2>স্বাগতম, <span id="dashName">Sub Authority</span>!</h2>
+            <h2>রিফ্রেশ, <span id="dashName">Sub Authority</span>!</h2>
             <p id="dashDesig">Sub Authority Panel</p>
             <div class="access-badge">
                 <i class="fas fa-shield-alt"></i>
-                <span id="accessCount">0</span> টি পেইজ অ্যাক্সেসযোগ্য
+                <span id="accessCount">0</span> ?? মোট? ড্যাশবোর্ডমোট?
             </div>
         </div>
         <div class="dash-avatar-wrap">
@@ -156,8 +156,8 @@
         </div>
     </div>
 
-    <!-- ── Quick Access ── -->
-    <div class="dash-section-title"><i class="fas fa-bolt"></i> দ্রুত প্রবেশ</div>
+    <!-- -- Quick Access -- -->
+    <div class="dash-section-title"><i class="fas fa-bolt"></i> স্টাফ সংখ্যা</div>
 
     <div class="section-card">
         <!-- Shimmer loading -->
@@ -174,8 +174,8 @@
         <!-- No access -->
         <div class="no-access" id="noAccess" style="display:none;">
             <i class="fas fa-lock"></i>
-            <h5>কোনো পেইজ অ্যাক্সেসযোগ্য নয়</h5>
-            <p>পেইজ এক্সেস পেতে আপনার Authority-র সাথে যোগাযোগ করুন।</p>
+            <h5>মোট? দোকান পয়সাপ্রতিষ্ঠার বছর</h5>
+            <p>দোকান পয়সা? দোকান পয়সা Authority-? মোট? ইনভয়েস দেখুন</p>
         </div>
     </div>
 
@@ -188,7 +188,7 @@
 <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// ── Page key → HTML URL map (সব authority pages) ────────────────────────────
+// -- Page key ? HTML URL map (?? authority pages) ----------------------------
 var PAGE_URLS = {
     'profile':             '/authority-profile.html',
     'package':             '/authority-package.html',
@@ -203,7 +203,7 @@ var PAGE_URLS = {
 };
 
 $(document).ready(function () {
-    // Auth guard — only Sub-Authority allowed
+    // Auth guard � only Sub-Authority allowed
     TailorAuth.restore();
     var isLoggedIn = TailorAuth.get('isLoggedIn');
     var category   = TailorAuth.get('category');

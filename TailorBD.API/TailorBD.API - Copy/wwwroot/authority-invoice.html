@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Management - TailorBD</title>
 
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/authority-profile.css">
 
-    <!-- Auth utility — MUST be first script, runs synchronously before any guard -->
-    <script src="/js/auth.js"></script>
+    <!-- Auth utility - MUST be first script, runs synchronously before any guard -->
+    <script src="/js/auth.js?v=2.1.6"></script>
     <!-- Shared sidebar + navbar component -->
-    <script src="/js/authority-layout.js" data-page="invoice"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="invoice"></script>
 
     <style>
         :root {
@@ -136,7 +137,7 @@
 </head>
 <body>
 
-<!-- ── MAIN ── -->
+<!-- -- MAIN -- -->
 <div class="auth-main">
     <div class="auth-content">
 
@@ -145,7 +146,7 @@
             <div class="ph-icon"><i class="fas fa-file-invoice-dollar"></i></div>
             <div class="ph-text">
                 <h2>Invoice Management</h2>
-                <p>সকল প্রতিষ্ঠানের বিল তৈরি, অটো-রিনিউ ও পেমেন্ট ট্র্যাক করুন</p>
+                <p data-lang-key="সব প্রতিষ্ঠানের ইনভয়েস দেখুন ও তৈরি করুন, প্যাকেজ-রিনিউ ও পেমেন্ট ব্যবস্থাপনা করুন">সব প্রতিষ্ঠানের ইনভয়েস দেখুন ও তৈরি করুন, প্যাকেজ-রিনিউ ও পেমেন্ট ব্যবস্থাপনা করুন</p>
             </div>
         </div>
 
@@ -153,31 +154,31 @@
         <div class="stat-grid" id="statGrid">
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--auth-grad);"><i class="fas fa-building"></i></div>
-                <div><div class="sc-val" id="statTotal">—</div><div class="sc-lbl">মোট ইনস্টিটিউশন</div></div>
+                <div><div class="sc-val" id="statTotal">?</div><div class="sc-lbl" data-lang-key="মোট প্রতিষ্ঠান">মোট প্রতিষ্ঠান</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-clock"></i></div>
-                <div><div class="sc-val" id="statExpired">—</div><div class="sc-lbl">মেয়াদ শেষ</div></div>
+                <div><div class="sc-val" id="statExpired">?</div><div class="sc-lbl" data-lang-key="মেয়াদ শেষ">মেয়াদ শেষ</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-exclamation-triangle"></i></div>
-                <div><div class="sc-val" id="statExpiring">—</div><div class="sc-lbl">১৫ দিনে মেয়াদ শেষ</div></div>
+                <div><div class="sc-val" id="statExpiring">?</div><div class="sc-lbl" data-lang-key="৭ দিনে মেয়াদ শেষ">৭ দিনে মেয়াদ শেষ</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-check-circle"></i></div>
-                <div><div class="sc-val" id="statDue">—</div><div class="sc-lbl">বকেয়া বিল আছে</div></div>
+                <div><div class="sc-val" id="statDue">?</div><div class="sc-lbl" data-lang-key="বকেয়া আছে এমন">বকেয়া আছে এমন</div></div>
             </div>
         </div>
 
         <!-- Tabs -->
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('tab-institutions',this)"><i class="fas fa-building me-1"></i>প্রতিষ্ঠান তালিকা</button>
-            <button class="tab-btn" onclick="switchTab('tab-invoices',this)"><i class="fas fa-list me-1"></i>Invoice তালিকা</button>
-            <button class="tab-btn" onclick="switchTab('tab-create',this)"><i class="fas fa-plus-circle me-1"></i>নতুন Invoice</button>
-            <button class="tab-btn" onclick="switchTab('tab-auto',this)"><i class="fas fa-robot me-1"></i>অটো-জেনারেট</button>
+            <button class="tab-btn active" onclick="switchTab('tab-institutions',this)"><i class="fas fa-building me-1"></i><span data-lang-key="প্রতিষ্ঠান তালিকা">প্রতিষ্ঠান তালিকা</span></button>
+            <button class="tab-btn" onclick="switchTab('tab-invoices',this)"><i class="fas fa-list me-1"></i><span data-lang-key="Invoice তালিকা">Invoice তালিকা</span></button>
+            <button class="tab-btn" onclick="switchTab('tab-create',this)"><i class="fas fa-plus-circle me-1"></i><span data-lang-key="নতুন Invoice">নতুন Invoice</span></button>
+            <button class="tab-btn" onclick="switchTab('tab-auto',this)"><i class="fas fa-robot me-1"></i><span data-lang-key="অটো-জেনারেট">অটো-জেনারেট</span></button>
         </div>
 
-        <!-- ═══ TAB 1 — Institutions ═══ -->
+        <!-- --- TAB 1 ? Institutions --- -->
         <div class="tab-panel active" id="tab-institutions">
             <div class="action-bar">
                 <div class="search-box">
@@ -185,29 +186,29 @@
                     <input type="text" id="insSearch" placeholder="নাম, ফোন বা ইউজার খুঁজুন..." oninput="filterInstitutions()">
                 </div>
                 <select class="filter-select" id="insValidation" onchange="loadInstitutions()">
-                    <option value="">সব</option>
+                    <option value="" data-lang-key="সব">সব</option>
                     <option value="Valid">Valid</option>
                     <option value="Invalid">Invalid</option>
                 </select>
                 <select class="filter-select" id="insExpiry" onchange="loadInstitutions()">
-                    <option value="">সব মেয়াদ</option>
-                    <option value="expired">মেয়াদ শেষ</option>
-                    <option value="expiring">১৫日に শেষ</option>
+                    <option value="" data-lang-key="সব মেয়াদ">সব মেয়াদ</option>
+                    <option value="expired" data-lang-key="মেয়াদ শেষ">মেয়াদ শেষ</option>
+                    <option value="expiring" data-lang-key="শেষ হচ্ছে">শেষ হচ্ছে</option>
                 </select>
                 <button class="btn-action btn-success-action" id="bulkRenewBtn" onclick="bulkRenew()" disabled>
-                    <i class="fas fa-redo"></i> নির্বাচিত Renew
+                    <i class="fas fa-redo"></i> <span data-lang-key="নির্বাচিত Renew">নির্বাচিত Renew</span>
                 </button>
                 <button class="btn-action btn-primary-action" onclick="goCreateForSelected()">
-                    <i class="fas fa-file-invoice"></i> Invoice তৈরি
+                    <i class="fas fa-file-invoice"></i> <span data-lang-key="Invoice তৈরি">Invoice তৈরি</span>
                 </button>
             </div>
             <div class="section-card">
                 <div class="section-title">
                     <div class="st-icon"><i class="fas fa-list"></i></div>
-                    প্রতিষ্ঠান তালিকা
+                    <span data-lang-key="প্রতিষ্ঠান তালিকা">প্রতিষ্ঠান তালিকা</span>
                     <div class="st-badge" id="insCountBadge">0</div>
                     <label style="margin-left:auto;font-size:.8rem;color:#64748b;font-weight:500;cursor:pointer;">
-                        <input type="checkbox" id="selectAllIns" class="custom-check me-1" onchange="toggleSelectAll(this)"> সব নির্বাচন
+                        <input type="checkbox" id="selectAllIns" class="custom-check me-1" onchange="toggleSelectAll(this)"> <span data-lang-key="সব নির্বাচন">সব নির্বাচন</span>
                     </label>
                 </div>
                 <div class="table-responsive">
@@ -215,11 +216,11 @@
                         <thead>
                             <tr>
                                 <th style="width:36px;"></th>
-                                <th>প্রতিষ্ঠান</th>
-                                <th>ফোন</th>
-                                <th>প্যাকেজ</th>
-                                <th>মেয়াদ শেষ</th>
-                                <th>বকেয়া</th>
+                                <th data-lang-key="প্রতিষ্ঠান">প্রতিষ্ঠান</th>
+                                <th data-lang-key="ফোন">ফোন</th>
+                                <th data-lang-key="প্যাকেজ">প্যাকেজ</th>
+                                <th data-lang-key="মেয়াদ শেষ">মেয়াদ শেষ</th>
+                                <th data-lang-key="পরিমাণ">পরিমাণ</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -232,7 +233,7 @@
             </div>
         </div>
 
-        <!-- ═══ TAB 2 — Invoice List ═══ -->
+        <!-- --- TAB 2 ? Invoice List --- -->
         <div class="tab-panel" id="tab-invoices">
             <div class="action-bar">
                 <div class="search-box">
@@ -240,13 +241,13 @@
                     <input type="text" id="invSearchInstitution" placeholder="Institution ID..." oninput="loadInvoices()">
                 </div>
                 <select class="filter-select" id="invStatus" onchange="loadInvoices()">
-                    <option value="">সব Status</option>
+                    <option value="" data-lang-key="সব Status">সব Status</option>
                     <option value="Due">Due</option>
                     <option value="Paid">Paid</option>
                     <option value="Partial">Partial</option>
                 </select>
                 <button class="btn-action btn-primary-action" onclick="loadInvoices()">
-                    <i class="fas fa-sync"></i> রিফ্রেশ
+                    <i class="fas fa-sync"></i> <span data-lang-key="রিফ্রেশ">রিফ্রেশ</span>
                 </button>
             </div>
             <div class="section-card">
@@ -260,19 +261,19 @@
                         <thead>
                             <tr>
                                 <th>Invoice ID</th>
-                                <th>প্রতিষ্ঠান</th>
+                                <th data-lang-key="প্রতিষ্ঠান">প্রতিষ্ঠান</th>
                                 <th>Invoice For</th>
                                 <th>Issue Date</th>
                                 <th>End Date</th>
-                                <th>মোট</th>
-                                <th>বকেয়া</th>
+                                <th data-lang-key="মূল্য">মূল্য</th>
+                                <th data-lang-key="পরিমাণ">পরিমাণ</th>
                                 <th>Status</th>
                                 <th>Type</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="invTbody">
-                            <tr><td colspan="10" class="text-center py-4">Invoice লোড করুন</td></tr>
+                            <tr><td colspan="10" class="text-center py-4" data-lang-key="Invoice লোড হচ্ছে...">Invoice লোড হচ্ছে...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -286,7 +287,7 @@
             </div>
         </div>
 
-        <!-- ═══ TAB 3 — Create Invoice ═══ -->
+        <!-- --- TAB 3 ? Create Invoice --- -->
         <div class="tab-panel" id="tab-create">
             <div class="section-card">
                 <div class="section-title">
@@ -295,14 +296,14 @@
                 </div>
                 <div class="row g-3">
                     <div class="col-12">
-                        <label style="font-weight:600;font-size:.83rem;color:#475569;">নির্বাচিত প্রতিষ্ঠান</label>
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;" data-lang-key="নির্বাচিত প্রতিষ্ঠান">নির্বাচিত প্রতিষ্ঠান</label>
                         <div id="selectedInsChips" class="d-flex flex-wrap gap-2 mt-1 p-3 rounded-3" style="background:#f8fafc;border:1.5px solid #e2e8f0;min-height:42px;">
-                            <span class="text-muted small" id="noSelMsg">প্রত institucional তালিকা থেকে নির্বাচন করুন অথবা নিচে ID দিন</span>
+                            <span class="text-muted small" id="noSelMsg" data-lang-key="বামে প্রতিষ্ঠান নির্বাচন করুন অথবা নিচে ID দিন">বামে প্রতিষ্ঠান নির্বাচন করুন অথবা নিচে ID দিন</span>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label style="font-weight:600;font-size:.83rem;color:#475569;">Institution ID গুলো (কমা দিয়ে)</label>
-                        <input type="text" id="manualInsIds" class="form-control" placeholder="যেমন: 1,2,5">
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;" data-lang-key="Institution ID দিন (কমা দিয়ে)">Institution ID দিন (কমা দিয়ে)</label>
+                        <input type="text" id="manualInsIds" class="form-control" placeholder="উদা: 1,2,5">
                     </div>
                     <div class="col-md-4">
                         <label style="font-weight:600;font-size:.83rem;color:#475569;">Invoice For</label>
@@ -317,7 +318,7 @@
                         <input type="date" id="endDate" class="form-control">
                     </div>
                     <div class="col-md-2">
-                        <label style="font-weight:600;font-size:.83rem;color:#475569;">Discount (৳)</label>
+                        <label style="font-weight:600;font-size:.83rem;color:#475569;" data-lang-key="Discount (৳)">Discount (৳)</label>
                         <input type="number" id="discount" class="form-control" value="0" min="0">
                     </div>
                 </div>
@@ -331,7 +332,7 @@
                 </div>
                 <div class="row g-2 mb-3">
                     <div class="col">
-                        <input type="text" id="lineDetails" class="form-control" placeholder="Description (যেমন: Renew — Basic)">
+                        <input type="text" id="lineDetails" class="form-control" placeholder="বিবরণ (উদা: Renew - Basic)">
                     </div>
                     <div class="col-auto">
                         <input type="number" id="lineAmount" class="form-control" placeholder="Amount (৳)" min="0" style="width:140px;">
@@ -344,20 +345,20 @@
                 </div>
                 <div class="table-responsive">
                     <table class="table lines-table">
-                        <thead><tr><th>Description</th><th>Amount (৳)</th><th></th></tr></thead>
-                        <tbody id="linesTbody"><tr id="noLinesRow"><td colspan="3" class="text-center text-muted py-2">কোনো line item নেই</td></tr></tbody>
-                        <tfoot><tr><td class="text-end">মোট:</td><td id="linesTotal">৳ 0.00</td><td></td></tr></tfoot>
+                        <thead><tr><th>Description</th><th data-lang-key="Amount (৳)">Amount (৳)</th><th></th></tr></thead>
+                        <tbody id="linesTbody"><tr id="noLinesRow"><td colspan="3" class="text-center text-muted py-2" data-lang-key="কোনো line item নেই">কোনো line item নেই</td></tr></tbody>
+                        <tfoot><tr><td class="text-end" data-lang-key="মোট:">মোট:</td><td id="linesTotal" data-lang-key="৳ 0.00">৳ 0.00</td><td></td></tr></tfoot>
                     </table>
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <button class="btn-action btn-primary-action" id="createInvoiceBtn" onclick="submitCreateInvoice()">
-                        <i class="fas fa-paper-plane"></i> Invoice তৈরি করুন
+                        <i class="fas fa-paper-plane"></i> <span data-lang-key="Invoice তৈরি করুন">Invoice তৈরি করুন</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- ═══ TAB 4 — Auto Generate ═══ -->
+        <!-- --- TAB 4 ? Auto Generate --- -->
         <div class="tab-panel" id="tab-auto">
             <div class="row g-4">
                 <!-- Info card -->
@@ -365,29 +366,29 @@
                     <div class="section-card h-100">
                         <div class="section-title">
                             <div class="st-icon"><i class="fas fa-robot"></i></div>
-                            অটো-জেনারেট কিভাবে কাজ করে?
+                    অটো-জেনারেট কিভাবে কাজ করে
                         </div>
                         <div class="d-flex flex-column gap-3" style="font-size:.88rem;color:#475569;">
                             <div class="d-flex gap-3 align-items-start">
                                 <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
-                                <div><strong>প্রতিদিন রাত ১২:০৫ টায়</strong> সিস্টেম স্বয়ংক্রিয়ভাবে চেক করে।</div>
+                                <div><strong data-lang-key="প্রতিদিন রাত ১২:০০ টায়">প্রতিদিন রাত ১২:০০ টায়</strong> স্বয়ংক্রিয়ভাবে চলে</div>
                             </div>
                             <div class="d-flex gap-3 align-items-start">
                                 <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
-                                <div>যে সব প্রতিষ্ঠানের <strong>মেয়াদ শেষ হয়েছে</strong> তাদের জন্য invoice তৈরি হয়।</div>
+                                <div>যে সব প্রতিষ্ঠানের <strong data-lang-key="মেয়াদ শেষ হওয়া">মেয়াদ শেষ হওয়া</strong> প্যাকেজ আছে তাদের invoice তৈরি হয়</div>
                             </div>
                             <div class="d-flex gap-3 align-items-start">
                                 <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
-                                <div>একই মাসে দুটো অটো-invoice তৈরি হয় না (<strong>duplicate protection</strong>)।</div>
+                                <div>ইতিমধ্যে invoice থাকলে auto-invoice তৈরি হয় না (<strong>duplicate protection</strong>)</div>
                             </div>
                             <div class="d-flex gap-3 align-items-start">
                                 <div style="width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">4</div>
-                                <div>যদি কোনো কারণে না হয়, নিচের বাটনে ক্লিক করে <strong>এক ক্লিকে সব বানানো যাবে।</strong></div>
+                                <div>প্রতিটি মাস আলাদা ইনভয়েস, প্রতি প্যাকেজের মূল্য অনুযায়ী <strong data-lang-key="আলাদা পরিমাণ নিয়ে তৈরি হয়">আলাদা পরিমাণ নিয়ে তৈরি হয়</strong></div>
                             </div>
                         </div>
                         <div class="mt-4 p-3 rounded-3" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
-                            <div style="font-size:.78rem;color:#64748b;margin-bottom:2px;">পরবর্তী অটো-রান</div>
-                            <div style="font-size:1rem;font-weight:700;color:#10b981;" id="nextRunTime">—</div>
+                            <div style="font-size:.78rem;color:#64748b;margin-bottom:2px;" data-lang-key="পরবর্তী অটো-রান">পরবর্তী অটো-রান</div>
+                            <div style="font-size:1rem;font-weight:700;color:#10b981;" id="nextRunTime"></div>
                         </div>
                     </div>
                 </div>
@@ -396,14 +397,13 @@
                     <div class="section-card">
                         <div class="section-title">
                             <div class="st-icon" style="background:var(--green-grad);"><i class="fas fa-magic"></i></div>
-                            এক ক্লিকে সব বিল তৈরি করুন
+                            ম্যানুয়াল অটোজেনারেট চালু করুন
                         </div>
-                        <p style="font-size:.88rem;color:#64748b;margin-bottom:16px;">
-                            এই বাটনে ক্লিক করলে যে সব প্রতিষ্ঠানের মেয়াদ শেষ হয়েছে এবং এই মাসে এখনো অটো-invoice নেই,
-                            তাদের সবার জন্য স্বয়ংক্রিয়ভাবে invoice তৈরি হবে।
-                        </p>
+                        <p style="font-size:.88rem;color:#64748b;margin-bottom:16px;" data-lang-key="এই বাটনে ক্লিক করলে সব প্রতিষ্ঠানের মেয়াদ শেষ হওয়া প্যাকেজের জন্য auto-invoice তৈরি হবে,
+                            যাদের এই মাসের জন্য ইতিমধ্যে invoice আছে তাদের বাদ দেওয়া হবে।">এই বাটনে ক্লিক করলে সব প্রতিষ্ঠানের মেয়াদ শেষ হওয়া প্যাকেজের জন্য auto-invoice তৈরি হবে,
+                            যাদের এই মাসের জন্য ইতিমধ্যে invoice আছে তাদের বাদ দেওয়া হবে।</p>
                         <button class="btn-action btn-success-action" id="autoGenBtn" onclick="runAutoGenerate()" style="font-size:1rem;padding:13px 28px;">
-                            <i class="fas fa-magic"></i> এখনই সব বিল তৈরি করুন
+                            <i class="fas fa-magic"></i> <span data-lang-key="এখনই চালু করুন">এখনই চালু করুন</span>
                         </button>
                         <div id="autoGenResult" class="mt-3" style="display:none;"></div>
                     </div>
@@ -416,11 +416,13 @@
                             <button class="btn-sm-icon btn-view ms-auto" onclick="loadAutoLog()"><i class="fas fa-sync"></i></button>
                         </div>
                         <div id="autoLogContainer">
-                            <div class="text-center text-muted py-3" style="font-size:.85rem;">লগ লোড করুন</div>
+                            <div class="text-center text-muted py-3" style="font-size:.85rem;" data-lang-key="কোনো লগ নেই">কোনো লগ নেই</div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
         </div>
 
     </div><!-- auth-content -->
@@ -431,13 +433,13 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 rounded-4 shadow">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">পেমেন্ট আপডেট</h5>
+                <h5 class="modal-title fw-bold" data-lang-key="পেমেন্ট করুন">পেমেন্ট করুন</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="payInvoiceId">
                 <div class="mb-2">
-                    <label style="font-size:.82rem;font-weight:600;color:#475569;">মোট বিল</label>
+                    <label style="font-size:.82rem;font-weight:600;color:#475569;" data-lang-key="মোট পরিমাণ">মোট পরিমাণ</label>
                     <div id="payTotal" style="font-size:1.1rem;font-weight:700;color:#1e293b;"></div>
                 </div>
                 <div>
@@ -446,8 +448,8 @@
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">বাতিল</button>
-                <button class="btn btn-success rounded-pill px-4" onclick="submitPayment()">সেভ করুন</button>
+                <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal" data-lang-key="বাতিল">বাতিল</button>
+                <button class="btn btn-success rounded-pill px-4" onclick="submitPayment()" data-lang-key="জমা দিন">জমা দিন</button>
             </div>
         </div>
     </div>
@@ -458,14 +460,14 @@
 <script src="/lib/jquery/jquery.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-// ── State ─────────────────────────────────────────────────────────────────────
+// -- State ---------------------------------------------------------------------
 let allInstitutions = [];
 let selectedInsIds  = new Set();
 let invPage         = 1;
 let invTotal        = 0;
 let lines           = [];
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// -- Helpers -------------------------------------------------------------------
 function esc(s) {
     return String(s == null ? '' : s)
         .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -473,17 +475,18 @@ function esc(s) {
 }
 
 function fmt(d) {
-    if (!d) return '—';
+    if (!d) return '-';
     const dt = d instanceof Date ? d : new Date(d);
-    return dt.toLocaleDateString('bn-BD', { day:'numeric', month:'short', year:'numeric' });
+    const loc = (window.AuthLang||'bn')==='en' ? 'en-GB' : 'bn-BD';
+    return dt.toLocaleDateString(loc, { day:'numeric', month:'short', year:'numeric' });
 }
 
 function fmtDate(d) { return fmt(d); }
 
-// ── Payment Modal ─────────────────────────────────────────────────────────────
+// -- Payment Modal -------------------------------------------------------------
 function openPayModal(invoiceId, totalAmount) {
     document.getElementById('payInvoiceId').value = invoiceId;
-    document.getElementById('payTotal').textContent = '৳ ' + parseFloat(totalAmount||0).toFixed(2);
+    document.getElementById('payTotal').textContent = '? ' + parseFloat(totalAmount||0).toFixed(2);
     document.getElementById('payAmount').value = '';
     new bootstrap.Modal(document.getElementById('paymentModal')).show();
 }
@@ -500,19 +503,19 @@ async function submitPayment() {
         });
         const data = await res.json();
         bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
-        if (data.success) { toast('পেমেন্ট আপডেট হয়েছে', 'success'); loadInvoices(); }
+        if (data.success) { toast('পেমেন্ট সফল হয়েছে', 'success'); loadInvoices(); }
         else { toast(data.message, 'error'); }
     } catch(e) { toast('Error: '+e.message, 'error'); }
 }
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
+// -- Toast ---------------------------------------------------------------------
 function toast(msg, type='info') {
     const t = $(`<div class="toast-item ${type}">${msg}</div>`);
     $('#toastWrap').append(t);
     setTimeout(()=>t.fadeOut(300,()=>t.remove()), 3500);
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
+// -- Tabs ----------------------------------------------------------------------
 function switchTab(id, btn) {
     document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -521,7 +524,7 @@ function switchTab(id, btn) {
     if (id === 'tab-invoices') loadInvoices();
 }
 
-// ── Load Institutions ─────────────────────────────────────────────────────────
+// -- Load Institutions ---------------------------------------------------------
 async function loadInstitutions() {
     const validation = document.getElementById('insValidation').value;
     const expiry     = document.getElementById('insExpiry').value;
@@ -533,7 +536,7 @@ async function loadInstitutions() {
         allInstitutions = data.data || [];
         renderInstitutions(allInstitutions);
         updateStats();
-    } catch(e) { toast('প্রতিষ্ঠান লোড ব্যর্থ: '+e.message,'error'); }
+    } catch(e) { toast('প্রতিষ্ঠান লোড ত্রুটি: '+e.message,'error'); }
 }
 
 function filterInstitutions() {
@@ -549,7 +552,7 @@ function renderInstitutions(list) {
     document.getElementById('insCountBadge').textContent = list.length;
     const tbody = document.getElementById('insTbody');
     if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">কোনো প্রতিষ্ঠান পাওয়া যায়নি</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted" data-lang-key="কোনো প্রতিষ্ঠান পাওয়া যায়নি">কোনো প্রতিষ্ঠান পাওয়া যায়নি</td></tr>';
         return;
     }
     tbody.innerHTML = list.map(ins => {
@@ -558,7 +561,7 @@ function renderInstitutions(list) {
         const diff   = expiry ? Math.ceil((expiry - now) / 86400000) : null;
         let expClass = 'expiry-ok', expTag = '';
         if (!expiry) { expClass=''; }
-        else if (diff < 0)   { expClass='expiry-expired';  expTag=`<span class="badge-expiring ms-1">মেয়াদ শেষ</span>`; }
+        else if (diff < 0)   { expClass='expiry-expired';  expTag=`<span class="badge-expiring ms-1">${(window.AuthLang||'bn')==='en'?'Expired':'মেয়াদ শেষ'}</span>`; }
         else if (diff <= 15) { expClass='expiry-expiring'; expTag=`<span class="badge-expiring ms-1">${diff}d</span>`; }
 
         const validBadge = ins.validation === 'Valid'
@@ -572,13 +575,15 @@ function renderInstitutions(list) {
                 <div style="font-weight:600;font-size:.88rem;color:#1e293b;">${esc(ins.institutionName)}</div>
                 <div style="font-size:.75rem;color:#94a3b8;">${esc(ins.userName)}</div>
             </td>
-            <td>${esc(ins.phone||'—')}</td>
+            <td>${esc(ins.phone||'-')}</td>
             <td>
-                <div style="font-size:.83rem;">${esc(ins.packageName||'—')}</div>
-                ${ins.packageInterval ? `<span class="badge-auto">${esc(ins.packageInterval)} মাস</span>` : ''}}
+                <div style="font-size:.83rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    ${esc(ins.packageName||'-')}
+                    ${ins.packageInterval ? `<span class="badge-auto">${esc(ins.packageInterval)} ${(window.AuthLang||'bn')==='en'?'mo':'মাস'}</span>` : ''}
+                </div>
             </td>
-            <td class="${expClass}">${expiry ? fmt(expiry) : '—'}${expTag}</td>
-            <td style="color:${due>0?'#ef4444':'#10b981'};font-weight:600;">৳ ${due.toFixed(2)}</td>
+            <td class="${expClass}">${expiry ? fmt(expiry) : '-'}${expTag}</td>
+            <td style="color:${due>0?'#ef4444':'#10b981'};font-weight:600;white-space:nowrap;">৳ ${due.toFixed(2)}</td>
             <td>${validBadge}</td>
             <td>
                 <button class="btn-sm-icon btn-renew" onclick="oneClickRenew(${ins.institutionId},'${esc(ins.institutionName)}')">
@@ -590,9 +595,10 @@ function renderInstitutions(list) {
             </td>
         </tr>`;
     }).join('');
-}
+        if(window.applyLang) applyLang(window.AuthLang||'bn');
+    }
 
-function updateStats() {
+    function updateStats() {
     const now = new Date();
     document.getElementById('statTotal').textContent    = allInstitutions.length;
     document.getElementById('statExpired').textContent  = allInstitutions.filter(i => i.expire_Date && new Date(i.expire_Date) < now).length;
@@ -625,20 +631,16 @@ function updateBulkBtn() {
 
 function updateSelectedChips() {
     const container = document.getElementById('selectedInsChips');
-    const noMsg = document.getElementById('noSelMsg');
     if (selectedInsIds.size === 0) {
-        container.innerHTML = '';
-        container.appendChild(noMsg);
-        noMsg.style.display = '';
+        container.innerHTML = '<span class="text-muted small" id="noSelMsg">বামে প্রতিষ্ঠান নির্বাচন করুন অথবা নিচে ID দিন</span>';
         return;
     }
-    noMsg.style.display = 'none';
     container.innerHTML = '';
     selectedInsIds.forEach(id => {
         const ins  = allInstitutions.find(i => i.institutionId === id);
         const chip = document.createElement('span');
         chip.style.cssText = 'background:#ede9fe;color:#6366f1;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:6px;';
-        chip.innerHTML = `${esc(ins?.institutionName || '#'+id)} <span onclick="removeChip(${id})" style="cursor:pointer;opacity:.7;">✕</span>`;
+        chip.innerHTML = `${esc(ins?.institutionName || '#'+id)} <span onclick="removeChip(${id})" style="cursor:pointer;opacity:.7;">&times;</span>`;
         container.appendChild(chip);
     });
 }
@@ -655,20 +657,20 @@ function goCreateForSelected() {
     updateSelectedChips();
 }
 
-// ── One-click renew ───────────────────────────────────────────────────────────
+// -- One-click renew -----------------------------------------------------------
 async function oneClickRenew(id, name) {
-    if (!confirm(`"${name}" এর জন্য এক ক্লিকে Renewal Invoice তৈরি করবেন?`)) return;
+    if (!confirm(`"${name}" এর জন্য Renewal Invoice তৈরি করবেন?`)) return;
     try {
         const res  = await fetch(`/api/invoice/renew/${id}`, { method: 'POST' });
         const data = await res.json();
-        if (data.success) { toast(`✅ Invoice #${data.invoiceId} তৈরি হয়েছে`, 'success'); loadInstitutions(); }
+        if (data.success) { toast(`✓ Invoice #${data.invoiceId} তৈরি হয়েছে`, 'success'); loadInstitutions(); }
         else { toast(data.message, 'error'); }
     } catch(e) { toast('Error: '+e.message, 'error'); }
 }
 
 async function bulkRenew() {
     if (!selectedInsIds.size) return;
-    if (!confirm(`${selectedInsIds.size} টি প্রতিষ্ঠানের জন্য Renewal Invoice তৈরি করবেন?`)) return;
+    if (!confirm(`${selectedInsIds.size}টি প্রতিষ্ঠানের জন্য Renewal Invoice তৈরি করবেন?`)) return;
     let ok=0, fail=0;
     for (const id of selectedInsIds) {
         try {
@@ -677,11 +679,11 @@ async function bulkRenew() {
             d.success ? ok++ : fail++;
         } catch { fail++; }
     }
-    toast(`${ok} Renew সফল, ${fail} ব্যর্থ`, ok>0?'success':'error');
+    toast(`${ok} টি Renew সফল, ${fail} টি ব্যর্থ`, ok>0?'success':'error');
     selectedInsIds.clear(); updateBulkBtn(); loadInstitutions();
 }
 
-// ── Invoice list ──────────────────────────────────────────────────────────────
+// -- Invoice list --------------------------------------------------------------
 function viewInvoices(insId) {
     document.getElementById('invSearchInstitution').value = insId;
     switchTab('tab-invoices', document.querySelectorAll('.tab-btn')[1]);
@@ -704,7 +706,7 @@ async function loadInvoices() {
 
         const tbody = document.getElementById('invTbody');
         if (!list.length) {
-            tbody.innerHTML='<tr><td colspan="10" class="text-center py-4 text-muted">কোনো Invoice পাওয়া যায়নি</td></tr>';
+            tbody.innerHTML='<tr><td colspan="10" class="text-center py-4 text-muted" data-lang-key="কোনো Invoice পাওয়া যায়নি">কোনো Invoice পাওয়া যায়নি</td></tr>';
             return;
         }
         tbody.innerHTML = list.map(inv => {
@@ -720,9 +722,9 @@ async function loadInvoices() {
                     <div style="font-size:.73rem;color:#94a3b8;">${esc(inv.userName)}</div>
                 </td>
                 <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(inv.invoice_For||'')}</td>
-                <td>${inv.issuDate ? fmtDate(inv.issuDate) : '—'}</td>
-                <td>${inv.endDate  ? fmtDate(inv.endDate)  : '—'}</td>
-                <td style="font-weight:600;">৳ ${parseFloat(inv.totalAmount||0).toFixed(2)}</td>
+                <td>${inv.issuDate ? fmtDate(inv.issuDate) : '-'}</td>
+                <td>${inv.endDate  ? fmtDate(inv.endDate)  : '-'}</td>
+                <td style="font-weight:600;" data-lang-key="৳ ${parseFloat(inv.totalAmount||0).toFixed(2)}">৳ ${parseFloat(inv.totalAmount||0).toFixed(2)}</td>
                 <td style="color:${due>0?'#ef4444':'#10b981'};font-weight:600;">৳ ${due}</td>
                 <td>${statusBadge}</td>
                 <td>${autoBadge}</td>
@@ -733,12 +735,12 @@ async function loadInvoices() {
                 </td>
             </tr>`;
         }).join('');
-    } catch(e) { toast('Invoice লোড ব্যর্থ: '+e.message,'error'); }
+    } catch(e) { toast('Invoice লোড ত্রুটি: '+e.message,'error'); }
 }
 
 function changePage(dir) { invPage = Math.max(1, invPage+dir); loadInvoices(); }
 
-// ── Create Invoice ────────────────────────────────────────────────────────────
+// -- Create Invoice ------------------------------------------------------------
 function addLine() {
     const det = document.getElementById('lineDetails').value.trim();
     const amt = parseFloat(document.getElementById('lineAmount').value) || 0;
@@ -755,14 +757,14 @@ function renderLines() {
     const tbody = document.getElementById('linesTbody');
     document.getElementById('noLinesRow')?.remove();
     if (!lines.length) {
-        tbody.innerHTML = '<tr id="noLinesRow"><td colspan="3" class="text-center text-muted py-2">কোনো line item নেই</td></tr>';
+        tbody.innerHTML = '<tr id="noLinesRow"><td colspan="3" class="text-center text-muted py-2" data-lang-key="কোনো line item নেই">কোনো line item নেই</td></tr>';
         document.getElementById('linesTotal').textContent = '৳ 0.00';
         return;
     }
     tbody.innerHTML = lines.map((l,i) => `
         <tr>
             <td>${esc(l.details)}</td>
-            <td style="font-weight:600;">৳ ${l.amount.toFixed(2)}</td>
+            <td style="font-weight:600;" data-lang-key="৳ ${l.amount.toFixed(2)}">৳ ${l.amount.toFixed(2)}</td>
             <td><button class="btn-sm-icon" style="background:#fef2f2;color:#ef4444;border:1px solid #fecaca;" onclick="removeLine(${i})"><i class="fas fa-trash"></i></button></td>
         </tr>`).join('');
     const total = lines.reduce((s,l)=>s+l.amount,0);
@@ -774,7 +776,7 @@ async function submitCreateInvoice() {
     const manualIds = document.getElementById('manualInsIds').value.split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n));
     const allIds    = [...new Set([...ids,...manualIds])];
     if (!allIds.length) { toast('কোনো প্রতিষ্ঠান নির্বাচন করা হয়নি', 'error'); return; }
-    if (!lines.length)  { toast('কমপক্ষে একটি invoice line যোগ করুন', 'error'); return; }
+    if (!lines.length)  { toast('অন্তত একটি invoice line যোগ করুন', 'error'); return; }
 
     const payload = {
         institutionIds: allIds,
@@ -793,7 +795,7 @@ async function submitCreateInvoice() {
         const res  = await fetch('/api/invoice/create', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
         const data = await res.json();
         if (data.success) {
-            toast(`✅ ${data.created} Invoice তৈরি হয়েছে!`, 'success');
+            toast(`✓ ${data.created}টি Invoice তৈরি হয়েছে!`, 'success');
             lines = []; renderLines();
             selectedInsIds.clear(); updateBulkBtn();
             document.getElementById('manualInsIds').value = '';
@@ -804,7 +806,7 @@ async function submitCreateInvoice() {
     btn.innerHTML = '<i class="fas fa-paper-plane"></i> Invoice তৈরি করুন';
 }
 
-// ── Auto generate ─────────────────────────────────────────────────────────────
+// -- Auto generate -------------------------------------------------------------
 async function runAutoGenerate() {
     const btn = document.getElementById('autoGenBtn');
     btn.disabled = true;
@@ -818,25 +820,25 @@ async function runAutoGenerate() {
         if (d.success) {
             res.innerHTML = `
                 <div class="p-3 rounded-3" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
-                    <div style="font-size:1.95rem;font-weight:700;color:#065f46;margin-bottom:8px;">✅ সফলভাবে সম্পন্ন</div>
+                    <div style="font-size:1.95rem;font-weight:700;color:#065f46;margin-bottom:8px;" data-lang-key="✓ সফলভাবে সম্পন্ন">✓ সফলভাবে সম্পন্ন</div>
                     <div class="row text-center g-2">
-                        <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#10b981;">${d.result.generated}</div><div style="font-size:.75rem;color:#64748b;">তৈরি হয়েছে</div></div>
-                        <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#6366f1;">${d.result.skipped}</div><div style="font-size:.75rem;color:#64748b;">Skip হয়েছে</div></div>
+                        <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#10b981;">${d.result.generated}</div><div style="font-size:.75rem;color:#64748b;" data-lang-key="তৈরি হয়েছে">তৈরি হয়েছে</div></div>
+                        <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#6366f1;">${d.result.skipped}</div><div style="font-size:.75rem;color:#64748b;" data-lang-key="Skip হয়েছে">Skip হয়েছে</div></div>
                         <div class="col-4"><div style="font-size:1.3rem;font-weight:800;color:#ef4444;">${d.result.errors}</div><div style="font-size:.75rem;color:#64748b;">Error</div></div>
                     </div>
                 </div>`;
         } else {
-            res.innerHTML = `<div class="p-3" style="color:#991b1b;">✖ ${d.message}</div>`;
+            res.innerHTML = `<div class="p-3" style="color:#991b1b;">✗ ${d.message}</div>`;
         }
     } catch (e) {
         res.style.display='block';
-        res.innerHTML = `<div class="p-3" style="color:#991b1b;">✖ Error: ${e.message}</div>`;
+        res.innerHTML = `<div class="p-3" style="color:#991b1b;">✗ Error: ${e.message}</div>`;
     }
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-magic"></i> এখনই সব বিল তৈরি করুন';
+    btn.innerHTML = '<i class="fas fa-magic"></i> এখনই চালু করুন';
 }
 
-// ── Auto log ─────────────────────────────────────────────────────────────────
+// -- Auto log -----------------------------------------------------------------
 async function loadAutoLog() {
     const container = document.getElementById('autoLogContainer');
     container.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</div>';
@@ -845,15 +847,15 @@ async function loadAutoLog() {
         const data = await res.json();
         const list = data.data || [];
         if (!list.length) {
-            container.innerHTML = `<div class="text-center py-4 text-muted" style="font-size:.85rem;">কোনো লগ পাওয়া যায়নি</div>`;
+            container.innerHTML = `<div class="text-center py-4 text-muted" style="font-size:.85rem;" data-lang-key="কোনো লগ পাওয়া যায়নি">কোনো লগ পাওয়া যায়নি</div>`;
             return;
         }
         container.innerHTML = list.map(l => {
             const date = l.runDate ? new Date(l.runDate) : null;
             return `<div class="log-item">
-                <div class="log-date">${date ? fmt(date) : '—'}</div>
+                <div class="log-date">${date ? fmt(date) : '-'}</div>
                 <div class="log-stats">
-                    তৈরি: <span style="color:#10b981;">${l.generated}</span> &bull;
+                    তৈরি: <span style="color:#10b981;">${l.generated}</span>
                     Skip: <span style="color:#6366f1;">${l.skipped}</span> &bull;
                     Error: <span style="color:#ef4444;">${l.errors}</span>
                 </div>
@@ -861,11 +863,11 @@ async function loadAutoLog() {
             </div>`;
         }).join('');
     } catch(e) {
-        container.innerHTML = `<div class="text-center py-3" style="color:#991b1b;">✖ Error: ${e.message}</div>`;
+        container.innerHTML = `<div class="text-center py-3" style="color:#991b1b;">✗ Error: ${e.message}</div>`;
     }
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// -- Init ----------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function () {
     loadInstitutions();
     // Set today as default issue date

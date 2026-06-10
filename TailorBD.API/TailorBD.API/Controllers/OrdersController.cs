@@ -378,7 +378,13 @@ namespace TailorBD.API.Controllers
                         OrderList.DressQuantity,
                         OrderList.Details,
                         OrderList.OrderList_SN,
-                        Dress.Dress_Name
+                        Dress.Dress_Name,
+                        ISNULL((
+                            SELECT SUM(OP.Amount)
+                            FROM Order_Payment OP
+                            WHERE OP.OrderListID = OrderList.OrderListID
+                              AND OP.InstitutionID = OrderList.InstitutionID
+                        ), 0) AS Amount
                     FROM OrderList
                     INNER JOIN Dress ON OrderList.DressID = Dress.DressID
                     WHERE OrderList.OrderID = @OrderID AND OrderList.InstitutionID = @InstitutionID
@@ -399,7 +405,8 @@ namespace TailorBD.API.Controllers
                         dress_Name = reader.GetString(reader.GetOrdinal("Dress_Name")),
                         dressQuantity = reader.GetInt32(reader.GetOrdinal("DressQuantity")),
                         details = reader.IsDBNull(reader.GetOrdinal("Details")) ? "" : reader.GetString(reader.GetOrdinal("Details")),
-                        orderList_SN = reader.IsDBNull(reader.GetOrdinal("OrderList_SN")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderList_SN"))
+                        orderList_SN = reader.IsDBNull(reader.GetOrdinal("OrderList_SN")) ? 0 : reader.GetInt32(reader.GetOrdinal("OrderList_SN")),
+                        amount = reader.IsDBNull(reader.GetOrdinal("Amount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("Amount")))
                     });
                 }
 
@@ -606,19 +613,23 @@ namespace TailorBD.API.Controllers
                     };
                 }
 
-                // Get order items (dress + payment details)
+                // Get order items (dress rows — payment optional for legacy orders)
                 var itemsQuery = @"
                     SELECT
+                        OL.OrderListID,
+                        OL.DressID,
                         Dress.Dress_Name AS dressName,
-                        OrderList.DressQuantity AS dressQuantity,
-                        Order_Payment.Details AS details,
-                        Order_Payment.Unit AS unit,
-                        Order_Payment.UnitPrice AS unitPrice,
-                        Order_Payment.Amount AS amount
-                    FROM OrderList
-                    INNER JOIN Dress ON OrderList.DressID = Dress.DressID
-                    INNER JOIN Order_Payment ON OrderList.OrderListID = Order_Payment.OrderListID
-                    WHERE OrderList.OrderID = @OrderID AND OrderList.InstitutionID = @InstitutionID";
+                        OL.DressQuantity AS dressQuantity,
+                        OL.Details AS details,
+                        ISNULL(SUM(OP.Amount), 0) AS amount,
+                        ISNULL(SUM(OP.Unit), 0) AS unit,
+                        ISNULL(SUM(OP.UnitPrice), 0) AS unitPrice
+                    FROM OrderList OL
+                    INNER JOIN Dress ON OL.DressID = Dress.DressID
+                    LEFT JOIN Order_Payment OP ON OL.OrderListID = OP.OrderListID
+                        AND OP.InstitutionID = OL.InstitutionID
+                    WHERE OL.OrderID = @OrderID AND OL.InstitutionID = @InstitutionID
+                    GROUP BY OL.OrderListID, OL.DressID, Dress.Dress_Name, OL.DressQuantity, OL.Details";
 
                 var orderItems = new List<object>();
                 using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(itemsQuery, connection))
@@ -736,19 +747,23 @@ namespace TailorBD.API.Controllers
                     };
                 }
 
-                // 2. Order items (dress + payment rows)
+                // 2. Order items (dress rows — payment optional for legacy orders)
                 var itemsQuery = @"
                     SELECT
+                        OL.OrderListID,
+                        OL.DressID,
                         Dress.Dress_Name     AS dressName,
                         OL.DressQuantity     AS dressQuantity,
-                        OP.Details           AS details,
-                        OP.Unit              AS unit,
-                        OP.UnitPrice         AS unitPrice,
-                        OP.Amount            AS amount
+                        OL.Details           AS details,
+                        ISNULL(SUM(OP.Amount), 0) AS amount,
+                        ISNULL(SUM(OP.Unit), 0)   AS unit,
+                        ISNULL(SUM(OP.UnitPrice), 0) AS unitPrice
                     FROM OrderList OL
-                    INNER JOIN Dress         ON OL.DressID         = Dress.DressID
-                    INNER JOIN Order_Payment OP ON OL.OrderListID  = OP.OrderListID
-                    WHERE OL.OrderID = @OrderID AND OL.InstitutionID = @InstitutionID";
+                    INNER JOIN Dress ON OL.DressID = Dress.DressID
+                    LEFT JOIN Order_Payment OP ON OL.OrderListID = OP.OrderListID
+                        AND OP.InstitutionID = OL.InstitutionID
+                    WHERE OL.OrderID = @OrderID AND OL.InstitutionID = @InstitutionID
+                    GROUP BY OL.OrderListID, OL.DressID, Dress.Dress_Name, OL.DressQuantity, OL.Details";
 
                 var orderItems = new List<object>();
                 using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(itemsQuery, connection))
@@ -761,6 +776,8 @@ namespace TailorBD.API.Controllers
                     {
                         orderItems.Add(new
                         {
+                            orderListId = reader.GetInt32(reader.GetOrdinal("OrderListID")),
+                            dressID = reader.GetInt32(reader.GetOrdinal("DressID")),
                             dressName = reader.IsDBNull(reader.GetOrdinal("dressName")) ? "" : reader.GetString(reader.GetOrdinal("dressName")),
                             dressQuantity = reader.IsDBNull(reader.GetOrdinal("dressQuantity")) ? 0 : reader.GetInt32(reader.GetOrdinal("dressQuantity")),
                             details = reader.IsDBNull(reader.GetOrdinal("details")) ? "" : reader.GetString(reader.GetOrdinal("details")),

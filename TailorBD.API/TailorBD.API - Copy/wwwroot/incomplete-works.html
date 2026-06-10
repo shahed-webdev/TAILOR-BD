@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>অর্ডারের কাজ সম্পূর্ণ করুন - TailorBD</title>
+    <title>অসম্পূর্ণ অর্ডার - TailorBD</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -548,18 +548,18 @@
     <main class="main-content" id="mainContent">
         <div class="dashboard-content">
             <div class="work-complete-container">
-                <h2><span class="lang-content" data-en="Complete Incomplete Orders" data-bn="যে সকল অর্ডারের কাজ শেষ হয়েছে টিক দিয়ে সম্পূর্ণ করুন">যে সকল অর্ডারের কাজ সম্পূর্ণ করুন</span></h2>
+                <h2><span class="lang-content" data-en="Complete Incomplete Orders" data-bn="অসম্পূর্ণ অর্ডার সম্পন্ন করুন">অসম্পূর্ণ অর্ডার সম্পন্ন করুন</span></h2>
 
                 <!-- Search Section -->
                 <div class="search-section">
                     <div class="search-tabs">
                         <label>
                             <input type="radio" name="searchType" value="number" checked>
-                            <span class="lang-content" data-en="Order No. and Mobile No." data-bn="অর্ডার নং এবং মোবাইল নং">অর্ডার নং এবং মোবাইল নং</span>
+                            <span class="lang-content" data-en="Order No. and Mobile No." data-bn="অর্ডার নং ও মোবাইল নং">অর্ডার নং ও মোবাইল নং</span>
                         </label>
                         <label>
                             <input type="radio" name="searchType" value="date">
-                            <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারী তারিখ">ডেলিভারী তারিখ</span>
+                            <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
                         </label>
                     </div>
 
@@ -567,8 +567,8 @@
                     <div class="search-by-number active">
                         <div class="search-form">
                             <div class="form-group">
-                                <label for="mobileNo" class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</label>
-                                <input type="text" id="mobileNo" list="mobileNoList" class="lang-content" data-en-placeholder="Mobile Number" data-bn-placeholder="মোবাইল নাম্বার" placeholder="মোবাইল নাম্বার">
+                                <label for="mobileNo" class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                <input type="text" id="mobileNo" list="mobileNoList" class="lang-content" data-en-placeholder="Mobile Number" data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নম্বর">
                                 <datalist id="mobileNoList"></datalist>
                             </div>
                             <div class="form-group">
@@ -577,8 +577,8 @@
                                 <datalist id="customerNameList"></datalist>
                             </div>
                             <div class="form-group">
-                                <label for="orderNo" class="lang-content" data-en="Order Number" data-bn="অর্ডার নাম্বার">অর্ডার নাম্বার</label>
-                                <input type="text" id="orderNo" list="orderNoList" class="lang-content" data-en-placeholder="Example: 10,20,30" data-bn-placeholder="উদাহরণ: 10,20,30" placeholder="উদাহরণ: 10,20,30">
+                                <label for="orderNo" class="lang-content" data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</label>
+                                <input type="text" id="orderNo" list="orderNoList" class="lang-content" data-en-placeholder="Example: 10,20,30" data-bn-placeholder="যেমন: 10,20,30" placeholder="যেমন: 10,20,30">
                                 <datalist id="orderNoList"></datalist>
                             </div>
                             <div class="form-group">
@@ -587,7 +587,7 @@
                                 <datalist id="addressList"></datalist>
                             </div>
                             <div class="form-group">
-                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></button>
+                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span></button>
                             </div>
                         </div>
                     </div>
@@ -596,15 +596,15 @@
                     <div class="search-by-date">
                         <div class="search-form">
                             <div class="form-group">
-                                <label for="startDate" class="lang-content" data-en="From Date" data-bn="কোন তারিখ থেকে">কোন তারিখ থেকে</label>
+                                <label for="startDate" class="lang-content" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
                                 <input type="date" id="startDate">
                             </div>
                             <div class="form-group">
-                                <label for="endDate" class="lang-content" data-en="To Date" data-bn="কোন তারিখ পর্যন্ত">কোন তারিখ পর্যন্ত</label>
+                                <label for="endDate" class="lang-content" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
                                 <input type="date" id="endDate">
                             </div>
                             <div class="form-group">
-                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></button>
+                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span></button>
                             </div>
                         </div>
                     </div>
@@ -613,21 +613,21 @@
                 <!-- Orders Table -->
                 <div class="orders-table-container">
                     <div class="total-count" id="totalCount">
-                        <span class="lang-content" data-en="Total: 0 incomplete orders" data-bn="সর্বমোট: 0 টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে">সর্বমোট: 0 টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে</span>
+                        <span class="lang-content" data-en="Total: 0 incomplete orders" data-bn="মোট: 0 টি অসম্পূর্ণ অর্ডার">মোট: 0 টি অসম্পূর্ণ অর্ডার</span>
                     </div>
 
                     <div class="legend">
                         <div class="legend-item">
                             <div class="legend-box today"></div>
-                            <span class="lang-content" data-en="Today's Delivery Date" data-bn="আজকের ডেলিভারী তারিখ">আজকের ডেলিভারী তারিখ</span>
+                            <span class="lang-content" data-en="Today's Delivery Date" data-bn="আজকের ডেলিভারি তারিখ">আজকের ডেলিভারি তারিখ</span>
                         </div>
                         <div class="legend-item">
                             <div class="legend-box overdue"></div>
-                            <span class="lang-content" data-en="Delivery Date Passed" data-bn="ডেলিভারী তারিখ অতিক্রান্ত">ডেলিভারী তারিখ অতিক্রান্ত</span>
+                            <span class="lang-content" data-en="Delivery Date Passed" data-bn="ডেলিভারি তারিখ অতিক্রান্ত">ডেলিভারি তারিখ অতিক্রান্ত</span>
                         </div>
                         <div class="legend-item">
                             <div class="legend-box partly"></div>
-                            <span class="lang-content" data-en="Partly Completed" data-bn="আংশিক সম্পূর্ণ">আংশিক সম্পূর্ণ</span>
+                            <span class="lang-content" data-en="Partly Completed" data-bn="আংশিক সম্পন্ন">আংশিক সম্পন্ন</span>
                         </div>
                     </div>
 
@@ -638,7 +638,7 @@
                     </div>
 
                     <button type="button" class="btn-complete" id="btnComplete" onclick="completeWork()" disabled>
-                        <span class="lang-content" data-en="Complete Work" data-bn="কাজ সম্পূর্ণ করুন">কাজ সম্পূর্ণ করুন</span>
+                        <span class="lang-content" data-en="Complete Work" data-bn="কাজ সম্পন্ন করুন">কাজ সম্পন্ন করুন</span>
                     </button>
                 </div>
             </div>
@@ -659,9 +659,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- App Components -->
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     
     <!-- Incomplete Works JS -->
-    <script src="/js/incomplete-works.js"></script>
+    <script src="/js/incomplete-works.js?v=2.1.6"></script>
 </body>
 </html>

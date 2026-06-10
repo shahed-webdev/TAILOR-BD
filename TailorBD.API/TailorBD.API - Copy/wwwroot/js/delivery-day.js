@@ -17,8 +17,8 @@
             return;
         }
 
-        // Default: today's date
-        var today = new Date().toISOString().split('T')[0];
+        // Default: today's date (local timezone safe)
+        var today = localDateStr(new Date());
         $('#startDate').val(today);
         $('#endDate').val(today);
 
@@ -69,13 +69,31 @@
         });
     }
 
+    // timezone-safe: local date string YYYY-MM-DD
+    function localDateStr(d) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+    }
+
+    // Parse date string safely in local timezone
+    function parseLocalDate(dateStr) {
+        if (!dateStr) return null;
+        // "2026-04-08T00:00:00" or "2026-04-08" → treat as local
+        var s = dateStr.split('T')[0]; // "2026-04-08"
+        var parts = s.split('-');
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    }
+
     function updateStats(orders) {
-        var today = new Date().toISOString().split('T')[0];
+        var today = localDateStr(new Date());
         var todayCount = 0, overdueCount = 0;
 
         orders.forEach(function (o) {
             if (o.deliveryDate) {
-                var dd = new Date(o.deliveryDate).toISOString().split('T')[0];
+                var d = parseLocalDate(o.deliveryDate);
+                var dd = localDateStr(d);
                 if (dd === today) todayCount++;
                 else if (dd < today) overdueCount++;
             }
@@ -94,7 +112,7 @@
             return;
         }
 
-        var today = new Date().toISOString().split('T')[0];
+        var today = localDateStr(new Date());
 
         var html = '<table><thead><tr>' +
             '<th>অর্ডার নং</th>' +
@@ -110,7 +128,7 @@
 
         orders.forEach(function (order) {
             var deliveryDate = order.deliveryDate ? formatDate(order.deliveryDate) : '-';
-            var dd = order.deliveryDate ? new Date(order.deliveryDate).toISOString().split('T')[0] : '';
+            var dd = order.deliveryDate ? localDateStr(parseLocalDate(order.deliveryDate)) : '';
             var rowClass = '';
             var badge = '';
 
@@ -143,7 +161,7 @@
 
     function formatDate(dateStr) {
         if (!dateStr) return '-';
-        var d = new Date(dateStr);
+        var d = parseLocalDate(dateStr);
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
     }

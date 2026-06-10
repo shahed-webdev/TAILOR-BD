@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>স্টাইল ক্যাটাগরি যুক্ত করুন - TailorBD</title>
+    <title>স্টাইল ক্যাটাগরি - TailorBD</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
     <style>
-        /* ── Compact page overrides ── */
+        /* -- Compact page overrides -- */
         .page-header { margin-bottom: 16px !important; }
         .page-header h1 { font-size: 1.3rem; margin-bottom: 2px; }
         .page-header p   { font-size: .85rem; margin: 0; }
@@ -131,18 +131,18 @@
             <!-- Page Header -->
             <div class="page-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 data-en="Style Categories" data-bn="স্টাইল ক্যাটাগরির তালিকা">স্টাইল ক্যাটাগরির তালিকা</h1>
+                    <h1 data-en="Style Categories" data-bn="স্টাইল ক্যাটাগরি">স্টাইল ক্যাটাগরি</h1>
                     <p class="text-muted" id="dressNameHeader"></p>
                 </div>
                 <a href="/dress-add.html" class="btn btn-sm btn-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> ফিরুন
+                    <i class="fas fa-arrow-left me-1"></i> ফিরে যান
                 </a>
             </div>
 
             <!-- Add Category Form -->
             <div class="add-form-card">
                 <div class="card-header">
-                    <i class="fas fa-plus-circle me-1"></i> নতুন ক্যাটাগরি যুক্ত করুন
+                    <i class="fas fa-plus-circle me-1"></i> নতুন স্টাইল ক্যাটাগরি যোগ করুন
                 </div>
                 <div class="card-body">
                     <form id="addCategoryForm">
@@ -150,16 +150,16 @@
                             <div class="col-sm-5">
                                 <label class="form-label form-label-sm mb-1">ক্যাটাগরির নাম</label>
                                 <input type="text" class="form-control form-control-sm" id="categoryName"
-                                       placeholder="যেমন: কাটিং স্টাইল, কলার..." required>
+                                       placeholder="যেমন: ডিজাইন, পকেট, কলার..." required>
                             </div>
                             <div class="col-sm-3">
-                                <label class="form-label form-label-sm mb-1">সিরিয়াল</label>
+                                <label class="form-label form-label-sm mb-1">ক্রমিক নম্বর</label>
                                 <input type="number" class="form-control form-control-sm" id="categorySerial"
                                        placeholder="১, ২, ৩..." min="1">
                             </div>
                             <div class="col-sm-4">
                                 <button type="submit" class="btn btn-primary btn-sm w-100">
-                                    <i class="fas fa-plus me-1"></i> ক্যাটাগরি যুক্ত করুন
+                                    <i class="fas fa-plus me-1"></i> ক্যাটাগরি যোগ করুন
                                 </button>
                             </div>
                         </div>
@@ -172,18 +172,18 @@
                 <div class="table-card-header">
                     <h6><i class="fas fa-list me-2 text-primary"></i>স্টাইল ক্যাটাগরি তালিকা</h6>
                     <button type="button" class="btn btn-success btn-sm" id="updateSerialsBtn" style="display:none;">
-                        <i class="fas fa-save me-1"></i> সিরিয়াল আপডেট করুন
+                        <i class="fas fa-save me-1"></i> ক্রমিক আপডেট করুন
                     </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="categoriesTable">
                         <thead>
                             <tr>
-                                <th style="width:60px;">ইডিট</th>
+                                <th style="width:60px;">নির্বাচন</th>
                                 <th>ক্যাটাগরির নাম</th>
-                                <th style="width:160px;">ডিজাইন যুক্ত করুন</th>
-                                <th style="width:90px;">সিরিয়াল</th>
-                                <th style="width:60px;">ডিলিট</th>
+                                <th style="width:160px;">ডিজাইন যোগ করুন</th>
+                                <th style="width:90px;">ক্রমিক</th>
+                                <th style="width:60px;">মুছুন</th>
                             </tr>
                         </thead>
                         <tbody id="categoriesTableBody">
@@ -207,7 +207,7 @@
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header py-2" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;">
-                    <h6 class="modal-title mb-0"><i class="fas fa-edit me-1"></i> ক্যাটাগরি এডিট</h6>
+                    <h6 class="modal-title mb-0"><i class="fas fa-edit me-1"></i> ক্যাটাগরি সম্পাদনা</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -220,7 +220,7 @@
                 <div class="modal-footer py-2">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">বাতিল</button>
                     <button type="button" class="btn btn-primary btn-sm" onclick="updateCategory()">
-                        <i class="fas fa-save me-1"></i> সংরক্ষণ
+                        <i class="fas fa-save me-1"></i> সংরক্ষণ করুন
                     </button>
                 </div>
             </div>
@@ -234,9 +234,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- App Components -->
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
 
     <!-- Dress Style Add JS -->
-    <script src="/js/dress-style-add.js"></script>
+    <script src="/js/dress-style-add.js?v=2.1.6"></script>
 </body>
 </html>

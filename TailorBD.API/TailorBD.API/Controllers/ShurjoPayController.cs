@@ -73,13 +73,17 @@ namespace TailorBD.API.Controllers
                 if (totalAmount <= 0)
                     return BadRequest(new { success = false, message = "মোট বকেয়া পরিমাণ শূন্য।" });
 
+                // Add gateway charge: 1% (৳10 per ৳1000)
+                double gatewayCharge = Math.Round(totalAmount * 0.01, 2);
+                double payableAmount = Math.Round(totalAmount + gatewayCharge, 2);
+
                 var mergedIds = string.Join(",", invoiceList.Select(r => (int)r.InvoiceID));
 
                 // ── Call ShurjoPay ────────────────────────────────────────────
                 var result = await _shurjoPay.InitiatePaymentAsync(
                     req.InstitutionId,
                     mergedIds,
-                    totalAmount,
+                    payableAmount,
                     req.CustomerName,
                     req.CustomerEmail  ?? "",
                     req.CustomerPhone,
@@ -96,22 +100,24 @@ namespace TailorBD.API.Controllers
                         (@MerchantOrderId, @SpOrderId, @InstitutionID, @InvoiceIds, @TotalAmount, 'Pending', GETDATE())",
                     new
                     {
-                        MerchantOrderId = result.OrderId,
-                        SpOrderId       = result.OrderId,
+                        MerchantOrderId = result.MerchantOrderId,
+                        SpOrderId       = result.SpOrderId,
                         InstitutionID   = req.InstitutionId,
                         InvoiceIds      = mergedIds,
                         TotalAmount     = totalAmount
                     });
 
-                _logger.LogInformation("[ShurjoPay] Payment initiated: InstitutionID={id}, Amount={amt}, OrderId={oid}",
-                    req.InstitutionId, totalAmount, result.OrderId);
+                _logger.LogInformation("[ShurjoPay] Payment initiated: InstitutionID={id}, Amount={amt}, MerchantOrderId={mid}, SpOrderId={sid}",
+                    req.InstitutionId, totalAmount, result.MerchantOrderId, result.SpOrderId);
 
                 return Ok(new
                 {
-                    success     = true,
-                    checkoutUrl = result.CheckoutUrl,
-                    orderId     = result.OrderId,
-                    totalAmount
+                    success       = true,
+                    checkoutUrl   = result.CheckoutUrl,
+                    orderId       = result.OrderId,
+                    totalAmount,
+                    gatewayCharge,
+                    payableAmount
                 });
             }
             catch (Exception ex)
@@ -158,10 +164,14 @@ namespace TailorBD.API.Controllers
 
                 double totalAmount = req.RechargeSms * req.PerSmsPrice;
 
+                // Add gateway charge: 1.9% (৳19 per ৳1000)
+                double gatewayCharge = Math.Round(totalAmount * 0.019, 2);
+                double payableAmount = Math.Round(totalAmount + gatewayCharge, 2);
+
                 var result = await _shurjoPay.InitiatePaymentAsync(
                     req.InstitutionId,
                     $"SMS:{req.RechargeSms}",
-                    totalAmount,
+                    payableAmount,
                     customerName,
                     customerEmail,
                     customerPhone,
@@ -177,8 +187,8 @@ namespace TailorBD.API.Controllers
                         (@MerchantOrderId, @SpOrderId, @InstitutionID, @InvoiceIds, @TotalAmount, 'Pending', GETDATE())",
                     new
                     {
-                        MerchantOrderId = result.OrderId,
-                        SpOrderId       = result.OrderId,
+                        MerchantOrderId = result.MerchantOrderId,
+                        SpOrderId       = result.SpOrderId,
                         InstitutionID   = req.InstitutionId,
                         InvoiceIds      = $"SMS_RECHARGE:{req.RechargeSms}:{req.PerSmsPrice}",
                         TotalAmount     = totalAmount
@@ -189,11 +199,13 @@ namespace TailorBD.API.Controllers
 
                 return Ok(new
                 {
-                    success     = true,
-                    checkoutUrl = result.CheckoutUrl,
-                    orderId     = result.OrderId,
+                    success       = true,
+                    checkoutUrl   = result.CheckoutUrl,
+                    orderId       = result.OrderId,
                     totalAmount,
-                    rechargeSms = req.RechargeSms
+                    gatewayCharge,
+                    payableAmount,
+                    rechargeSms   = req.RechargeSms
                 });
             }
             catch (Exception ex)
@@ -235,12 +247,21 @@ namespace TailorBD.API.Controllers
                 if (currentStatus == "Paid")
                     return Ok(new { success = true, alreadyPaid = true, message = "পেমেন্ট ইতিমধ্যে নিশ্চিত হয়েছে।" });
 
-                // ── Verify with ShurjoPay API ──────────────────────────────────
-                var spOrderId = (string)(order.SpOrderId ?? order.MerchantOrderId ?? "");
-                var verify = await _shurjoPay.VerifyPaymentAsync(spOrderId);
+                // ── Verify with ShurjoPay API (try SpOrderId first, then MerchantOrderId) ──
+                var spOrderId      = (string)(order.SpOrderId ?? "");
+                var merchantOrderId = (string)(order.MerchantOrderId ?? "");
+                var verify = await _shurjoPay.VerifyPaymentAsync(
+                    !string.IsNullOrWhiteSpace(spOrderId) ? spOrderId : merchantOrderId);
 
-                _logger.LogInformation("[ShurjoPay] Verify result: OrderId={oid}, Status={st}, Amount={amt}",
-                    req.OrderId, verify.PaymentStatus, verify.Amount);
+                if (!verify.Success
+                    && !string.IsNullOrWhiteSpace(merchantOrderId)
+                    && !string.Equals(merchantOrderId, spOrderId, StringComparison.OrdinalIgnoreCase))
+                {
+                    verify = await _shurjoPay.VerifyPaymentAsync(merchantOrderId);
+                }
+
+                _logger.LogInformation("[ShurjoPay] Verify result: RequestOrderId={req}, SpOrderId={sp}, MerchantOrderId={mid}, Status={st}, Amount={amt}",
+                    req.OrderId, spOrderId, merchantOrderId, verify.PaymentStatus, verify.Amount);
 
                 // ── Update ShurjoPay_Order status for non-success first ──────
                 var newStatus = verify.Success ? "Paid"
@@ -393,6 +414,7 @@ namespace TailorBD.API.Controllers
                         {
                             var invRow = await con.QueryFirstOrDefaultAsync(@"
                                 SELECT inv.InvoiceID, inv.RegistrationID,
+                                       ISNULL(inv.PaidAmount, 0) AS PaidAmount,
                                        ISNULL(NULLIF(inv.TotalAmount,0),
                                            (SELECT ISNULL(SUM(Amount),0) FROM Invoice_Line WHERE InvoiceID=inv.InvoiceID)
                                        ) AS TotalAmount,
@@ -402,17 +424,19 @@ namespace TailorBD.API.Controllers
 
                             if (invRow == null) continue;
 
-                            double total    = invRow.TotalAmount == null ? 0.0 : Convert.ToDouble(invRow.TotalAmount);
-                            double discount = invRow.Discount    == null ? 0.0 : Convert.ToDouble(invRow.Discount);
-                            double dueAmt   = Math.Max(0, total - discount);
-                            int    regId    = invRow.RegistrationID == null ? 0 : (int)invRow.RegistrationID;
+                            double total     = invRow.TotalAmount == null ? 0.0 : Convert.ToDouble(invRow.TotalAmount);
+                            double discount  = invRow.Discount    == null ? 0.0 : Convert.ToDouble(invRow.Discount);
+                            double prevPaid  = invRow.PaidAmount  == null ? 0.0 : Convert.ToDouble(invRow.PaidAmount);
+                            double netPayable = Math.Max(0, total - discount);
+                            double newPaid   = Math.Max(prevPaid, netPayable);
+                            int    regId     = invRow.RegistrationID == null ? 0 : (int)invRow.RegistrationID;
 
                             await con.ExecuteAsync(@"
                                 UPDATE Invoice
                                 SET PaidAmount    = @PaidAmount,
                                     PaymentStatus = 'Paid'
                                 WHERE InvoiceID   = @id",
-                                new { PaidAmount = dueAmt, id = invoiceId }, tx);
+                                new { PaidAmount = newPaid, id = invoiceId }, tx);
 
                             await con.ExecuteAsync(@"
                                 INSERT INTO Invoice_Payment_Record
@@ -426,7 +450,7 @@ namespace TailorBD.API.Controllers
                                     InvoiceID      = invoiceId,
                                     InstitutionID  = institutionId,
                                     RegistrationID = regId,
-                                    Amount         = dueAmt
+                                    Amount         = Math.Max(0, netPayable - prevPaid)
                                 }, tx);
                         }
                     }

@@ -859,6 +859,136 @@ namespace TailorBD.API.Controllers
         }
 
         /// <summary>
+        /// Get customer item sell due records
+        /// </summary>
+        [HttpGet("item-sell-due")]
+        public async Task<ActionResult> GetItemSellDue([FromQuery] int customerId, [FromQuery] int institutionId)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                var list = new List<object>();
+                using var cmd = new SqlCommand(@"
+                    SELECT
+                        fs.FabricsSellingID   AS SellingId,
+                        fs.Selling_SN         AS SellingSN,
+                        fs.SellingDate,
+                        fs.SellingTotalPrice,
+                        fs.SellingDiscountAmount,
+                        fs.SellingPaidAmount - ISNULL(fs.SellingReturnAmount, 0) AS SellingPaidAmount,
+                        fs.SellingDueAmount,
+                        STUFF((
+                            SELECT ', ' + f2.FabricCode + ' (' + CAST(sl2.SellingQuantity AS NVARCHAR) + ')'
+                            FROM Fabrics_Selling_List sl2
+                            JOIN Fabrics f2 ON sl2.FabricID = f2.FabricID
+                            WHERE sl2.FabricsSellingID = fs.FabricsSellingID
+                            FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, '') AS ItemDetails
+                    FROM Fabrics_Selling fs
+                    WHERE fs.InstitutionID = @InstitutionID
+                      AND fs.CustomerID = @CustomerID
+                      AND fs.SellingDueAmount > 0
+                    ORDER BY fs.Selling_SN DESC", connection);
+                cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                cmd.Parameters.AddWithValue("@CustomerID", customerId);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    list.Add(new
+                    {
+                        sellingId        = reader.GetInt32(0),
+                        sellingSN        = Convert.ToInt32(reader.GetValue(1)),
+                        sellingDate      = reader.GetDateTime(2),
+                        totalPrice       = reader.IsDBNull(3) ? 0.0 : reader.GetDouble(3),
+                        discountAmount   = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
+                        paidAmount       = reader.IsDBNull(5) ? 0.0 : reader.GetDouble(5),
+                        dueAmount        = reader.IsDBNull(6) ? 0.0 : reader.GetDouble(6),
+                        itemDetails      = reader.IsDBNull(7) ? "" : reader.GetString(7)
+                    });
+                }
+
+                return Ok(new { success = true, data = list });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting item sell due");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Collect item sell due payment
+        /// </summary>
+        [HttpPost("collect-item-sell-due")]
+        public async Task<ActionResult> CollectItemSellDue([FromBody] CollectItemSellDueModel model)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+                using var transaction = connection.BeginTransaction();
+
+                try
+                {
+                    foreach (var item in model.Payments)
+                    {
+                        if (item.PaidAmount <= 0 && item.DiscountAmount <= 0) continue;
+
+                        // Update Fabrics_Selling paid and discount amounts
+                        using (var updateCmd = new SqlCommand(@"
+                            UPDATE Fabrics_Selling
+                            SET SellingPaidAmount     = SellingPaidAmount     + @PaidAmount,
+                                SellingDiscountAmount = SellingDiscountAmount + @DiscountAmount
+                            WHERE FabricsSellingID = @FabricsSellingID",
+                            connection, transaction))
+                        {
+                            updateCmd.Parameters.AddWithValue("@PaidAmount", item.PaidAmount);
+                            updateCmd.Parameters.AddWithValue("@DiscountAmount", item.DiscountAmount);
+                            updateCmd.Parameters.AddWithValue("@FabricsSellingID", item.SellingId);
+                            await updateCmd.ExecuteNonQueryAsync();
+                        }
+
+                        if (item.PaidAmount > 0)
+                        {
+                            // Insert into Fabrics_Selling_PaymentRecord
+                            using var payCmd = new SqlCommand(@"
+                                INSERT INTO Fabrics_Selling_PaymentRecord
+                                    (FabricsSellingID, RegistrationID, InstitutionID, AccountID,
+                                     SellingPaidAmount, Payment_Situation, SellingPaid_Date, InsertDate)
+                                VALUES
+                                    (@FabricsSellingID, @RegistrationID, @InstitutionID, @AccountID,
+                                     @SellingPaidAmount, 'FabricsDuePaid', GETDATE(), GETDATE())",
+                                connection, transaction);
+                            payCmd.Parameters.AddWithValue("@FabricsSellingID", item.SellingId);
+                            payCmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
+                            payCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                            payCmd.Parameters.AddWithValue("@AccountID", item.AccountId.HasValue ? (object)item.AccountId.Value : DBNull.Value);
+                            payCmd.Parameters.AddWithValue("@SellingPaidAmount", item.PaidAmount);
+                            await payCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+
+                    transaction.Commit();
+                    return Ok(new { success = true, message = "আইটেম সেল বাকি সফলভাবে সংগ্রহ হয়েছে" });
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error collecting item sell due");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Get customer list with search and pagination
         /// </summary>
         [HttpGet("customer-list")]
@@ -1005,6 +1135,176 @@ namespace TailorBD.API.Controllers
         }
 
         /// <summary>
+        /// Get all saved measurements for a customer (all dresses) – for print page
+        /// </summary>
+        [HttpGet("all-measurements")]
+        public async Task<ActionResult> GetAllMeasurements([FromQuery] int customerId, [FromQuery] int institutionId)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                // Customer info
+                object customerInfo = null;
+                using (var cmd = new SqlCommand(
+                    "SELECT CustomerName, Phone, Address, CustomerNumber, Cloth_For_ID FROM Customer WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID",
+                    connection))
+                {
+                    cmd.Parameters.AddWithValue("@CustomerID", customerId);
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    if (await reader.ReadAsync())
+                    {
+                        customerInfo = new
+                        {
+                            customerName = reader.GetString(0),
+                            phone = reader.IsDBNull(1) ? "" : reader.GetString(1),
+                            address = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                            customerNumber = reader.IsDBNull(3) ? "" : reader.GetValue(3).ToString(),
+                            clothForId = reader.GetInt32(4)
+                        };
+                    }
+                }
+
+                if (customerInfo == null)
+                    return NotFound(new { success = false, message = "Customer not found" });
+
+                // Institution name & phone (for print header)
+                string institutionName = "";
+                string institutionPhone = "";
+                using (var cmd = new SqlCommand(
+                    "SELECT ISNULL(InstitutionName, ''), ISNULL(Phone, '') FROM Institution WHERE InstitutionID = @InstitutionID",
+                    connection))
+                {
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    if (await reader.ReadAsync())
+                    {
+                        institutionName = reader.GetString(0);
+                        institutionPhone = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                    }
+                }
+
+                // Dresses that have at least one measurement for this customer
+                var dressList = new List<(int DressId, string DressName)>();
+                using (var cmd = new SqlCommand(
+                    @"SELECT DISTINCT D.DressID, D.Dress_Name
+                      FROM Dress D
+                      INNER JOIN Measurement_Type MT ON D.DressID = MT.DressID AND MT.InstitutionID = @InstitutionID
+                      INNER JOIN Customer_Measurement CM ON MT.MeasurementTypeID = CM.MeasurementTypeID
+                      WHERE CM.CustomerID = @CustomerID AND D.InstitutionID = @InstitutionID
+                      ORDER BY D.Dress_Name",
+                    connection))
+                {
+                    cmd.Parameters.AddWithValue("@CustomerID", customerId);
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                        dressList.Add((reader.GetInt32(0), reader.GetString(1)));
+                }
+
+                var measurementsList = new List<object>();
+
+                foreach (var (dressId, dressName) in dressList)
+                {
+                    // Measurements grouped by groupID (same order as money-receipt print)
+                    var mRows = new List<(int GroupID, int TypeID, string TypeName, string Value, int SN)>();
+                    using (var cmd = new SqlCommand(
+                        @"SELECT MT.Measurement_GroupID, MT.MeasurementTypeID, MT.MeasurementType, CM.Measurement,
+                                 ISNULL(MT.Measurement_Group_SerialNo, 99999) AS SN
+                          FROM Measurement_Type MT
+                          INNER JOIN Customer_Measurement CM ON MT.MeasurementTypeID = CM.MeasurementTypeID
+                          LEFT JOIN Measurement_Type MT_GRP ON MT.Measurement_GroupID = MT_GRP.MeasurementTypeID
+                          WHERE CM.CustomerID = @CustomerID AND MT.DressID = @DressID
+                            AND CM.Measurement IS NOT NULL AND CM.Measurement <> ''
+                          ORDER BY ISNULL(MT_GRP.Ascending, 99999), ISNULL(MT.Measurement_Group_SerialNo, 99999)",
+                        connection))
+                    {
+                        cmd.Parameters.AddWithValue("@CustomerID", customerId);
+                        cmd.Parameters.AddWithValue("@DressID", dressId);
+                        using var reader = await cmd.ExecuteReaderAsync();
+                        while (await reader.ReadAsync())
+                            mRows.Add((reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4)));
+                    }
+
+                    var measurements = mRows.Select(r => new
+                    {
+                        groupID = r.GroupID,
+                        measurementTypeID = r.TypeID,
+                        type = r.TypeName,
+                        value = r.Value
+                    }).ToList<object>();
+
+                    // Styles (only checked ones for this customer)
+                    var styleRows = new List<object>();
+                    using (var cmd = new SqlCommand(
+                        @"SELECT DSC.Dress_Style_Category_Name, DS.Dress_Style_Name, ISNULL(CDS.DressStyleMesurement, '')
+                          FROM Customer_Dress_Style CDS
+                          INNER JOIN Dress_Style DS ON CDS.Dress_StyleID = DS.Dress_StyleID
+                          INNER JOIN Dress_Style_Category DSC ON DS.Dress_Style_CategoryID = DSC.Dress_Style_CategoryID
+                          WHERE CDS.CustomerID = @CustomerID AND DS.DressID = @DressID
+                          ORDER BY ISNULL(DSC.CategorySerial, 99999), ISNULL(DS.StyleSerial, 99999)",
+                        connection))
+                    {
+                        cmd.Parameters.AddWithValue("@CustomerID", customerId);
+                        cmd.Parameters.AddWithValue("@DressID", dressId);
+                        using var reader = await cmd.ExecuteReaderAsync();
+                        while (await reader.ReadAsync())
+                        {
+                            styleRows.Add(new
+                            {
+                                categoryName = reader.GetString(0),
+                                name = reader.GetString(1),
+                                measurement = reader.GetString(2)
+                            });
+                        }
+                    }
+
+                    // Dress details note
+                    string cdDetails = "";
+                    using (var cmd = new SqlCommand(
+                        "SELECT ISNULL(CDDetails, '') FROM Customer_Dress WHERE CustomerID = @CustomerID AND DressID = @DressID AND InstitutionID = @InstitutionID",
+                        connection))
+                    {
+                        cmd.Parameters.AddWithValue("@CustomerID", customerId);
+                        cmd.Parameters.AddWithValue("@DressID", dressId);
+                        cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                        var val = await cmd.ExecuteScalarAsync();
+                        cdDetails = val?.ToString() ?? "";
+                    }
+
+                    measurementsList.Add(new
+                    {
+                        dressId,
+                        dressName,
+                        measurements,
+                        styles = styleRows,
+                        details = cdDetails
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        customer = customerInfo,
+                        institutionName,
+                        institutionPhone,
+                        measurements = measurementsList
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting all measurements");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Delete customer
         /// </summary>
         [HttpDelete("delete-customer/{customerId}")]
@@ -1104,6 +1404,22 @@ namespace TailorBD.API.Controllers
             public string Phone { get; set; } = "";
             public string Address { get; set; } = "";
             public string Description { get; set; } = "";
+        }
+
+        public class CollectItemSellDueModel
+        {
+            public int InstitutionId { get; set; }
+            public int RegistrationId { get; set; }
+            public int CustomerId { get; set; }
+            public List<ItemSellDuePaymentItem> Payments { get; set; } = new();
+        }
+
+        public class ItemSellDuePaymentItem
+        {
+            public int SellingId { get; set; }
+            public double PaidAmount { get; set; }
+            public double DiscountAmount { get; set; }
+            public int? AccountId { get; set; }
         }
     }
 }

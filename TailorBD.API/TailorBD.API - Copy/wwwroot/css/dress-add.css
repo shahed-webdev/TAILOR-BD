@@ -1,12 +1,31 @@
 /* Dress Add Page Styles */
 
+/* Override global dashboard padding for compact layout */
+.dashboard-content {
+    padding: 12px 16px !important;
+}
+
+.page-header {
+    margin-bottom: 8px !important;
+}
+
+.page-header h1 {
+    font-size: 1.15rem !important;
+    font-weight: 700;
+}
+
+.page-header p {
+    font-size: 0.78rem;
+    margin-top: 2px !important;
+}
+
 .dress-thumbnail {
-    width: 80px;
-    height: 80px;
+    width: 44px;
+    height: 44px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 2px solid #e0e0e0;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
     display: block;
 }
 
@@ -17,17 +36,17 @@
 
 /* Placeholder for dresses without images */
 .dress-thumbnail-placeholder {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
     border: 2px dashed #e0e0e0;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #999;
-    font-size: 2rem;
-    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
 }
 
 .dress-thumbnail-placeholder:hover {
@@ -54,20 +73,36 @@
 }
 
 .dress-serial {
-    width: 80px !important;
+    width: 60px !important;
     text-align: center;
+    font-size: 0.8rem;
+    padding: 3px 6px !important;
+}
+
+/* Compact font for the entire dress table */
+#dressTable {
+    font-size: 0.82rem;
+}
+
+#dressTable td, #dressTable th {
+    vertical-align: middle;
 }
 
 .action-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    padding: 6px 14px;
+    font-size: 0.82rem;
 }
 
 .table-card {
     background: white;
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 10px;
+    padding: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -82,34 +117,34 @@
 
 .table thead th {
     border: none;
-    padding: 16px;
+    padding: 8px 10px;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
 }
 
 .table tbody tr {
-    transition: all 0.3s ease;
+    transition: background 0.2s ease;
 }
 
 .table tbody tr:hover {
     background: #f8f9ff;
-    transform: translateX(5px);
 }
 
 .table tbody td {
     vertical-align: middle;
-    padding: 16px;
+    padding: 5px 8px;
 }
 
 .btn-sm {
-    padding: 6px 12px;
-    font-size: 0.875rem;
+    padding: 4px 8px;
+    font-size: 0.8rem;
 }
 
 .btn-sm i {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 /* Modal Styles */
@@ -326,19 +361,19 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .table-responsive {
-        overflow-x: auto;
-    }
+.table-responsive {
+    overflow-x: auto;
+}
     
-    .dress-thumbnail,
-    .dress-thumbnail-placeholder {
-        width: 60px;
-        height: 60px;
-    }
+.dress-thumbnail,
+.dress-thumbnail-placeholder {
+    width: 36px;
+    height: 36px;
+}
     
-    .dress-thumbnail-placeholder {
-        font-size: 1.5rem;
-    }
+.dress-thumbnail-placeholder {
+    font-size: 1rem;
+}
     
     .action-buttons {
         flex-direction: column;

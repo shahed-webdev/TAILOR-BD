@@ -22,26 +22,42 @@ namespace TailorBD.API.Controllers
             // Order
             ["~/AccessAdmin/Order/New_Order.aspx"]              = "/new-order.html",
             ["~/AccessAdmin/Order/Order_List.aspx"]             = "/order-list.html",
+            ["~/AccessAdmin/Order/OrdrList.aspx"]               = "/order-list.html",
+            ["~/AccessAdmin/Order/Order.aspx"]                  = "/new-order.html",
             ["~/AccessAdmin/Order/Incomplete_Works.aspx"]       = "/incomplete-works.html",
             ["~/AccessAdmin/Order/Change_Delivery_Date.aspx"]   = "/change-delivery-date.html",
             ["~/AccessAdmin/Order/Delete_Order.aspx"]           = "/delete-order.html",
             ["~/AccessAdmin/Order/Quick_Order.aspx"]            = "/quick-order.html",
             ["~/AccessAdmin/quick-order/Order.aspx"]            = "/quick-order.html",
+            ["~/AccessAdmin/Order/MoneyReceipt.aspx"]           = "/money-receipt.html",
+            ["~/AccessAdmin/Order/FinishOrder.aspx"]            = "/finish-order.html",
+            ["~/AccessAdmin/Order/Add_More_Dress_In_Order.aspx"] = "/add-more-dress.html",
+            ["~/AccessAdmin/Order/OrderDetailsForMaker.aspx"] = "/order-edit.html",
+            ["~/AccessAdmin/quick-order/UpdateOrder.aspx"]    = "/update-order.html",
             // Delivery
             ["~/AccessAdmin/Delivery/Delivery_Give.aspx"]       = "/delivery-give.html",
+            ["~/AccessAdmin/Delivery/Delivery.aspx"]            = "/delivery-give.html",
             ["~/AccessAdmin/Delivery/Delivered_Orders.aspx"]    = "/delivered-orders.html",
+            ["~/AccessAdmin/Delivery/Delivered_Works.aspx"]     = "/delivery-cut-dress.html",
+            ["~/AccessAdmin/Delivery/Incompleteworks.aspx"]     = "/incomplete-works.html",
             ["~/AccessAdmin/Delivery/Delivery_Day.aspx"]        = "/delivery-day.html",
             ["~/AccessAdmin/Delivery/Delivery_Cut_Dress.aspx"]  = "/delivery-cut-dress.html",
             // Customer
             ["~/AccessAdmin/Customer/Add_Customer.aspx"]        = "/add-customer.html",
+            ["~/AccessAdmin/Customer/Add_Customer_Mesurement.aspx"] = "/add-customer.html",
             ["~/AccessAdmin/Customer/CustomerList.aspx"]        = "/customer-list.html",
             ["~/AccessAdmin/Customer/Customer_List.aspx"]       = "/customer-list.html",
+            ["~/AccessAdmin/Customer/CustomerDetails.aspx"]     = "/customer-details.html",
+            ["~/AccessAdmin/Customer/Customer_Details.aspx"]    = "/customer-details.html",
+            ["~/AccessAdmin/Customer/Customer_Detail.aspx"]     = "/customer-details.html",
             // Basic / Dress / Sub-Admin
             ["~/AccessAdmin/Dress/Dress_Add.aspx"]              = "/dress-add.html",
+            ["~/AccessAdmin/Dress/Mesurement_Printing_Setting.aspx"] = "/print-settings.html",
             ["~/AccessAdmin/Basic/Tailor_Info.aspx"]            = "/tailor-info.html",
+            ["~/AccessAdmin/TailorInfo.aspx"]                     = "/tailor-info.html",
             ["~/AccessAdmin/Basic/Sub_Admin.aspx"]              = "/sub-admin.html",
             ["~/AccessAdmin/Basic/Access_Management.aspx"]      = "/access-management.html",
-            ["~/AccessAdmin/Basic/Map_Print_Setting.aspx"]      = "/map-print-setting.html",
+            ["~/AccessAdmin/Basic/Map_Print_Setting.aspx"]      = "/print-settings.html",
             ["~/AccessAdmin/Sub_Admin/SignUp_Sub_Admin.aspx"]   = "/sub-admin.html",
             ["~/AccessAdmin/Sub_Admin/Access_Manage.aspx"]      = "/access-management.html",
             // Accounts
@@ -104,6 +120,7 @@ namespace TailorBD.API.Controllers
             ["~/AccessAdmin/Fabrics/Supplier.aspx"]                        = "/item-supplier-add.html",
             ["~/AccessAdmin/Fabrics/Damage/Damage_Fabrics.aspx"]           = "/item-damage-add.html",
             ["~/AccessAdmin/Fabrics/Damage/Damage_Add.aspx"]               = "/item-damage-add.html",
+            ["~/AccessAdmin/Fabrics/Damage/Damage_Report.aspx"]            = "/item-damage-add.html",
             // SMS / Message — actual ASPX file names
             ["~/AccessAdmin/SMS/Send_SMS.aspx"]                = "/sms.html",
             ["~/AccessAdmin/SMS/SMS_Send.aspx"]                = "/sms.html",
@@ -112,7 +129,31 @@ namespace TailorBD.API.Controllers
             ["~/AccessAdmin/SMS/Others_SMS.aspx"]              = "/contact-list.html",
             ["~/AccessAdmin/SMS/Contact_List.aspx"]            = "/contact-list.html",
             ["~/AccessAdmin/SMS/SMS_Settings.aspx"]            = "/sms-settings.html",
+            ["~/AccessAdmin/SMS/SMS_Recharge.aspx"]            = "/sms-recharge.html",
+            ["~/AccessAdmin/SMS/Recharge.aspx"]                = "/sms-recharge.html",
+            ["~/AccessAdmin/Messages/Recharge.aspx"]           = "/sms-recharge.html",
         };
+
+        // Legacy auto-generated .html URLs that differ from the real page files
+        private static readonly Dictionary<string, string> HtmlPageAliases = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["/ordrlist.html"]                   = "/order-list.html",
+            ["/incompleteworks.html"]            = "/incomplete-works.html",
+            ["/add-customer-mesurement.html"]    = "/add-customer.html",
+            ["/damage-report.html"]              = "/item-damage-add.html",
+            ["/mesurement-printing-setting.html"]= "/print-settings.html",
+            ["/map-print-setting.html"]          = "/print-settings.html",
+            ["/delivered-works.html"]            = "/delivery-cut-dress.html",
+        };
+
+        private static string ToCanonicalHtmlUrl(string htmlUrl)
+        {
+            if (string.IsNullOrWhiteSpace(htmlUrl)) return htmlUrl ?? string.Empty;
+            var key = htmlUrl.Trim();
+            if (!key.StartsWith('/')) key = "/" + key;
+            key = key.TrimEnd('/');
+            return HtmlPageAliases.TryGetValue(key, out var canonical) ? canonical : key;
+        }
 
         /// <summary>
         /// Converts a legacy ~/... .aspx URL to the modern .html URL.
@@ -124,10 +165,11 @@ namespace TailorBD.API.Controllers
             var key = rawUrl.Trim();
 
             // 1. Exact match
-            if (AspxToHtml.TryGetValue(key, out var html)) return html;
+            if (AspxToHtml.TryGetValue(key, out var html)) return ToCanonicalHtmlUrl(html);
 
-            // 2. Already an .html URL — return as-is
-            if (key.EndsWith(".html", StringComparison.OrdinalIgnoreCase)) return key;
+            // 2. Already an .html URL — return as-is (with alias resolution)
+            if (key.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+                return ToCanonicalHtmlUrl(key.StartsWith('/') ? key : "/" + key);
 
             // 3. Pattern-based fallback for any ASPX path not in the table
             //    ~/AccessAdmin/Folder/Page_Name.aspx  →  /page-name.html
@@ -136,10 +178,10 @@ namespace TailorBD.API.Controllers
             {
                 var fileName = System.IO.Path.GetFileNameWithoutExtension(key); // e.g. "Add_Account"
                 var kebab = fileName.Replace('_', '-').ToLowerInvariant();      // e.g. "add-account"
-                return "/" + kebab + ".html";
+                return ToCanonicalHtmlUrl("/" + kebab + ".html");
             }
 
-            return key;
+            return ToCanonicalHtmlUrl(key);
         }
 
         // ── All sidebar HTML page URLs (canonical list) ─────────────────────
@@ -149,6 +191,7 @@ namespace TailorBD.API.Controllers
             ["/quick-order.html"]            = ("Quick Order",              "Order"),
             ["/new-order.html"]              = ("New Order",               "Order"),
             ["/order-list.html"]             = ("Order List",              "Order"),
+            ["/money-receipt.html"]          = ("Money Receipt",           "Order"),
             ["/incomplete-works.html"]       = ("Complete Order Works",    "Order"),
             ["/change-delivery-date.html"]   = ("Change Delivery Date",   "Order"),
             ["/delete-order.html"]           = ("Permanently Delete Order","Order"),
@@ -163,7 +206,7 @@ namespace TailorBD.API.Controllers
             // Basic Setting
             ["/tailor-info.html"]            = ("Tailor Shop Info",        "Basic"),
             ["/dress-add.html"]              = ("Add Dress & Measurement", "Basic"),
-            ["/map-print-setting.html"]      = ("Map Print Setting",       "Basic"),
+            ["/print-settings.html"]         = ("Print Settings",          "Basic"),
             ["/sub-admin.html"]              = ("SignUp Sub Admin",        "Basic"),
             ["/access-management.html"]      = ("Sub Admin Page Access",   "Basic"),
             // Item Management - Basic Setting
@@ -201,6 +244,7 @@ namespace TailorBD.API.Controllers
             ["/sms.html"]                    = ("Send SMS",                "Message"),
             ["/sms-history.html"]            = ("SMS History",             "Message"),
             ["/contact-list.html"]           = ("Phone Contact List",      "Message"),
+            ["/sms-recharge.html"]           = ("SMS Recharge",            "Message"),
             ["/sms-settings.html"]           = ("SMS Settings",            "Message"),
         };
 

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TailorBD.API.Models;
 using TailorBD.API.Services;
 
@@ -111,11 +111,19 @@ namespace TailorBD.API.Controllers
                     return BadRequest(ApiResponse<int>.ErrorResponse("Invalid customer data"));
 
                 customer.Date = DateTime.Now;
-                var customerId = await _customerService.CreateCustomerAsync(customer);
-                
-                return CreatedAtAction(nameof(GetCustomerById), 
-                    new { id = customerId, institutionId = customer.InstitutionID }, 
-                    ApiResponse<int>.SuccessResponse(customerId, "Customer created successfully"));
+                var result = await _customerService.CreateCustomerAsync(customer);
+
+                // negative result = duplicate (existing CustomerID returned as negative)
+                if (result < 0)
+                {
+                    var existingId = -result;
+                    var msg = $"{customer.CustomerName} (মোবাইল: {customer.Phone}) পূর্বে নিবন্ধিত, পুনরায় নিবন্ধন করা যাবে না।";
+                    return Conflict(ApiResponse<int>.ErrorResponse(msg));
+                }
+
+                return CreatedAtAction(nameof(GetCustomerById),
+                    new { id = result, institutionId = customer.InstitutionID },
+                    ApiResponse<int>.SuccessResponse(result, "Customer created successfully"));
             }
             catch (Exception ex)
             {
@@ -178,7 +186,58 @@ namespace TailorBD.API.Controllers
         }
 
         /// <summary>
-        /// Autocomplete suggest � search by no/name/phone, returns top 10
+        /// Get customer photo
+        /// </summary>
+        [HttpGet("{id}/photo")]
+        public async Task<IActionResult> GetPhoto(int id, [FromQuery] int institutionId)
+        {
+            try
+            {
+                var imageBytes = await _customerService.GetCustomerPhotoAsync(id, institutionId);
+                if (imageBytes == null || imageBytes.Length == 0)
+                    return NotFound();
+                return File(imageBytes, "image/jpeg");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving photo for customer {CustomerId}", id);
+                return StatusCode(500);
+            }
+        }
+
+        /// <summary>
+        /// Upload customer photo
+        /// </summary>
+        [HttpPost("{id}/photo")]
+        public async Task<ActionResult<ApiResponse<bool>>> UploadPhoto(int id, [FromQuery] int institutionId, IFormFile photo)
+        {
+            try
+            {
+                if (photo == null || photo.Length == 0)
+                    return BadRequest(ApiResponse<bool>.ErrorResponse("No photo provided"));
+
+                if (photo.Length > 2 * 1024 * 1024)
+                    return BadRequest(ApiResponse<bool>.ErrorResponse("Photo must be under 2MB"));
+
+                using var ms = new MemoryStream();
+                await photo.CopyToAsync(ms);
+                var imageBytes = ms.ToArray();
+
+                var result = await _customerService.SaveCustomerPhotoAsync(id, institutionId, imageBytes);
+                if (!result)
+                    return NotFound(ApiResponse<bool>.ErrorResponse("Customer not found"));
+
+                return Ok(ApiResponse<bool>.SuccessResponse(true, "Photo uploaded successfully"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading photo for customer {CustomerId}", id);
+                return StatusCode(500, ApiResponse<bool>.ErrorResponse("An error occurred while uploading photo"));
+            }
+        }
+
+        /// <summary>
+        /// Autocomplete suggest — search by no/name/phone, returns top 10
         /// </summary>
         [HttpGet("suggest")]
         public async Task<ActionResult<ApiResponse<IEnumerable<CustomerDto>>>> Suggest(

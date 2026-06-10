@@ -1280,6 +1280,204 @@ namespace TailorBD.API.Controllers
         }
 
         /// <summary>
+        /// Search Order Payment Records by OrderSerialNumber (Authority only)
+        /// </summary>
+        [HttpGet("authority/{institutionId}/order-payments")]
+        public async Task<ActionResult> GetOrderPayments(int institutionId, [FromQuery] int orderSerialNumber)
+        {
+            try
+            {
+                var cs = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var con = new Microsoft.Data.SqlClient.SqlConnection(cs);
+                await con.OpenAsync();
+
+                using var cmd = new Microsoft.Data.SqlClient.SqlCommand(@"
+                    SELECT PR.PaymentRecordID,
+                           PR.OrderID,
+                           PR.Amount,
+                           PR.Payment_TimeStatus,
+                           PR.OrderPaid_Date,
+                           PR.Insert_Date,
+                           [Order].OrderSerialNumber,
+                           Customer.CustomerNumber,
+                           Customer.CustomerName,
+                           Customer.Phone,
+                           ISNULL(Account.AccountName,'') AS AccountName
+                    FROM Payment_Record PR
+                    INNER JOIN [Order]   ON PR.OrderID     = [Order].OrderID
+                    INNER JOIN Customer  ON PR.CustomerID  = Customer.CustomerID
+                    LEFT  JOIN Account   ON PR.AccountID   = Account.AccountID
+                    WHERE [Order].InstitutionID    = @InstitutionID
+                      AND [Order].OrderSerialNumber = @OrderSN
+                    ORDER BY PR.Insert_Date DESC", con);
+                cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                cmd.Parameters.AddWithValue("@OrderSN", orderSerialNumber);
+
+                var list = new List<object>();
+                using var rdr = await cmd.ExecuteReaderAsync();
+                while (await rdr.ReadAsync())
+                {
+                    list.Add(new
+                    {
+                        paymentRecordId    = Convert.ToInt32(rdr["PaymentRecordID"]),
+                        orderId            = Convert.ToInt32(rdr["OrderID"]),
+                        amount             = rdr["Amount"] == DBNull.Value ? 0.0 : Convert.ToDouble(rdr["Amount"]),
+                        paymentTimeStatus  = rdr["Payment_TimeStatus"]?.ToString() ?? "",
+                        orderPaidDate      = rdr["OrderPaid_Date"] == DBNull.Value ? null : (DateTime?)Convert.ToDateTime(rdr["OrderPaid_Date"]),
+                        insertDate         = rdr["Insert_Date"] == DBNull.Value ? null : (DateTime?)Convert.ToDateTime(rdr["Insert_Date"]),
+                        orderSerialNumber  = Convert.ToInt32(rdr["OrderSerialNumber"]),
+                        customerNumber     = rdr["CustomerNumber"] == DBNull.Value ? 0 : Convert.ToInt32(rdr["CustomerNumber"]),
+                        customerName       = rdr["CustomerName"]?.ToString() ?? "",
+                        phone              = rdr["Phone"]?.ToString() ?? "",
+                        accountName        = rdr["AccountName"]?.ToString() ?? ""
+                    });
+                }
+
+                return Ok(new { success = true, data = list });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting order payments");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Delete a single Order Payment Record (Authority only)
+        /// </summary>
+        [HttpDelete("authority/{institutionId}/order-payment/{paymentRecordId}")]
+        public async Task<ActionResult> DeleteOrderPayment(int institutionId, int paymentRecordId)
+        {
+            try
+            {
+                var cs = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var con = new Microsoft.Data.SqlClient.SqlConnection(cs);
+                await con.OpenAsync();
+
+                // Verify the record belongs to this institution
+                using var checkCmd = new Microsoft.Data.SqlClient.SqlCommand(@"
+                    SELECT COUNT(*) FROM Payment_Record PR
+                    INNER JOIN [Order] ON PR.OrderID = [Order].OrderID
+                    WHERE PR.PaymentRecordID = @ID AND [Order].InstitutionID = @InsID", con);
+                checkCmd.Parameters.AddWithValue("@ID", paymentRecordId);
+                checkCmd.Parameters.AddWithValue("@InsID", institutionId);
+                var count = (int)await checkCmd.ExecuteScalarAsync();
+                if (count == 0)
+                    return NotFound(new { success = false, message = "পেমেন্ট রেকর্ড পাওয়া যায়নি" });
+
+                using var delCmd = new Microsoft.Data.SqlClient.SqlCommand(
+                    "DELETE FROM Payment_Record WHERE PaymentRecordID = @ID", con);
+                delCmd.Parameters.AddWithValue("@ID", paymentRecordId);
+                await delCmd.ExecuteNonQueryAsync();
+
+                return Ok(new { success = true, message = "পেমেন্ট রেকর্ড মুছে ফেলা হয়েছে" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting order payment");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Search Item Sell Payment Records by Selling SN (Authority only)
+        /// </summary>
+        [HttpGet("authority/{institutionId}/item-sell-payments")]
+        public async Task<ActionResult> GetItemSellPayments(int institutionId, [FromQuery] string sellingSN)
+        {
+            try
+            {
+                var cs = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var con = new Microsoft.Data.SqlClient.SqlConnection(cs);
+                await con.OpenAsync();
+
+                using var cmd = new Microsoft.Data.SqlClient.SqlCommand(@"
+                    SELECT PR.FabricSellingPaymentRecordID,
+                           PR.FabricsSellingID,
+                           PR.SellingPaidAmount,
+                           PR.Payment_Situation,
+                           PR.SellingPaid_Date,
+                           PR.InsertDate,
+                           FS.Selling_SN,
+                           ISNULL(Customer.CustomerName,'') AS CustomerName,
+                           ISNULL(Customer.CustomerNumber,0) AS CustomerNumber,
+                           ISNULL(Account.AccountName,'') AS AccountName
+                    FROM Fabrics_Selling_PaymentRecord PR
+                    INNER JOIN Fabrics_Selling FS ON PR.FabricsSellingID = FS.FabricsSellingID
+                    LEFT  JOIN Customer              ON FS.CustomerID    = Customer.CustomerID
+                    LEFT  JOIN Account               ON PR.AccountID     = Account.AccountID
+                    WHERE FS.InstitutionID = @InstitutionID
+                      AND FS.Selling_SN    = @SellingSN
+                    ORDER BY PR.InsertDate DESC", con);
+                cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                cmd.Parameters.AddWithValue("@SellingSN", sellingSN.Trim());
+
+                var list = new List<object>();
+                using var rdr = await cmd.ExecuteReaderAsync();
+                while (await rdr.ReadAsync())
+                {
+                    list.Add(new
+                    {
+                        fabricSellingPaymentRecordId = Convert.ToInt32(rdr["FabricSellingPaymentRecordID"]),
+                        fabricsSellingId             = Convert.ToInt32(rdr["FabricsSellingID"]),
+                        sellingPaidAmount            = rdr["SellingPaidAmount"] == DBNull.Value ? 0.0 : Convert.ToDouble(rdr["SellingPaidAmount"]),
+                        paymentSituation             = rdr["Payment_Situation"]?.ToString() ?? "",
+                        sellingPaidDate              = rdr["SellingPaid_Date"] == DBNull.Value ? null : (DateTime?)Convert.ToDateTime(rdr["SellingPaid_Date"]),
+                        insertDate                   = rdr["InsertDate"] == DBNull.Value ? null : (DateTime?)Convert.ToDateTime(rdr["InsertDate"]),
+                        sellingSN                    = rdr["Selling_SN"]?.ToString() ?? "",
+                        customerName                 = rdr["CustomerName"]?.ToString() ?? "",
+                        customerNumber               = rdr["CustomerNumber"] == DBNull.Value ? 0 : Convert.ToInt32(rdr["CustomerNumber"]),
+                        accountName                  = rdr["AccountName"]?.ToString() ?? ""
+                    });
+                }
+
+                return Ok(new { success = true, data = list });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting item sell payments");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Delete a single Item Sell Payment Record (Authority only)
+        /// </summary>
+        [HttpDelete("authority/{institutionId}/item-sell-payment/{paymentRecordId}")]
+        public async Task<ActionResult> DeleteItemSellPayment(int institutionId, int paymentRecordId)
+        {
+            try
+            {
+                var cs = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var con = new Microsoft.Data.SqlClient.SqlConnection(cs);
+                await con.OpenAsync();
+
+                // Verify the record belongs to this institution
+                using var checkCmd = new Microsoft.Data.SqlClient.SqlCommand(@"
+                    SELECT COUNT(*) FROM Fabrics_Selling_PaymentRecord PR
+                    INNER JOIN Fabrics_Selling FS ON PR.FabricsSellingID = FS.FabricsSellingID
+                    WHERE PR.FabricSellingPaymentRecordID = @ID AND FS.InstitutionID = @InsID", con);
+                checkCmd.Parameters.AddWithValue("@ID", paymentRecordId);
+                checkCmd.Parameters.AddWithValue("@InsID", institutionId);
+                var count = (int)await checkCmd.ExecuteScalarAsync();
+                if (count == 0)
+                    return NotFound(new { success = false, message = "পেমেন্ট রেকর্ড পাওয়া যায়নি" });
+
+                using var delCmd = new Microsoft.Data.SqlClient.SqlCommand(
+                    "DELETE FROM Fabrics_Selling_PaymentRecord WHERE FabricSellingPaymentRecordID = @ID", con);
+                delCmd.Parameters.AddWithValue("@ID", paymentRecordId);
+                await delCmd.ExecuteNonQueryAsync();
+
+                return Ok(new { success = true, message = "আইটেম সেল পেমেন্ট রেকর্ড মুছে ফেলা হয়েছে" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting item sell payment");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Public endpoint — homepage stats section এর জন্য (auth ছাড়া)
         /// Total shops, customers, orders, delivered, pending
         /// </summary>

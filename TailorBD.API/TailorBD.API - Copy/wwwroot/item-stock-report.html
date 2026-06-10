@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -123,7 +123,7 @@
                     <div class="d-flex gap-2 no-print">
                         <button class="btn-export" onclick="exportCSV()">
                             <i class="fas fa-file-csv"></i>
-                            <span data-en="Export CSV" data-bn="এক্সপোর্ট">এক্সপোর্ট</span>
+                            <span data-en="Export CSV" data-bn="CSV রপ্তানি">CSV রপ্তানি</span>
                         </button>
                         <button class="btn-export" style="background:#6c7ae0;" onclick="window.print()">
                             <i class="fas fa-print"></i>
@@ -141,11 +141,10 @@
                 <div class="filter-card no-print">
                     <div class="row g-2 align-items-end mb-3">
                         <div class="col-md-4 col-sm-6">
-                            <label class="f-label"><span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></label>
+                            <label class="f-label"><span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span></label>
                             <input type="text" id="fSearch" class="f-control"
                                 data-en-placeholder="Code or item name..."
-                                data-bn-placeholder="কোড বা আইটেমের নাম..."
-                                placeholder="কোড বা আইটেমের নাম..."
+                                data-bn-placeholder="কোড বা আইটেমের নাম..." placeholder="কোড বা আইটেমের নাম..."
                                 oninput="debouncedLoad()">
                         </div>
                         <div class="col-md-2 col-sm-6">
@@ -164,7 +163,7 @@
                             <label class="f-label"><span data-en="Sort By" data-bn="সাজান">সাজান</span></label>
                             <select id="fSort" class="f-control" onchange="loadList(1)">
                                 <option value="stock"   data-en="Stock (High→Low)"   data-bn="স্টক (বেশি→কম)">স্টক (বেশি→কম)</option>
-                                <option value="sold"    data-en="Most Sold"           data-bn="বেশি বিক্রি">বেশি বিক্রি</option>
+                                <option value="sold"    data-en="Most Sold"           data-bn="সর্বাধিক বিক্রয়">সর্বাধিক বিক্রয়</option>
                                 <option value="buying"  data-en="Buying Price"        data-bn="ক্রয় মূল্য">ক্রয় মূল্য</option>
                                 <option value="selling" data-en="Selling Price"       data-bn="বিক্রয় মূল্য">বিক্রয় মূল্য</option>
                                 <option value="name"    data-en="Name (A→Z)"          data-bn="নাম (A→Z)">নাম (A→Z)</option>
@@ -188,12 +187,12 @@
                         </button>
                         <button class="s-tab" data-status="in" onclick="setStatus(this,'in')">
                             <i class="fas fa-check-circle"></i>
-                            <span data-en="In Stock" data-bn="স্টকে আছে">স্টকে আছে</span>
+                            <span data-en="In Stock" data-bn="স্টক আছে">স্টক আছে</span>
                             <span class="cnt" id="cntIn">0</span>
                         </button>
                         <button class="s-tab" data-status="low" onclick="setStatus(this,'low')">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <span data-en="Low Stock" data-bn="কম স্টক">কম স্টক</span>
+                            <span data-en="Low Stock" data-bn="স্টক কম">স্টক কম</span>
                             <span class="cnt" id="cntLow">0</span>
                         </button>
                         <button class="s-tab" data-status="out" onclick="setStatus(this,'out')">
@@ -210,7 +209,7 @@
                         <div class="tbl-title">
                             <i class="fas fa-list me-1" style="color:#6c7ae0;"></i>
                             <span id="resultCount" style="color:#6c7ae0;font-weight:800;">0</span>
-                            <span data-en="items" data-bn="টি আইটেম">টি আইটেম</span>
+                            <span data-en="items" data-bn="আইটেম">আইটেম</span>
                         </div>
                         <div id="pageInfoTop" class="pag-info" style="font-size:12px;"></div>
                     </div>
@@ -223,16 +222,16 @@
                                 <tr>
                                     <th>#</th>
                                     <th><span data-en="Code" data-bn="কোড">কোড</span></th>
-                                    <th><span data-en="Item Name" data-bn="আইটেম">আইটেম</span></th>
+                                    <th><span data-en="Item Name" data-bn="আইটেমের নাম">আইটেমের নাম</span></th>
                                     <th><span data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</span></th>
-                                    <th><span data-en="Buy Price" data-bn="ক্রয়">ক্রয়</span></th>
-                                    <th><span data-en="Sell Price" data-bn="বিক্রয়">বিক্রয়</span></th>
-                                    <th><span data-en="Bought" data-bn="মোট ক্রয়">মোট ক্রয়</span></th>
-                                    <th><span data-en="Sold" data-bn="মোট বিক্রয়">মোট বিক্রয়</span></th>
-                                    <th><span data-en="Damage" data-bn="ড্যামেজ">ড্যামেজ</span></th>
-                                    <th><span data-en="Return↑" data-bn="ফেরত↑">ফেরত↑</span></th>
+                                    <th><span data-en="Buy Price" data-bn="ক্রয় মূল্য">ক্রয় মূল্য</span></th>
+                                    <th><span data-en="Sell Price" data-bn="বিক্রয় মূল্য">বিক্রয় মূল্য</span></th>
+                                    <th><span data-en="Bought" data-bn="ক্রয়">ক্রয়</span></th>
+                                    <th><span data-en="Sold" data-bn="বিক্রয়">বিক্রয়</span></th>
+                                    <th><span data-en="Damage" data-bn="নষ্ট">নষ্ট</span></th>
+                                    <th><span data-en="Return" data-bn="ফেরত">ফেরত</span></th>
                                     <th><span data-en="Stock" data-bn="স্টক">স্টক</span></th>
-                                    <th><span data-en="Status" data-bn="অবস্থা">অবস্থা</span></th>
+                                    <th><span data-en="Status" data-bn="স্টাটাস">স্টাটাস</span></th>
                                     <th><span data-en="Stock Value" data-bn="স্টক মূল্য">স্টক মূল্য</span></th>
                                 </tr>
                             </thead>
@@ -262,7 +261,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/item-stock-report.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/item-stock-report.js?v=2.1.6"></script>
 </body>
 </html>

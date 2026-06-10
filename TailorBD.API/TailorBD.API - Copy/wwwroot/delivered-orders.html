@@ -55,7 +55,7 @@
         .stat-label { font-size: 13px; opacity: 0.9; }
 
         /* Summary text */
-        .summary-text { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 10px; }
+        .summary-text { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 0; }
 
         /* Table */
         .table-wrapper { overflow-x: auto; margin-top: 10px; }
@@ -127,7 +127,7 @@
                     <div class="stats-cards">
                         <div class="stat-card green">
                             <div class="stat-value" id="totalDelivered">0</div>
-                            <div class="stat-label" data-en="Total Delivered" data-bn="মোট ডেলিভার">মোট ডেলিভার</div>
+                            <div class="stat-label" data-en="Total Delivered" data-bn="মোট ডেলিভারি">মোট ডেলিভারি</div>
                         </div>
                         <div class="stat-card red">
                             <div class="stat-value" id="totalDue">৳0.00</div>
@@ -139,7 +139,7 @@
                     <div class="search-mode-group">
                         <label class="radio-order">
                             <input type="radio" name="searchMode" value="orderNo" checked>
-                            <span data-en="Order No. And Mobile No." data-bn="অর্ডার নং এবং মোবাইল নং">অর্ডার নং এবং মোবাইল নং</span>
+                            <span data-en="Order No. And Mobile No." data-bn="অর্ডার নম্বর ও মোবাইল নম্বর">অর্ডার নম্বর ও মোবাইল নম্বর</span>
                         </label>
                         <label class="radio-date">
                             <input type="radio" name="searchMode" value="date">
@@ -147,7 +147,7 @@
                         </label>
                         <label class="radio-due" style="color:#dc3545;">
                             <input type="radio" name="searchMode" value="dueOnly">
-                            <span data-en="With Due Only" data-bn="শুধু বাকি আছে">শুধু বাকি আছে</span>
+                            <span data-en="With Due Only" data-bn="শুধু বাকি সহ">শুধু বাকি সহ</span>
                         </label>
                     </div>
 
@@ -156,41 +156,37 @@
                         <div class="search-panel">
                             <div class="search-grid">
                                 <div class="form-group autocomplete-wrapper">
-                                    <label data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</label>
+                                    <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
                                     <input type="text" id="mobileNo"
                                         data-en-placeholder="Mobile Number"
-                                        data-bn-placeholder="মোবাইল নাম্বার"
-                                        placeholder="মোবাইল নাম্বার"
+                                        data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নম্বর"
                                         autocomplete="off">
                                     <div class="autocomplete-list" id="mobileNoSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group autocomplete-wrapper">
-                                    <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                                    <label data-en="Customer Name" data-bn="গ্রাহকের নাম">গ্রাহকের নাম</label>
                                     <input type="text" id="customerName"
                                         data-en-placeholder="Customer Name"
-                                        data-bn-placeholder="কাস্টমারের নাম"
-                                        placeholder="কাস্টমারের নাম"
+                                        data-bn-placeholder="গ্রাহকের নাম" placeholder="গ্রাহকের নাম"
                                         autocomplete="off">
                                     <div class="autocomplete-list" id="customerNameSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="Order Number (one or multiple)" data-bn="অর্ডার নাম্বার (এক বা একাধিক)">অর্ডার নাম্বার (এক বা একাধিক)</label>
+                                    <label data-en="Order Number (one or multiple)" data-bn="অর্ডার নম্বর (এক বা একাধিক)">অর্ডার নম্বর (এক বা একাধিক)</label>
                                     <textarea id="orderNo"
                                         data-en-placeholder="e.g. Order numbers: 10,20,30"
-                                        data-bn-placeholder="উদাহরণস্বরূপ: অর্ডার নাম্বার 10,20,30"
-                                        placeholder="উদাহরণস্বরূপ: অর্ডার নাম্বার 10,20,30"></textarea>
+                                        data-bn-placeholder="উদাঃ অর্ডার নম্বর: ১০,২০,৩০" placeholder="উদাঃ অর্ডার নম্বর: ১০,২০,৩০"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
                                     <textarea id="address"
                                         data-en-placeholder="Address"
-                                        data-bn-placeholder="ঠিকানা"
-                                        placeholder="ঠিকানা"></textarea>
+                                        data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা"></textarea>
                                 </div>
                                 <div>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
                                         <i class="fas fa-search"></i>
-                                        <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
                             </div>
@@ -202,25 +198,28 @@
                         <div class="search-panel">
                             <div class="search-grid-date">
                                 <div class="form-group">
-                                    <label data-en="From Date" data-bn="কোন তারিখ থেকে">কোন তারিখ থেকে</label>
+                                    <label data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
                                     <input type="date" id="startDate">
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="To Date" data-bn="কোন তারিখ পর্যন্ত">কোন তারিখ পর্যন্ত</label>
+                                    <label data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
                                     <input type="date" id="endDate">
                                 </div>
                                 <div>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
                                         <i class="fas fa-search"></i>
-                                        <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Summary -->
-                    <div class="summary-text" id="summaryText"></div>
+                    <!-- Summary + Pagination Top -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:nowrap; gap:8px; margin-bottom:8px;">
+                        <div class="summary-text" id="summaryText"></div>
+                        <div class="pagination-wrapper" style="margin:0;" id="paginationContainerTop"></div>
+                    </div>
 
                     <!-- Orders Table -->
                     <div class="table-wrapper">
@@ -242,7 +241,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/delivered-orders.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/delivered-orders.js?v=2.1.6"></script>
 </body>
 </html>

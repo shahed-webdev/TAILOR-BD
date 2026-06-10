@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কাস্টমার মাপ প্রিন্ট - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link href="/css/money-receipt.css?v=2.2.5" rel="stylesheet">
+    <style>
+        .cmp-action-bar {
+            background: white;
+            padding: 14px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 12px;
+        }
+        .cmp-customer-header {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+        }
+        .cmp-customer-header .cust-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+        .cmp-customer-header .cust-meta {
+            font-size: 13px;
+            color: #666;
+        }
+        .cmp-dress-select-bar {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        .cmp-dress-select-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            white-space: nowrap;
+        }
+        .cmp-dress-select-bar select {
+            padding: 7px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: inherit;
+            min-width: 200px;
+        }
+        .cmp-dress-select-bar select:focus { outline: none; border-color: #6c7ae0; }
+        .cmp-border-check { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+
+        /* print container styling re-use from money-receipt */
+        .cmp-print-container {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .cmp-slip {
+            padding-top: var(--measurement-top-space, 0px);
+            margin-bottom: 16px;
+            page-break-inside: avoid;
+        }
+        .cmp-slip:last-child { margin-bottom: 0; }
+        .cmp-shop-name {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .cmp-meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+            table-layout: fixed;
+        }
+        .cmp-meta-table td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            vertical-align: middle;
+            word-break: break-word;
+        }
+        .cmp-cust-highlight {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #000;
+            margin: 4px 0 2px;
+            line-height: 1.35;
+        }
+        .cmp-cust-address {
+            text-align: center;
+            font-size: 11px;
+            color: #222;
+            margin-bottom: 8px;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .no-data-msg { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .main-content { margin-left: 0 !important; }
+            .cmp-print-container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingSpinner" class="loading-overlay" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div id="app-sidebar"></div>
+    <main class="main-content" id="mainContent">
+        <div id="app-navbar"></div>
+        <div class="dashboard-content">
+            <div id="alertContainer"></div>
+
+            <!-- Action Bar -->
+            <div class="cmp-action-bar no-print">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-secondary btn-sm" id="btnGoBack">
+                            <i class="fas fa-arrow-left me-1"></i>ফিরে যান
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="window.print()">
+                            <i class="fas fa-print me-1"></i>প্রিন্ট করুন
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="downloadPDF()">
+                            <i class="fas fa-file-pdf me-1"></i>পিডিএফ ডাউনলোড
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="shareAsPDF()">
+                            <i class="fas fa-share-alt me-1"></i>পিডিএফ শেয়ার
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="mb-0 fw-semibold" style="font-size:13px;">প্রিন্ট সাইজ:</label>
+                        <select class="form-select form-select-sm" id="printSizeSelect" style="width:auto;">
+                            <option value="3">3 inch</option>
+                            <option value="3.5">3.5 inch</option>
+                            <option value="4" selected>4 inch</option>
+                            <option value="4.5">4.5 inch</option>
+                            <option value="5">5 inch</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dress filter + border toggle -->
+            <div class="cmp-dress-select-bar no-print" id="dressSelectBar">
+                <label><i class="fas fa-tshirt me-1"></i>পোষাক নির্বাচন:</label>
+                <select id="dressFilter">
+                    <option value="all">সব পোষাক একসাথে</option>
+                </select>
+                <div id="dressPager" style="display:none;" class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" id="prevDressBtn">
+                        <i class="fas fa-chevron-left"></i> আগে
+                    </button>
+                    <span id="dressPageInfo" class="fw-semibold" style="font-size:13px;"></span>
+                    <button class="btn btn-outline-secondary btn-sm" id="nextDressBtn">
+                        পরে <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="cmp-border-check ms-auto">
+                    <input type="checkbox" id="hideBorderCheckbox" class="form-check-input">
+                    <label for="hideBorderCheckbox" class="form-check-label">বর্ডার লুকান</label>
+                </div>
+            </div>
+
+            <!-- Print Content -->
+            <div class="cmp-print-container" id="cmpPrintContainer">
+                <div class="text-center p-4 text-muted">লোড হচ্ছে...</div>
+            </div>
+        </div>
+    </main>
+
+    <div id="app-modals"></div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app-components.js?v=2.2.8"></script>
+    <script src="/js/customer-measurement-print.js?v=1.0.11"></script>
+</body>
+</html>

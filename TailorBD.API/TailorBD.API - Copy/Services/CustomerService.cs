@@ -13,6 +13,8 @@ namespace TailorBD.API.Services
         Task<int> CreateCustomerAsync(Customer customer);
         Task<bool> UpdateCustomerAsync(Customer customer);
         Task<bool> DeleteCustomerAsync(int customerId, int institutionId);
+        Task<byte[]?> GetCustomerPhotoAsync(int customerId, int institutionId);
+        Task<bool> SaveCustomerPhotoAsync(int customerId, int institutionId, byte[] imageBytes);
     }
 
     public class CustomerService : ICustomerService
@@ -146,7 +148,18 @@ namespace TailorBD.API.Services
         public async Task<int> CreateCustomerAsync(Customer customer)
         {
             using var connection = _context.CreateConnection();
-            
+
+            // Duplicate check: same name + same phone in same institution
+            var existingId = await connection.QueryFirstOrDefaultAsync<int?>(
+                @"SELECT TOP 1 CustomerID FROM Customer
+                  WHERE InstitutionID = @InstitutionID
+                    AND CustomerName   = @CustomerName
+                    AND Phone          = @Phone",
+                new { customer.InstitutionID, customer.CustomerName, customer.Phone });
+
+            if (existingId.HasValue)
+                return -existingId.Value; // negative = already exists, caller checks sign
+
             // Get next customer number for this institution
             var customerNumberSql = @"
                 SELECT ISNULL(MAX(CASE WHEN ISNUMERIC(CustomerNumber) = 1 THEN CAST(CustomerNumber AS INT) ELSE 0 END), 0) + 1 
@@ -201,6 +214,25 @@ namespace TailorBD.API.Services
             var sql = "DELETE FROM Customer WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID";
             
             var affectedRows = await connection.ExecuteAsync(sql, new { CustomerID = customerId, InstitutionID = institutionId });
+            return affectedRows > 0;
+        }
+
+        public async Task<byte[]?> GetCustomerPhotoAsync(int customerId, int institutionId)
+        {
+            using var connection = _context.CreateConnection();
+            var sql = "SELECT Image FROM Customer WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID";
+            var result = await connection.QueryFirstOrDefaultAsync<byte[]?>(sql,
+                new { CustomerID = customerId, InstitutionID = institutionId });
+            return result;
+        }
+
+        public async Task<bool> SaveCustomerPhotoAsync(int customerId, int institutionId, byte[] imageBytes)
+        {
+            using var connection = _context.CreateConnection();
+            var sql = @"UPDATE Customer SET Image = @Image 
+                        WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID";
+            var affectedRows = await connection.ExecuteAsync(sql,
+                new { Image = imageBytes, CustomerID = customerId, InstitutionID = institutionId });
             return affectedRows > 0;
         }
     }

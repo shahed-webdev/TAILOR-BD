@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-en="Sell Item - TailorBD" data-bn="আইটেম বিক্রি - TailorBD">আইটেম বিক্রি - TailorBD</title>
+    <title data-en="Sell Item - TailorBD" data-bn="আইটেম বিক্রয় - TailorBD">আইটেম বিক্রয় - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -116,7 +116,7 @@
         <div class="modal-box">
             <div class="modal-title">
                 <span><i class="fas fa-user-plus me-2" style="color:#6c7ae0;"></i>
-                    <span data-en="Add Customer" data-bn="কাস্টমার যুক্ত করুন">কাস্টমার যুক্ত করুন</span>
+                    <span data-en="Add Customer" data-bn="কাস্টমার যোগ করুন">কাস্টমার যোগ করুন</span>
                 </span>
                 <button class="modal-close" onclick="closeCustModal()">&times;</button>
             </div>
@@ -126,24 +126,24 @@
                 <div class="cust-results" id="custResults"></div>
             </div>
             <div class="mb-2">
-                <label class="f-label" data-en="Customer Name" data-bn="নাম">নাম</label>
+                <label class="f-label" data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
                 <input type="text" id="cName" class="f-input" oninput="searchCustomer()" placeholder="">
             </div>
             <div class="mb-2">
                 <label class="f-label" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
                 <input type="text" id="cAddress" class="f-input">
             </div>
-            <div class="mb-2">
+                <div class="mb-2">
                 <label class="f-label" data-en="Gender" data-bn="লিঙ্গ">লিঙ্গ</label>
                 <select id="cGender" class="f-select">
-                    <option value="1">পুরুষ</option>
-                    <option value="2">মহিলা</option>
-                    <option value="3">বাচ্চা</option>
+                    <option value="1" data-en="Male" data-bn="পুরুষ">পুরুষ</option>
+                    <option value="2" data-en="Female" data-bn="মহিলা">মহিলা</option>
+                    <option value="3" data-en="Other" data-bn="অন্যান্য">অন্যান্য</option>
                 </select>
             </div>
             <button class="btn-submit" onclick="saveCustomer()" id="saveCustBtn">
                 <i class="fas fa-check me-1"></i>
-                <span data-en="Save Customer" data-bn="সেভ করুন">সেভ করুন</span>
+                <span data-en="Save Customer" data-bn="কাস্টমার সেভ করুন">কাস্টমার সেভ করুন</span>
             </button>
         </div>
     </div>
@@ -156,7 +156,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
                         <i class="fas fa-tags me-2"></i>
-                        <span data-en="Sell Item" data-bn="আইটেম বিক্রি করুন">আইটেম বিক্রি করুন</span>
+                        <span data-en="Sell Item" data-bn="আইটেম বিক্রয়">আইটেম বিক্রয়</span>
                     </h5>
                     <a href="/item-sell-record.html" style="font-size:13px;color:#6c7ae0;">
                         <i class="fas fa-history me-1"></i>
@@ -173,8 +173,7 @@
                             <i class="fas fa-search si"></i>
                             <input type="text" id="searchInput" autocomplete="off"
                                 data-en-placeholder="Type item code or name and press Enter..."
-                                data-bn-placeholder="কোড বা আইটেমের নাম লিখুন..."
-                                placeholder="কোড বা আইটেমের নাম লিখুন...">
+                                data-bn-placeholder="আইটেম কোড বা নাম লিখুন এবং Enter চাপুন..." placeholder="আইটেম কোড বা নাম লিখুন এবং Enter চাপুন...">
                             <span class="search-badge">Enter ↵</span>
                             <div class="ac-dropdown" id="acDropdown" style="display:none;"></div>
                         </div>
@@ -183,13 +182,13 @@
                         <div class="cart-card">
                             <div class="cart-head">
                                 <i class="fas fa-shopping-basket"></i>
-                                <span data-en="Cart" data-bn="বিক্রির তালিকা">বিক্রির তালিকা</span>
+                                <span data-en="Cart" data-bn="কার্ট">কার্ট</span>
                                 <span id="cartCount" style="margin-left:auto;background:rgba(255,255,255,.25);border-radius:99px;padding:2px 10px;font-size:12px;">0</span>
                             </div>
                             <div id="cartBody">
                                 <div class="empty-cart" id="emptyCart">
                                     <i class="fas fa-shopping-basket"></i>
-                                    <span data-en="No items added. Search and add items." data-bn="কোনো আইটেম নেই। উপরে খুঁজে যুক্ত করুন।">কোনো আইটেম নেই। উপরে খুঁজে যুক্ত করুন।</span>
+                                    <span data-en="No items added. Search and add items." data-bn="কোনো আইটেম যোগ হয়নি। আইটেম খুঁজে যোগ করুন।">কোনো আইটেম যোগ হয়নি। আইটেম খুঁজে যোগ করুন।</span>
                                 </div>
                                 <div id="cartTable" style="display:none;overflow-x:auto;">
                                     <table class="tbl">
@@ -198,8 +197,8 @@
                                                 <th>#</th>
                                                 <th class="td-left" style="min-width:140px;"><span data-en="Item" data-bn="আইটেম">আইটেম</span></th>
                                                 <th><span data-en="Stock" data-bn="স্টক">স্টক</span></th>
-                                                <th><span data-en="Qty" data-bn="পরিমান">পরিমান</span></th>
-                                                <th><span data-en="Unit Price" data-bn="দর">দর</span></th>
+                                                <th><span data-en="Qty" data-bn="পরিমাণ">পরিমাণ</span></th>
+                                                <th><span data-en="Unit Price" data-bn="একক মূল্য">একক মূল্য</span></th>
                                                 <th><span data-en="Total" data-bn="মোট">মোট</span></th>
                                                 <th></th>
                                             </tr>
@@ -217,13 +216,13 @@
                         <div class="sum-card">
                             <div class="sum-head">
                                 <i class="fas fa-calculator me-2" style="color:#6c7ae0;"></i>
-                                <span data-en="Summary" data-bn="হিসাব">হিসাব</span>
+                                <span data-en="Summary" data-bn="সারসংক্ষেপ">সারসংক্ষেপ</span>
                             </div>
 
                             <!-- Customer -->
                             <button class="btn-cust" onclick="openCustModal()">
                                 <i class="fas fa-user-plus me-2"></i>
-                                <span data-en="Add Customer (optional)" data-bn="কাস্টমার যুক্ত করুন (ঐচ্ছিক)">কাস্টমার যুক্ত করুন (ঐচ্ছিক)</span>
+                                <span data-en="Add Customer (optional)" data-bn="কাস্টমার যোগ করুন (ঐচ্ছিক)">কাস্টমার যোগ করুন (ঐচ্ছিক)</span>
                             </button>
                             <div id="custStrip" style="display:none;"></div>
 
@@ -239,7 +238,7 @@
                                 <span class="sum-val" id="sSubtotal">৳0.00</span>
                             </div>
                             <div class="mb-2 mt-1">
-                                <div class="f-label" data-en="Discount" data-bn="ছাড়">ছাড়</div>
+                                <div class="f-label" data-en="Discount" data-bn="ছাড়">ছাড়</div>
                                 <input type="number" id="fDiscount" class="f-input" min="0" step="0.01" value="0" oninput="updateSummary()">
                             </div>
                             <div class="sum-row">
@@ -247,17 +246,17 @@
                                 <span class="sum-val" id="sAfterDisc">৳0.00</span>
                             </div>
                             <div class="mb-2 mt-1">
-                                <div class="f-label" data-en="Paid Amount" data-bn="পরিশোধ">পরিশোধ</div>
+                                <div class="f-label" data-en="Paid Amount" data-bn="পরিশোধিত পরিমাণ">পরিশোধিত পরিমাণ</div>
                                 <input type="number" id="fPaid" class="f-input" min="0" step="0.01" value="0" oninput="updateSummary()">
                             </div>
                             <div class="sum-row due-row sum-total-row">
-                                <span class="sum-lbl" data-en="Due Amount" data-bn="বাকি">বাকি</span>
+                                <span class="sum-lbl" data-en="Due Amount" data-bn="বাকি পরিমাণ">বাকি পরিমাণ</span>
                                 <span class="sum-val" id="sDue">৳0.00</span>
                             </div>
 
                             <button class="btn-submit" id="submitBtn" onclick="submitSale()" disabled>
                                 <i class="fas fa-check-circle me-2"></i>
-                                <span data-en="Complete Sale" data-bn="বিক্রি সম্পন্ন করুন">বিক্রি সম্পন্ন করুন</span>
+                                <span data-en="Complete Sale" data-bn="বিক্রয় সম্পন্ন করুন">বিক্রয় সম্পন্ন করুন</span>
                             </button>
                         </div>
                     </div>
@@ -269,7 +268,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/item-sell.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/item-sell.js?v=2.1.6"></script>
 </body>
 </html>

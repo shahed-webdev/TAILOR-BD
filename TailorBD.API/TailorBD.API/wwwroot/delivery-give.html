@@ -14,50 +14,119 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/css/dashboard.css">
 
+    <script src="/js/auth.js?v=2.1.6"></script>
+
     <style>
         #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
         .main-content { margin-left: 260px; min-height: 100vh; transition: margin-left 0.3s ease; }
         @media (max-width: 768px) { #app-navbar, .main-content { margin-left: 0; } }
 
-        .container { max-width: 100%; margin: 0 auto; padding: 10px; background: #f5f7fa; min-height: 100vh; }
-        .content { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; margin-bottom: 20px; font-size: 22px; font-weight: 600; }
+        .container { max-width: 100%; margin: 0 auto; padding: 6px; background: #f5f7fa; min-height: 100vh; }
+        .content { background: white; border-radius: 8px; padding: 12px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-bottom: 12px; font-size: 18px; font-weight: 600; }
 
-        .search-section { margin-bottom: 20px; }
-        .search-tabs { display: flex; gap: 15px; margin-bottom: 15px; }
-        .search-tabs label { display: flex; align-items: center; cursor: pointer; font-size: 14px; }
+        .search-section { margin-bottom: 12px; }
+        .search-tabs { display: flex; gap: 12px; margin-bottom: 10px; }
+        .search-tabs label { display: flex; align-items: center; cursor: pointer; font-size: 12px; }
         .search-tabs input[type="radio"] { margin-right: 6px; }
         .search-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
         .form-group { flex: 1; min-width: 150px; }
-        .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 13px; }
-        .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
-        .btn-search { padding: 8px 20px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px; }
+        .form-group label { display: block; margin-bottom: 3px; color: #555; font-weight: 500; font-size: 11px; }
+        .form-group input { width: 100%; padding: 5px 7px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
+        .btn-search { padding: 5px 14px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 12px; }
         .btn-search:hover { background: #5a68c9; }
         .search-by-date { display: none; }
         .search-by-date.active { display: block; }
         .search-by-number { display: none; }
         .search-by-number.active { display: block; }
 
-        .table-wrapper { overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1400px; }
-        th { background: #6c7ae0; color: white; padding: 10px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
-        td { padding: 8px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; text-align: center; }
-        tr:hover { background-color: #f8f9fa; }
+        .table-wrapper { overflow-x: auto; margin-top: 10px; }
+        .dashboard-content { padding: 12px 14px; }
+        .dg-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+        .dg-table th {
+            background: #6c7ae0;
+            color: white;
+            padding: 2px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 11px;
+            line-height: 1.2;
+            white-space: normal;
+            word-break: break-word;
+            vertical-align: middle;
+        }
+        .dg-table td {
+            padding: 0;
+            border-bottom: 1px solid #e8e8e8;
+            vertical-align: middle;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dg-table tbody tr:hover { background-color: #f8f9fa; }
+        .dg-table .cell-clip {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+        .dg-table .cell-wrap {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            max-height: 2.4em;
+            line-height: 1.25;
+            font-size: 11px;
+        }
+        .dg-table .money-stack { line-height: 1.2; font-size: 11px; padding: 1px 0; }
+        .dg-table .money-stack .total { color: #1a1a1a; font-weight: 600; font-size: 12px; }
+        .dg-table .money-stack .paid { color: #28a745; font-weight: 600; font-size: 11px; }
+        .dg-table .money-stack .due { font-weight: 700; color: #c0392b; font-size: 12px; }
+        .dg-table .col-chk { width: 22px; }
+        .dg-table .col-act { width: 58px; max-width: 58px; }
+        .dg-table td.col-act-cell {
+            padding: 0;
+            overflow: visible;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .dg-table input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: pointer; }
+        .dg-table .act-btns {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 100%;
+            min-height: 100%;
+            padding: 2px 0;
+            box-sizing: border-box;
+        }
+        .dg-table .btn-icon-sm {
+            background: none; border: none; cursor: pointer; padding: 0; line-height: 1;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px; flex-shrink: 0;
+        }
+        .dg-table .btn-icon-sm i { font-size: 16px; line-height: 1; }
+        .dg-table .btn-icon-sm.deliver i { color: #28a745; }
+        .dg-table .btn-icon-sm.details i { color: #007bff; }
 
-        .btn-deliver { padding: 5px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn-deliver:hover { background: #218838; }
-        .btn-deliver-link { text-decoration: none; display: inline-block; transition: transform 0.2s; }
-        .btn-deliver-link:hover { transform: scale(1.2); }
-        .btn-details-icon { background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s; }
-        .btn-details-icon:hover { transform: scale(1.2); }
-
-        .loading { text-align: center; padding: 40px; color: #666; }
-        .empty-message { text-align: center; padding: 40px; color: #666; }
-        .error-message { text-align: center; padding: 20px; color: #dc3545; }
-
-        .status-badge { padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+        .status-badge { padding: 1px 3px; border-radius: 2px; font-size: 10px; font-weight: 600; display: inline-block; white-space: nowrap; }
         .status-ready { background: #d4edda; color: #155724; }
         .status-partial { background: #fff3cd; color: #856404; }
+
+        .loading { text-align: center; padding: 24px; color: #666; font-size: 12px; }
+        .empty-message { text-align: center; padding: 24px; color: #666; font-size: 12px; }
+        .error-message { text-align: center; padding: 16px; color: #dc3545; font-size: 12px; }
 
         /* SMS Send Panel */
         #smsSendPanel { transition: all 0.3s; }
@@ -85,7 +154,7 @@
         .order-details-bottom .alert { background: #e7f3ff; border: 1px solid #b3d9ff; color: #004085; font-size: 14px; }
 
         /* Pagination */
-        .pagination .page-link { color: #6c7ae0; font-size: 13px; padding: 4px 10px; }
+        .pagination .page-link { color: #6c7ae0; font-size: 11px; padding: 2px 7px; }
         .pagination .page-item.active .page-link { background-color: #6c7ae0; border-color: #6c7ae0; color: white; }
         .pagination .page-item.disabled .page-link { color: #aaa; }
         .pagination .page-link:hover { background-color: #ebebff; color: #5a68c9; }
@@ -252,8 +321,8 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- App Components (sidebar, navbar, modals, session) -->
-    <script src="/js/app-components.js?v=2.1.4"></script>
+    <script src="/js/app-components.js?v=2.1.5"></script>
     <!-- Delivery Give Page Logic -->
-    <script src="/js/delivery-give.js?v=2.2.0"></script>
+    <script src="/js/delivery-give.js?v=2.2.5"></script>
 </body>
 </html>

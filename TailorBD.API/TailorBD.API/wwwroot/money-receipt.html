@@ -17,7 +17,7 @@
     
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link href="/css/money-receipt.css" rel="stylesheet">
+    <link href="/css/money-receipt.css?v=2.2.6" rel="stylesheet">
 
     <!-- bfcache & stale-tab fix: inline so it always runs regardless of JS file cache -->
     <script>
@@ -122,7 +122,7 @@
                         <div class="receipt-header">
                             <h2 class="institution-name" id="receiptInstitutionName">...</h2>
                             <p class="institution-subtitle" id="dialogTitle"></p>
-                            <div class="institution-contact">
+                            <div class="institution-contact receipt-contact-fit">
                                 <span id="institutionPhone"></span>
                                 <span class="mx-1" id="institutionSeparator" style="display:none;">|</span>
                                 <span id="institutionAddress"></span>
@@ -176,29 +176,36 @@
                         <!-- Payment Summary -->
                         <div class="payment-summary">
                             <table class="summary-table">
+                                <colgroup>
+                                    <col style="width:24%">
+                                    <col style="width:24%">
+                                    <col style="width:10%">
+                                    <col style="width:23%">
+                                    <col style="width:19%">
+                                </colgroup>
                                 <tr>
-                                    <td class="lang-content" data-en="Total:" data-bn="মোট:">মোট:</td>
-                                    <td class="text-end"><strong id="totalAmount">৳0.00</strong></td>
+                                    <td colspan="4" class="summary-label lang-content" data-en="Total:" data-bn="মোট:">মোট:</td>
+                                    <td class="summary-value text-end"><strong id="totalAmount">৳0.00</strong></td>
                                 </tr>
                                 <tr id="discountRow" style="display: none;">
-                                    <td class="lang-content" data-en="Discount:" data-bn="ছাড়:">ছাড়:</td>
-                                    <td class="text-end"><span id="discountAmount">0.00</span></td>
+                                    <td colspan="4" class="summary-label lang-content" data-en="Discount:" data-bn="ছাড়:">ছাড়:</td>
+                                    <td class="summary-value text-end"><span id="discountAmount">0.00</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="lang-content" data-en="Paid:" data-bn="পরিশোধ:">পরিশোধ:</td>
-                                    <td class="text-end"><span id="paidAmount">0.00</span></td>
+                                    <td colspan="4" class="summary-label lang-content" data-en="Paid:" data-bn="পরিশোধ:">পরিশোধ:</td>
+                                    <td class="summary-value text-end"><span id="paidAmount">0.00</span></td>
                                 </tr>
                                 <tr class="total-row">
-                                    <td><strong class="lang-content" data-en="Due:" data-bn="বাকি:">বাকি:</strong></td>
-                                    <td class="text-end"><strong id="dueAmount">৳0.00</strong></td>
+                                    <td colspan="4" class="summary-label"><strong class="lang-content" data-en="Due:" data-bn="বাকি:">বাকি:</strong></td>
+                                    <td class="summary-value text-end"><strong id="dueAmount">৳0.00</strong></td>
                                 </tr>
                                 <tr id="previousDueRow" style="display: none;">
-                                    <td class="lang-content" data-en="Previous Due:" data-bn="আগের বাকি:">আগের বাকি:</td>
-                                    <td class="text-end"><span id="previousDueAmount">0.00</span></td>
+                                    <td colspan="4" class="summary-label lang-content" data-en="Previous Due:" data-bn="আগের বাকি:">আগের বাকি:</td>
+                                    <td class="summary-value text-end"><span id="previousDueAmount">0.00</span></td>
                                 </tr>
                                 <tr id="totalDueRow" style="display: none;" class="total-row">
-                                    <td><strong class="lang-content" data-en="Total Due:" data-bn="মোট বাকি:">মোট বাকি:</strong></td>
-                                    <td class="text-end"><strong id="totalDueAmount">৳0.00</strong></td>
+                                    <td colspan="4" class="summary-label"><strong class="lang-content" data-en="Total Due:" data-bn="মোট বাকি:">মোট বাকি:</strong></td>
+                                    <td class="summary-value text-end"><strong id="totalDueAmount">৳0.00</strong></td>
                                 </tr>
                             </table>
                         </div>
@@ -270,9 +277,9 @@
     <script src="/js/auth.js"></script>
 
     <!-- App Components -->
-    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/app-components.js?v=2.2.7"></script>
 
     <!-- Money Receipt JS -->
-    <script src="/js/money-receipt.js?v=2.1.6"></script>
+    <script src="/js/money-receipt.js?v=2.2.6"></script>
 </body>
 </html>

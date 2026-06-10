@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -11,8 +11,8 @@
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/authority-profile.css">
 
-    <script src="/js/auth.js"></script>
-    <script src="/js/authority-layout.js" data-page="collected-payment-report"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="collected-payment-report"></script>
 
     <style>
         :root {
@@ -109,12 +109,12 @@
         <div class="page-header">
             <div class="ph-icon"><i class="fas fa-receipt"></i></div>
             <div class="ph-text">
-                <h2>পেমেন্ট কালেক্ট রিপোর্ট</h2>
-                <p>চলতি মাসের কালেকশন ও ডিউ তালিকা দেখুন — যেকোনো তারিখ দিয়ে সার্চ করুন</p>
+                <h2 data-lang-key="সংগৃহীত পেমেন্ট রিপোর্ট">সংগৃহীত পেমেন্ট রিপোর্ট</h2>
+                <p data-lang-key="তারিখ অনুসারে পেমেন্ট দেখুন ও বকেয়া তালিকা — সহজে হিসাব মেলান করুন">তারিখ অনুসারে পেমেন্ট দেখুন ও বকেয়া তালিকা — সহজে হিসাব মেলান করুন</p>
             </div>
             <div style="z-index:1;margin-left:auto;">
                 <a href="/authority-collect-payment.html" class="btn-sm-act" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.4);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:9px;font-size:.82rem;font-weight:600;">
-                    <i class="fas fa-arrow-left"></i> ব্যাক
+                    <i class="fas fa-arrow-left"></i> <span data-lang-key="ফিরে যান">ফিরে যান</span>
                 </a>
             </div>
         </div>
@@ -123,52 +123,52 @@
         <div class="stat-grid" id="summaryCards">
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-taka-sign"></i></div>
-                <div><div class="sc-val" id="scMonthCollected">—</div><div class="sc-lbl">এই মাসে কালেক্ট (৳)</div></div>
+                <div><div class="sc-val" id="scMonthCollected">�</div><div class="sc-lbl" data-lang-key="এই মাসে সংগৃহীত (৳)">এই মাসে সংগৃহীত (৳)</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--indigo-grad);"><i class="fas fa-building"></i></div>
-                <div><div class="sc-val" id="scInsPaid">—</div><div class="sc-lbl">প্রতিষ্ঠান পেইড</div></div>
+                <div><div class="sc-val" id="scInsPaid">�</div><div class="sc-lbl" data-lang-key="প্রতিষ্ঠান প্রদান">প্রতিষ্ঠান প্রদান</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-file-invoice-dollar"></i></div>
-                <div><div class="sc-val" id="scPayCount">—</div><div class="sc-lbl">পেমেন্ট রেকর্ড</div></div>
+                <div><div class="sc-val" id="scPayCount">�</div><div class="sc-lbl" data-lang-key="পেমেন্ট সংখ্যা">পেমেন্ট সংখ্যা</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-exclamation-circle"></i></div>
-                <div><div class="sc-val" id="scTotalDue">—</div><div class="sc-lbl">মোট বকেয়া (৳)</div></div>
+                <div><div class="sc-val" id="scTotalDue">�</div><div class="sc-lbl" data-lang-key="মোট বকেয়া (৳)">মোট বকেয়া (৳)</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--indigo-grad);"><i class="fas fa-calendar-check"></i></div>
-                <div><div class="sc-val" id="scRangeCollected">—</div><div class="sc-lbl">নির্বাচিত সময়ে কালেক্ট (৳)</div></div>
+                <div><div class="sc-val" id="scRangeCollected">�</div><div class="sc-lbl" data-lang-key="নির্বাচিত সময়ে সংগৃহীত (৳)">নির্বাচিত সময়ে সংগৃহীত (৳)</div></div>
             </div>
         </div>
 
         <!-- Date Filter -->
         <div class="filter-bar">
             <div>
-                <label>শুরুর তারিখ</label>
+                <label data-lang-key="তারিখ থেকে">তারিখ থেকে</label>
                 <input type="date" id="fromDate" class="form-control" style="min-width:150px;">
             </div>
             <div>
-                <label>শেষ তারিখ</label>
+                <label data-lang-key="তারিখ পর্যন্ত">তারিখ পর্যন্ত</label>
                 <input type="date" id="toDate" class="form-control" style="min-width:150px;">
             </div>
             <div style="display:flex;gap:8px;align-items:flex-end;">
                 <button class="btn-search" onclick="loadReport()">
-                    <i class="fas fa-search"></i> সার্চ করুন
+                    <i class="fas fa-search"></i> <span data-lang-key="তথ্য দেখুন">তথ্য দেখুন</span>
                 </button>
                 <button class="btn-reset" onclick="resetFilter()">
-                    <i class="fas fa-undo me-1"></i>রিসেট
+                    <i class="fas fa-undo me-1"></i><span data-lang-key="রিসেট">রিসেট</span>
                 </button>
             </div>
             <div style="margin-left:auto;">
-                <label style="margin-bottom:3px;">দ্রুত নির্বাচন</label>
+                <label style="margin-bottom:3px;" data-lang-key="দ্রুত নির্বাচন">দ্রুত নির্বাচন</label>
                 <div class="quick-range">
-                    <button class="qr-btn active" onclick="setRange('month', this)">এই মাস</button>
-                    <button class="qr-btn" onclick="setRange('last7', this)">শেষ ৭ দিন</button>
-                    <button class="qr-btn" onclick="setRange('last30', this)">শেষ ৩০ দিন</button>
-                    <button class="qr-btn" onclick="setRange('lastmonth', this)">গত মাস</button>
-                    <button class="qr-btn" onclick="setRange('year', this)">এই বছর</button>
+                    <button class="qr-btn active" onclick="setRange('month', this)" data-lang-key="এই মাস">এই মাস</button>
+                    <button class="qr-btn" onclick="setRange('last7', this)" data-lang-key="শেষ ৭ দিন">শেষ ৭ দিন</button>
+                    <button class="qr-btn" onclick="setRange('last30', this)" data-lang-key="শেষ ৩০ দিন">শেষ ৩০ দিন</button>
+                    <button class="qr-btn" onclick="setRange('lastmonth', this)" data-lang-key="গত মাস">গত মাস</button>
+                    <button class="qr-btn" onclick="setRange('year', this)" data-lang-key="এই বছর">এই বছর</button>
                 </div>
             </div>
         </div>
@@ -176,16 +176,16 @@
         <!-- Tabs -->
         <div class="report-tabs">
             <button class="tab-btn active" id="tabPayments" onclick="showTab('payments', this)">
-                <i class="fas fa-money-bill-wave me-2"></i>কালেক্টেড পেমেন্ট
+                <i class="fas fa-money-bill-wave me-2"></i>সংগৃহীত পেমেন্ট
                 <span class="badge bg-success ms-1 rounded-pill" id="payBadge" style="font-size:.68rem;">0</span>
             </button>
             <button class="tab-btn" id="tabDue" onclick="showTab('due', this)">
-                <i class="fas fa-exclamation-circle me-2"></i>ডিউ তালিকা
+                <i class="fas fa-exclamation-circle me-2"></i>বকেয়া তালিকা
                 <span class="badge bg-danger ms-1 rounded-pill" id="dueBadge" style="font-size:.68rem;">0</span>
             </button>
         </div>
 
-        <!-- ── Collected Payments Tab ── -->
+        <!-- -- Collected Payments Tab -- -->
         <div id="panelPayments">
             <div class="section-card" style="padding:0;overflow:hidden;" id="payTableWrap">
                 <div class="table-responsive">
@@ -193,13 +193,13 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>তারিখ</th>
-                                <th>প্রতিষ্ঠান</th>
-                                <th>Invoice বিবরণ</th>
-                                <th>মাধ্যম</th>
-                                <th>আদায়কারী</th>
-                                <th style="text-align:right;">ডিসকাউন্ট (৳)</th>
-                                <th style="text-align:right;">পরিমাণ (৳)</th>
+                                <th data-lang-key="তারিখ">তারিখ</th>
+                                <th data-lang-key="প্রতিষ্ঠান">প্রতিষ্ঠান</th>
+                                <th data-lang-key="Invoice বিবরণ">Invoice বিবরণ</th>
+                                <th data-lang-key="মাধ্যম">মাধ্যম</th>
+                                <th data-lang-key="সংগ্রাহক">সংগ্রাহক</th>
+                                <th style="text-align:right;" data-lang-key="ছাড় (৳)">ছাড় (৳)</th>
+                                <th style="text-align:right;" data-lang-key="পায়না (৳)">পায়না (৳)</th>
                             </tr>
                         </thead>
                         <tbody id="payTbody">
@@ -212,7 +212,7 @@
             </div>
         </div>
 
-        <!-- ── Due List Tab ── -->
+        <!-- -- Due List Tab -- -->
         <div id="panelDue" style="display:none;">
             <!-- Due search -->
             <div class="d-flex gap-2 mb-3 align-items-center">
@@ -221,7 +221,7 @@
                         <i class="fas fa-search text-muted" style="font-size:.8rem;"></i>
                     </span>
                     <input type="text" id="dueSearch" class="form-control border-start-0 ps-0"
-                           placeholder="প্রতিষ্ঠান / ফোন / ইউজার সার্চ..." oninput="filterDueTable()">
+                           placeholder="প্রতিষ্ঠান / নাম / মোট নম্বর..." oninput="filterDueTable()">
                 </div>
                 <div class="ms-auto" style="font-size:.82rem;color:#64748b;" id="dueResultInfo"></div>
             </div>
@@ -231,13 +231,13 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>প্রতিষ্ঠান</th>
-                                <th>ইউজার</th>
-                                <th>ফোন</th>
-                                <th>স্ট্যাটাস</th>
-                                <th>বকেয়া Invoice</th>
-                                <th style="text-align:right;">মোট বকেয়া (৳)</th>
-                                <th>অ্যাকশন</th>
+                                <th data-lang-key="প্রতিষ্ঠান">প্রতিষ্ঠান</th>
+                                <th data-lang-key="নাম">নাম</th>
+                                <th data-lang-key="মোট">মোট</th>
+                                <th data-lang-key="স্ট্যাটাস">স্ট্যাটাস</th>
+                                <th data-lang-key="বকেয়া Invoice">বকেয়া Invoice</th>
+                                <th style="text-align:right;" data-lang-key="মোট বকেয়া (৳)">মোট বকেয়া (৳)</th>
+                                <th data-lang-key="কার্যক্রম">কার্যক্রম</th>
                             </tr>
                         </thead>
                         <tbody id="dueTbody"></tbody>
@@ -258,7 +258,7 @@
     var _allDues     = [];
     var _currentTab  = 'payments';
 
-    // ── Formatting helpers ──────────────────────────────────────────────────
+    // -- Formatting helpers --------------------------------------------------
     function fmt(n) {
         return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
     }
@@ -275,7 +275,7 @@
         return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
     }
 
-    // ── Quick range ─────────────────────────────────────────────────────────
+    // -- Quick range ---------------------------------------------------------
     function setRange(range, btn) {
         $('.qr-btn').removeClass('active');
         $(btn).addClass('active');
@@ -309,7 +309,7 @@
         loadReport();
     }
 
-    // ── Tab switching ───────────────────────────────────────────────────────
+    // -- Tab switching -------------------------------------------------------
     function showTab(tab, btn) {
         _currentTab = tab;
         $('.tab-btn').removeClass('active');
@@ -323,7 +323,7 @@
         }
     }
 
-    // ── Load report ─────────────────────────────────────────────────────────
+    // -- Load report ---------------------------------------------------------
     function loadReport() {
         var from = $('#fromDate').val() || monthStartStr();
         var to   = $('#toDate').val()   || todayStr();
@@ -336,7 +336,7 @@
             url: '/api/invoice/authority/collected-payments?fromDate=' + from + '&toDate=' + to,
             method: 'GET',
             success: function(r) {
-                if (!r.success || !r.data) { showToast('ডেটা লোড ব্যর্থ', 'danger'); return; }
+                if (!r.success || !r.data) { showToast('তথ্য লোড হয়নি', 'danger'); return; }
                 var d = r.data;
 
                 // Summary cards
@@ -358,19 +358,19 @@
                 renderDues(_allDues);
             },
             error: function() {
-                showToast('সার্ভার থেকে ডেটা লোড করা সম্ভব নয়', 'danger');
-                $('#payTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted">ডেটা পাওয়া যায়নি</td></tr>');
-                $('#dueTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted">ডেটা পাওয়া যায়নি</td></tr>');
+                showToast('সার্ভার থেকে তথ্য আনা সম্ভব হয়নি', 'danger');
+                $('#payTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted" data-lang-key="তথ্য পাওয়া যায়নি">তথ্য পাওয়া যায়নি</td></tr>');
+                $('#dueTbody').html('<tr><td colspan="8" class="text-center py-4 text-muted" data-lang-key="তথ্য পাওয়া যায়নি">তথ্য পাওয়া যায়নি</td></tr>');
             }
         });
     }
 
-    // ── Render collected payments ────────────────────────────────────────────
+    // -- Render collected payments --------------------------------------------
     function renderPayments(rows) {
         var $tbody = $('#payTbody');
         $tbody.empty();
         if (!rows || rows.length === 0) {
-            $tbody.html('<tr><td colspan="8" class="empty-state"><i class="fas fa-file-invoice-dollar d-block mb-2"></i>নির্বাচিত সময়ে কোনো পেমেন্ট পাওয়া যায়নি</td></tr>');
+            $tbody.html('<tr><td colspan="8" class="empty-state"><i class="fas fa-file-invoice-dollar d-block mb-2"></i><span data-lang-key="নির্বাচিত সময়ে কোনো পেমেন্ট পাওয়া যায়নি">নির্বাচিত সময়ে কোনো পেমেন্ট পাওয়া যায়নি</span></td></tr>');
             return;
         }
 
@@ -378,7 +378,7 @@
         var grouped = {};
         var groupOrder = [];
         rows.forEach(function(r) {
-            var dk = r.paidDate ? new Date(r.paidDate).toISOString().slice(0, 10) : '—';
+            var dk = r.paidDate ? new Date(r.paidDate).toISOString().slice(0, 10) : '�';
             if (!grouped[dk]) { grouped[dk] = []; groupOrder.push(dk); }
             grouped[dk].push(r);
         });
@@ -409,8 +409,8 @@
             $tbody.append(
                 '<tr class="group-date-row">' +
                 '<td colspan="6"><i class="fas fa-calendar-day me-1"></i>' + fmtDate(dk) + '</td>' +
-                '<td style="text-align:right;color:#f97316;font-weight:800;">' + (dayDiscount > 0 ? '৳' + fmt(dayDiscount) : '—') + '</td>' +
-                '<td style="text-align:right;color:#10b981;font-weight:800;">৳' + fmt(dayTotal) + '</td>' +
+                '<td style="text-align:right;color:#f97316;font-weight:800;">' + (dayDiscount > 0 ? '৳' + fmt(dayDiscount) : '<span style="color:#cbd5e1;">—</span>') + '</td>' +
+                '<td style="text-align:right;color:#10b981;font-weight:800;" data-lang-key="৳' + fmt(dayTotal) + '">৳' + fmt(dayTotal) + '</td>' +
                 '</tr>'
             );
 
@@ -424,12 +424,12 @@
                     '<tr>' +
                     '<td style="color:#94a3b8;">' + sl + '</td>' +
                     '<td style="white-space:nowrap;">' + fmtDate(r.paidDate) + '</td>' +
-                    '<td><strong>' + (r.institutionName || '—') + '</strong></td>' +
-                    '<td style="color:#64748b;font-size:.8rem;">' + (r.invoice_For || '—') + '</td>' +
-                    '<td>' + (r.payment_Method || '<span style="color:#cbd5e1;">—</span>') + '</td>' +
-                    '<td>' + (r.collected_By   || '<span style="color:#cbd5e1;">—</span>') + '</td>' +
-                    '<td style="text-align:right;font-weight:700;color:#f97316;">' + (showDiscount ? '৳' + fmt(r.discount) : '<span style="color:#cbd5e1;">—</span>') + '</td>' +
-                    '<td style="text-align:right;font-weight:700;color:#10b981;">৳' + fmt(r.paidAmount) + '</td>' +
+                    '<td><strong>' + (r.institutionName || '�') + '</strong></td>' +
+                    '<td style="color:#64748b;font-size:.8rem;">' + (r.invoice_For || '�') + '</td>' +
+                    '<td>' + (r.payment_Method || '<span style="color:#cbd5e1;">�</span>') + '</td>' +
+                    '<td>' + (r.collected_By   || '<span style="color:#cbd5e1;">�</span>') + '</td>' +
+                '<td style="text-align:right;font-weight:700;color:#f97316;">' + (showDiscount ? '৳' + fmt(r.discount) : '<span style="color:#cbd5e1;">—</span>') + '</td>' +
+                    '<td style="text-align:right;font-weight:700;color:#10b981;" data-lang-key="৳' + fmt(r.paidAmount) + '">৳' + fmt(r.paidAmount) + '</td>' +
                     '</tr>'
                 );
             });
@@ -438,21 +438,21 @@
         // Grand total row
         $tbody.append(
             '<tr class="total-row">' +
-            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i>মোট কালেক্ট করা হয়েছে</td>' +
-            '<td style="text-align:right;font-size:1.05rem;color:#f97316;">' + (totalDiscountAll > 0 ? '৳' + fmt(totalDiscountAll) : '—') + '</td>' +
-            '<td style="text-align:right;font-size:1.05rem;">৳' + fmt(totalAll) + '</td>' +
+            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i><span data-lang-key="সার্বিক সংগৃহীত মোট টাকা">সার্বিক সংগৃহীত মোট টাকা</span></td>' +
+            '<td style="text-align:right;font-size:1.05rem;color:#f97316;">' + (totalDiscountAll > 0 ? '৳' + fmt(totalDiscountAll) : '<span style="color:#cbd5e1;">—</span>') + '</td>' +
+            '<td style="text-align:right;font-size:1.05rem;" data-lang-key="৳' + fmt(totalAll) + '">৳' + fmt(totalAll) + '</td>' +
             '</tr>'
         );
     }
 
-    // ── Render due list ──────────────────────────────────────────────────────
+    // -- Render due list ------------------------------------------------------
     function renderDues(rows) {
         var $tbody = $('#dueTbody');
         $tbody.empty();
         $('#dueResultInfo').text(rows.length + ' টি প্রতিষ্ঠান');
 
         if (!rows || rows.length === 0) {
-            $tbody.html('<tr><td colspan="8"><div class="empty-state"><i class="fas fa-check-circle" style="color:#10b981;opacity:1;"></i><p>দারুণ! কোনো বকেয়া নেই</p></div></td></tr>');
+            $tbody.html('<tr><td colspan="8"><div class="empty-state"><i class="fas fa-check-circle" style="color:#10b981;opacity:1;"></i><p data-lang-key="বাহ! কোনো বকেয়া নেই">বাহ! কোনো বকেয়া নেই</p></div></td></tr>');
             return;
         }
 
@@ -465,15 +465,15 @@
             $tbody.append(
                 '<tr data-name="' + (r.institutionName || '').toLowerCase() + '" data-user="' + (r.userName || '').toLowerCase() + '" data-phone="' + (r.phone || '') + '">' +
                 '<td style="color:#94a3b8;">' + (idx + 1) + '</td>' +
-                '<td><strong>' + (r.institutionName || '—') + '</strong></td>' +
-                '<td style="color:#64748b;">' + (r.userName || '—') + '</td>' +
-                '<td>' + (r.phone || '—') + '</td>' +
+                '<td><strong>' + (r.institutionName || '�') + '</strong></td>' +
+                '<td style="color:#64748b;">' + (r.userName || '�') + '</td>' +
+                '<td>' + (r.phone || '�') + '</td>' +
                 '<td>' + statusBadge + '</td>' +
-                '<td><span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;">' + r.dueInvoiceCount + ' টি</span></td>' +
-                '<td style="text-align:right;"><span class="due-badge">৳' + fmt(r.totalDue) + '</span></td>' +
+                '<td><span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;" data-lang-key="' + r.dueInvoiceCount + ' টি">' + r.dueInvoiceCount + ' টি</span></td>' +
+                '<td style="text-align:right;"><span class="due-badge" data-lang-key="৳' + fmt(r.totalDue) + '">৳' + fmt(r.totalDue) + '</span></td>' +
                 '<td>' +
                 '<a href="/authority-collect-payment.html" class="btn btn-sm btn-success rounded-pill px-3" style="font-size:.76rem;font-weight:600;">' +
-                '<i class="fas fa-hand-holding-usd me-1"></i>কালেক্ট</a>' +
+                '<i class="fas fa-hand-holding-usd me-1"></i><span data-lang-key="পেমেন্ট করুন">পেমেন্ট করুন</span></a>' +
                 '</td>' +
                 '</tr>'
             );
@@ -482,14 +482,14 @@
         // Total row
         $tbody.append(
             '<tr class="total-row">' +
-            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i>মোট বকেয়া</td>' +
-            '<td style="text-align:right;font-size:1.05rem;color:#ef4444;">৳' + fmt(totalDue) + '</td>' +
+            '<td colspan="6" style="text-align:right;"><i class="fas fa-sigma me-2"></i><span data-lang-key="মোট বকেয়া">মোট বকেয়া</span></td>' +
+            '<td style="text-align:right;font-size:1.05rem;color:#ef4444;" data-lang-key="৳' + fmt(totalDue) + '">৳' + fmt(totalDue) + '</td>' +
             '<td></td>' +
             '</tr>'
         );
     }
 
-    // ── Due table live search ────────────────────────────────────────────────
+    // -- Due table live search ------------------------------------------------
     function filterDueTable() {
         var q = $('#dueSearch').val().toLowerCase().trim();
         var visible = 0;
@@ -506,7 +506,7 @@
         $('#dueResultInfo').text(visible + ' টি প্রতিষ্ঠান');
     }
 
-    // ── Toast ────────────────────────────────────────────────────────────────
+    // -- Toast ----------------------------------------------------------------
     function showToast(msg, type) {
         type = type || 'success';
         var id = 'toast_' + Date.now();
@@ -519,7 +519,7 @@
         setTimeout(function() { $('#' + id).fadeOut(300, function() { $(this).remove(); }); }, 3000);
     }
 
-    // ── Init ─────────────────────────────────────────────────────────────────
+    // -- Init -----------------------------------------------------------------
     $(document).ready(function() {
         // Set default date range to current month
         $('#fromDate').val(monthStartStr());

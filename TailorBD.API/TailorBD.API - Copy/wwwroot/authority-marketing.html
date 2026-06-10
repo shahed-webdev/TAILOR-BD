@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
     <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/authority-profile.css">
-    <script src="/js/auth.js"></script>
-    <script src="/js/authority-layout.js" data-page="marketing"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="marketing"></script>
     <style>
         :root {
             --green-grad:  linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -102,7 +102,7 @@
             <div class="ph-icon"><i class="fas fa-chart-line"></i></div>
             <div class="ph-text">
                 <h2>Marketing Reports</h2>
-                <p>মার্কেটিং ভিজিট রিপোর্ট যোগ করুন, খুঁজুন ও SMS পাঠান</p>
+                <p>মার্কেটিং ভিজিট রিপোর্ট দেখুন, যোগ করুন ও SMS পাঠান</p>
             </div>
             <div style="z-index:1;margin-left:auto;">
                 <button class="btn-act" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.35);padding:7px 16px;font-size:.82rem;" onclick="loadReports()">
@@ -115,23 +115,23 @@
         <div class="stat-grid" id="statGrid">
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--auth-grad);"><i class="fas fa-store"></i></div>
-                <div><div class="sc-val" id="statTotal">—</div><div class="sc-lbl">মোট ভিজিট</div></div>
+                <div><div class="sc-val" id="statTotal">...</div><div class="sc-lbl">মোট ভিজিট</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--green-grad);"><i class="fas fa-star"></i></div>
-                <div><div class="sc-val" id="statVeryHigh">—</div><div class="sc-lbl">Very High</div></div>
+                <div><div class="sc-val" id="statVeryHigh">�</div><div class="sc-lbl">Very High</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--blue-grad);"><i class="fas fa-thumbs-up"></i></div>
-                <div><div class="sc-val" id="statHigh">—</div><div class="sc-lbl">High</div></div>
+                <div><div class="sc-val" id="statHigh">�</div><div class="sc-lbl">High</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--orange-grad);"><i class="fas fa-minus-circle"></i></div>
-                <div><div class="sc-val" id="statAvg">—</div><div class="sc-lbl">Average</div></div>
+                <div><div class="sc-val" id="statAvg">�</div><div class="sc-lbl">Average</div></div>
             </div>
             <div class="stat-card">
                 <div class="sc-icon" style="background:var(--red-grad);"><i class="fas fa-times-circle"></i></div>
-                <div><div class="sc-val" id="statNo">—</div><div class="sc-lbl">No / Low</div></div>
+                <div><div class="sc-val" id="statNo">�</div><div class="sc-lbl">No / Low</div></div>
             </div>
         </div>
 
@@ -142,10 +142,10 @@
             <button class="tab-btn" onclick="switchTab('tab-sms',this)"><i class="fas fa-sms me-1"></i>SMS পাঠান</button>
         </div>
 
-        <!-- ══ TAB 1 — Report List ══ -->
+        <!-- -- TAB 1 � Report List -- -->
         <div class="tab-panel active" id="tab-list">
             <div class="filter-bar">
-                <input type="text" id="searchInput" placeholder="প্রতিষ্ঠান / ফোন / এলাকা খুঁজুন..." oninput="applyFilters()" style="flex:1;min-width:200px;">
+                <input type="text" id="searchInput" placeholder="প্রতিষ্ঠান / মোট / এলাকা খুঁজুন..." oninput="applyFilters()" style="flex:1;min-width:200px;">
                 <select id="filterPossibility" onchange="applyFilters()">
                     <option value="">সব Possibility</option>
                     <option>Very High</option>
@@ -168,7 +168,7 @@
                                 <th style="width:36px;"></th>
                                 <th>প্রতিষ্ঠান</th>
                                 <th>যোগাযোগ</th>
-                                <th>ফোন</th>
+                                <th>মোট</th>
                                 <th>এলাকা / মার্কেট</th>
                                 <th>Possibility</th>
                                 <th>Visited Date</th>
@@ -184,7 +184,7 @@
             </div>
         </div>
 
-        <!-- ══ TAB 2 — Add Report ══ -->
+        <!-- -- TAB 2 � Add Report -- -->
         <div class="tab-panel" id="tab-add">
             <div class="form-card">
                 <div class="fc-title"><i class="fas fa-plus-circle" style="color:#6366f1;"></i> নতুন মার্কেটিং রিপোর্ট যোগ করুন</div>
@@ -198,7 +198,7 @@
                         <input type="text" id="fContactPerson" class="form-control" placeholder="নাম">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label-custom">ফোন <span class="text-danger">*</span></label>
+                        <label class="form-label-custom">মোট <span class="text-danger">*</span></label>
                         <input type="text" id="fPhone" class="form-control" placeholder="01XXXXXXXXX">
                     </div>
                     <div class="col-md-3">
@@ -215,7 +215,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label-custom">মার্কেটের নাম <span class="text-danger">*</span></label>
-                        <input type="text" id="fMarketName" class="form-control" placeholder="মার্কেট নাম">
+                        <input type="text" id="fMarketName" class="form-control" placeholder="মার্কেটের নাম">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label-custom">দোকান নং <span class="text-danger">*</span></label>
@@ -251,14 +251,14 @@
                     <div class="col-12 d-flex justify-content-end gap-2">
                         <button class="btn btn-light border px-4" onclick="resetForm()"><i class="fas fa-undo me-1"></i>রিসেট</button>
                         <button class="btn btn-primary px-4 fw-bold" id="submitBtn" onclick="submitReport()">
-                            <i class="fas fa-paper-plane me-1"></i>সেভ করুন
+                            <i class="fas fa-paper-plane me-1"></i>জমা দিন
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ══ TAB 3 — SMS ══ -->
+        <!-- -- TAB 3 � SMS -- -->
         <div class="tab-panel" id="tab-sms">
             <div class="filter-bar">
                 <select id="smsFilterPossibility" onchange="loadSMSList()">
@@ -285,7 +285,7 @@
                                 <th style="width:36px;"><input type="checkbox" id="smsSelectAll" onchange="selectAllSMS(this.checked)" style="accent-color:#6366f1;"></th>
                                 <th>প্রতিষ্ঠান</th>
                                 <th>যোগাযোগ</th>
-                                <th>ফোন</th>
+                                <th>মোট</th>
                                 <th>এলাকা</th>
                                 <th>Possibility</th>
                             </tr>
@@ -298,8 +298,8 @@
             </div>
 
             <div class="sms-area">
-                <label class="form-label-custom mb-2"><i class="fas fa-comment-dots me-1"></i>বার্তা লিখুন <span class="text-danger">*</span></label>
-                <textarea id="smsText" class="form-control mb-3" rows="4" placeholder="আপনার বার্তা এখানে লিখুন..."></textarea>
+                <label class="form-label-custom mb-2"><i class="fas fa-comment-dots me-1"></i>বার্তার টেক্সট <span class="text-danger">*</span></label>
+                <textarea id="smsText" class="form-control mb-3" rows="4" placeholder="এখানে বার্তাটি লিখুন..."></textarea>
                 <div class="d-flex justify-content-between align-items-center">
                     <div style="font-size:.82rem;color:#64748b;" id="smsCharCount">০ অক্ষর</div>
                     <button class="btn btn-success px-4 fw-bold" onclick="sendSMS()">
@@ -325,7 +325,7 @@
                 <div class="row g-3">
                     <div class="col-md-4"><label class="form-label-custom">প্রতিষ্ঠান <span class="text-danger">*</span></label><input type="text" id="eInstitutionName" class="form-control"></div>
                     <div class="col-md-4"><label class="form-label-custom">যোগাযোগ <span class="text-danger">*</span></label><input type="text" id="eContactPerson" class="form-control"></div>
-                    <div class="col-md-4"><label class="form-label-custom">ফোন <span class="text-danger">*</span></label><input type="text" id="ePhone" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label-custom">মোট <span class="text-danger">*</span></label><input type="text" id="ePhone" class="form-control"></div>
                     <div class="col-md-3"><label class="form-label-custom">শহর</label><input type="text" id="eCity" class="form-control"></div>
                     <div class="col-md-3"><label class="form-label-custom">এলাকা</label><input type="text" id="eArea" class="form-control"></div>
                     <div class="col-md-3"><label class="form-label-custom">পোস্ট কোড</label><input type="text" id="ePostCode" class="form-control"></div>
@@ -339,12 +339,12 @@
                             <option>Very High</option><option>High</option><option>Average</option><option>Low</option><option>No</option>
                         </select>
                     </div>
-                    <div class="col-12"><label class="form-label-custom">Feedback</label><textarea id="eFeedback" class="form-control" rows="2"></textarea></div>
+                    <div class="col-12"><label class="form-label-custom">Feedback / মন্তব্য</label><textarea id="eFeedback" class="form-control" rows="2"></textarea></div>
                 </div>
             </div>
             <div class="modal-footer border-0">
                 <button class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">বাতিল</button>
-                <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="saveEdit()"><i class="fas fa-check me-1"></i>আপডেট</button>
+                <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="saveEdit()"><i class="fas fa-check me-1"></i>সেভ করুন</button>
             </div>
         </div>
     </div>
@@ -354,26 +354,26 @@
 <script src="/lib/jquery/jquery.min.js"></script>
 <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-// ── State ─────────────────────────────────────────────────────────────────────
+// -- State ---------------------------------------------------------------------
 let allReports   = [];
 let smsReports   = [];
 let selectedSMS  = new Set();
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// -- Helpers -------------------------------------------------------------------
 function esc(s) {
     return String(s == null ? '' : s)
         .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
         .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function fmt(d) {
-    if (!d) return '—';
+    if (!d) return '�';
     const dt = d instanceof Date ? d : new Date(d);
-    return isNaN(dt) ? '—' : dt.toLocaleDateString('bn-BD', {day:'numeric',month:'short',year:'numeric'});
+    return isNaN(dt) ? '�' : dt.toLocaleDateString('bn-BD', {day:'numeric',month:'short',year:'numeric'});
 }
 function posBadge(p) {
     const map = {'Very High':'pos-very-high','High':'pos-high','Average':'pos-average','Low':'pos-low','No':'pos-no'};
     const cls = map[p] || 'pos-average';
-    return `<span class="${cls}">${esc(p||'—')}</span>`;
+    return `<span class="${cls}">${esc(p||'�')}</span>`;
 }
 function toast(msg, type='info') {
     const t = $(`<div class="toast-item ${type}">${esc(msg)}</div>`);
@@ -388,7 +388,7 @@ function switchTab(id, btn) {
     if (id === 'tab-sms') loadSMSList();
 }
 
-// ── Load Reports ──────────────────────────────────────────────────────────────
+// -- Load Reports --------------------------------------------------------------
 async function loadReports() {
     document.getElementById('refreshIcon').classList.add('fa-spin');
     try {
@@ -448,20 +448,20 @@ function renderReports(list) {
             <td style="color:#94a3b8;font-size:.75rem;">${i+1}</td>
             <td>
                 <div style="font-weight:700;color:#1e293b;">${esc(r.institutionName)}</div>
-                <div style="font-size:.73rem;color:#94a3b8;">${esc(r.city||'')}${r.postCode?' · '+esc(r.postCode):''}</div>
+                <div style="font-size:.73rem;color:#94a3b8;">${esc(r.city||'')}${r.postCode?' � '+esc(r.postCode):''}</div>
             </td>
             <td>
-                <div>${esc(r.contactPersonName||'—')}</div>
+                <div>${esc(r.contactPersonName||'�')}</div>
                 ${r.visitedBy?`<div style="font-size:.72rem;color:#94a3b8;">by ${esc(r.visitedBy)}</div>`:''}
             </td>
-            <td>${esc(r.phone||'—')}</td>
+            <td>${esc(r.phone||'�')}</td>
             <td>
-                <div style="font-weight:600;">${esc(r.area||'—')}</div>
+                <div style="font-weight:600;">${esc(r.area||'�')}</div>
                 <div style="font-size:.72rem;color:#94a3b8;">${esc(r.marketName||'')}${r.shopNo?' #'+esc(r.shopNo):''}</div>
             </td>
             <td>${posBadge(r.possibility)}</td>
             <td style="font-size:.8rem;">${fmt(r.visitingDate)}</td>
-            <td style="font-weight:600;color:${r.dealPrice>0?'#10b981':'#94a3b8'};">${r.dealPrice>0?'৳'+r.dealPrice:'—'}</td>
+            <td style="font-weight:600;color:${r.dealPrice>0?'#10b981':'#94a3b8'};">${r.dealPrice>0?'?'+r.dealPrice:'�'}</td>
             <td>
                 <button class="btn-act btn-edit me-1" onclick="openEdit(${r.id})"><i class="fas fa-edit"></i></button>
                 <button class="btn-act btn-delete" onclick="deleteReport(${r.id})"><i class="fas fa-trash"></i></button>
@@ -469,7 +469,7 @@ function renderReports(list) {
         </tr>`).join('');
 }
 
-// ── Submit Report ─────────────────────────────────────────────────────────────
+// -- Submit Report -------------------------------------------------------------
 async function submitReport() {
     const payload = {
         institutionName:   document.getElementById('fInstitutionName').value.trim(),
@@ -489,7 +489,7 @@ async function submitReport() {
 
     if (!payload.institutionName) { toast('প্রতিষ্ঠানের নাম দিন', 'error'); return; }
     if (!payload.contactPersonName) { toast('যোগাযোগকারীর নাম দিন', 'error'); return; }
-    if (!payload.phone) { toast('ফোন নম্বর দিন', 'error'); return; }
+    if (!payload.phone) { toast('মোট নম্বর দিন', 'error'); return; }
     if (!payload.city) { toast('শহর দিন', 'error'); return; }
     if (!payload.area) { toast('এলাকা দিন', 'error'); return; }
     if (!payload.marketName) { toast('মার্কেটের নাম দিন', 'error'); return; }
@@ -498,20 +498,20 @@ async function submitReport() {
     if (!payload.visitingDate) { toast('তারিখ দিন', 'error'); return; }
 
     const btn = document.getElementById('submitBtn');
-    btn.disabled = true; btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>সেভ হচ্ছে...';
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>জমা হচ্ছে...';
     try {
         const res  = await fetch('/api/marketing/reports', {
             method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
         });
         const data = await res.json();
         if (data.success) {
-            toast('রিপোর্ট সেভ হয়েছে', 'success');
+            toast('রিপোর্ট সফলভাবে যোগ হয়েছে', 'success');
             resetForm();
             loadReports();
             switchTab('tab-list', document.querySelectorAll('.tab-btn')[0]);
-        } else { toast(data.message||'ব্যর্থ হয়েছে', 'error'); }
+        } else { toast(data.message||'সমস্যা হয়েছে', 'error'); }
     } catch(e) { toast('Error: '+e.message, 'error'); }
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>সেভ করুন';
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>জমা দিন';
 }
 
 function resetForm() {
@@ -524,7 +524,7 @@ function resetForm() {
     document.getElementById('fVisitingDate').value = new Date().toISOString().split('T')[0];
 }
 
-// ── Edit ─────────────────────────────────────────────────────────────────────
+// -- Edit ---------------------------------------------------------------------
 function openEdit(id) {
     const r = allReports.find(x=>x.id===id);
     if (!r) return;
@@ -569,24 +569,24 @@ async function saveEdit() {
         const data = await res.json();
         if (data.success) {
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-            toast('আপডেট সফল', 'success');
+            toast('আপডেট হয়েছে', 'success');
             loadReports();
-        } else { toast(data.message||'ব্যর্থ', 'error'); }
+        } else { toast(data.message||'সমস্যা হয়েছে', 'error'); }
     } catch(e) { toast('Error: '+e.message, 'error'); }
 }
 
-// ── Delete ────────────────────────────────────────────────────────────────────
+// -- Delete --------------------------------------------------------------------
 async function deleteReport(id) {
     if (!confirm('এই রিপোর্টটি মুছে ফেলবেন?')) return;
     try {
         const res  = await fetch('/api/marketing/reports/' + id, { method: 'DELETE' });
         const data = await res.json();
-        if (data.success) { toast('মুছে ফেলা হয়েছে', 'success'); loadReports(); }
-        else { toast(data.message||'ব্যর্থ', 'error'); }
+        if (data.success) { toast('রিপোর্ট মুছে ফেলা হয়েছে', 'success'); loadReports(); }
+        else { toast(data.message||'সমস্যা হয়েছে', 'error'); }
     } catch(e) { toast('Error: '+e.message, 'error'); }
 }
 
-// ── SMS Tab ───────────────────────────────────────────────────────────────────
+// -- SMS Tab -------------------------------------------------------------------
 function loadSMSList() {
     const pos  = document.getElementById('smsFilterPossibility').value;
     const area = document.getElementById('smsFilterArea').value;
@@ -609,9 +609,9 @@ function renderSMSList() {
             <td><input type="checkbox" class="sms-chk" data-id="${r.id}" style="accent-color:#6366f1;"
                 ${selectedSMS.has(r.id)?'checked':''} onchange="toggleSMSSelect(${r.id},this.checked)"></td>
             <td style="font-weight:600;">${esc(r.institutionName)}</td>
-            <td>${esc(r.contactPersonName||'—')}</td>
-            <td><a href="tel:${esc(r.phone)}">${esc(r.phone||'—')}</a></td>
-            <td>${esc(r.area||'—')}</td>
+            <td>${esc(r.contactPersonName||'�')}</td>
+            <td><a href="tel:${esc(r.phone)}">${esc(r.phone||'�')}</a></td>
+            <td>${esc(r.area||'�')}</td>
             <td>${posBadge(r.possibility)}</td>
         </tr>`).join('');
     updateSelectedCount();
@@ -640,7 +640,7 @@ function updateSelectedCount() {
 async function sendSMS() {
     const msg = document.getElementById('smsText').value.trim();
     if (!msg) { toast('বার্তা লিখুন', 'error'); return; }
-    if (!selectedSMS.size) { toast('কমপক্ষে একজন নির্বাচন করুন', 'error'); return; }
+    if (!selectedSMS.size) { toast('অন্তত একজন প্রাপক নির্বাচন করুন', 'error'); return; }
 
     const phones = smsReports
         .filter(r => selectedSMS.has(r.id))
@@ -657,15 +657,15 @@ async function sendSMS() {
         });
         const data = await res.json();
         if (data.success) {
-            toast(`✅ ${data.sent} টি SMS পাঠানো হয়েছে`, 'success');
+            toast(`✓ ${data.sent} টি SMS সফলভাবে পাঠানো হয়েছে`, 'success');
             document.getElementById('smsText').value = '';
             selectedSMS.clear();
             renderSMSList();
-        } else { toast(data.message||'ব্যর্থ হয়েছে', 'error'); }
+        } else { toast(data.message||'SMS পাঠাতে সমস্যা হয়েছে', 'error'); }
     } catch(e) { toast('Error: '+e.message, 'error'); }
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// -- Init ----------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function () {
     if (!TailorAuth.guard('Authority')) return;
     TailorAuth.guardSubPage('marketing');

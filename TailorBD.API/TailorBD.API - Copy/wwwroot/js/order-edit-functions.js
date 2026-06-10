@@ -129,15 +129,40 @@ function renderMeasurements() {
 // Update Measurement
 function updateMeasurement(groupIndex, measurementTypeId, value) {
     if (currentEditingIndex === null) return;
-    
+
     const item = orderItems[currentEditingIndex];
     const measurementGroup = item.measurements[groupIndex];
     const measurement = measurementGroup.measurements.find(m => m.measurementTypeID === measurementTypeId);
-    
+
     if (measurement) {
         measurement.measurement = value;
         console.log('✏️ Updated measurement:', measurement.measurementTypeName, '=', value);
     }
+}
+
+// Save Measurements - reads all current input values from modal
+function saveMeasurements() {
+    if (currentEditingIndex === null) return;
+
+    const container = document.getElementById('measurementsContainer');
+    if (!container) return;
+
+    const inputs = container.querySelectorAll('.measurement-input-old');
+    inputs.forEach(input => {
+        const onchangeAttr = input.getAttribute('onchange');
+        if (onchangeAttr) {
+            // Extract groupIndex and measurementTypeId from onchange attribute
+            const match = onchangeAttr.match(/updateMeasurement\((\d+),\s*(\d+),/);
+            if (match) {
+                const groupIndex = parseInt(match[1]);
+                const measurementTypeId = parseInt(match[2]);
+                updateMeasurement(groupIndex, measurementTypeId, input.value);
+            }
+        }
+    });
+
+    console.log('✅ Measurements saved successfully');
+    alert('মাপ সফলভাবে সংরক্ষণ করা হয়েছে');
 }
 
 // Open Style Modal

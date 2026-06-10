@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-en="Purchase Item - TailorBD" data-bn="আইটেম ক্রয় করুন - TailorBD">আইটেম ক্রয় করুন - TailorBD</title>
+    <title data-en="Purchase Item - TailorBD" data-bn="আইটেম ক্রয় - TailorBD">আইটেম ক্রয় - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,20 +14,20 @@
         #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
         .page-container { width: 100%; padding: 10px 20px; }
 
-        /* ─── Layout ─── */
+        /* --- Layout --- */
         .purchase-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
         @media(max-width: 992px) { .purchase-layout { grid-template-columns: 1fr; } #app-navbar { margin-left: 0; } .main-content { margin-left: 0; } .page-container { padding: 10px; } }
 
-        /* ─── Cards ─── */
+        /* --- Cards --- */
         .card-box { background: #fff; border-radius: 10px; padding: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); margin-bottom: 18px; }
         .card-title { font-size: 15px; font-weight: 700; color: #6c7ae0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
 
-        /* ─── Radio tabs ─── */
+        /* --- Radio tabs --- */
         .mode-tabs { display: flex; gap: 0; border-radius: 8px; overflow: hidden; border: 1.5px solid #6c7ae0; width: fit-content; margin-bottom: 18px; }
         .mode-tab { padding: 7px 22px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: #fff; color: #6c7ae0; transition: background 0.2s, color 0.2s; }
         .mode-tab.active { background: #6c7ae0; color: #fff; }
 
-        /* ─── Form Fields ─── */
+        /* --- Form Fields --- */
         .f-label { font-size: 12.5px; font-weight: 500; color: #555; margin-bottom: 4px; display: block; }
         .f-label .req { color: #dc3545; }
         .f-control { width: 100%; padding: 8px 11px; border: 1px solid #ddd; border-radius: 6px; font-size: 13.5px; font-family: inherit; box-sizing: border-box; transition: border-color 0.2s; }
@@ -35,7 +35,7 @@
         .f-control.is-invalid { border-color: #dc3545; }
         .err-msg { color: #dc3545; font-size: 11.5px; margin-top: 2px; display: none; }
 
-        /* ─── Autocomplete ─── */
+        /* --- Autocomplete --- */
         .autocomplete-wrap { position: relative; }
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); z-index: 999; max-height: 220px; overflow-y: auto; display: none; }
         .autocomplete-item { padding: 9px 13px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
@@ -44,7 +44,7 @@
         .autocomplete-item .item-stock { font-size: 11px; color: #888; float: right; }
         .autocomplete-item .item-price { font-size: 11px; color: #333; }
 
-        /* ─── Cart Table ─── */
+        /* --- Cart Table --- */
         .cart-table { width: 100%; border-collapse: collapse; }
         .cart-table thead th { background: #f8f9ff; padding: 9px 10px; font-size: 12px; font-weight: 600; color: #555; border-bottom: 2px solid #e8eaf6; white-space: nowrap; }
         .cart-table tbody tr { border-bottom: 1px solid #f0f0f0; }
@@ -57,7 +57,7 @@
         .cart-empty { text-align: center; color: #bbb; padding: 30px; font-size: 13px; }
         .item-code-cell { font-weight: 600; color: #6c7ae0; font-size: 12px; }
 
-        /* ─── Summary Panel ─── */
+        /* --- Summary Panel --- */
         .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
         .summary-row label { color: #666; font-weight: 500; }
         .summary-row .val { font-weight: 700; color: #333; }
@@ -65,7 +65,7 @@
         .grand-total { font-size: 18px; font-weight: 800; color: #6c7ae0; }
         .due-amount  { font-size: 15px; font-weight: 700; color: #dc3545; }
 
-        /* ─── Buttons ─── */
+        /* --- Buttons --- */
         .btn-primary-c { padding: 10px 26px; background: #6c7ae0; color: #fff; border: none; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; width: 100%; justify-content: center; }
         .btn-primary-c:hover { background: #5a68c9; }
         .btn-primary-c:disabled { background: #aaa; cursor: not-allowed; }
@@ -74,17 +74,17 @@
         .btn-add-cart { padding: 8px 20px; background: #28a745; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; white-space: nowrap; }
         .btn-add-cart:hover { background: #218838; }
 
-        /* ─── Item info badge ─── */
+        /* --- Item info badge --- */
         .item-info-badge { background: #f0f3ff; border-radius: 7px; padding: 8px 12px; font-size: 12.5px; color: #444; display: none; margin-top: 6px; }
         .item-info-badge .stock { color: #28a745; font-weight: 700; }
         .item-info-badge .price { color: #6c7ae0; font-weight: 700; }
 
-        /* ─── Toast ─── */
+        /* --- Toast --- */
         .toast-notify { position: fixed; top: 20px; right: 24px; z-index: 9999; min-width: 280px; padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.15); display: none; align-items: center; gap: 10px; }
         .toast-notify.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
         .toast-notify.error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
 
-        /* ─── Modal ─── */
+        /* --- Modal --- */
         .modal-header-custom { background: linear-gradient(135deg,#6c7ae0,#8a94e8); color:#fff; }
         .spinner-sm { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -113,16 +113,16 @@
                                     </button>
                                     <button class="mode-tab" id="tabOld" onclick="setMode('old')">
                                         <i class="fas fa-history me-1"></i>
-                                        <span data-en="Existing Item Purchase" data-bn="পুরাতন আইটেম ক্রয়">পুরাতন আইটেম ক্রয়</span>
+                                        <span data-en="Existing Item Purchase" data-bn="পূর্বের আইটেম ক্রয়">পূর্বের আইটেম ক্রয়</span>
                                     </button>
                                 </div>
 
-                                <!-- নতুন আইটেম প্যানেল -->
+                                <!-- মোট? সাইনিং পরিমাণ -->
                                 <div id="newItemPanel">
                                     <div class="row g-3">
                                         <div class="col-md-4">
                                             <label class="f-label">
-                                                <span data-en="Measurement Unit" data-bn="মেজারমেন্ট ইউনিট">মেজারমেন্ট ইউনিট</span>
+                                                <span data-en="Measurement Unit" data-bn="পরিমাপ একক">পরিমাপ একক</span>
                                                 <span class="req">*</span>
                                             </label>
                                             <select id="newUnitDDL" class="f-control">
@@ -152,8 +152,7 @@
                                             </label>
                                             <input type="text" id="newItemCode" class="f-control"
                                                 data-en-placeholder="Enter code"
-                                                data-bn-placeholder="কোড লিখুন"
-                                                placeholder="কোড লিখুন" autocomplete="off"
+                                                data-bn-placeholder="কোড লিখুন" placeholder="কোড লিখুন" autocomplete="off"
                                                 oninput="checkNewItemCode()">
                                             <div class="err-msg" id="err-newCode"></div>
                                             <small id="newCodeHint" style="font-size:12px; display:block; min-height:16px; margin-top:3px;"></small>
@@ -165,13 +164,12 @@
                                             </label>
                                             <input type="text" id="newItemName" class="f-control"
                                                 data-en-placeholder="Enter name"
-                                                data-bn-placeholder="নাম লিখুন"
-                                                placeholder="নাম লিখুন" autocomplete="off">
+                                                data-bn-placeholder="নাম লিখুন" placeholder="নাম লিখুন" autocomplete="off">
                                             <div class="err-msg" id="err-newName"></div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="f-label">
-                                                <span data-en="Quantity" data-bn="পরিমান">পরিমান</span>
+                                                <span data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</span>
                                                 <span class="req">*</span>
                                             </label>
                                             <input type="number" id="newQty" class="f-control"
@@ -181,7 +179,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="f-label">
-                                                <span data-en="Unit Buying Price" data-bn="ইউনিট ক্রয় মূল্য">ইউনিট ক্রয় মূল্য</span>
+                                                <span data-en="Unit Buying Price" data-bn="একক ক্রয় মূল্য">একক ক্রয় মূল্য</span>
                                             </label>
                                             <input type="number" id="newUnitBuyPrice" class="f-control"
                                                 placeholder="0.00" step="0.01" min="0"
@@ -199,7 +197,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="f-label">
-                                                <span data-en="Selling Price (per unit)" data-bn="বিক্রয় মূল্য (প্রতি ইউনিট)">বিক্রয় মূল্য (প্রতি ইউনিট)</span>
+                                                <span data-en="Selling Price (per unit)" data-bn="বিক্রয় মূল্য (একক প্রতি)">বিক্রয় মূল্য (একক প্রতি)</span>
                                                 <span class="req">*</span>
                                             </label>
                                             <input type="number" id="newSellingPrice" class="f-control" placeholder="0.00" min="0" step="0.01">
@@ -215,19 +213,18 @@
                                     </div>
                                 </div>
 
-                                <!-- পুরাতন আইটেম প্যানেল -->
+                                <!-- ঠিকানা সাইনিং পরিমাণ -->
                                 <div id="oldItemPanel" style="display:none;">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="f-label">
-                                                <span data-en="Search by Item Code" data-bn="আইটেম কোড দিয়ে খুঁজুন">아이템 কোড দিয়ে খুঁজুন</span>
+                                                <span data-en="Search by Item Code" data-bn="আইটেম কোড দিয়ে অনুসন্ধান">আইটেম কোড দিয়ে অনুসন্ধান</span>
                                                 <span class="req">*</span>
                                             </label>
                                             <div class="autocomplete-wrap">
                                                 <input type="text" id="oldItemSearch" class="f-control"
                                                     data-en-placeholder="Enter code or name..."
-                                                    data-bn-placeholder="কোড বা নাম লিখুন..."
-                                                    placeholder="কোড বা নাম লিখুন..." autocomplete="off"
+                                                    data-bn-placeholder="কোড বা নাম লিখুন..." placeholder="কোড বা নাম লিখুন..." autocomplete="off"
                                                     oninput="searchOldItem(this.value)">
                                                 <div class="autocomplete-list" id="oldItemList"></div>
                                             </div>
@@ -237,16 +234,15 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="f-label">
-                                                <span data-en="New Selling Price (to change)" data-bn="নতুন বিক্রয় মূল্য (পরিবর্তন করতে)">নতুন বিক্রয় মূল্য (পরিবর্তন করতে)</span>
+                                                <span data-en="New Selling Price (to change)" data-bn="নতুন বিক্রয় মূল্য (পরিবর্তনের জন্য)">নতুন বিক্রয় মূল্য (পরিবর্তনের জন্য)</span>
                                             </label>
                                             <input type="number" id="oldNewSellingPrice" class="f-control"
                                                 data-en-placeholder="Leave blank to keep same"
-                                                data-bn-placeholder="পরিবর্তন না করলে খালি রাখুন"
-                                                placeholder="পরিবর্তন না করলে খালি রাখুন" min="0.01" step="0.01">
+                                                data-bn-placeholder="একই রাখতে খালি রাখুন" placeholder="একই রাখতে খালি রাখুন" min="0.01" step="0.01">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="f-label">
-                                                <span data-en="Quantity" data-bn="পরিমান">পরিমান</span>
+                                                <span data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</span>
                                                 <span class="req">*</span>
                                             </label>
                                             <input type="number" id="oldQty" class="f-control"
@@ -255,7 +251,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="f-label">
-                                                <span data-en="Unit Buying Price" data-bn="ইউনিট ক্রয় মূল্য">ইউনিট ক্রয় মূল্য</span>
+                                                <span data-en="Unit Buying Price" data-bn="একক ক্রয় মূল্য">একক ক্রয় মূল্য</span>
                                             </label>
                                             <input type="number" id="oldUnitBuyPrice" class="f-control"
                                                 placeholder="0.00" step="0.01" min="0"
@@ -295,9 +291,9 @@
                                                 <th>#</th>
                                                 <th><span data-en="Code / Name" data-bn="কোড / নাম">কোড / নাম</span></th>
                                                 <th><span data-en="Selling Price" data-bn="বিক্রয় মূল্য">বিক্রয় মূল্য</span></th>
-                                                <th><span data-en="Qty" data-bn="পরিমান">পরিমান</span></th>
-                                                <th><span data-en="Unit Price" data-bn="ইউনিট মূল্য">ইউনিট মূল্য</span></th>
-                                                <th><span data-en="Total" data-bn="মোট মূল্য">মোট মূল্য</span></th>
+                                                <th><span data-en="Qty" data-bn="পরিমাণ">পরিমাণ</span></th>
+                                                <th><span data-en="Unit Price" data-bn="একক মূল্য">একক মূল্য</span></th>
+                                                <th><span data-en="Total" data-bn="মোট">মোট</span></th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -321,24 +317,24 @@
                                 </div>
 
                                 <div class="summary-row">
-                                    <label><span data-en="Total Price" data-bn="මොটা মূল্য">মোট মূল্য</span></label>
+                                    <label><span data-en="Total Price" data-bn="মোট মূল্য">মোট মূল্য</span></label>
                                     <span class="val">৳ <span id="sumGrandTotal">0.00</span></span>
                                 </div>
                                 <div class="summary-row">
-                                    <label><span data-en="Discount" data-bn="ছাড়">ছাড়</span></label>
+                                    <label><span data-en="Discount" data-bn="ছাড়">ছাড়</span></label>
                                     <input type="number" id="discountAmt" class="cart-input" style="width:120px;" value="0" min="0" step="0.01" oninput="calcSummary()">
                                 </div>
                                 <div class="summary-row">
-                                    <label><span data-en="% Discount" data-bn="% ছাড়">% ছাড়</span></label>
+                                    <label><span data-en="% Discount" data-bn="% ছাড়">% ছাড়</span></label>
                                     <input type="number" id="discountPct" class="cart-input" style="width:120px;" value="0" min="0" max="100" step="0.01" oninput="calcSummaryByPct()">
                                 </div>
                                 <hr class="summary-divider">
                                 <div class="summary-row">
-                                    <label><span data-en="Net Total" data-bn="নেট মোট">নেট মোট</span></label>
+                                    <label><span data-en="Net Total" data-bn="মোট বিল">মোট বিল</span></label>
                                     <span class="grand-total">৳ <span id="sumNetTotal">0.00</span></span>
                                 </div>
                                 <div class="summary-row mt-2">
-                                    <label><span data-en="Paid" data-bn="পরিশোধিত">পরিশোধিত</span></label>
+                                    <label><span data-en="Paid" data-bn="পরিশোধ">পরিশোধ</span></label>
                                     <input type="number" id="paidAmount" class="cart-input" style="width:120px;" value="0" min="0" step="0.01" oninput="calcDue()">
                                 </div>
                                 <div class="summary-row">
@@ -361,21 +357,20 @@
                                     </label>
                                     <input type="text" id="billNo" class="f-control"
                                         data-en-placeholder="Optional"
-                                        data-bn-placeholder="ঐচ্ছিক"
-                                        placeholder="ঐচ্ছিক" autocomplete="off">
+                                        data-bn-placeholder="ঐচ্ছিক" placeholder="ঐচ্ছিক" autocomplete="off">
                                 </div>
                                 <div class="mb-3">
                                     <label class="f-label">
-                                        <span data-en="Account" data-bn="একাউন্ট">একাউন্ট</span>
+                                        <span data-en="Account" data-bn="হিসাব">হিসাব</span>
                                     </label>
                                     <select id="accountDDL" class="f-control">
-                                        <option value="0" data-en="[ Without Account ]" data-bn="[ একাউন্ট ছাড়া ]">[ একাউন্ট ছাড়া ]</option>
+                                        <option value="0" data-en="[ Without Account ]" data-bn="[ হিসাব ব্যতীত ]">[ হিসাব ব্যতীত ]</option>
                                     </select>
                                 </div>
                                 <div class="mb-3 form-check">
                                     <input class="form-check-input" type="checkbox" id="updateBuyingPriceChk" checked>
                                     <label class="form-check-label" style="font-size:13px;" for="updateBuyingPriceChk">
-                                        <span data-en="Update current buying price" data-bn="বর্তমান ক্রয় দাম আপডেট করুন">বর্তমান ক্রয় দাম আপডেট করুন</span>
+                                        <span data-en="Update current buying price" data-bn="বর্তমান ক্রয়মূল্য আপডেট করুন">বর্তমান ক্রয়মূল্য আপডেট করুন</span>
                                     </label>
                                 </div>
 
@@ -387,7 +382,7 @@
                                 </button>
                                 <button class="btn-outline-c w-100 justify-content-center" onclick="openSupplierModal()">
                                     <i class="fas fa-user-tie"></i>
-                                    <span data-en="Purchase with Supplier" data-bn="সাপ্লায়ারসহ ক্রয় করুন">সাপ্লায়ারসহ ক্রয় করুন</span>
+                                    <span data-en="Purchase with Supplier" data-bn="সরবরাহকারী সহ ক্রয়">সরবরাহকারী সহ ক্রয়</span>
                                 </button>
                                 <div class="alert-box mt-2" id="submitAlert"></div>
                             </div>
@@ -410,7 +405,7 @@
                 <div class="modal-header modal-header-custom">
                     <h6 class="modal-title fw-bold">
                         <i class="fas fa-user-tie me-2"></i>
-                        <span data-en="Select Supplier" data-bn="সাপ্লায়ার নির্বাচন">সাপ্লায়ার নির্বাচন</span>
+                        <span data-en="Select Supplier" data-bn="সরবরাহকারী নির্বাচন করুন">সরবরাহকারী নির্বাচন করুন</span>
                     </h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -418,26 +413,26 @@
                     <ul class="nav nav-tabs px-3 pt-3" id="supplierTabs">
                         <li class="nav-item">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#oldSupplierTab">
-                                <span data-en="Existing Supplier" data-bn="পুরাতন সাপ্লায়ার">পুরাতন সাপ্লায়ার</span>
+                                <span data-en="Existing Supplier" data-bn="পূর্বের সরবরাহকারী">পূর্বের সরবরাহকারী</span>
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#newSupplierTab">
-                                <span data-en="New Supplier" data-bn="নতুন সাপ্লায়ার">নতুন সাপ্লায়ার</span>
+                                <span data-en="New Supplier" data-bn="নতুন সরবরাহকারী">নতুন সরবরাহকারী</span>
                             </button>
                         </li>
                     </ul>
                     <div class="tab-content p-3">
-                        <!-- পুরাতন সাপ্লায়ার -->
+                        <!-- আরেকটি যোগ করুনমোট -->
                         <div class="tab-pane fade show active" id="oldSupplierTab">
                             <div class="mb-3">
                                 <label class="f-label">
-                                    <span data-en="Supplier" data-bn="সাপ্লায়ার">সাপ্লায়ার</span>
+                                    <span data-en="Supplier" data-bn="সরবরাহকারী">সরবরাহকারী</span>
                                     <span class="req">*</span>
                                 </label>
                                 <div class="autocomplete-wrap">
                                     <input type="text" id="oldSupplierSearch" class="f-control"
-                                        placeholder="নাম বা মোবাইল দিয়ে খুঁজুন..."
+                                        placeholder="নাম বা মোবাইল দিয়ে খুঁজুন..."
                                         autocomplete="off"
                                         oninput="searchSupplier(this.value)">
                                     <div class="autocomplete-list" id="oldSupplierList"></div>
@@ -447,15 +442,14 @@
                             <div class="item-info-badge" id="supplierInfoBadge" style="display:none;"></div>
                             <div class="mb-3 mt-2">
                                 <label class="f-label">
-                                    <span data-en="Paid Amount" data-bn="পরিশোধিত পরিমান">পরিশোধিত পরিমান</span>
+                                    <span data-en="Paid Amount" data-bn="পরিশোধিত পরিমাণ">পরিশোধিত পরিমাণ</span>
                                 </label>
                                 <div style="font-size:13px; font-weight:700; color:#6c7ae0; margin-bottom:6px;">
-                                    <span data-en="Net Total" data-bn="নেট মোট">নেট মোট</span>: ৳ <span id="sOldNetTotal">0.00</span>
+                                    <span data-en="Net Total" data-bn="মোট বিল">মোট বিল</span>: ৳ <span id="sOldNetTotal">0.00</span>
                                 </div>
                                 <input type="number" id="oldSupplierPaid" class="f-control"
                                     data-en-placeholder="Paid amount"
-                                    data-bn-placeholder="পরিশোধিত পরিমান"
-                                    placeholder="পরিশোধিত পরিমান" min="0" step="0.01"
+                                    data-bn-placeholder="পরিশোধিত পরিমাণ" placeholder="পরিশোধিত পরিমাণ" min="0" step="0.01"
                                     oninput="calcSupplierDue('old')">
                                 <div style="font-size:12.5px; margin-top:4px;" id="oldSupplierDueMsg"></div>
                             </div>
@@ -466,7 +460,7 @@
                             <div class="alert-box mt-2" id="oldSupAlert"></div>
                         </div>
 
-                        <!-- নতুন সাপ্লায়ার -->
+                        <!-- মোট? ড্যাশবোর্ড -->
                         <div class="tab-pane fade" id="newSupplierTab">
                             <div class="row g-2">
                                 <div class="col-12">
@@ -475,18 +469,16 @@
                                     </label>
                                     <input type="text" id="nsCompany" class="f-control"
                                         data-en-placeholder="Company name"
-                                        data-bn-placeholder="কোম্পানির নাম"
-                                        placeholder="কোম্পানির নাম" autocomplete="off">
+                                        data-bn-placeholder="কোম্পানির নাম" placeholder="কোম্পানির নাম" autocomplete="off">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="f-label">
-                                        <span data-en="Supplier Name" data-bn="সাপ্লায়ারের নাম">সাপ্লায়ারের নাম</span>
+                                        <span data-en="Supplier Name" data-bn="সরবরাহকারীর নাম">সরবরাহকারীর নাম</span>
                                         <span class="req">*</span>
                                     </label>
                                     <input type="text" id="nsName" class="f-control"
                                         data-en-placeholder="Name"
-                                        data-bn-placeholder="নাম"
-                                        placeholder="নাম" autocomplete="off">
+                                        data-bn-placeholder="নাম" placeholder="সরবরাহকারীর নাম" autocomplete="off">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="f-label">
@@ -494,8 +486,7 @@
                                     </label>
                                     <input type="text" id="nsPhone" class="f-control"
                                         data-en-placeholder="Mobile number"
-                                        data-bn-placeholder="মোবাইল নম্বর"
-                                        placeholder="মোবাইল নম্বর" autocomplete="off">
+                                        data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নম্বর" autocomplete="off">
                                 </div>
                                 <div class="col-12">
                                     <label class="f-label">
@@ -503,20 +494,18 @@
                                     </label>
                                     <input type="text" id="nsAddress" class="f-control"
                                         data-en-placeholder="Address"
-                                        data-bn-placeholder="ঠিকানা"
-                                        placeholder="ঠিকানা" autocomplete="off">
+                                        data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা" autocomplete="off">
                                 </div>
                                 <div class="col-12 mt-1">
                                     <label class="f-label">
-                                        <span data-en="Paid Amount" data-bn="পরিশোধিত পরিমান">পরিশোধিত পরিমান</span>
+                                        <span data-en="Paid Amount" data-bn="পরিশোধিত পরিমাণ">পরিশোধিত পরিমাণ</span>
                                     </label>
                                     <div style="font-size:13px; font-weight:700; color:#6c7ae0; margin-bottom:6px;">
-                                        <span data-en="Net Total" data-bn="নেট মোট">নেট মোট</span>: ৳ <span id="sNewNetTotal">0.00</span>
+                                        <span data-en="Net Total" data-bn="মোট বিল">মোট বিল</span>: ৳ <span id="sNewNetTotal">0.00</span>
                                     </div>
                                     <input type="number" id="newSupplierPaid" class="f-control"
                                         data-en-placeholder="Paid amount"
-                                        data-bn-placeholder="পরিশোধিত পরিমান"
-                                        placeholder="পরিশোধিত পরিমান" min="0" step="0.01"
+                                        data-bn-placeholder="পরিশোধিত পরিমাণ" placeholder="পরিশোধিত পরিমাণ" min="0" step="0.01"
                                         oninput="calcSupplierDue('new')">
                                     <div style="font-size:12.5px; margin-top:4px;" id="newSupplierDueMsg"></div>
                                 </div>
@@ -535,7 +524,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/item-purchase.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/item-purchase.js?v=2.1.6"></script>
 </body>
 </html>

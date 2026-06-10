@@ -6,8 +6,8 @@
    State
 ─────────────────────────────────────────────── */
 let qo = {
-    orderNumber: null,
-    customer: { id: 0, clothForId: 1, name: '', phone: '' },
+orderNumber: null,
+customer: { id: 0, clothForId: 1, name: '', phone: '', photo: '' },
     dresses: [],       // { dressId, dressName, quantity, details, measurements, styles, payments }
     paymentMethods: [],
     discountLimit: 0,
@@ -64,6 +64,26 @@ $(function () {
 
     if (qo.orderNumber) showOrderNumber(qo.orderNumber);
     if (qo.customer.id) showCustomerBar();
+
+    // customer modal open হলে বর্তমান customer তথ্য prefill করুন
+    document.getElementById('customerModal').addEventListener('show.bs.modal', function () {
+        // ছবি field ও preview reset
+        $('#customerPhoto').val('');
+        $('#customerPhotoPreview').html('<i class="fas fa-user text-secondary" style="font-size:1.6rem"></i>');
+
+        if (qo.customer.id) {
+            $('#customerPhone').val(qo.customer.phone);
+            $('#customerName').val(qo.customer.name);
+            $('#setCustomerBtn').show();
+            $('#addCustomerBtn').hide();
+        } else {
+            $('#customerPhone').val('');
+            $('#customerName').val('');
+            $('#customerAddress').val('');
+            $('#setCustomerBtn').hide();
+            $('#addCustomerBtn').show();
+        }
+    });
 });
 
 /* ───────────────────────────────────────────────
@@ -171,14 +191,33 @@ function showOrderNumber(num) {
 let customerList = [];
 
 window.searchCustomer = function () {
-    clearTimeout(qo.searchTimer);
-    qo.searchTimer = setTimeout(async () => {
-        const phone = $('#customerPhone').val().trim();
-        const name  = $('#customerName').val().trim();
-        if (!phone && !name) return;
+clearTimeout(qo.searchTimer);
 
-        const q = encodeURIComponent(phone || name);
-        const type = phone ? 'phone' : 'name';
+// field খালি হলে customer state reset করুন
+const phoneNow = $('#customerPhone').val().trim();
+const nameNow  = $('#customerName').val().trim();
+if (!phoneNow && !nameNow && qo.customer.id) {
+    qo.customer = { id: 0, clothForId: 1, name: '', phone: '' };
+    saveStore();
+    $('#customerInfoBar').hide();
+    $('#setCustomerBtn').hide();
+    $('#addCustomerBtn').show();
+}
+
+qo.searchTimer = setTimeout(async () => {
+    const phone = $('#customerPhone').val().trim();
+    const name  = $('#customerName').val().trim();
+
+    // যে field এ typing হচ্ছে সেটা detect করি
+    const activeId = $(document.activeElement).attr('id');
+    const isPhone = activeId === 'customerPhone';
+    const isName  = activeId === 'customerName';
+
+    const query = isPhone ? phone : (isName ? name : '');
+    if (!query) { $('#phoneDropdown,#nameDropdown').hide(); return; }
+
+        const q = encodeURIComponent(query);
+        const type = isPhone ? 'phone' : 'name';
         const url = `/api/Customers/suggest?q=${q}&type=${type}&institutionId=${institutionId()}`;
         const res = await apiFetch(url).catch(() => null);
         customerList = res?.data || [];
@@ -186,14 +225,21 @@ window.searchCustomer = function () {
         const html = customerList.map((c, i) => {
             const cName = c.customerName || c.CustomerName || '';
             const cPhone = c.phone || c.Phone || '';
-            return `<div class="dropdown-item" onclick="selectCustomer(${i})">${cName} — ${cPhone}</div>`;
+            return `<div class="dropdown-item" onmousedown="selectCustomer(${i})">${cName} — ${cPhone}</div>`;
         }).join('');
 
         const $phone = $('#phoneDropdown'), $name = $('#nameDropdown');
-        if (phone) { $phone.html(html).toggle(!!html); $name.hide(); }
-        else       { $name.html(html).toggle(!!html);  $phone.hide(); }
+        if (isPhone) { $phone.html(html).toggle(!!html); $name.hide(); }
+        else         { $name.html(html).toggle(!!html);  $phone.hide(); }
     }, 400);
 };
+
+// dropdown এর বাইরে click করলে hide হবে
+$(document).on('click', function (e) {
+    if (!$(e.target).closest('.autocomplete-wrapper').length) {
+        $('#phoneDropdown,#nameDropdown').hide();
+    }
+});
 
 window.selectCustomer = function (idx) {
     const c = customerList[idx];
@@ -209,22 +255,34 @@ window.selectCustomer = function (idx) {
     $('#customerGender').val(cClothFor);
     $('#phoneDropdown,#nameDropdown').hide();
 
-    qo.customer = { id: cId, clothForId: cClothFor, name: cName, phone: cPhone };
+    const cPhoto = `/api/Customers/${cId}/photo?institutionId=${institutionId()}`;
+    qo.customer = { id: cId, clothForId: cClothFor, name: cName, phone: cPhone, photo: cPhoto };
     saveStore();
     showCustomerBar();
 
     $('#setCustomerBtn').show();
     $('#addCustomerBtn').hide();
+
+    // auto-close dropdown এ select করার পর নাম field এ focus দিন
+    $('#customerName').focus();
 };
 
 function showCustomerBar() {
     $('#selectedCustomerName').text(qo.customer.name);
     $('#selectedCustomerPhone').text(qo.customer.phone);
+    // ছবি দেখানো
+    const $wrap = $('#customerAvatarWrap');
+    const photoUrl = qo.customer.photo;
+    if (photoUrl) {
+        $wrap.html(`<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user\'></i>'">`);
+    } else {
+        $wrap.html('<i class="fas fa-user" id="customerAvatarIcon"></i>');
+    }
     $('#customerInfoBar').show();
 }
 
 window.setCustomer = async function () {
-    bootstrap.Modal.getInstance(document.getElementById('customerModal'))?.hide();
+closeCustomerModal();
 
     // Reload dresses for gender
     await loadDresses();
@@ -243,6 +301,19 @@ window.setCustomer = async function () {
     renderAll();
 };
 
+window.previewCustomerPhoto = function (input) {
+    const $preview = $('#customerPhotoPreview');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $preview.html(`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`);
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        $preview.html('<i class="fas fa-user text-secondary" style="font-size:1.6rem"></i>');
+    }
+};
+
 window.addNewCustomer = async function () {
     const phone   = $('#customerPhone').val().trim();
     const name    = $('#customerName').val().trim();
@@ -253,6 +324,9 @@ window.addNewCustomer = async function () {
         showAlert(window.currentLang === 'en' ? 'Phone and name required' : 'ফোন ও নাম আবশ্যক', 'warning');
         return;
     }
+
+    const $btn = $('#addCustomerBtn').prop('disabled', true)
+        .html(`<span class="spinner-border spinner-border-sm me-1"></span>${window.currentLang === 'en' ? 'Adding...' : 'যুক্ত হচ্ছে...'}`);
 
     const res = await apiFetch(`/api/Customers`, {
         method: 'POST',
@@ -267,13 +341,37 @@ window.addNewCustomer = async function () {
         })
     }).catch(() => null);
 
-    if (res?.isSuccess) {
+    $btn.prop('disabled', false).html(
+        `<i class="fas fa-user-plus me-1"></i>${window.currentLang === 'en' ? 'Add Customer' : 'কাস্টমার যুক্ত করুন'}`);
+
+    // success field from ApiResponse (can be "success" or "isSuccess" depending on serialization)
+    if (res?.success || res?.isSuccess) {
         const newCustomerId = res.data;
-        qo.customer = { id: newCustomerId, clothForId: +gender, name, phone };
+        const photoUrl = `/api/Customers/${newCustomerId}/photo?institutionId=${institutionId()}`;
+        qo.customer = { id: newCustomerId, clothForId: +gender, name, phone, photo: photoUrl };
         saveStore();
+
+        // modal আগে বন্ধ করুন
+        closeCustomerModal();
+
+        // customer bar দেখান
         showCustomerBar();
-        bootstrap.Modal.getInstance(document.getElementById('customerModal'))?.hide();
-        showAlert(window.currentLang === 'en' ? 'Customer added!' : 'কাস্টমার যুক্ত হয়েছে!', 'success');
+
+        // সফল বার্তা দেখান
+        showAlert(window.currentLang === 'en' ? `✅ Customer "${name}" added!` : `✅ "${name}" কাস্টমার যুক্ত হয়েছে!`, 'success');
+
+        // ছবি থাকলে background এ upload করুন
+        const photoFile = $('#customerPhoto')[0].files[0];
+        if (photoFile) {
+            const fd = new FormData();
+            fd.append('photo', photoFile);
+            fetch(`/api/Customers/${newCustomerId}/photo?institutionId=${institutionId()}`, {
+                method: 'POST',
+                body: fd
+            }).catch(() => null);
+        }
+
+        // পোশাক লিস্ট reload করুন
         loadDresses();
     } else {
         showAlert(res?.message || (window.currentLang === 'en' ? 'Failed to add customer' : 'কাস্টমার যুক্ত করা যায়নি'), 'danger');
@@ -815,6 +913,17 @@ window.submitOrder = async function () {
 /* ───────────────────────────────────────────────
    Helpers
 ─────────────────────────────────────────────── */
+function closeCustomerModal() {
+    const modalEl = document.getElementById('customerModal');
+    // Always forcefully remove modal DOM state first (works regardless of Bootstrap instance)
+    $(modalEl).removeClass('show').attr('aria-hidden', 'true').removeAttr('aria-modal').css('display', 'none');
+    $('body').removeClass('modal-open').css('padding-right', '');
+    $('.modal-backdrop').remove();
+    // Also dispose Bootstrap instance so it can be re-initialized fresh next time
+    const inst = bootstrap.Modal.getInstance(modalEl);
+    if (inst) inst.dispose();
+}
+
 function showAlert(msg, type = 'info') {
     const $a = $(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">
         ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`);

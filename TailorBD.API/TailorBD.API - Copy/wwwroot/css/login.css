@@ -4,13 +4,13 @@
  */
 
 :root {
-    --primary-color: #6366f1;
-    --secondary-color: #8b5cf6;
-    --accent-color: #ec4899;
-    --dark-color: #1e293b;
+    --primary-color: #1e3a5f;
+    --secondary-color: #2d4f7c;
+    --accent-color: #38bdf8;
+    --dark-color: #0f172a;
     --light-color: #f8fafc;
     --text-color: #334155;
-    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-1: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f2342 100%);
 }
 
 * {
@@ -102,8 +102,8 @@ body {
 }
 
 .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #1e3a5f;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.15);
     outline: none;
 }
 
@@ -140,7 +140,7 @@ body {
 }
 
 .toggle-password:hover {
-    color: var(--primary-color);
+    color: #1e3a5f;
 }
 
 .btn-login {
@@ -159,7 +159,7 @@ body {
 
 .btn-login:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 102, 241, 0.3);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
 }
 
 .btn-login:active {
@@ -189,14 +189,14 @@ body {
 }
 
 .links a {
-    color: var(--primary-color);
+    color: #1e3a5f;
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .links a:hover {
-    color: var(--secondary-color);
+    color: #2d4f7c;
 }
 
 .back-home {

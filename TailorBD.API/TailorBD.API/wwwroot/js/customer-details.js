@@ -78,12 +78,19 @@
         $.get(`/api/customer-page/dresses-by-gender?institutionId=${institutionId}&clothForId=${clothForId}&customerId=${customerId}`, function (r) {
             if (!r.success || !r.data.length) return;
             let html = `<option value="0">মাপ যুক্ত করার জন্য পোষাক নির্বাচন করুন</option>`;
+            let hasSavedMeasurements = false;
             r.data.forEach(function (d) {
                 const cls = d.hasMeasurement ? ' class="has-measurement"' : '';
                 const mark = d.hasMeasurement ? ' ✔' : '';
                 html += `<option value="${d.dressId}"${cls}>${escapeHtml(d.dressName)}${mark}</option>`;
+                if (d.hasMeasurement) hasSavedMeasurements = true;
             });
             $('#dressSelect').html(html);
+
+            if (hasSavedMeasurements) {
+                const printUrl = `/customer-measurement-print.html?customerId=${customerId}&clothForId=${clothForId}`;
+                $('#btnPrintMeasurement').attr('href', printUrl).css('display', 'inline-flex');
+            }
         });
     }
 
@@ -184,6 +191,10 @@
             success: function (r) {
                 showMsg('#measureSaveMsg', r.success ? 'success' : 'error', r.message || 'সমস্যা হয়েছে');
                 $btn.prop('disabled', false).html('<i class="fas fa-save"></i> মাপ যুক্ত/পরিবর্তন করুন');
+                if (r.success) {
+                    const printUrl = `/customer-measurement-print.html?customerId=${customerId}&clothForId=${clothForId}`;
+                    $('#btnPrintMeasurement').attr('href', printUrl).css('display', 'inline-flex');
+                }
             },
             error: function () {
                 showMsg('#measureSaveMsg', 'error', 'সমস্যা হয়েছে। আবার চেষ্টা করুন।');

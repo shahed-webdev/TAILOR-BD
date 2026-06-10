@@ -8,9 +8,9 @@
     let currentLang   = 'bn';
     let institutionInfo = null;
 
-    const translations = {
-        en: { in:'In', out:'Out', noData:'No records found.', all:'All Accounts', loading:'Loading...', of:'of', page:'Page' },
-        bn: { in:'ইন',  out:'আউট', noData:'কোন রেকর্ড নেই।', all:'সব একাউন্ট', loading:'লোড হচ্ছে...', of:'এর মধ্যে', page:'পেজ' }
+        const translations = {
+        en: { in:'In', out:'Out', noData:'No records found.', all:'All Accounts', loading:'Loading...', page:'Page' },
+        bn: { in:'ইন',  out:'আউট', noData:'কোন রেকর্ড নেই।', all:'সব একাউন্ট', loading:'লোড হচ্ছে...', page:'পেজ' }
     };
     const t = (k) => (translations[currentLang] || translations.bn)[k] || k;
 
@@ -153,7 +153,7 @@
         }
 
         $('#totalCount').text(t('page') + ' ' + res.page + ' / ' + res.totalPages +
-            ' (' + res.total + ' ' + t('of') + ' ' + res.total + ')');
+            ' (' + res.total + ' টি রেকর্ড)');
 
         const offset = (res.page - 1) * res.pageSize;
         res.data.forEach(function (r, i) {

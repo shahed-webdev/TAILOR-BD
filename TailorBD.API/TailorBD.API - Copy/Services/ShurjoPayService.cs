@@ -7,7 +7,7 @@ namespace TailorBD.API.Services
     // ── ShurjoPay sandbox / live credentials ─────────────────────────────────
     public class ShurjoPayOptions
     {
-        public string BaseUrl   { get; set; } = "https://sandbox.shurjopayment.com";
+        public string BaseUrl   { get; set; } = "https://engine.shurjopayment.com";
         public string Username  { get; set; } = "";
         public string Password  { get; set; } = "";
         public string MerchantId { get; set; } = "";
@@ -137,11 +137,11 @@ namespace TailorBD.API.Services
                     return new SpCheckoutResult { Success = false, Message = "ShurjoPay token অর্জন করা সম্ভব হয়নি।" };
 
                 var client  = _httpFactory.CreateClient("ShurjoPay");
-                var orderId = $"TBDINV-{institutionId}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+                var orderId = $"ITG-{institutionId}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
                 var payload = new
                 {
-                    prefix           = "TBDINV",
+                    prefix           = "ITG",
                     token            = tokenResp.Token,
                     return_url       = _opt.ReturnUrl,
                     cancel_url       = _opt.CancelUrl,
@@ -257,12 +257,17 @@ namespace TailorBD.API.Services
                     amt = amProp.ValueKind == JsonValueKind.Number ? amProp.GetDouble()
                         : double.TryParse(amProp.GetString(), out var da) ? da : 0;
 
+                var isSuccess = payStatus == "Completed"
+                    || payStatus == "Paid"
+                    || spStatus  == "Paid Successfully"
+                    || spStatus  == "Success";
+
                 return new SpVerifyResult
                 {
-                    Success       = payStatus == "Completed" || spStatus == "Paid Successfully",
+                    Success       = isSuccess,
                     SpOrderId     = orderId,
                     SpTxnId       = txId,
-                    PaymentStatus = payStatus,
+                    PaymentStatus = isSuccess ? "Completed" : payStatus,
                     Amount        = amt,
                     Message       = spStatus,
                     RawJson       = raw

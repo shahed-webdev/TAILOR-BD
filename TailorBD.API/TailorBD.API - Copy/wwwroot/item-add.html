@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আইটেম যুক্ত করুন - TailorBD</title>
+    <title>আইটেম যোগ করুন - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
         #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
         .page-container { width: 100%; padding: 10px 20px; }
 
-        /* ─── Toolbar ─── */
+        /* --- Toolbar --- */
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
         .btn-add-new { padding: 9px 22px; background: #6c7ae0; color: #fff; border: none; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; white-space: nowrap; }
         .btn-add-new:hover { background: #5a68c9; }
@@ -23,7 +23,7 @@
         .search-box input:focus { outline: none; border-color: #6c7ae0; box-shadow: 0 0 0 3px rgba(108,122,224,0.1); }
         .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 13px; }
 
-        /* ─── Table Card ─── */
+        /* --- Table Card --- */
         .table-card { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
         .table-title { font-size: 16px; font-weight: 600; color: #444; }
@@ -49,7 +49,7 @@
         .item-sn   { color: #aaa; font-size: 11px; font-weight: 600; }
         .price-cell { font-weight: 600; color: #333; }
 
-        /* ─── Modal Form ─── */
+        /* --- Modal Form --- */
         .modal-header-custom { background: linear-gradient(135deg, #6c7ae0, #8a94e8); color: #fff; }
         .modal-form-label { font-size: 13px; font-weight: 500; color: #555; margin-bottom: 4px; display: block; }
         .req { color: #dc3545; }
@@ -65,7 +65,7 @@
         .btn-submit:hover { background: #5a68c9; }
         .btn-submit:disabled { background: #aaa; cursor: not-allowed; }
 
-        /* ─── Toast Notification ─── */
+        /* --- Toast Notification --- */
         .toast-notify { position: fixed; top: 20px; right: 24px; z-index: 9999; min-width: 280px; padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.15); display: none; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
         .toast-notify.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
         .toast-notify.error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
@@ -88,26 +88,26 @@
             <div class="container-fluid">
                 <div class="page-container">
 
-                    <!-- ─── Toolbar: Search + Add Button ─── -->
+                    <!-- --- Toolbar: Search + Add Button --- -->
                     <div class="toolbar">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" id="searchInput"
-                                placeholder="কোড বা নাম দিয়ে খুঁজুন..."
+                                placeholder="কোড, নাম বা ক্যাটাগরি দিয়ে খুঁজুন..."
                                 oninput="searchItems(this.value)">
                         </div>
                         <button class="btn-add-new" onclick="openAddModal()">
                             <i class="fas fa-plus"></i>
-                            <span data-en="Add New Item" data-bn="নতুন আইটেম যুক্ত করুন">নতুন আইটেম যুক্ত করুন</span>
+                            <span data-en="Add New Item" data-bn="নতুন আইট৅ম যোগ করুন">নতুন আইটেম যোগ করুন</span>
                         </button>
                     </div>
 
-                    <!-- ─── List Table ─── -->
+                    <!-- --- List Table --- -->
                     <div class="table-card">
                         <div class="table-header">
                             <div class="table-title">
                                 <i class="fas fa-list me-2" style="color:#6c7ae0"></i>
-                                <span data-en="Item List" data-bn="আইটেমের তালিকা">আইটেমের তালিকা</span>
+                                <span data-en="Item List" data-bn="আইটেম তালিকা">আইটেম তালিকা</span>
                                 <span class="badge-count ms-2" id="rowCount">0</span>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                                         <th>#</th>
                                         <th data-en="Code"          data-bn="কোড">কোড</th>
                                         <th data-en="Name"          data-bn="নাম">নাম</th>
-                                        <th data-en="Unit"          data-bn="ইউনিট">ইউনিট</th>
+                                        <th data-en="Unit"          data-bn="একক">একক</th>
                                         <th data-en="Category"      data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
                                         <th data-en="Brand"         data-bn="ব্র্যান্ড">ব্র্যান্ড</th>
                                         <th data-en="Selling Price" data-bn="বিক্রয় মূল্য">বিক্রয় মূল্য</th>
@@ -143,75 +143,70 @@
 
     <div id="app-modals"></div>
 
-    <!-- ════════════════════════════════════════════
+    <!-- --------------------------------------------
          ADD ITEM MODAL
-    ════════════════════════════════════════════ -->
+    -------------------------------------------- -->
     <div class="modal fade" id="addItemModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header modal-header-custom">
                     <h6 class="modal-title fw-bold">
                         <i class="fas fa-box-open me-2"></i>
-                        <span data-en="Add New Item" data-bn="নতুন আইটেম যুক্ত করুন">নতুন আইটেম যুক্ত করুন</span>
+                        <span data-en="Add New Item" data-bn="নতুন আইট৅ম যোগ করুন">নতুন আইটেম যোগ করুন</span>
                     </h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row g-3">
-                        <!-- কোড -->
+                        <!-- মোট -->
                         <div class="col-md-6">
                             <label class="modal-form-label"><span data-en="Item Code" data-bn="আইটেম কোড">আইটেম কোড</span> <span class="req">*</span></label>
                             <input type="text" id="itemCode" class="modal-form-control" placeholder="যেমন: ITM-001" autocomplete="off">
                             <div class="invalid-feedback" id="err-itemCode"></div>
                         </div>
-                        <!-- নাম -->
+                        <!-- মোট -->
                         <div class="col-md-6">
                             <label class="modal-form-label"><span data-en="Item Name" data-bn="আইটেমের নাম">আইটেমের নাম</span> <span class="req">*</span></label>
                             <input type="text" id="itemName" class="modal-form-control" placeholder="আইটেমের নাম লিখুন" autocomplete="off">
                             <div class="invalid-feedback" id="err-itemName"></div>
                         </div>
-                        <!-- ইউনিট -->
+                        <!-- পয়সা -->
                         <div class="col-md-4">
-                            <label class="modal-form-label"><span data-en="Measurement Unit" data-bn="মেজারমেন্ট ইউনিট">মেজারমেন্ট ইউনিট</span> <span class="req">*</span></label>
+                            <label class="modal-form-label"><span data-en="Measurement Unit" data-bn="পরিমাপ একক">পরিমাপ একক</span> <span class="req">*</span></label>
                             <select id="measurementUnit" class="modal-form-control">
                                 <option value="0">[ নির্বাচন করুন ]</option>
                             </select>
                             <div class="invalid-feedback" id="err-unit"></div>
                         </div>
-                        <!-- ক্যাটাগরি -->
                         <div class="col-md-4">
                             <label class="modal-form-label"><span data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</span></label>
                             <select id="category" class="modal-form-control">
                                 <option value="0">[ ক্যাটাগরি ]</option>
                             </select>
                         </div>
-                        <!-- ব্র্যান্ড -->
                         <div class="col-md-4">
                             <label class="modal-form-label"><span data-en="Brand" data-bn="ব্র্যান্ড">ব্র্যান্ড</span></label>
                             <select id="brand" class="modal-form-control">
                                 <option value="0">[ ব্র্যান্ড ]</option>
                             </select>
                         </div>
-                        <!-- কালার -->
                         <div class="col-md-4">
-                            <label class="modal-form-label"><span data-en="Color" data-bn="কালার">কালার</span></label>
+                            <label class="modal-form-label"><span data-en="Color" data-bn="রঙ">রঙ</span></label>
                             <input type="text" id="itemColor" class="modal-form-control" placeholder="যেমন: লাল, নীল" autocomplete="off">
                         </div>
-                        <!-- স্টাইল -->
                         <div class="col-md-4">
                             <label class="modal-form-label"><span data-en="Style" data-bn="স্টাইল">স্টাইল</span></label>
-                            <input type="text" id="itemStyle" class="modal-form-control" placeholder="যেমন: চেক, প্লেইন" autocomplete="off">
+                            <input type="text" id="itemStyle" class="modal-form-control" placeholder="যেমন: স্লিম, রেগুলার" autocomplete="off">
                         </div>
-                        <!-- বিক্রয় মূল্য -->
                         <div class="col-md-4">
-                            <label class="modal-form-label"><span data-en="Selling Unit Price" data-bn="বিক্রয় মূল্য (প্রতি ইউনিট)">বিক্রয় মূল্য</span> <span class="req">*</span></label>
+                            <label class="modal-form-label"><span data-en="Selling Unit Price" data-bn="বিক্রয় মূল্য (একক প্রতি)">বিক্রয় মূল্য (একক প্রতি)</span> <span class="req">*</span></label>
                             <input type="number" id="sellingPrice" class="modal-form-control" placeholder="0.00" min="0.01" step="0.01">
                             <div class="invalid-feedback" id="err-price"></div>
                         </div>
-                        <!-- বিস্তারিত -->
+                        <!-- ওয়েবসাইট -->
                         <div class="col-12">
                             <label class="modal-form-label"><span data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</span></label>
-                            <input type="text" id="itemDetails" class="modal-form-control" placeholder="আইটেম সম্পর্কে বিস্তারিত" autocomplete="off">
+                            <input type="text" id="itemDetails" class="modal-form-control" placeholder="আইটেমের বিস্তারিত বিবরণ (ঐচ্ছিক)" autocomplete="off">
                         </div>
                     </div>
                     <div class="alert-msg" id="alertMsg"></div>
@@ -222,23 +217,23 @@
                     </button>
                     <button class="btn-submit btn-sm" id="btnSubmit" onclick="addItem()">
                         <i class="fas fa-plus"></i>
-                        <span data-en="Add Item" data-bn="যুক্ত করুন">যুক্ত করুন</span>
+                        <span data-en="Add Item" data-bn="আইটেম যোগ করুন">আইটেম যোগ করুন</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ════════════════════════════════════════════
+    <!-- --------------------------------------------
          EDIT ITEM MODAL
-    ════════════════════════════════════════════ -->
+    -------------------------------------------- -->
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header modal-header-custom">
                     <h6 class="modal-title fw-bold">
                         <i class="fas fa-edit me-2"></i>
-                        <span data-en="Edit Item" data-bn="আইটেম এডিট করুন">আইটেম এডিট করুন</span>
+                        <span data-en="Edit Item" data-bn="আইটেম সম্পাদনা করুন">আইটেম সম্পাদনা করুন</span>
                     </h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -250,7 +245,7 @@
                             <input type="text" id="editItemName" class="modal-form-control">
                         </div>
                         <div class="col-md-6">
-                            <label class="modal-form-label">কালার</label>
+                            <label class="modal-form-label">রঙ</label>
                             <input type="text" id="editItemColor" class="modal-form-control">
                         </div>
                         <div class="col-md-6">
@@ -262,13 +257,13 @@
                             <input type="number" id="editSellingPrice" class="modal-form-control" min="0.01" step="0.01">
                         </div>
                         <div class="col-md-6">
-                            <label class="modal-form-label">বর্তমান ক্রয় মূল্য</label>
+                            <label class="modal-form-label">ক্রয় মূল্য</label>
                             <input type="number" id="editBuyingPrice" class="modal-form-control" min="0" step="0.01">
                         </div>
                         <div class="col-md-6">
-                            <label class="modal-form-label">স্টক অ্যাডজাস্টমেন্ট</label>
+                            <label class="modal-form-label">স্টক সমন্বয়</label>
                             <input type="number" id="editStockAdj" class="modal-form-control" step="0.01" value="0">
-                            <small class="text-muted" style="font-size:11px;">ধনাত্মক = যোগ, ঋণাত্মক = কমানো</small>
+                            <small class="text-muted" style="font-size:11px;">পজিটিভ = যোগ, নেগেটিভ = বিয়োগ</small>
                         </div>
                         <div class="col-12">
                             <label class="modal-form-label">বিস্তারিত</label>
@@ -280,31 +275,31 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">বাতিল</button>
                     <button type="button" class="btn-submit btn-sm" id="btnSaveEdit" onclick="saveEdit()">
-                        <i class="fas fa-check me-1"></i> সেভ করুন
+                        <i class="fas fa-check me-1"></i> সংরক্ষণ করুন
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ─── Delete Confirm Modal ─── -->
+    <!-- --- Delete Confirm Modal --- -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
                     <h6 class="modal-title text-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>মুছার নিশ্চিতকরণ
+                        <i class="fas fa-exclamation-triangle me-2"></i>মুছে ফেলার নিশ্চিতকরণ
                     </h6>
                 </div>
                 <div class="modal-body pt-2">
                     <p class="mb-0" style="font-size:14px">
-                        <strong id="deleteItemName" class="text-danger"></strong> মুছতে চান?
+                        আপনি কি <strong id="deleteItemName" class="text-danger"></strong> মুছে ফেলতে চান?
                     </p>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">বাতিল</button>
                     <button type="button" class="btn btn-sm btn-danger" id="btnConfirmDelete">
-                        <i class="fas fa-trash me-1"></i>মুছুন
+                        <i class="fas fa-trash me-1"></i>হ্যাঁ, মুছুন
                     </button>
                 </div>
             </div>
@@ -313,11 +308,11 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
 
     <!-- Toast -->
     <div class="toast-notify" id="pageToast"></div>
 
-    <script src="/js/item-add.js"></script>
+    <script src="/js/item-add.js?v=2.1.6"></script>
 </body>
 </html>

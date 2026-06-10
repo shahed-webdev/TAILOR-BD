@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ব্র্যান্ড - TailorBD</title>
+    <title>ব্র্যান্ড যু্ক্ত করুন - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -59,7 +59,7 @@
                     <div class="card">
                         <div class="card-title">
                             <i class="fas fa-tag"></i>
-                            <span data-en="Add Brand" data-bn="ব্র্যান্ড যুক্ত করুন">ব্র্যান্ড যুক্ত করুন</span>
+                            <span data-en="Add Brand" data-bn="ব্র্যান্ড যোগ করুন">ব্র্যান্ড যোগ করুন</span>
                         </div>
                         <div class="input-row">
                             <div class="form-group">
@@ -69,15 +69,14 @@
                                 </label>
                                 <input type="text" id="brandNameInput"
                                     data-en-placeholder="e.g. Samsung, Nike, Raymond"
-                                    data-bn-placeholder="যেমন: স্যামসাং, নাইকি, রেমন্ড"
-                                    placeholder="যেমন: স্যামসাং, নাইকি, রেমন্ড"
+                                    data-bn-placeholder="টপটেন, রেমন্ড, টরে" placeholder="টপটেন, রেমন্ড, টরে"
                                     autocomplete="off"
                                     onkeypress="if(event.key==='Enter') addBrand()">
                                 <div class="invalid-feedback" id="brandNameError"></div>
                             </div>
                             <button class="btn-add" id="btnAdd" onclick="addBrand()">
                                 <i class="fas fa-plus"></i>
-                                <span data-en="Add" data-bn="যুক্ত করুন">যুক্ত করুন</span>
+                                <span data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
                             </button>
                         </div>
                         <div class="alert-msg" id="alertMsg"></div>
@@ -87,7 +86,7 @@
                         <div class="table-header">
                             <div class="table-title">
                                 <i class="fas fa-list me-2" style="color:#6c7ae0"></i>
-                                <span data-en="Brand List" data-bn="ব্র্যান্ডের তালিকা">ব্র্যান্ডের তালিকা</span>
+                                <span data-en="Brand List" data-bn="ব্র্যান্ড তালিকা">ব্র্যান্ড তালিকা</span>
                             </div>
                             <span class="badge-count" id="rowCount">0</span>
                         </div>
@@ -114,11 +113,11 @@
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
-                    <h6 class="modal-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i><span data-en="Confirm Delete" data-bn="মুছার নিশ্চিতকরণ">মুছার নিশ্চিতকরণ</span></h6>
+                    <h6 class="modal-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i><span data-en="Confirm Delete" data-bn="সাইনিং পরিমাণমোট">সাইনিং পরিমাণমোট</span></h6>
                 </div>
                 <div class="modal-body pt-2">
                     <p class="mb-0" style="font-size:14px">
-                        <span data-en="Are you sure you want to delete" data-bn="আপনি কি মুছতে চান">আপনি কি মুছতে চান</span>
+                        <span data-en="Are you sure you want to delete" data-bn="মোট? ?? ইউজার নাম">মোট? ?? ইউজার নাম</span>
                         <strong id="deleteItemName" class="text-danger"></strong>?
                     </p>
                 </div>
@@ -132,7 +131,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/item-brand.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/item-brand.js?v=2.1.6"></script>
 </body>
 </html>

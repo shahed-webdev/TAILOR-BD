@@ -237,21 +237,21 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js?v=2.1.7"></script>
-    <script src="/js/due-notice.js?v=2.1.6"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app-components.js?v=2.2.8"></script>
+    <script src="/js/due-notice.js?v=2.2.0"></script>
 
     <script>
     (function () {
         'use strict';
 
-        // Trigger due notice after session is ready
+        // Due notice — admin dashboard এর মতো sub-admin dashboard এ
         $(document).ready(function () {
-            // Small delay to ensure sessionStorage is populated
             setTimeout(function () {
-                if (window.DueNotice) {
-                    DueNotice.init();
+                if (window.TailorBD && typeof window.TailorBD.initDueNotice === 'function') {
+                    window.TailorBD.initDueNotice();
                 }
-            }, 1500);
+            }, 800);
         });
 
         // -- icon map: pageURL fragment ? FA icon class ----------------------
@@ -302,6 +302,7 @@
             '/new-order.html':            { bn: 'দোকান পয়সা?',        en: 'New Order' },
             '/quick-order.html':          { bn: 'দোকান পয়সা?',        en: 'Quick Order' },
             '/order-list.html':           { bn: 'ঠিকানা দিন',      en: 'Order List' },
+            '/money-receipt.html':        { bn: 'মানি রিসিপ্ট',       en: 'Money Receipt' },
             '/delivery-give.html':        { bn: '?পরবর্তী ধাপ',       en: 'Delivery Give' },
             '/delivered-orders.html':     { bn: 'উত্তর লিখুন?',    en: 'Delivered' },
             '/add-customer.html':         { bn: 'উত্তর লিখুন মোট?', en: 'Add Customer' },
@@ -317,10 +318,13 @@
             '/add-other-income.html':     { bn: '?পরবর্তী ধাপ',        en: 'Other Income' },
             '/income-expense-report.html':{ bn: 'মোট ? পয়সা',         en: 'Income/Expense' },
             '/sms.html':                  { bn: '?ইসুয়ের তারিখ',       en: 'Send SMS' },
+            '/sms-recharge.html':         { bn: 'SMS রিচার্জ',          en: 'SMS Recharge' },
             '/sms-history.html':          { bn: 'ঠিকানা দিন',      en: 'SMS History' },
             '/contact-list.html':         { bn: 'উত্তর লিখুন',     en: 'Contacts' },
             '/employee.html':             { bn: 'ইনভয়েসের বিষয়',    en: 'Employee' },
             '/incomplete-works.html':     { bn: 'মোট ?পরবর্তী ধাপ?',  en: 'Complete Works' },
+            '/print-settings.html':       { bn: 'মাপ প্রিন্ট সেটিং',   en: 'Print Settings' },
+            '/item-damage-add.html':      { bn: 'ড্যামেজ রিপোর্ট',     en: 'Damage Report' },
             '/change-delivery-date.html': { bn: 'উত্তর লিখুন',     en: 'Change Delivery' },
             '/account-management.html':   { bn: 'অক্টোবর',            en: 'Account Mgmt' },
             '/account-log.html':          { bn: '?রিনিউ পরিমাণ',         en: 'Account Log' },
@@ -336,6 +340,23 @@
             var lang = localStorage.getItem('preferredLanguage') || 'bn';
             if (TITLE_MAP[key]) return TITLE_MAP[key][lang] || TITLE_MAP[key].bn;
             return pageTitle || key;
+        }
+
+        function resolveDashboardUrl(url) {
+            if (window.TailorBD && typeof window.TailorBD.resolvePageUrl === 'function') {
+                return window.TailorBD.resolvePageUrl(url);
+            }
+            var norm = ('/' + String(url || '').replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
+            var aliases = {
+                '/ordrlist.html': '/order-list.html',
+                '/incompleteworks.html': '/incomplete-works.html',
+                '/add-customer-mesurement.html': '/add-customer.html',
+                '/damage-report.html': '/item-damage-add.html',
+                '/mesurement-printing-setting.html': '/print-settings.html',
+                '/map-print-setting.html': '/print-settings.html',
+                '/delivered-works.html': '/delivery-cut-dress.html'
+            };
+            return aliases[norm] || norm;
         }
 
         // -- Render quick links -----------------------------------------------
@@ -354,7 +375,7 @@
             $grid.empty();
             pages.forEach(function (p, idx) {
                 // API now always returns .html URLs (mapped by server)
-                var url   = (p.pageURL   || p.PageURL   || '#').trim();
+                var url   = resolveDashboardUrl((p.pageURL   || p.PageURL   || '#').trim());
                 // Prefer DB PageTitle; fall back to our local map; fall back to url basename
                 var dbTitle = (p.pageTitle || p.PageTitle || '').trim();
                 var label = dbTitle || labelFor(url, url);
@@ -453,10 +474,10 @@
                         var seen = {};
                         var pages = [];
                         r.data.forEach(function (p) {
-                            var url = (p.pageURL || p.PageURL || '').toLowerCase();
+                            var url = resolveDashboardUrl((p.pageURL || p.PageURL || '').toLowerCase());
                             if (url && !seen[url]) {
                                 seen[url] = true;
-                                pages.push(p);
+                                pages.push({ pageURL: url, pageTitle: p.pageTitle || p.PageTitle || '' });
                             }
                         });
 

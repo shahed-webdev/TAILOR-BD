@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-en="Supplier Management - TailorBD" data-bn="সাপ্লায়ার ম্যানেজমেন্ট - TailorBD">সাপ্লায়ার ম্যানেজমেন্ট - TailorBD</title>
+    <title data-en="Supplier Management - TailorBD" data-bn="সরবরাহকারী ব্যবস্থাপনা - TailorBD">সরবরাহকারী ব্যবস্থাপনা - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -120,11 +120,11 @@
                 <div class="d-flex justify-content-between align-items-center mb-3 no-print">
                     <h5 style="font-weight:700;color:#6c7ae0;margin:0;">
                         <i class="fas fa-user-tie me-2"></i>
-                        <span data-en="Supplier Management" data-bn="সাপ্লায়ার ম্যানেজমেন্ট">সাপ্লায়ার ম্যানেজমেন্ট</span>
+                        <span data-en="Supplier Management" data-bn="সরবরাহকারী ব্যবস্থাপনা">সরবরাহকারী ব্যবস্থাপনা</span>
                     </h5>
                     <button class="btn-primary2" onclick="openAddModal()">
                         <i class="fas fa-plus"></i>
-                        <span data-en="Add Supplier" data-bn="সাপ্লায়ার যুক্ত করুন">সাপ্লায়ার যুক্ত করুন</span>
+                        <span data-en="Add Supplier" data-bn="সরবরাহকারী যোগ করুন">সরবরাহকারী যোগ করুন</span>
                     </button>
                 </div>
 
@@ -134,11 +134,11 @@
                 <!-- Supplier List -->
                 <div class="card-box">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                        <div class="sec-title mb-0"><i class="fas fa-list"></i> <span data-en="Supplier List" data-bn="সাপ্লায়ারের তালিকা">সাপ্লায়ারের তালিকা</span></div>
+                        <div class="sec-title mb-0"><i class="fas fa-list"></i> <span data-en="Supplier List" data-bn="সরবরাহকারীর তালিকা">সরবরাহকারীর তালিকা</span></div>
                         <div class="tbl-search">
                             <i class="fas fa-search"></i>
                             <input type="text" id="searchBox" class="f-control tbl-search" style="width:220px;" oninput="filterTable()"
-                                data-bn-placeholder="নাম বা ফোনে খুঁজুন" data-en-placeholder="Search by name or phone" placeholder="নাম বা ফোনে খুঁজুন">
+                                data-bn-placeholder="নাম বা ফোন দিয়ে খুঁজুন..." data-en-placeholder="Search by name or phone" placeholder="নাম বা ফোন দিয়ে খুঁজুন...">
                         </div>
                     </div>
 
@@ -149,11 +149,11 @@
                                 <tr>
                                     <th>#</th>
                                     <th data-en="Company" data-bn="কোম্পানি">কোম্পানি</th>
-                                    <th data-en="Supplier Name" data-bn="সাপ্লায়ারের নাম">সাপ্লায়ারের নাম</th>
+                                    <th data-en="Supplier Name" data-bn="সরবরাহকারীর নাম">সরবরাহকারীর নাম</th>
                                     <th data-en="Phone" data-bn="ফোন">ফোন</th>
                                     <th data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
                                     <th data-en="Total Purchase" data-bn="মোট ক্রয়">মোট ক্রয়</th>
-                                    <th data-en="Paid" data-bn="পরিশোধিত">পরিশোধিত</th>
+                                    <th data-en="Paid" data-bn="পরিশোধ">পরিশোধ</th>
                                     <th data-en="Due" data-bn="বাকি">বাকি</th>
                                     <th data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
                                 </tr>
@@ -162,7 +162,7 @@
                         </table>
                         <div id="noSupMsg" style="display:none;text-align:center;color:#bbb;padding:30px;font-size:14px;">
                             <i class="fas fa-user-slash fa-2x mb-2" style="display:block;"></i>
-                            <span data-en="No suppliers found" data-bn="কোনো সাপ্লায়ার নেই">কোনো সাপ্লায়ার নেই</span>
+                            <span data-en="No suppliers found" data-bn="কোনো সরবরাহকারী পাওয়া যায়নি">কোনো সরবরাহকারী পাওয়া যায়নি</span>
                         </div>
                     </div>
                 </div>
@@ -171,12 +171,12 @@
         </div>
     </main>
 
-    <!-- ═══════════════ ADD SUPPLIER MODAL ═══════════════ -->
+    <!-- --------------- ADD SUPPLIER MODAL --------------- -->
     <div class="modal fade" id="addModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 8px 30px rgba(0,0,0,.15);">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i><span data-en="Add New Supplier" data-bn="নতুন সাপ্লায়ার যুক্ত করুন">নতুন সাপ্লায়ার যুক্ত করুন</span></h5>
+                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i><span data-en="Add New Supplier" data-bn="নতুন সরবরাহকারী যোগ করুন">নতুন সরবরাহকারী যোগ করুন</span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -186,12 +186,12 @@
                             data-bn-placeholder="কোম্পানির নাম" data-en-placeholder="Company name" placeholder="কোম্পানির নাম">
                     </div>
                     <div class="mb-3">
-                        <label class="f-label"><span data-en="Supplier Name" data-bn="সাপ্লায়ারের নাম">সাপ্লায়ারের নাম</span> <span style="color:#dc3545;">*</span></label>
+                        <label class="f-label"><span data-en="Supplier Name" data-bn="সরবরাহকারীর নাম">সরবরাহকারীর নাম</span> <span style="color:#dc3545;">*</span></label>
                         <input type="text" id="addName" class="f-control" style="width:100%;"
-                            data-bn-placeholder="সাপ্লায়ারের নাম দিন" data-en-placeholder="Enter supplier name" placeholder="সাপ্লায়ারের নাম দিন">
+                            data-bn-placeholder="সরবরাহকারীর নাম লিখুন" data-en-placeholder="Enter supplier name" placeholder="সরবরাহকারীর নাম লিখুন">
                     </div>
                     <div class="mb-3">
-                        <label class="f-label" data-en="Phone" data-bn="ফোন নম্বর">ফোন নম্বর</label>
+                        <label class="f-label" data-en="Phone" data-bn="ফোন">ফোন</label>
                         <input type="tel" id="addPhone" class="f-control" style="width:100%;"
                             data-bn-placeholder="মোবাইল নম্বর" data-en-placeholder="Mobile number" placeholder="মোবাইল নম্বর">
                     </div>
@@ -206,19 +206,19 @@
                         <i class="fas fa-times"></i> <span data-en="Cancel" data-bn="বাতিল">বাতিল</span>
                     </button>
                     <button type="button" class="btn-primary2" onclick="submitAdd()">
-                        <i class="fas fa-check"></i> <span data-en="Save Supplier" data-bn="সাপ্লায়ার সংরক্ষণ করুন">সাপ্লায়ার সংরক্ষণ করুন</span>
+                        <i class="fas fa-check"></i> <span data-en="Save Supplier" data-bn="সরবরাহকারী সেভ করুন">সরবরাহকারী সেভ করুন</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ═══════════════ EDIT SUPPLIER MODAL ═══════════════ -->
+    <!-- --------------- EDIT SUPPLIER MODAL --------------- -->
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 8px 30px rgba(0,0,0,.15);">
                 <div class="modal-header" style="background:#fd7e14;">
-                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i><span data-en="Edit Supplier" data-bn="সাপ্লায়ার সম্পাদনা">সাপ্লায়ার সম্পাদনা</span></h5>
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i><span data-en="Edit Supplier" data-bn="সরবরাহকারী সম্পাদন করুন">সরবরাহকারী সম্পাদন করুন</span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -228,11 +228,11 @@
                         <input type="text" id="editCompany" class="f-control" style="width:100%;">
                     </div>
                     <div class="mb-3">
-                        <label class="f-label"><span data-en="Supplier Name" data-bn="সাপ্লায়ারের নাম">সাপ্লায়ারের নাম</span> <span style="color:#dc3545;">*</span></label>
+                        <label class="f-label"><span data-en="Supplier Name" data-bn="সরবরাহকারীর নাম">সরবরাহকারীর নাম</span> <span style="color:#dc3545;">*</span></label>
                         <input type="text" id="editName" class="f-control" style="width:100%;">
                     </div>
                     <div class="mb-3">
-                        <label class="f-label" data-en="Phone" data-bn="ফোন নম্বর">ফোন নম্বর</label>
+                        <label class="f-label" data-en="Phone" data-bn="ফোন">ফোন</label>
                         <input type="tel" id="editPhone" class="f-control" style="width:100%;">
                     </div>
                     <div class="mb-3">
@@ -252,12 +252,12 @@
         </div>
     </div>
 
-    <!-- ═══════════════ DETAIL MODAL ═══════════════ -->
+    <!-- --------------- DETAIL MODAL --------------- -->
     <div class="modal fade" id="detailModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content" style="border-radius:10px;border:none;box-shadow:0 8px 30px rgba(0,0,0,.15);">
                 <div class="modal-header green">
-                    <h5 class="modal-title" id="detModalTitle"><i class="fas fa-user-tie me-2"></i>সাপ্লায়ার বিবরণ</h5>
+                    <h5 class="modal-title" id="detModalTitle"><i class="fas fa-user-tie me-2"></i>সরবরাহকারীর বিস্তারিত</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-3" id="detModalBody">
@@ -269,7 +269,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     <script>
     (function () {
         let institutionId  = 0;
@@ -277,7 +277,7 @@
         let allSuppliers   = [];
         let currentDetailId = 0;
 
-        // ── Session ──────────────────────────────────────────────────────────
+        // -- Session ----------------------------------------------------------
         function getSession() {
             institutionId  = parseInt(sessionStorage.getItem('institutionId')  || localStorage.getItem('session_institutionId')  || '0');
             registrationId = parseInt(sessionStorage.getItem('registrationId') || localStorage.getItem('session_registrationId') || '0');
@@ -289,7 +289,7 @@
             });
             setTimeout(function () { getSession(); if (institutionId) loadSuppliers(); }, 1500);
 
-            // language change — re-render KPI + table with new labels
+            // language change � re-render KPI + table with new labels
             $(document).on('languageChanged', function () {
                 applyPlaceholders();
                 if (allSuppliers.length) {
@@ -310,7 +310,7 @@
             });
         }
 
-        // ── Load Supplier List ────────────────────────────────────────────────
+        // -- Load Supplier List ------------------------------------------------
         function loadSuppliers() {
             getSession();
             if (!institutionId) return;
@@ -326,7 +326,7 @@
             }).fail(function () { $('#listSpinner').hide(); });
         }
 
-        // ── KPI ───────────────────────────────────────────────────────────────
+        // -- KPI ---------------------------------------------------------------
         function renderKPI(data) {
             const lang = getLang();
             const total     = data.length;
@@ -336,9 +336,9 @@
             const hasDue    = data.filter(function (d) { return parseFloat(d.TotalDue) > 0; }).length;
 
             const labels = {
-                suppliers: lang === 'en' ? 'Total Suppliers' : 'মোট সাপ্লায়ার',
+                suppliers: lang === 'en' ? 'Total Suppliers' : 'মোট সরবরাহকারী',
                 totalAmt:  lang === 'en' ? 'Total Purchase'  : 'মোট ক্রয়',
-                paid:      lang === 'en' ? 'Total Paid'      : 'মোট পরিশোধিত',
+                paid:      lang === 'en' ? 'Total Paid'      : 'মোট পরিশোধ',
                 due:       lang === 'en' ? 'Total Due'       : 'মোট বাকি',
                 withDue:   lang === 'en' ? 'With Due'        : 'বাকি আছে'
             };
@@ -355,7 +355,7 @@
             return '<div class="kpi-chip ' + (cardCls || '') + '"><div class="cv ' + cls + '">' + pre + val + '</div><div class="cl">' + lbl + '</div></div>';
         }
 
-        // ── Table ─────────────────────────────────────────────────────────────
+        // -- Table -------------------------------------------------------------
         function renderTable(data) {
             const lang = getLang();
             const $b = $('#supTbody').empty();
@@ -365,7 +365,7 @@
             $('#noSupMsg').hide();
             data.forEach(function (s, i) {
                 const due    = parseFloat(s.TotalDue);
-                const dueLbl = lang === 'en' ? (due > 0 ? '৳' + fmt(due) : 'Clear') : (due > 0 ? '৳' + fmt(due) : 'ক্লিয়ার');
+                const dueLbl = lang === 'en' ? (due > 0 ? '৳' + fmt(due) : 'Clear') : (due > 0 ? '৳' + fmt(due) : 'পরিষ্কার');
                 $b.append(
                     '<tr data-name="' + esc(s.SupplierName).toLowerCase() + '" data-phone="' + esc(s.SupplierPhone) + '">' +
                     '<td style="color:#aaa;font-size:12px;">' + (i + 1) + '</td>' +
@@ -378,15 +378,15 @@
                     '<td><span class="due-badge ' + (due > 0 ? 'has-due' : 'no-due') + '">' + dueLbl + '</span></td>' +
                     '<td>' +
                     '<div class="d-flex gap-1 flex-wrap">' +
-                    '<button class="btn-outline2" onclick="openDetail(' + s.SupplierID + ')" title="' + (lang === 'en' ? 'Details' : 'বিবরণ') + '"><i class="fas fa-eye"></i></button>' +
-                    '<button class="btn-outline2" onclick="openEdit(' + s.SupplierID + ')" title="' + (lang === 'en' ? 'Edit' : 'সম্পাদনা') + '"><i class="fas fa-edit"></i></button>' +
-                    '<button class="btn-danger2" style="padding:6px 10px;" onclick="deleteSupplier(' + s.SupplierID + ',\'' + esc(s.SupplierName) + '\')" title="' + (lang === 'en' ? 'Delete' : 'ডিলিট') + '"><i class="fas fa-trash"></i></button>' +
+                    '<button class="btn-outline2" onclick="openDetail(' + s.SupplierID + ')" title="' + (lang === 'en' ? 'Details' : 'অজানা') + '"><i class="fas fa-eye"></i></button>' +
+                    '<button class="btn-outline2" onclick="openEdit(' + s.SupplierID + ')" title="' + (lang === 'en' ? 'Edit' : 'মঙ্গলবার') + '"><i class="fas fa-edit"></i></button>' +
+                    '<button class="btn-danger2" style="padding:6px 10px;" onclick="deleteSupplier(' + s.SupplierID + ',\'' + esc(s.SupplierName) + '\')" title="' + (lang === 'en' ? 'Delete' : 'অজানা') + '"><i class="fas fa-trash"></i></button>' +
                     '</div></td>' +
                     '</tr>');
             });
         }
 
-        // ── Table Search ──────────────────────────────────────────────────────
+        // -- Table Search ------------------------------------------------------
         window.filterTable = function () {
             const q = $('#searchBox').val().toLowerCase().trim();
             $('#supTbody tr').each(function () {
@@ -396,7 +396,7 @@
             });
         };
 
-        // ── ADD Supplier ──────────────────────────────────────────────────────
+        // -- ADD Supplier ------------------------------------------------------
         window.openAddModal = function () {
             $('#addCompany,#addName,#addPhone,#addAddress').val('');
             new bootstrap.Modal('#addModal').show();
@@ -405,7 +405,7 @@
         window.submitAdd = function () {
             getSession();
             const name = $('#addName').val().trim();
-            if (!name) { showToast(getLang() === 'en' ? 'Enter supplier name' : 'সাপ্লায়ারের নাম দিন', 'error'); return; }
+            if (!name) { showToast(getLang() === 'en' ? 'Enter supplier name' : 'সরবরাহকারীর নাম লিখুন', 'error'); return; }
 
             $.ajax({
                 url: '/api/ItemPurchase/add-supplier',
@@ -422,17 +422,17 @@
                 success: function (res) {
                     if (res.success) {
                         bootstrap.Modal.getInstance('#addModal').hide();
-                        showToast(getLang() === 'en' ? 'Supplier added!' : 'সাপ্লায়ার যুক্ত হয়েছে!', 'success');
+                        showToast(getLang() === 'en' ? 'Supplier added!' : 'ড্যাশবোর্ড নিশ্চিত করুন? ঠিকানা!', 'success');
                         loadSuppliers();
                     } else {
-                        showToast(res.message || 'সমস্যা হয়েছে', 'error');
+                        showToast(res.message || 'ঠিকানা দিন', 'error');
                     }
                 },
-                error: function () { showToast('সার্ভার এরর', 'error'); }
+                error: function () { showToast('পরবর্তী ধাপ', 'error'); }
             });
         };
 
-        // ── EDIT Supplier ─────────────────────────────────────────────────────
+        // -- EDIT Supplier -----------------------------------------------------
         window.openEdit = function (id) {
             const s = allSuppliers.find(function (x) { return x.SupplierID === id; });
             if (!s) return;
@@ -447,7 +447,7 @@
         window.submitEdit = function () {
             getSession();
             const name = $('#editName').val().trim();
-            if (!name) { showToast(getLang() === 'en' ? 'Enter supplier name' : 'সাপ্লায়ারের নাম দিন', 'error'); return; }
+            if (!name) { showToast(getLang() === 'en' ? 'Enter supplier name' : 'সরবরাহকারীর নাম লিখুন', 'error'); return; }
 
             $.ajax({
                 url: '/api/ItemPurchase/update-supplier',
@@ -464,21 +464,21 @@
                 success: function (res) {
                     if (res.success) {
                         bootstrap.Modal.getInstance('#editModal').hide();
-                        showToast(getLang() === 'en' ? 'Updated!' : 'আপডেট হয়েছে!', 'success');
+                        showToast(getLang() === 'en' ? 'Updated!' : 'স্টাফ সংখ্যা!', 'success');
                         loadSuppliers();
                     } else {
-                        showToast(res.message || 'সমস্যা হয়েছে', 'error');
+                        showToast(res.message || 'ঠিকানা দিন', 'error');
                     }
                 },
-                error: function () { showToast('সার্ভার এরর', 'error'); }
+                error: function () { showToast('পরবর্তী ধাপ', 'error'); }
             });
         };
 
-        // ── DELETE Supplier ───────────────────────────────────────────────────
+        // -- DELETE Supplier ---------------------------------------------------
         window.deleteSupplier = function (id, name) {
             const msg = getLang() === 'en'
                 ? 'Delete "' + name + '"? This cannot be undone.'
-                : '"' + name + '" ডিলিট করবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।';
+                : '"' + name + '" কে মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।';
             if (!confirm(msg)) return;
             getSession();
 
@@ -487,21 +487,21 @@
                 type: 'DELETE',
                 success: function (res) {
                     if (res.success) {
-                        showToast(getLang() === 'en' ? 'Deleted!' : 'ডিলিট হয়েছে!', 'success');
+                        showToast(getLang() === 'en' ? 'Deleted!' : 'স্টাফ সংখ্যা!', 'success');
                         loadSuppliers();
                     } else {
                         showToast(res.message, 'error');
                     }
                 },
-                error: function () { showToast('সার্ভার এরর', 'error'); }
+                error: function () { showToast('পরবর্তী ধাপ', 'error'); }
             });
         };
 
-        // ── DETAIL Modal ──────────────────────────────────────────────────────
+        // -- DETAIL Modal ------------------------------------------------------
         window.openDetail = function (id) {
             currentDetailId = id;
             const s = allSuppliers.find(function (x) { return x.SupplierID === id; });
-            const title = s ? esc(s.SupplierName) : 'সাপ্লায়ার বিবরণ';
+            const title = s ? esc(s.SupplierName) : 'সরবরাহকারীর বিস্তারিত';
             $('#detModalTitle').html('<i class="fas fa-user-tie me-2"></i>' + title);
             $('#detModalBody').html('<div style="text-align:center;padding:30px;"><div class="spin"></div></div>');
             new bootstrap.Modal('#detailModal').show();
@@ -510,7 +510,7 @@
             $.get('/api/ItemPurchase/supplier-details?supplierId=' + id + '&institutionId=' + institutionId, function (res) {
                 if (!res.success) { $('#detModalBody').html('<p class="text-center text-danger">' + (res.message || 'Error') + '</p>'); return; }
                 renderDetailModal(res);
-            }).fail(function () { $('#detModalBody').html('<p class="text-center text-danger">সার্ভার এরর</p>'); });
+            }).fail(function () { $('#detModalBody').html('<p class="text-center text-danger">ডেটা লোড করতে সমস্যা হয়েছে</p>'); });
         };
 
         function renderDetailModal(res) {
@@ -524,7 +524,7 @@
             let infoHtml =
                 '<div class="row g-2 mb-3">' +
                 infoChip(lang === 'en' ? 'Company' : 'কোম্পানি', inf.SupplierCompanyName || '—') +
-                infoChip(lang === 'en' ? 'Supplier' : 'সাপ্লায়ার', inf.SupplierName) +
+                infoChip(lang === 'en' ? 'Supplier' : 'সরবরাহকারী', inf.SupplierName) +
                 infoChip(lang === 'en' ? 'Phone' : 'ফোন', inf.SupplierPhone || '—') +
                 infoChip(lang === 'en' ? 'Address' : 'ঠিকানা', inf.SupplierAddress || '—') +
                 '</div>';
@@ -534,13 +534,13 @@
             infoHtml +=
                 '<div class="row g-2 mb-3">' +
                 kpiChip('৳' + fmt(inf.TotalAmount), lang === 'en' ? 'Total Purchase' : 'মোট ক্রয়', '') +
-                kpiChip('৳' + fmt(inf.TotalPaid),   lang === 'en' ? 'Total Paid'     : 'মোট পরিশোধিত', 'green') +
+                kpiChip('৳' + fmt(inf.TotalPaid),   lang === 'en' ? 'Total Paid'     : 'মোট পরিশোধ', 'green') +
                 kpiChip('৳' + fmt(inf.TotalDue),    lang === 'en' ? 'Due'            : 'মোট বাকি', totalDue > 0 ? 'red' : 'green') +
-                kpiChip('৳' + fmt(inf.TotalReturn), lang === 'en' ? 'Return'         : 'ফেরত', 'orange') +
+                kpiChip('৳' + fmt(inf.TotalReturn), lang === 'en' ? 'Return'         : 'মোট ফেরত', 'orange') +
                 '</div>';
 
             // Tabs
-            const tab1 = lang === 'en' ? 'Due Payments' : 'বাকি পেমেন্ট';
+            const tab1 = lang === 'en' ? 'Due Payments' : 'বাকি পরিশোধ';
             const tab2 = lang === 'en' ? 'History'      : 'পেমেন্ট ইতিহাস';
             infoHtml += '<div class="det-tab">' +
                 '<button id="tabBtn1" class="active" onclick="switchTab(1)">' + tab1 + (dues.length ? ' <span style="background:#dc3545;color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;">' + dues.length + '</span>' : '') + '</button>' +
@@ -563,9 +563,9 @@
                     '<th>SN</th>' +
                     '<th>' + (lang === 'en' ? 'Date' : 'তারিখ') + '</th>' +
                     '<th>' + (lang === 'en' ? 'Total' : 'মোট') + '</th>' +
-                    '<th>' + (lang === 'en' ? 'Paid' : 'পেইড') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Paid' : 'পরিশোধ') + '</th>' +
                     '<th>' + (lang === 'en' ? 'Due' : 'বাকি') + '</th>' +
-                    '<th>' + (lang === 'en' ? 'Pay Now' : 'পেমেন্ট') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Pay Now' : 'পরিশোধ করুন') + '</th>' +
                     '</tr></thead><tbody>';
 
                 dues.forEach(function (d) {
@@ -584,20 +584,20 @@
                 dueHtml += '</tbody></table></div>';
 
                 // Account + pay date + submit
-                let accOpts = '<option value="0">' + (lang === 'en' ? 'Without Account' : 'একাউন্ট ছাড়া') + '</option>';
+                let accOpts = '<option value="0">' + (lang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া') + '</option>';
                 accs.forEach(function (a) {
                     accOpts += '<option value="' + a.AccountID + '"' + (a.IsDefault ? ' selected' : '') + '>' + esc(a.AccountName) + '</option>';
                 });
 
                 dueHtml +=
                     '<div class="row g-2 mt-2 align-items-end">' +
-                    '<div class="col-md-5"><label class="f-label">' + (lang === 'en' ? 'Account' : 'একাউন্ট') + '</label>' +
+                    '<div class="col-md-5"><label class="f-label">' + (lang === 'en' ? 'Account' : 'অ্যাকাউন্ট') + '</label>' +
                     '<select id="payAccount" class="f-control" style="width:100%;">' + accOpts + '</select></div>' +
-                    '<div class="col-md-4"><label class="f-label">' + (lang === 'en' ? 'Pay Date' : 'তারিখ') + '</label>' +
+                    '<div class="col-md-4"><label class="f-label">' + (lang === 'en' ? 'Pay Date' : 'পেমেন্টের তারিখ') + '</label>' +
                     '<input type="date" id="payDate" class="f-control" style="width:100%;" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
                     '<div class="col-md-3 d-flex align-items-end">' +
                     '<button class="btn-success2" style="width:100%;justify-content:center;" onclick="submitPayDue(' + currentDetailId + ')">' +
-                    '<i class="fas fa-check"></i> ' + (lang === 'en' ? 'Pay' : 'পেমেন্ট করুন') + '</button></div>' +
+                    '<i class="fas fa-check"></i> ' + (lang === 'en' ? 'Pay' : 'পরিশোধ করুন') + '</button></div>' +
                     '</div>';
             }
             dueHtml += '</div>';
@@ -608,10 +608,10 @@
                 histHtml += '<div style="text-align:center;color:#bbb;padding:20px;">' + (lang === 'en' ? 'No payment history' : 'কোনো পেমেন্ট ইতিহাস নেই') + '</div>';
             } else {
                 histHtml += '<div style="overflow-x:auto;"><table class="due-tbl"><thead><tr>' +
-                    '<th>' + (lang === 'en' ? 'SN' : 'রশিদ') + '</th>' +
-                    '<th>' + (lang === 'en' ? 'Amount' : 'পরিমান') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'SN' : 'ক্রমিক') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Amount' : 'পরিমাণ') + '</th>' +
                     '<th>' + (lang === 'en' ? 'Date' : 'তারিখ') + '</th>' +
-                    '<th>' + (lang === 'en' ? 'Account' : 'একাউন্ট') + '</th>' +
+                    '<th>' + (lang === 'en' ? 'Account' : 'অ্যাকাউন্ট') + '</th>' +
                     '<th>' + (lang === 'en' ? 'Note' : 'নোট') + '</th>' +
                     '</tr></thead><tbody>';
                 hist.forEach(function (h) {
@@ -630,7 +630,7 @@
             $('#detModalBody').html(infoHtml + dueHtml + histHtml);
         }
 
-        // ── Tab Switch ────────────────────────────────────────────────────────
+        // -- Tab Switch --------------------------------------------------------
         window.switchTab = function (n) {
             $('#tabPane1,#tabPane2').hide();
             $('#tabBtn1,#tabBtn2').removeClass('active');
@@ -638,14 +638,14 @@
             $('#tabBtn' + n).addClass('active');
         };
 
-        // ── Validate pay input ────────────────────────────────────────────────
+        // -- Validate pay input ------------------------------------------------
         window.validatePayInput = function (inp) {
             const due = parseFloat(inp.dataset.due);
             const val = parseFloat(inp.value) || 0;
             inp.classList.toggle('over', val > due);
         };
 
-        // ── Submit Pay Due ────────────────────────────────────────────────────
+        // -- Submit Pay Due ----------------------------------------------------
         window.submitPayDue = function (supplierId) {
             getSession();
             const payments = [];
@@ -654,14 +654,14 @@
                 if (amt > 0) {
                     const due = parseFloat($(this).data('due'));
                     if (amt > due) {
-                        showToast((getLang() === 'en' ? 'Payment exceeds due for #' : 'বাকির চেয়ে বেশি: #') + $(this).data('buying'), 'error');
+            showToast((getLang() === 'en' ? 'Payment exceeds due for #' : 'পরিশোধের পরিমাণ বাকির চেয়ে বেশি #') + $(this).data('buying'), 'error');
                         return false;
                     }
                     payments.push({ BuyingId: parseInt($(this).data('buying')), PaidAmount: amt });
                 }
             });
             if (!payments.length) {
-                showToast(getLang() === 'en' ? 'Enter at least one amount' : 'কমপক্ষে একটি পরিমান দিন', 'error');
+                showToast(getLang() === 'en' ? 'Enter at least one amount' : 'অন্তত একটি পরিমাণ লিখুন', 'error');
                 return;
             }
 
@@ -679,18 +679,18 @@
                 }),
                 success: function (res) {
                     if (res.success) {
-                        showToast(res.message || (getLang() === 'en' ? 'Payment done!' : 'পেমেন্ট সম্পন্ন!'), 'success');
+                        showToast(res.message || (getLang() === 'en' ? 'Payment done!' : 'পেমেন্ট সম্পন্ন হয়েছে!'), 'success');
                         bootstrap.Modal.getInstance('#detailModal').hide();
                         loadSuppliers();
                     } else {
                         showToast(res.message, 'error');
                     }
                 },
-                error: function () { showToast('সার্ভার এরর', 'error'); }
+                error: function () { showToast('সার্ভার সমস্যা হয়েছে', 'error'); }
             });
         };
 
-        // ── Helpers ───────────────────────────────────────────────────────────
+        // -- Helpers -----------------------------------------------------------
         function infoChip(lbl, val) {
             return '<div class="col-md-6"><div class="inf-chip"><div class="lbl">' + lbl + '</div><div class="val">' + esc(val) + '</div></div></div>';
         }

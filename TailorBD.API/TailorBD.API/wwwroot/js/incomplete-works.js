@@ -5,11 +5,12 @@ let currentRegistrationId = null;
 
 // Constants
 const API_BASE_URL = '/api/delivery';
-const ITEMS_PER_PAGE = 25;
+const PAGE_SIZE = 100;
 
 // State
 let currentPage = 1;
 let totalCount = 0;
+let totalPages = 0;
 let currentFilters = {};
 let currentLanguage = localStorage.getItem('language') || 'bn';
 
@@ -256,13 +257,19 @@ function setupSearchTabs() {
 }
 
 // Search orders
-async function searchOrders() {
+async function searchOrders(page) {
+    if (typeof page === 'number') {
+        currentPage = page;
+    } else {
+        currentPage = 1;
+    }
+
     const searchType = document.querySelector('input[name="searchType"]:checked').value;
     const ordersTableContainer = document.getElementById('ordersTableContainer');
     ordersTableContainer.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
 
     try {
-        let queryParams = `institutionId=${currentInstitutionId}`;
+        let queryParams = `institutionId=${currentInstitutionId}&page=${currentPage}&pageSize=${PAGE_SIZE}`;
 
         if (searchType === 'number') {
             const phone = document.getElementById('mobileNo').value.trim();
@@ -292,8 +299,6 @@ async function searchOrders() {
             if (endDate) queryParams += `&endDate=${endDate}`;
         }
 
-        queryParams += '&pageSize=100'; // Load more at once
-
         const response = await fetch(`/api/Delivery/incomplete-works?${queryParams}`);
         const result = await response.json();
 
@@ -303,7 +308,8 @@ async function searchOrders() {
 
         // Update total count
         const totalCountEl = document.getElementById('totalCount');
-        const totalCount = result.data.totalCount || 0;
+        totalCount = result.data.totalCount || 0;
+        totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 0;
         const lang = window.currentLang || 'bn';
         
         if (lang === 'en') {
@@ -325,6 +331,41 @@ async function searchOrders() {
     }
 }
 
+function renderPaginationHtml() {
+    const lang = window.currentLang || 'bn';
+    const from = totalCount === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+    const to = Math.min(currentPage * PAGE_SIZE, totalCount);
+    const info = lang === 'en'
+        ? `Showing ${from}-${to} of ${totalCount}`
+        : `মোট ${totalCount} টির মধ্যে ${from}-${to}`;
+
+    if (totalPages <= 1) {
+        return `<div class="iw-pagination-bar"><span class="iw-page-info">${info}</span></div>`;
+    }
+
+    return `
+        <div class="iw-pagination-bar">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm mb-0 flex-wrap">
+                    <li class="page-item${currentPage === 1 ? ' disabled' : ''}">
+                        <a class="page-link" href="#" onclick="goToIncompletePage(${currentPage - 1}); return false;">${lang === 'en' ? '« Prev' : '« আগে'}</a>
+                    </li>
+                    <li class="page-item active"><span class="page-link">${currentPage} / ${totalPages}</span></li>
+                    <li class="page-item${currentPage === totalPages ? ' disabled' : ''}">
+                        <a class="page-link" href="#" onclick="goToIncompletePage(${currentPage + 1}); return false;">${lang === 'en' ? 'Next »' : 'পরের »'}</a>
+                    </li>
+                </ul>
+            </nav>
+            <span class="iw-page-info">${info}</span>
+        </div>`;
+}
+
+window.goToIncompletePage = function(page) {
+    if (page < 1 || page > totalPages) return;
+    searchOrders(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 // Render orders table
 async function renderOrdersTable(orders) {
     const ordersTableContainer = document.getElementById('ordersTableContainer');
@@ -332,29 +373,44 @@ async function renderOrdersTable(orders) {
 
     if (!orders || orders.length === 0) {
         const emptyMsg = lang === 'en' ? 'No orders found' : 'কোন অর্ডার পাওয়া যায়নি';
-        ordersTableContainer.innerHTML = `<div class="empty-message">${emptyMsg}</div>`;
+        ordersTableContainer.innerHTML = renderPaginationHtml() + `<div class="empty-message">${emptyMsg}</div>`;
         return;
     }
 
-    let tableHTML = `
-        <table>
+    const paginationHtml = renderPaginationHtml();
+
+    let tableHTML = paginationHtml + `
+        <table class="iw-table">
+            <colgroup>
+                <col class="col-chk">
+                <col style="width:4%">
+                <col style="width:9%">
+                <col style="width:7%">
+                <col style="width:8%">
+                <col style="width:22%">
+                <col style="width:5%">
+                <col style="width:5%">
+                <col style="width:5%">
+                <col style="width:8%">
+                <col style="width:8%">
+                <col class="col-chk">
+                <col class="col-act">
+            </colgroup>
             <thead>
                 <tr>
-                    <th>
-                        <input type="checkbox" id="selectAll" class="order-list-checkbox">
-                    </th>
-                    <th>${lang === 'en' ? 'Order No.' : 'অর্ডার নং'}</th>
+                    <th><input type="checkbox" id="selectAll" class="order-list-checkbox"></th>
+                    <th>${lang === 'en' ? 'No.' : 'নং'}</th>
                     <th>${lang === 'en' ? 'Name' : 'নাম'}</th>
-                    <th>${lang === 'en' ? 'Mobile' : 'মোবাইল'}</th>
-                    <th>${lang === 'en' ? 'Address' : 'ঠিকানা'}</th>
+                    <th>${lang === 'en' ? 'Phone' : 'মোবা.'}</th>
+                    <th>${lang === 'en' ? 'Addr.' : 'ঠিকানা'}</th>
                     <th>${lang === 'en' ? 'Order List' : 'অর্ডার লিস্ট'}</th>
-                    <th>${lang === 'en' ? 'Order Date' : 'অর্ডারের তারিখ'}</th>
-                    <th>${lang === 'en' ? 'Delivery Date' : 'ডেলিভারী তারিখ'}</th>
-                    <th>${lang === 'en' ? 'Total Amount' : 'মোট টাকা'}</th>
-                    <th>${lang === 'en' ? 'Where to Store' : 'কোথায় রাখবেন'}</th>
-                    <th>${lang === 'en' ? 'Details' : 'বিস্তারিত'}</th>
-                    <th>${lang === 'en' ? 'SMS' : 'SMS'}</th>
-                    <th></th>
+                    <th>${lang === 'en' ? 'Order' : 'অর্ডার'}</th>
+                    <th>${lang === 'en' ? 'Del.' : 'ডেলি.'}</th>
+                    <th>${lang === 'en' ? 'Total' : 'মোট'}</th>
+                    <th>${lang === 'en' ? 'Store' : 'রাখা'}</th>
+                    <th>${lang === 'en' ? 'Note' : 'নোট'}</th>
+                    <th>SMS</th>
+                    <th>${lang === 'en' ? 'Pr.' : 'প্রি.'}</th>
                 </tr>
             </thead>
             <tbody>
@@ -370,40 +426,37 @@ async function renderOrdersTable(orders) {
         else if (order.isOverdue) rowClass = 'overdue';
         else if (order.isPartlyCompleted) rowClass = 'partly-completed';
 
+        const customerLabel = `(${order.customerNumber}) ${order.customerName}`;
+        const addrFull = order.address || '-';
+
         tableHTML += `
             <tr class="${rowClass}" data-order-id="${order.orderId}">
+                <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
                 <td>
-                    <input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}">
-                </td>
-                <td>
-                    <a href="order-measurements.html?orderId=${order.orderId}" class="view-measurement-link" target="_blank">
+                    <a href="order-measurements.html?orderId=${order.orderId}" class="view-measurement-link" target="_blank" title="${lang === 'en' ? 'View measurement' : 'মাপ দেখুন'}">
                         ${order.orderSerialNumber}
                     </a>
                 </td>
-                <td>(${order.customerNumber}) ${order.customerName}</td>
-                <td>${order.phone}</td>
-                <td>${order.address}</td>
-                <td>
-                    ${renderOrderListTable(orderListItems, order.orderId)}
-                </td>
+                <td><span class="cell-clip" title="${escapeHtml(customerLabel)}">${escapeHtml(clipCell(customerLabel, 16))}</span></td>
+                <td><span class="cell-clip" title="${escapeHtml(order.phone || '')}">${escapeHtml(order.phone || '-')}</span></td>
+                <td><span class="cell-clip" title="${escapeHtml(addrFull)}">${escapeHtml(clipCell(addrFull, 12))}</span></td>
+                <td>${renderOrderListTable(orderListItems, order.orderId)}</td>
                 <td>${formatDate(order.orderDate)}</td>
                 <td>${order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</td>
-                <td>${order.orderAmount.toFixed(2)}</td>
+                <td><strong>${Math.round(order.orderAmount)}</strong></td>
                 <td>
                     <input type="text" class="store-input" data-order-id="${order.orderId}" 
-                           placeholder="${lang === 'en' ? 'Store location' : 'স্টোর লোকেশন'}"
-                           value="${order.storeDetails || ''}">
+                           placeholder="${lang === 'en' ? 'Store' : 'রাখা'}"
+                           value="${escapeHtml(order.storeDetails || '')}">
                 </td>
                 <td>
                     <input type="text" class="details-input" data-order-id="${order.orderId}" 
-                           placeholder="${lang === 'en' ? 'Details' : 'বিস্তারিত'}"
-                           value="${order.details || ''}">
+                           placeholder="${lang === 'en' ? 'Note' : 'নোট'}"
+                           value="${escapeHtml(order.details || '')}">
                 </td>
+                <td><input type="checkbox" class="sms-checkbox" data-order-id="${order.orderId}"></td>
                 <td>
-                    <input type="checkbox" class="sms-checkbox" data-order-id="${order.orderId}">
-                </td>
-                <td>
-                    <i class="fas fa-print print-icon" onclick="window.open('order-measurements.html?orderId=${order.orderId}', '_blank')" title="${lang === 'en' ? 'Print' : 'প্রিন্ট করুন'}"></i>
+                    <i class="fas fa-print print-icon" onclick="window.open('order-measurements.html?orderId=${order.orderId}', '_blank')" title="${lang === 'en' ? 'Print' : 'প্রিন্ট'}"></i>
                 </td>
             </tr>
         `;
@@ -412,7 +465,7 @@ async function renderOrdersTable(orders) {
     tableHTML += `
             </tbody>
         </table>
-    `;
+    ` + paginationHtml;
 
     ordersTableContainer.innerHTML = tableHTML;
 
@@ -431,12 +484,18 @@ function renderOrderListTable(orderListItems, orderId) {
 
     let html = `
         <table class="order-list-nested">
+            <colgroup>
+                <col style="width:22%">
+                <col style="width:38%">
+                <col style="width:18%">
+                <col style="width:22%">
+            </colgroup>
             <thead>
                 <tr>
-                    <th>${lang === 'en' ? 'List No.' : 'লিস্ট নং'}</th>
+                    <th>${lang === 'en' ? 'Li.' : 'লি.'}</th>
                     <th>${lang === 'en' ? 'Dress' : 'পোষাক'}</th>
-                    <th>${lang === 'en' ? 'Total' : 'মোট'}</th>
-                    <th>${lang === 'en' ? 'Incomplete' : 'অসম্পূর্ণ'}</th>
+                    <th>${lang === 'en' ? 'Tot.' : 'মো.'}</th>
+                    <th>${lang === 'en' ? 'Inc.' : 'অসম্পূ.'}</th>
                 </tr>
             </thead>
             <tbody>
@@ -451,7 +510,7 @@ function renderOrderListTable(orderListItems, orderId) {
                            data-order-list-id="${item.orderListId}">
                     ${item.orderListSN}
                 </td>
-                <td>${item.dressName}</td>
+                <td><span class="cell-clip" title="${escapeHtml(item.dressName)}">${escapeHtml(clipCell(item.dressName, 10))}</span></td>
                 <td>${item.dressQuantity}</td>
                 <td>
                     <input type="number" class="pending-input" 
@@ -692,8 +751,7 @@ async function completeWork() {
 
         if (result.success) {
             alert(result.message || 'অর্ডারের কাজ সফলভাবে সম্পূর্ণ হয়েছে');
-            // Reload data
-            await searchOrders();
+            await searchOrders(currentPage);
         } else {
             throw new Error(result.message || 'Failed to complete work');
         }
@@ -715,6 +773,21 @@ function formatDate(dateString) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear().toString().substr(-2);
     return `${day}/${month}/${year}`;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function clipCell(text, maxLen) {
+    if (!text || text === '-') return '-';
+    const s = String(text);
+    return s.length <= maxLen ? s : s.substring(0, maxLen) + '…';
 }
 
 // Get auth data helper

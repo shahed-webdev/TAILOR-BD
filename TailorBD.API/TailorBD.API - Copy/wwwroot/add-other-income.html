@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -148,16 +148,16 @@
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <h5 style="font-weight:700;color:#28a745;margin:0;">
                         <i class="fas fa-hand-holding-usd me-2"></i>
-                        <span data-en="Other Income Management" data-bn="অন্যান্য আয় ব্যবস্থাপনা">অন্যান্য আয় ব্যবস্থাপনা</span>
+                        <span data-en="Other Income Management" data-bn="অন্যান্য আয় ম্যানেজমেন্ট">অন্যান্য আয় ম্যানেজমেন্ট</span>
                     </h5>
                     <div class="d-flex gap-2">
                         <button class="btn-outline2" onclick="openCategoryModal()">
                             <i class="fas fa-tags"></i>
-                            <span data-en="Manage Categories" data-bn="ধরণ পরিচালনা">ধরণ পরিচালনা</span>
+                            <span data-en="Manage Categories" data-bn="বিভাগ পরিচালনা">বিভাগ পরিচালনা</span>
                         </button>
                         <button class="btn-green3" onclick="openAddModal()">
                             <i class="fas fa-plus"></i>
-                            <span data-en="Add Income" data-bn="আয় যুক্ত করুন">আয় যুক্ত করুন</span>
+                            <span data-en="Add Income" data-bn="আয় যোগ করুন">আয় যোগ করুন</span>
                         </button>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                     <div class="card-box">
                         <div class="sec-title">
                             <i class="fas fa-chart-pie"></i>
-                            <span data-en="Top Income Categories" data-bn="শীর্ষ আয়ের ধরণ">শীর্ষ আয়ের ধরণ</span>
+                            <span data-en="Top Income Categories" data-bn="শীর্ষ আয় বিভাগ">শীর্ষ আয় বিভাগ</span>
                         </div>
                         <div class="top-cat-grid" id="topCatGrid"></div>
                     </div>
@@ -189,20 +189,20 @@
                             <input type="date" id="filterFrom" class="f-control" style="width:150px;" onchange="loadRecords(1)">
                         </div>
                         <div>
-                            <label class="f-label" data-en="To Date" data-bn="শেষ তারিখ">শেষ তারিখ</label>
+                            <label class="f-label" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
                             <input type="date" id="filterTo" class="f-control" style="width:150px;" onchange="loadRecords(1)">
                         </div>
                         <div style="flex:1;min-width:160px;">
-                            <label class="f-label" data-en="Category" data-bn="আয়ের ধরণ">আয়ের ধরণ</label>
+                            <label class="f-label" data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</label>
                             <select id="filterCategory" class="f-control" onchange="loadRecords(1)">
-                                <option value="0">সকল ধরণ</option>
+                                <option value="0">সব বিভাগ</option>
                             </select>
                         </div>
                         <div>
                             <label class="f-label">&nbsp;</label>
                             <button class="btn-outline-gray" onclick="clearFilters()">
                                 <i class="fas fa-times"></i>
-                                <span data-en="Clear" data-bn="রিসেট">রিসেট</span>
+                                <span data-en="Clear" data-bn="মুছে ফেলুন">মুছে ফেলুন</span>
                             </button>
                         </div>
                     </div>
@@ -222,10 +222,10 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th data-en="Category" data-bn="ধরণ">ধরণ</th>
+                                    <th data-en="Category" data-bn="ক্যাটাগরি">ক্যাটাগরি</th>
                                     <th data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
                                     <th data-en="Amount (৳)" data-bn="পরিমাণ (৳)">পরিমাণ (৳)</th>
-                                    <th data-en="Account" data-bn="অ্যাকাউন্ট">অ্যাকাউন্ট</th>
+                                    <th data-en="Account" data-bn="হিসাব">হিসাব</th>
                                     <th data-en="Date" data-bn="তারিখ">তারিখ</th>
                                     <th data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
                                 </tr>
@@ -251,7 +251,7 @@
                 <div class="modal-header green">
                     <h5 class="modal-title">
                         <i class="fas fa-hand-holding-usd me-2"></i>
-                        <span data-en="Add Income" data-bn="আয় যুক্ত करें">আয় যুক্ত করুন</span>
+                        <span data-en="Add Income" data-bn="আয় যোগ করুন">আয় যোগ করুন</span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -259,7 +259,7 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="f-label mb-0">
-                                <span data-en="Income Category" data-bn="আয়ের ধরণ">আয়ের ধরণ</span>
+                                <span data-en="Income Category" data-bn="আয়ের বিভাগ">আয়ের বিভাগ</span>
                                 <span style="color:#e74c3c;">*</span>
                             </label>
                             <button type="button" class="btn-outline2" style="padding:3px 10px;font-size:11px;" onclick="openCategoryModal()">
@@ -268,7 +268,7 @@
                             </button>
                         </div>
                         <select id="addCategory" class="f-control">
-                            <option value="0">-- ধরণ নির্বাচন করুন --</option>
+                            <option value="0">-- বিভাগ নির্বাচন করুন --</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -277,23 +277,23 @@
                             <span style="color:#e74c3c;">*</span>
                         </label>
                         <input type="number" id="addAmount" class="f-control" min="1" step="0.01"
-                            placeholder="আয়ের পরিমাণ লিখুন"
-                            data-bn-placeholder="আয়ের পরিমাণ লিখুন"
+                            placeholder="আয়ের পরিমাণ দিন"
+                            data-bn-placeholder="আয়ের পরিমাণ দিন"
                             data-en-placeholder="Enter income amount">
                     </div>
                     <div class="mb-3">
                         <label class="f-label">
-                            <span data-en="Income Details (Optional)" data-bn="বিস্তারিত বিবরণ (ঐচ্ছিক)">বিস্তারিত বিবরণ (ঐচ্ছিক)</span>
+                            <span data-en="Income Details (Optional)" data-bn="আয়ের বিবরণ (ঐচ্ছিক)">আয়ের বিবরণ (ঐচ্ছিক)</span>
                         </label>
                         <input type="text" id="addFor" class="f-control"
-                            placeholder="কি বাবদ আয় হলো"
-                            data-bn-placeholder="কি বাবদ আয় হলো"
+                            placeholder="কিসের জন্য আয়ের"
+                            data-bn-placeholder="কিসের জন্য আয়ের"
                             data-en-placeholder="What was it earned for?">
                     </div>
                     <div class="mb-3">
                         <label class="f-label" data-en="Account (Optional)" data-bn="অ্যাকাউন্ট (ঐচ্ছিক)">অ্যাকাউন্ট (ঐচ্ছিক)</label>
                         <select id="addAccount" class="f-control" onchange="checkAccountInfo()">
-                            <option value="0">অ্যাকাউন্ট ছাড়া</option>
+                            <option value="0">অ্যাকাউন্ট নেই</option>
                         </select>
                         <div class="balance-hint" id="balanceHint"></div>
                     </div>
@@ -309,7 +309,7 @@
                     </button>
                     <button type="button" class="btn-green3" id="submitIncBtn" onclick="submitIncome()">
                         <i class="fas fa-check"></i>
-                        <span data-en="Save Income" data-bn="আয় সংরক্ষণ করুন">আয় সংরক্ষণ করুন</span>
+                        <span data-en="Save Income" data-bn="আয় সেভ করুন">আয় সেভ করুন</span>
                     </button>
                 </div>
             </div>
@@ -348,7 +348,7 @@
                     </button>
                     <button type="button" class="btn-green3" style="background:#fd7e14;" onclick="submitEdit()">
                         <i class="fas fa-save"></i>
-                        <span data-en="Update" data-bn="আপডেট করুন">আপডেট করুন</span>
+                        <span data-en="Update" data-bn="আপডেট">আপডেট</span>
                     </button>
                 </div>
             </div>
@@ -362,7 +362,7 @@
                 <div class="modal-header blue">
                     <h5 class="modal-title">
                         <i class="fas fa-tags me-2"></i>
-                        <span data-en="Income Categories" data-bn="আয়ের ধরণ ব্যবস্থাপনা">আয়ের ধরণ ব্যবস্থাপনা</span>
+                        <span data-en="Income Categories" data-bn="আয়ের বিভাগসমূহ">আয়ের বিভাগসমূহ</span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -370,13 +370,13 @@
                     <!-- Add new -->
                     <div class="d-flex gap-2 mb-3">
                         <input type="text" id="newCatName" class="f-control"
-                            placeholder="নতুন আয়ের ধরণের নাম"
-                            data-bn-placeholder="নতুন আয়ের ধরণের নাম"
+                            placeholder="নতুন বিভাগের নাম"
+                            data-bn-placeholder="নতুন বিভাগের নাম"
                             data-en-placeholder="New category name"
                             onkeydown="if(event.key==='Enter') addCategory()">
                         <button class="btn-green3" onclick="addCategory()" style="white-space:nowrap;">
                             <i class="fas fa-plus"></i>
-                            <span data-en="Add" data-bn="যুক্ত করুন">যুক্ত করুন</span>
+                            <span data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
                         </button>
                     </div>
                     <!-- Table list -->
@@ -392,7 +392,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     <script>
     (function () {
         var institutionId  = 0;
@@ -403,7 +403,7 @@
         var allCategories  = [];
         var _initialized   = false;
 
-        /* ── helpers ── */
+        /* -- helpers -- */
         function getSession() {
             institutionId  = parseInt(sessionStorage.getItem('institutionId')  || localStorage.getItem('session_institutionId')  || '0');
             registrationId = parseInt(sessionStorage.getItem('registrationId') || localStorage.getItem('session_registrationId') || '0');
@@ -433,7 +433,7 @@
             applyLang();
         }
 
-        /* ── DOM ready ── */
+        /* -- DOM ready -- */
         $(document).ready(function () {
             $('#addDate').val(new Date().toISOString().split('T')[0]);
 
@@ -468,7 +468,7 @@
             });
         });
 
-        /* ── SUMMARY ── */
+        /* -- SUMMARY -- */
         function loadSummary() {
             getSession();
             if (!institutionId) return;
@@ -485,13 +485,13 @@
             var L = {
                 total:     lang === 'en' ? 'Total Income'   : 'মোট আয়',
                 records:   lang === 'en' ? 'Total Records'  : 'মোট রেকর্ড',
-                thisMonth: lang === 'en' ? 'This Month'     : 'এই মাসে',
-                cats:      lang === 'en' ? 'Categories'     : 'আয়ের ধরণ'
+                thisMonth: lang === 'en' ? 'This Month'     : 'এই মাস',
+                cats:      lang === 'en' ? 'Categories'     : 'বিভাগ'
             };
             $('#kpiRow').html(
-                chip('৳', fmt(s.TotalAmount),    L.total,     'green')  +
+                chip('\u09f3', fmt(s.TotalAmount),    L.total,     'green')  +
                 chip('',  s.TotalRecords,         L.records,   'orange') +
-                chip('৳', fmt(s.ThisMonthAmount), L.thisMonth, 'purple') +
+                chip('\u09f3', fmt(s.ThisMonthAmount), L.thisMonth, 'purple') +
                 chip('',  s.TotalCategories,      L.cats,      'red')
             );
         }
@@ -503,7 +503,7 @@
         function renderTopCategories(data) {
             var lang = getLang();
             if (!data.length) {
-                $('#topCatGrid').html('<p style="color:#bbb;font-size:13px;">' + (lang === 'en' ? 'No data' : 'কোনো ডেটা নেই') + '</p>');
+                $('#topCatGrid').html('<p style="color:#bbb;font-size:13px;">' + (lang === 'en' ? 'No data' : 'কোনো তথ্য নেই') + '</p>');
                 return;
             }
             var h = '';
@@ -511,14 +511,14 @@
                 h += '<div class="top-cat-card">' +
                     '<div class="rank">#' + (i + 1) + '</div>' +
                     '<div class="cname">' + esc(c.CategoryName) + '</div>' +
-                    '<div class="camnt">৳' + fmt(c.TotalAmount) + '</div>' +
+                '<div class="camnt">\u09f3' + fmt(c.TotalAmount) + '</div>' +
                     '<div class="ccnt">' + c.RecordCount + ' ' + (lang === 'en' ? 'records' : 'টি রেকর্ড') + '</div>' +
                     '</div>';
             });
             $('#topCatGrid').html(h);
         }
 
-        /* ── CATEGORIES ── */
+        /* -- CATEGORIES -- */
         function loadCategories() {
             getSession();
             if (!institutionId) return;
@@ -532,8 +532,8 @@
 
         function populateCategoryDropdowns() {
             var lang = getLang();
-            var addOpts    = '<option value="0">' + (lang === 'en' ? '-- Select Category --' : '-- ধরণ নির্বাচন করুন --') + '</option>';
-            var filterOpts = '<option value="0">' + (lang === 'en' ? 'All Categories' : 'সকল ধরণ') + '</option>';
+            var addOpts    = '<option value="0">' + (lang === 'en' ? '-- Select Category --' : '-- বিভাগ নির্বাচন করুন --') + '</option>';
+            var filterOpts = '<option value="0">' + (lang === 'en' ? 'All Categories' : 'সব বিভাগ') + '</option>';
             allCategories.forEach(function (c) {
                 addOpts    += '<option value="' + c.Extra_IncomeCategoryID + '">' + esc(c.CategoryName) + '</option>';
                 filterOpts += '<option value="' + c.Extra_IncomeCategoryID + '">' + esc(c.CategoryName) + '</option>';
@@ -547,15 +547,15 @@
             if (!allCategories.length) {
                 $('#catListWrap').html(
                     '<p style="color:#bbb;font-size:13px;text-align:center;padding:20px;">' +
-                    (lang === 'en' ? 'No categories yet. Add one above.' : 'কোনো ধরণ নেই। উপরে যুক্ত করুন।') + '</p>');
+                    (lang === 'en' ? 'No categories yet. Add one above.' : 'এখনো কোনো বিভাগ নেই। উপরে যোগ করুন') + '</p>');
                 return;
             }
             var editLbl   = lang === 'en' ? 'Edit'   : 'সম্পাদনা';
-            var deleteLbl = lang === 'en' ? 'Delete' : 'ডিলিট';
+            var deleteLbl = lang === 'en' ? 'Delete' : 'মুছে ফেলুন';
             var h = '<table class="cat-tbl"><thead><tr>' +
                 '<th style="width:36px;">#</th>' +
-                '<th>' + (lang === 'en' ? 'Category Name' : 'ধরণের নাম') + '</th>' +
-                '<th style="text-align:center;width:110px;">' + (lang === 'en' ? 'Action' : 'অ্যাকশন') + '</th>' +
+                '<th>' + (lang === 'en' ? 'Category Name' : 'বিভাগের নাম') + '</th>' +
+                '<th style="text-align:center;width:110px;">' + (lang === 'en' ? 'Action' : 'কার্যক্রম') + '</th>' +
                 '</tr></thead><tbody>';
             allCategories.forEach(function (c, i) {
                 h += '<tr id="catRow_' + c.Extra_IncomeCategoryID + '">' +
@@ -573,7 +573,7 @@
 
         window.editCategory = function (id, currentName) {
             var lang      = getLang();
-            var saveLbl   = lang === 'en' ? 'Save'   : 'সংরক্ষণ';
+            var saveLbl   = lang === 'en' ? 'Save'   : 'সেভ করুন';
             var cancelLbl = lang === 'en' ? 'Cancel' : 'বাতিল';
             $('#catNameCell_' + id).html(
                 '<input type="text" class="cat-edit-input" id="catEditInput_' + id + '" value="' + esc(currentName) + '"' +
@@ -591,12 +591,12 @@
         window.submitCategoryEdit = function (id) {
             var name = $('#catEditInput_' + id).val().trim();
             var lang = getLang();
-            if (!name) { showToast(lang === 'en' ? 'Enter category name' : 'ধরণের নাম লিখুন', 'error'); return; }
+            if (!name) { showToast(lang === 'en' ? 'Enter category name' : 'বিভাগের নাম দিন', 'error'); return; }
             $.ajax({
                 url: '/api/OtherIncome/categories', type: 'PUT', contentType: 'application/json',
                 data: JSON.stringify({ Extra_IncomeCategoryID: id, CategoryName: name }),
                 success: function (res) {
-                    if (res.success) { showToast(lang === 'en' ? 'Category updated!' : 'ধরণ আপডেট হয়েছে!', 'success'); loadCategories(); }
+                    if (res.success) { showToast(lang === 'en' ? 'Category updated!' : 'বিভাগ আপডেট হয়েছে!', 'success'); loadCategories(); }
                     else { showToast(res.message, 'error'); }
                 },
                 error: function () { showToast('Server error', 'error'); }
@@ -606,13 +606,13 @@
         window.addCategory = function () {
             var name = $('#newCatName').val().trim();
             var lang = getLang();
-            if (!name) { showToast(lang === 'en' ? 'Enter category name' : 'ধরণের নাম লিখুন', 'error'); return; }
+            if (!name) { showToast(lang === 'en' ? 'Enter category name' : 'বিভাগের নাম দিন', 'error'); return; }
             getSession();
             $.ajax({
                 url: '/api/OtherIncome/categories', type: 'POST', contentType: 'application/json',
                 data: JSON.stringify({ InstitutionID: institutionId, RegistrationID: registrationId, CategoryName: name }),
                 success: function (res) {
-                    if (res.success) { showToast(lang === 'en' ? 'Category added!' : 'ধরণ যুক্ত হয়েছে!', 'success'); $('#newCatName').val(''); loadCategories(); }
+                    if (res.success) { showToast(lang === 'en' ? 'Category added!' : 'বিভাগ যোগ হয়েছে!', 'success'); $('#newCatName').val(''); loadCategories(); }
                     else { showToast(res.message, 'error'); }
                 },
                 error: function () { showToast('Server error', 'error'); }
@@ -621,19 +621,19 @@
 
         window.deleteCategory = function (id) {
             var lang = getLang();
-            if (!confirm(lang === 'en' ? 'Delete this category?' : 'এই ধরণটি ডিলিট করবেন?')) return;
+            if (!confirm(lang === 'en' ? 'Delete this category?' : 'এই বিভাগ মুছে ফেলবেন?')) return;
             getSession();
             $.ajax({
                 url: '/api/OtherIncome/categories/' + id + '?institutionId=' + institutionId, type: 'DELETE',
                 success: function (res) {
-                    if (res.success) { showToast(lang === 'en' ? 'Deleted!' : 'ডিলিট হয়েছে!', 'success'); loadCategories(); }
+                    if (res.success) { showToast(lang === 'en' ? 'Deleted!' : 'মুছে ফেলা হয়েছে!', 'success'); loadCategories(); }
                     else { showToast(res.message, 'error'); }
                 },
                 error: function () { showToast('Server error', 'error'); }
             });
         };
 
-        /* ── ACCOUNTS ── */
+        /* -- ACCOUNTS -- */
         function loadAccounts() {
             getSession();
             if (!institutionId) return;
@@ -641,10 +641,10 @@
                 if (!res.success) return;
                 allAccounts = res.data || [];
                 var lang = getLang();
-                var opts = '<option value="0">' + (lang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া') + '</option>';
+                var opts = '<option value="0">' + (lang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট নেই') + '</option>';
                 allAccounts.forEach(function (a) {
                     opts += '<option value="' + a.AccountID + '" data-balance="' + a.AccountBalance + '">' +
-                            esc(a.AccountName) + ' (৳' + fmt(a.AccountBalance) + ')</option>';
+                            esc(a.AccountName) + ' (\u09f3' + fmt(a.AccountBalance) + ')</option>';
                 });
                 $('#addAccount').html(opts);
                 var def = allAccounts.find(function (a) { return a.Default_Status; });
@@ -662,7 +662,7 @@
                 .text((lang === 'en' ? 'Current Balance: ৳' : 'বর্তমান ব্যালেন্স: ৳') + fmt(bal));
         };
 
-        /* ── RECORDS TABLE ── */
+        /* -- RECORDS TABLE -- */
         window.loadRecords = function (page) {
             getSession();
             if (!institutionId) return;
@@ -697,13 +697,13 @@
                     '<td style="color:#aaa;font-size:12px;">' + ((currentPage - 1) * 30 + i + 1) + '</td>' +
                     '<td><span class="cat-badge">' + esc(d.CategoryName) + '</span></td>' +
                     '<td style="font-size:12.5px;color:#555;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' +
-                        (d.Extra_IncomeFor ? esc(d.Extra_IncomeFor) : '<span style="color:#ccc;">—</span>') + '</td>' +
+                        (d.Extra_IncomeFor ? esc(d.Extra_IncomeFor) : '<span style="color:#ccc;">-</span>') + '</td>' +
                     '<td style="font-weight:800;color:#28a745;">৳' + fmt(d.Extra_IncomeAmount) + '</td>' +
                     '<td style="font-size:12px;color:#888;">' + esc(d.AccountName) + '</td>' +
-                    '<td style="font-size:12px;color:#888;">' + (d.IncomeDate || '—') + '</td>' +
+                    '<td style="font-size:12px;color:#888;">' + (d.IncomeDate || '-') + '</td>' +
                     '<td style="white-space:nowrap;">' +
                         '<button class="btn-sm-edit me-1" onclick="openEditModal(' + d.Extra_IncomeID + ',' + d.Extra_IncomeAmount + ',\'' + forText + '\')" title="' + (lang === 'en' ? 'Edit' : 'সম্পাদনা') + '"><i class="fas fa-edit"></i></button>' +
-                        '<button class="btn-sm-del" onclick="deleteIncome(' + d.Extra_IncomeID + ')" title="' + (lang === 'en' ? 'Delete' : 'ডিলিট') + '"><i class="fas fa-trash"></i></button>' +
+                        '<button class="btn-sm-del" onclick="deleteIncome(' + d.Extra_IncomeID + ')" title="' + (lang === 'en' ? 'Delete' : 'মুছে ফেলুন') + '"><i class="fas fa-trash"></i></button>' +
                     '</td></tr>');
             });
         }
@@ -731,7 +731,7 @@
             loadRecords(1);
         };
 
-        /* ── ADD INCOME ── */
+        /* -- ADD INCOME -- */
         window.openAddModal = function () {
             $('#addCategory').val('0');
             $('#addAmount,#addFor').val('');
@@ -748,8 +748,8 @@
             var amount = parseFloat($('#addAmount').val()) || 0;
             var accId  = parseInt($('#addAccount').val()) || 0;
             if (!institutionId) { showToast(lang === 'en' ? 'Session not loaded, please wait' : 'সেশন লোড হয়নি, অপেক্ষা করুন', 'error'); return; }
-            if (!catId)  { showToast(lang === 'en' ? 'Select a category' : 'ধরণ নির্বাচন করুন', 'error'); return; }
-            if (!amount) { showToast(lang === 'en' ? 'Enter amount' : 'পরিমাণ লিখুন', 'error'); return; }
+            if (!catId)  { showToast(lang === 'en' ? 'Select a category' : 'বিভাগ নির্বাচন করুন', 'error'); return; }
+            if (!amount) { showToast(lang === 'en' ? 'Enter amount' : 'পরিমাণ দিন', 'error'); return; }
             $('#submitIncBtn').prop('disabled', true);
             $.ajax({
                 url: '/api/OtherIncome/add', type: 'POST', contentType: 'application/json',
@@ -766,7 +766,7 @@
                     $('#submitIncBtn').prop('disabled', false);
                     if (res.success) {
                         bootstrap.Modal.getInstance('#addIncomeModal').hide();
-                        showToast(lang === 'en' ? 'Income saved!' : 'আয় সফলভাবে যুক্ত হয়েছে!', 'success');
+                        showToast(lang === 'en' ? 'Income saved!' : 'আয় সেভ হয়েছে!', 'success');
                         loadSummary(); loadRecords(currentPage); loadAccounts();
                     } else { showToast(res.message, 'error'); }
                 },
@@ -778,7 +778,7 @@
             });
         };
 
-        /* ── EDIT INCOME ── */
+        /* -- EDIT INCOME -- */
         window.openEditModal = function (id, amount, forText) {
             $('#editIncId').val(id);
             $('#editAmount').val(amount);
@@ -791,14 +791,14 @@
             var lang   = getLang();
             var id     = parseInt($('#editIncId').val()) || 0;
             var amount = parseFloat($('#editAmount').val()) || 0;
-            if (!amount) { showToast(lang === 'en' ? 'Enter amount' : 'পরিমাণ লিখুন', 'error'); return; }
+            if (!amount) { showToast(lang === 'en' ? 'Enter amount' : 'পরিমাণ দিন', 'error'); return; }
             $.ajax({
                 url: '/api/OtherIncome/update', type: 'PUT', contentType: 'application/json',
                 data: JSON.stringify({ Extra_IncomeID: id, InstitutionID: institutionId, Extra_IncomeAmount: amount, Extra_IncomeFor: $('#editFor').val().trim() }),
                 success: function (res) {
                     if (res.success) {
                         bootstrap.Modal.getInstance('#editIncomeModal').hide();
-                        showToast(lang === 'en' ? 'Updated!' : 'আপডেট সফল হয়েছে!', 'success');
+                        showToast(lang === 'en' ? 'Updated!' : 'আপডেট হয়েছে!', 'success');
                         loadSummary(); loadRecords(currentPage);
                     } else { showToast(res.message, 'error'); }
                 },
@@ -806,22 +806,22 @@
             });
         };
 
-        /* ── DELETE INCOME ── */
+        /* -- DELETE INCOME -- */
         window.deleteIncome = function (id) {
             var lang = getLang();
-            if (!confirm(lang === 'en' ? 'Delete this income record?' : 'এই আয়ের রেকর্ড ডিলিট করবেন?')) return;
+            if (!confirm(lang === 'en' ? 'Delete this income record?' : 'এই আয়ের রেকর্ড মুছে ফেলবেন?')) return;
             getSession();
             $.ajax({
                 url: '/api/OtherIncome/' + id + '?institutionId=' + institutionId, type: 'DELETE',
                 success: function (res) {
-                    if (res.success) { showToast(lang === 'en' ? 'Deleted!' : 'ডিলিট হয়েছে!', 'success'); loadSummary(); loadRecords(currentPage); loadAccounts(); }
+                    if (res.success) { showToast(lang === 'en' ? 'Deleted!' : 'মুছে ফেলা হয়েছে!', 'success'); loadSummary(); loadRecords(currentPage); loadAccounts(); }
                     else { showToast(res.message, 'error'); }
                 },
                 error: function () { showToast('Server error', 'error'); }
             });
         };
 
-        /* ── CATEGORY MODAL ── */
+        /* -- CATEGORY MODAL -- */
         window.openCategoryModal = function () {
             var addModal = bootstrap.Modal.getInstance('#addIncomeModal');
             if (addModal) addModal.hide();
@@ -829,7 +829,7 @@
             new bootstrap.Modal('#categoryModal').show();
         };
 
-        /* ── TOAST ── */
+        /* -- TOAST -- */
         window.showToast = function (msg, type) {
             var t = document.createElement('div');
             t.className = 'toast-item ' + (type || 'info');

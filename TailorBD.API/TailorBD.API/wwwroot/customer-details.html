@@ -108,6 +108,8 @@
         .btn-save:disabled { background: #aaa; cursor: not-allowed; }
         .btn-print { padding: 9px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600; margin-top: 14px; margin-left: 8px; display: inline-flex; align-items: center; gap: 6px; }
         .btn-print:hover { background: #218838; }
+        .btn-print-measure { display: inline-flex !important; }
+        .btn-print-measure:hover { background: #138496 !important; }
 
         /* Table */
         .table-wrapper { overflow-x: auto; }
@@ -211,6 +213,11 @@
                             <select id="dressSelect">
                             <option value="0" data-en="Select dress to add measurement" data-bn="মাপ যোগ করতে পোশাক নির্বাচন করুন">মাপ যোগ করতে পোশাক নির্বাচন করুন</option>
                             </select>
+                            <a id="btnPrintMeasurement" href="#" target="_blank"
+                               class="btn-print-measure"
+                               style="display:none; padding:8px 16px; background:#17a2b8; color:white; border-radius:5px; font-size:13px; font-weight:600; text-decoration:none; align-items:center; gap:6px; white-space:nowrap;">
+                                <i class="fas fa-print"></i> মাপ প্রিন্ট করুন
+                            </a>
                         </div>
                         <div class="dress-legend"><span>★</span> সবুজ রঙে চিহ্নিত পোশাকে আগে থেকে মাপ আছে</div>
                         <div id="measurementArea"><div class="empty-msg">পোশাক নির্বাচন করুন</div></div>
@@ -316,7 +323,8 @@
             if (panel) panel.classList.add('active');
         });
     </script>
-    <script src="/js/app-components.js?v=2.1.7"></script>
-    <script src="/js/customer-details.js?v=2.1.6"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app-components.js?v=2.2.8"></script>
+    <script src="/js/customer-details.js?v=2.1.7"></script>
 </body>
 </html>

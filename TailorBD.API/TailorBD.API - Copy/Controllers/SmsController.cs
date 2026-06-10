@@ -16,6 +16,42 @@ namespace TailorBD.API.Controllers
 
         public SmsController(TailorBdContext context) => _context = context;
 
+        // ── SMS balance (simple) ──────────────────────────────────────────────
+        [HttpGet("balance/{institutionId}")]
+        public IActionResult GetBalance(int institutionId)
+        {
+            try
+            {
+                using var con = _context.CreateConnection();
+                var balance = con.ExecuteScalar<int?>(
+                    "SELECT SMS_Balance FROM SMS WHERE InstitutionID=@IID",
+                    new { IID = institutionId }) ?? 0;
+                return Ok(new { success = true, balance });
+            }
+            catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
+        }
+
+        // ── SMS recharge history ──────────────────────────────────────────────
+        [HttpGet("recharge-history/{institutionId}")]
+        public IActionResult GetRechargeHistory(int institutionId, int pageSize = 20)
+        {
+            try
+            {
+                using var con = _context.CreateConnection();
+                var data = con.Query(
+                    @"SELECT TOP (@PageSize)
+                        RechargeSMS AS rechargeSms,
+                        PerSMS_Price AS perSmsPrice,
+                        Date AS date
+                      FROM SMS_Recharge_Record
+                      WHERE InstitutionID = @IID
+                      ORDER BY Date DESC",
+                    new { IID = institutionId, PageSize = pageSize });
+                return Ok(new { success = true, data });
+            }
+            catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
+        }
+
         // ── SMS balance & masking ─────────────────────────────────────────────
         [HttpGet("info")]
         public IActionResult GetInfo(int institutionId)

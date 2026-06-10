@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -169,7 +169,7 @@
                         <div class="col-md-6 col-12 d-flex gap-2">
                             <button class="btn-load" onclick="loadReport()">
                                 <i class="fas fa-sync-alt"></i>
-                                <span data-en="Load Report" data-bn="রিপোর্ট দেখুন">রিপোর্ট দেখুন</span>
+                                <span data-en="Load Report" data-bn="রিপোর্ট লোড করুন">রিপোর্ট লোড করুন</span>
                             </button>
                             <button class="btn-print no-print" onclick="setThisMonth()">
                                 <i class="fas fa-calendar-alt me-1"></i>
@@ -177,7 +177,7 @@
                             </button>
                             <button class="btn-print no-print" onclick="clearDates()">
                                 <i class="fas fa-undo me-1"></i>
-                                <span data-en="All Time" data-bn="সর্বকাল">সর্বকাল</span>
+                                <span data-en="All Time" data-bn="রিসেট">রিসেট</span>
                             </button>
                         </div>
                     </div>
@@ -201,7 +201,7 @@
                             <div class="sec-card">
                                 <div class="sec-head blue">
                                     <i class="fas fa-chart-line"></i>
-                                    <span data-en="Monthly Purchase Trend (Last 12 Months)" data-bn="মাসিক ক্রয়ের ট্রেন্ড (শেষ ১২ মাস)">মাসিক ক্রয়ের ট্রেন্ড (শেষ ১২ মাস)</span>
+                                    <span data-en="Monthly Purchase Trend (Last 12 Months)" data-bn="মাসিক ক্রয় প্রবণতা (শেষ ১২ মাস)">মাসিক ক্রয় প্রবণতা (শেষ ১২ মাস)</span>
                                 </div>
                                 <div class="sec-body">
                                     <div id="barChartWrap"></div>
@@ -234,9 +234,9 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th><span data-en="Code" data-bn="কোড">কোড</span></th>
-                                                    <th><span data-en="Item Name" data-bn="আইটেম">আইটেম</span></th>
-                                                    <th><span data-en="Total Qty" data-bn="মোট পরিমান">মোট পরিমান</span></th>
-                                                    <th><span data-en="Avg Price" data-bn="গড় মূল্য">গড় মূল্য</span></th>
+                                                    <th><span data-en="Item Name" data-bn="আইটেমের নাম">আইটেমের নাম</span></th>
+                                                    <th><span data-en="Total Qty" data-bn="মোট পরিমাণ">মোট পরিমাণ</span></th>
+                                                    <th><span data-en="Avg Price" data-bn="গড় মূল্য">গড় মূল্য</span></th>
                                                     <th><span data-en="Total Value" data-bn="মোট মূল্য">মোট মূল্য</span></th>
                                                     <th><span data-en="Stock" data-bn="স্টক">স্টক</span></th>
                                                 </tr>
@@ -253,7 +253,7 @@
                             <div class="sec-card">
                                 <div class="sec-head teal">
                                     <i class="fas fa-truck"></i>
-                                    <span data-en="Top Suppliers" data-bn="শীর্ষ সাপ্লায়ার">শীর্ষ সাপ্লায়ার</span>
+                                    <span data-en="Top Suppliers" data-bn="শীর্ষ সরবরাহকারী">শীর্ষ সরবরাহকারী</span>
                                 </div>
                                 <div class="sec-body p-0">
                                     <div style="overflow-x:auto;">
@@ -261,9 +261,9 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th><span data-en="Supplier" data-bn="সাপ্লায়ার">সাপ্লায়ার</span></th>
+                                                    <th><span data-en="Supplier" data-bn="সরবরাহকারী">সরবরাহকারী</span></th>
                                                     <th><span data-en="Orders" data-bn="অর্ডার">অর্ডার</span></th>
-                                                    <th><span data-en="Amount" data-bn="মোট">মোট</span></th>
+                                                    <th><span data-en="Amount" data-bn="পরিমাণ">পরিমাণ</span></th>
                                                     <th><span data-en="Due" data-bn="বাকি">বাকি</span></th>
                                                 </tr>
                                             </thead>
@@ -279,7 +279,7 @@
                             <div class="sec-card" id="returnItemsSec" style="display:none;">
                                 <div class="sec-head red">
                                     <i class="fas fa-undo"></i>
-                                    <span data-en="Most Returned Items" data-bn="সবচেয়ে বেশি ফেরত দেওয়া আইটেম">সবচেয়ে বেশি ফেরত দেওয়া আইটেম</span>
+                                    <span data-en="Most Returned Items" data-bn="সর্বাধিক ফেরত দেওয়া আইটেম">সর্বাধিক ফেরত দেওয়া আইটেম</span>
                                 </div>
                                 <div class="sec-body" id="returnItemsBody"></div>
                             </div>
@@ -294,7 +294,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/item-purchase-report.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/item-purchase-report.js?v=2.1.6"></script>
 </body>
 </html>

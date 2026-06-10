@@ -60,8 +60,10 @@
 
     // Initialize page
     $(document).ready(function () {
-        institutionId = parseInt(sessionStorage.getItem('institutionId'));
-        registrationId = parseInt(sessionStorage.getItem('registrationId'));
+        if (window.TailorAuth) window.TailorAuth.restore();
+
+        institutionId = parseInt(sessionStorage.getItem('institutionId'), 10);
+        registrationId = parseInt(sessionStorage.getItem('registrationId'), 10);
 
         if (!institutionId || !registrationId) {
             alert('Session expired. Please login again.');

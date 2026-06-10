@@ -23,6 +23,7 @@
         loadDresses();
         loadAccounts();
         loadDueOrders();
+        loadItemSellDue();
         loadPaymentRecords();
         loadCustomerOrders('Pending', '#pendingOrdersContainer');
         loadCustomerOrders('Delivered', '#deliveredOrdersContainer');
@@ -54,8 +55,15 @@
             if (!r.success) return;
             const c = r.data;
             const initials = (c.customerName || 'C').charAt(0).toUpperCase();
+            const photoUrl = `/api/Customers/${customerId}/photo?institutionId=${institutionId}&_t=${Date.now()}`;
             const html = `
-                <div class="profile-avatar">${escapeHtml(initials)}</div>
+                <div class="profile-avatar-wrap" onclick="openPhotoModal()" title="ছবি বদলাতে ক্লিক করুন">
+                    <img id="profilePhoto" class="profile-photo" src="${photoUrl}"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                        alt="ছবি">
+                    <div class="profile-avatar" style="display:none;">${escapeHtml(initials)}</div>
+                    <div class="profile-photo-change"><i class="fas fa-camera"></i></div>
+                </div>
                 <div class="profile-info">
                     <ul>
                         <li><strong>(${escapeHtml(c.customerNumber)}) ${escapeHtml(c.customerName)}</strong></li>
@@ -206,6 +214,7 @@
             totalPaid += o.paidAmount;
             totalDue += o.dueAmount;
             rows += `<tr data-order-id="${o.orderId}" data-delivery-status="${o.deliveryStatus}" data-due="${o.dueAmount}">
+                <td><input type="checkbox" class="order-row-chk" style="width:16px;height:16px;cursor:pointer;accent-color:#6c7ae0;"></td>
                 <td><strong>${o.orderSerialNumber}</strong></td>
                 <td>${formatDate(o.orderDate)}</td>
                 <td>${o.deliveryDate ? formatDate(o.deliveryDate) : '-'}</td>
@@ -214,12 +223,14 @@
                 <td>${o.paidAmount.toFixed(2)}</td>
                 <td class="due-paid-col">${o.dueAmount.toFixed(2)} /-</td>
                 <td>${o.discount.toFixed(2)} /-</td>
+                <td><input type="number" class="row-collect-input due-input" min="0" max="${o.dueAmount.toFixed(2)}" step="0.01" placeholder="0" value="" style="display:none;"></td>
                 <td><span class="badge ${o.deliveryStatus === 'Delivered' ? 'bg-success' : 'bg-warning text-dark'}">${o.deliveryStatus}</span></td>
             </tr>`;
         });
 
         const html = `<table>
             <thead><tr>
+                <th style="width:36px;"><input type="checkbox" id="checkAllOrders" style="width:16px;height:16px;cursor:pointer;accent-color:#fff;" title="সব সিলেক্ট করুন"></th>
                 <th data-en="Order No" data-bn="অর্ডার নং">অর্ডার নং</th>
                 <th data-en="Order" data-bn="অর্ডার">অর্ডার</th>
                 <th data-en="Delivery" data-bn="ডেলিভারী">ডেলিভারী</th>
@@ -228,18 +239,56 @@
                 <th data-en="Paid" data-bn="পেইড">পেইড</th>
                 <th data-en="Due" data-bn="বাকি">বাকি</th>
                 <th data-en="Discount" data-bn="ডিসকাউন্ট">ডিসকাউন্ট</th>
+                <th data-en="Collecting" data-bn="কত নিচ্ছেন?">কত নিচ্ছেন?</th>
                 <th data-en="Status" data-bn="অবস্থা">অবস্থা</th>
             </tr></thead>
             <tbody>${rows}</tbody>
             <tfoot><tr>
+                <td></td>
                 <td colspan="4" style="text-align:right;padding-right:8px;font-weight:700;" data-en="Total:" data-bn="মোট:">মোট:</td>
                 <td>${totalAmt.toFixed(2)}</td>
                 <td>${totalPaid.toFixed(2)}</td>
                 <td class="due-paid-col">${totalDue.toFixed(2)} /-</td>
-                <td></td><td></td>
+                <td></td><td></td><td></td>
             </tr></tfoot>
         </table>`;
         $('#dueTableContainer').html(html);
+
+        // Check-all toggle
+        $(document).off('change.checkall').on('change.checkall', '#checkAllOrders', function () {
+            const checked = $(this).is(':checked');
+            $('#dueTableContainer tbody .order-row-chk').each(function () {
+                $(this).prop('checked', checked).trigger('change');
+            });
+        });
+
+        // Per-row checkbox: show/hide collect input and auto-fill due amount
+        $(document).off('change.rowchk').on('change.rowchk', '.order-row-chk', function () {
+            const $tr = $(this).closest('tr');
+            const $input = $tr.find('.row-collect-input');
+            if ($(this).is(':checked')) {
+                const due = parseFloat($tr.data('due')) || 0;
+                $input.val(due.toFixed(2)).show();
+            } else {
+                $input.val('').hide();
+            }
+            updateCollectPanelFromRows();
+        });
+
+        // Per-row collect input change → update panel total
+        $(document).off('input.rowcollect').on('input.rowcollect', '.row-collect-input', function () {
+            const $tr = $(this).closest('tr');
+            const due = parseFloat($tr.data('due')) || 0;
+            let val = parseFloat($(this).val()) || 0;
+            if (val > due) { $(this).val(due.toFixed(2)); val = due; }
+            if (val < 0) { $(this).val(0); }
+            updateCollectPanelFromRows();
+        });
+
+        // Discount input change → update panel total
+        $(document).off('input.discountchange').on('input.discountchange', '#collectDiscountInput', function () {
+            updateCollectPanelFromRows();
+        });
 
         // Update total due display
         $('#totalDueDisplay').text(totalDue.toFixed(2) + ' /-');
@@ -252,51 +301,47 @@
         if (typeof window.updateLanguage === 'function') window.updateLanguage();
     }
 
+    function updateCollectPanelFromRows() {
+        let total = 0;
+        const discount = parseFloat($('#collectDiscountInput').val()) || 0;
+        $('#dueTableContainer tbody tr').each(function () {
+            const $chk = $(this).find('.order-row-chk');
+            if ($chk.is(':checked')) {
+                total += parseFloat($(this).find('.row-collect-input').val()) || 0;
+            }
+        });
+        const net = Math.max(0, total - discount);
+        $('#collectAmountInput').val(net > 0 ? net.toFixed(2) : '');
+    }
+
     window.collectDue = function () {
-        const inputVal = $('#collectAmountInput').val().trim();
         const discountVal = $('#collectDiscountInput').val().trim();
-        const totalInput = parseFloat(inputVal) || 0;
         const discountInput = parseFloat(discountVal) || 0;
-
-        if (!inputVal && !discountVal) {
-            $('#collectAmountInput').addClass('error-input');
-            showMsg('#dueMsg', 'error', 'কত টাকা দিচ্ছেন সেটি লিখুন');
-            return;
-        }
-        $('#collectAmountInput').removeClass('error-input');
-
-        // Total due check
-        const totalDue = parseFloat($('#dueTableContainer tfoot td.due-paid-col').text()) || 0;
-        if ((totalInput + discountInput) > totalDue) {
-            showMsg('#dueMsg', 'error', `পেইড + ডিসকাউন্ট মোট বাকি (${totalDue.toFixed(2)}) এর চেয়ে বেশি হতে পারবে না`);
-            return;
-        }
-
-        // Distribute top-to-bottom across orders
-        const payments = [];
-        let remainingPaid = totalInput;
-        let remainingDiscount = discountInput;
         const accountId = parseInt($('#accountSelect').val()) || null;
 
+        // Collect from checked rows using per-row amounts
+        const payments = [];
+        let anyChecked = false;
+        let remainingDiscount = discountInput;
+
         $('#dueTableContainer tbody tr').each(function () {
-            if (remainingPaid <= 0 && remainingDiscount <= 0) return false;
+            const $chk = $(this).find('.order-row-chk');
+            if (!$chk.is(':checked')) return;
+            anyChecked = true;
+
             const orderId = parseInt($(this).data('order-id'));
             const deliveryStatus = $(this).data('delivery-status');
             const due = parseFloat($(this).data('due')) || 0;
+            const collectVal = parseFloat($(this).find('.row-collect-input').val()) || 0;
 
-            if (due <= 0) return;
-
-            const applyPaid = Math.min(remainingPaid, due);
-            remainingPaid = parseFloat((remainingPaid - applyPaid).toFixed(2));
-
-            const dueAfterPaid = due - applyPaid;
-            const applyDiscount = Math.min(remainingDiscount, dueAfterPaid);
+            const applyDiscount = Math.min(remainingDiscount, due);
             remainingDiscount = parseFloat((remainingDiscount - applyDiscount).toFixed(2));
+            const effectivePaid = Math.min(collectVal, Math.max(0, due - applyDiscount));
 
-            if (applyPaid > 0 || applyDiscount > 0) {
+            if (effectivePaid > 0 || applyDiscount > 0) {
                 payments.push({
                     orderId,
-                    paidAmount: applyPaid,
+                    paidAmount: effectivePaid,
                     discountAmount: applyDiscount,
                     deliveryStatus,
                     accountId
@@ -304,8 +349,13 @@
             }
         });
 
+        if (!anyChecked) {
+            showMsg('#dueMsg', 'error', 'অন্তত একটি অর্ডার চেকবক্সে টিক দিন');
+            return;
+        }
+
         if (!payments.length) {
-            showMsg('#dueMsg', 'error', 'কোনো বাকি অর্ডার পাওয়া যায়নি');
+            showMsg('#dueMsg', 'error', 'নির্বাচিত অর্ডারে কোনো পেমেন্ট দেওয়া হয়নি');
             return;
         }
 
@@ -423,6 +473,97 @@
         });
     }
 
+    // ── Photo modal ───────────────────────────────────────────────
+    var photoFile = null;
+
+    window.openPhotoModal = function () {
+        photoFile = null;
+        $('#photoFileInput').val('');
+        $('#photoPreviewImg').hide().attr('src', '');
+        $('#photoPlaceholder').show();
+        $('#btnSavePhoto').prop('disabled', false).html('<i class="fas fa-save me-1"></i>সেভ করুন');
+
+        // Load existing photo into modal preview
+        var img = new Image();
+        img.onload = function () {
+            $('#photoPlaceholder').hide();
+            $('#photoPreviewImg').attr('src', img.src).show();
+        };
+        img.src = '/api/Customers/' + customerId + '/photo?institutionId=' + institutionId + '&_t=' + Date.now();
+
+        $('#photoModal').addClass('show');
+    };
+
+    window.closePhotoModal = function () {
+        photoFile = null;
+        $('#photoModal').removeClass('show');
+    };
+
+    $(document).on('change', '#photoFileInput', function () {
+        var file = this.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            alert('ছবির সাইজ ২ MB এর বেশি হওয়া যাবে না');
+            $(this).val('');
+            return;
+        }
+        photoFile = file;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#photoPlaceholder').hide();
+            $('#photoPreviewImg').attr('src', e.target.result).show();
+        };
+        reader.readAsDataURL(file);
+    });
+
+    window.saveCustomerPhoto = function () {
+        if (!photoFile) { alert('অনুগ্রহ করে একটি ছবি বেছে নিন'); return; }
+
+        var savedFile = photoFile;
+        var formData = new FormData();
+        formData.append('photo', savedFile);
+
+        $('#btnSavePhoto').prop('disabled', true).text('সেভ হচ্ছে...');
+
+        $.ajax({
+            url: '/api/Customers/' + customerId + '/photo?institutionId=' + institutionId,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (r) {
+                if (r.success) {
+                    closePhotoModal();
+                    // Update profile photo immediately using the selected file's data URL
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var dataUrl = e.target.result;
+                        var $photo = $('#profilePhoto');
+                        if ($photo.length) {
+                            $photo[0].onerror = null;
+                            $photo.attr('src', dataUrl).show();
+                            $photo.next('.profile-avatar').hide();
+                        } else {
+                            // avatar was showing (no previous photo), swap to img
+                            var $wrap = $('.profile-avatar-wrap');
+                            $wrap.find('.profile-avatar').hide();
+                            $wrap.prepend(`<img id="profilePhoto" class="profile-photo" src="${dataUrl}" alt="ছবি">`);
+                        }
+                    };
+                    reader.readAsDataURL(savedFile);
+                } else {
+                    alert(r.message || 'ছবি সেভ করতে সমস্যা হয়েছে');
+                    $('#btnSavePhoto').prop('disabled', false).html('<i class="fas fa-save me-1"></i>সেভ করুন');
+                }
+            },
+            error: function () {
+                alert('সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                $('#btnSavePhoto').prop('disabled', false).html('<i class="fas fa-save me-1"></i>সেভ করুন');
+            }
+        });
+    };
+    // ─────────────────────────────────────────────────────────────
+
     function showMsg(selector, type, msg) {
         const $el = $(selector);
         $el.removeClass('alert-success alert-error')
@@ -441,4 +582,179 @@
     function escapeHtml(str) {
         return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
+
+    // ── Item Sell Due ─────────────────────────────────────────────
+    let itemSellDueData = [];
+
+    function loadItemSellDue() {
+        $('#itemSellDueTableContainer').html('<div class="loading">লোড হচ্ছে...</div>');
+        $.get(`/api/customer-page/item-sell-due?customerId=${customerId}&institutionId=${institutionId}`, function (r) {
+            if (!r.success || !r.data.length) {
+                $('#itemSellDueTableContainer').html('<div class="empty-msg">কোনো আইটেম সেল বাকি নেই</div>');
+                $('#itemSellCollectPanel').addClass('collect-panel-hidden');
+                return;
+            }
+            itemSellDueData = r.data;
+            renderItemSellDueTable(r.data);
+        });
+    }
+
+    function renderItemSellDueTable(records) {
+        let totalDue = 0;
+        let rows = '';
+        records.forEach(function (s) {
+            totalDue += s.dueAmount;
+            rows += `<tr data-selling-id="${s.sellingId}" data-due="${s.dueAmount}">
+                <td><input type="checkbox" class="item-sell-row-chk" style="width:16px;height:16px;cursor:pointer;accent-color:#6c7ae0;"></td>
+                <td><strong>${s.sellingSN}</strong></td>
+                <td>${formatDate(s.sellingDate)}</td>
+                <td style="text-align:left;">${escapeHtml(s.itemDetails || '-')}</td>
+                <td>${s.totalPrice.toFixed(2)}</td>
+                <td>${s.paidAmount.toFixed(2)}</td>
+                <td class="due-paid-col">${s.dueAmount.toFixed(2)} /-</td>
+                <td><input type="number" class="item-sell-collect-input due-input" min="0" max="${s.dueAmount.toFixed(2)}" step="0.01" placeholder="0" value="" style="display:none;"></td>
+            </tr>`;
+        });
+
+        const html = `<table>
+            <thead><tr>
+                <th style="width:36px;"><input type="checkbox" id="checkAllItemSell" style="width:16px;height:16px;cursor:pointer;accent-color:#fff;" title="সব সিলেক্ট করুন"></th>
+                <th>রশিদ নং</th>
+                <th>তারিখ</th>
+                <th>আইটেম বিবরণ</th>
+                <th>মোট</th>
+                <th>পেইড</th>
+                <th>বাকি</th>
+                <th>কত নিচ্ছেন?</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot><tr>
+                <td></td>
+                <td colspan="5" style="text-align:right;padding-right:8px;font-weight:700;">মোট:</td>
+                <td class="due-paid-col">${totalDue.toFixed(2)} /-</td>
+                <td></td>
+            </tr></tfoot>
+        </table>`;
+        $('#itemSellDueTableContainer').html(html);
+
+        // Check-all
+        $(document).off('change.itemcheckall').on('change.itemcheckall', '#checkAllItemSell', function () {
+            const checked = $(this).is(':checked');
+            $('#itemSellDueTableContainer tbody .item-sell-row-chk').each(function () {
+                $(this).prop('checked', checked).trigger('change');
+            });
+        });
+
+        // Per-row checkbox
+        $(document).off('change.itemrowchk').on('change.itemrowchk', '.item-sell-row-chk', function () {
+            const $tr = $(this).closest('tr');
+            const $input = $tr.find('.item-sell-collect-input');
+            if ($(this).is(':checked')) {
+                const due = parseFloat($tr.data('due')) || 0;
+                $input.val(due.toFixed(2)).show();
+            } else {
+                $input.val('').hide();
+            }
+            updateItemSellCollectPanel();
+        });
+
+        // Per-row collect input change
+        $(document).off('input.itemrowcollect').on('input.itemrowcollect', '.item-sell-collect-input', function () {
+            const $tr = $(this).closest('tr');
+            const due = parseFloat($tr.data('due')) || 0;
+            let val = parseFloat($(this).val()) || 0;
+            if (val > due) { $(this).val(due.toFixed(2)); }
+            if (val < 0) { $(this).val(0); }
+            updateItemSellCollectPanel();
+        });
+
+        // Discount change
+        $(document).off('input.itemdiscount').on('input.itemdiscount', '#itemSellCollectDiscountInput', function () {
+            updateItemSellCollectPanel();
+        });
+
+        $('#itemSellTotalDueDisplay').text(totalDue.toFixed(2) + ' /-');
+        $('#itemSellCollectAmountInput').val('');
+        $('#itemSellCollectDiscountInput').val('');
+        $('#itemSellCollectPanel').removeClass('collect-panel-hidden');
+
+        // Populate account select
+        const $sel = $('#itemSellAccountSelect');
+        $sel.html('<option value="">Without Account</option>');
+        accountsData.forEach(function (a) {
+            $sel.append(`<option value="${a.accountId}" ${a.isDefault ? 'selected' : ''}>${escapeHtml(a.accountName)}</option>`);
+        });
+    }
+
+    function updateItemSellCollectPanel() {
+        let total = 0;
+        const discount = parseFloat($('#itemSellCollectDiscountInput').val()) || 0;
+        $('#itemSellDueTableContainer tbody tr').each(function () {
+            if ($(this).find('.item-sell-row-chk').is(':checked')) {
+                total += parseFloat($(this).find('.item-sell-collect-input').val()) || 0;
+            }
+        });
+        const net = Math.max(0, total - discount);
+        $('#itemSellCollectAmountInput').val(net > 0 ? net.toFixed(2) : '');
+    }
+
+    window.collectItemSellDue = function () {
+        const discountInput = parseFloat($('#itemSellCollectDiscountInput').val()) || 0;
+        const accountId = parseInt($('#itemSellAccountSelect').val()) || null;
+
+        const payments = [];
+        let anyChecked = false;
+        let remainingDiscount = discountInput;
+
+        $('#itemSellDueTableContainer tbody tr').each(function () {
+            const $chk = $(this).find('.item-sell-row-chk');
+            if (!$chk.is(':checked')) return;
+            anyChecked = true;
+
+            const sellingId = parseInt($(this).data('selling-id'));
+            const due = parseFloat($(this).data('due')) || 0;
+            const collectVal = parseFloat($(this).find('.item-sell-collect-input').val()) || 0;
+
+            const applyDiscount = Math.min(remainingDiscount, due);
+            remainingDiscount = parseFloat((remainingDiscount - applyDiscount).toFixed(2));
+            const effectivePaid = Math.min(collectVal, Math.max(0, due - applyDiscount));
+
+            if (effectivePaid > 0 || applyDiscount > 0) {
+                payments.push({ sellingId, paidAmount: effectivePaid, discountAmount: applyDiscount, accountId });
+            }
+        });
+
+        if (!anyChecked) {
+            showMsg('#itemSellDueMsg', 'error', 'অন্তত একটি রেকর্ড চেকবক্সে টিক দিন');
+            return;
+        }
+        if (!payments.length) {
+            showMsg('#itemSellDueMsg', 'error', 'নির্বাচিত রেকর্ডে কোনো পেমেন্ট দেওয়া হয়নি');
+            return;
+        }
+
+        const $btn = $('#itemSellCollectPanel .btn-collect');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> ...');
+
+        $.ajax({
+            url: '/api/customer-page/collect-item-sell-due',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ institutionId, registrationId, customerId, payments }),
+            success: function (r) {
+                if (r.success) {
+                    showMsg('#itemSellDueMsg', 'success', r.message);
+                    setTimeout(function () { loadItemSellDue(); }, 800);
+                } else {
+                    showMsg('#itemSellDueMsg', 'error', r.message);
+                }
+                $btn.prop('disabled', false).html('<i class="fas fa-hand-holding-usd"></i> বাকি সংগ্রহ করুন');
+            },
+            error: function () {
+                showMsg('#itemSellDueMsg', 'error', 'সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                $btn.prop('disabled', false).html('<i class="fas fa-hand-holding-usd"></i> বাকি সংগ্রহ করুন');
+            }
+        });
+    };
+    // ─────────────────────────────────────────────────────────────
 })();

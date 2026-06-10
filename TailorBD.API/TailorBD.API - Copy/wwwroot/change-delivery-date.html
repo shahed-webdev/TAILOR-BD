@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -118,13 +118,13 @@
         <div class="dashboard-content">
             <div class="container">
                 <div class="content">
-                    <h2 data-en="Change Delivery Date" data-bn="ডেলিভারি তারিখ পরিবর্তন করুন">ডেলিভারি তারিখ পরিবর্তন করুন</h2>
+                    <h2 data-en="Change Delivery Date" data-bn="ডেলিভারি তারিখ পরিবর্তন">ডেলিভারি তারিখ পরিবর্তন</h2>
 
                     <!-- Search Mode Toggle -->
                     <div class="search-mode-group">
                         <label class="radio-order">
                             <input type="radio" name="searchMode" value="orderNo" checked>
-                            <span data-en="Order No. And Mobile No." data-bn="অর্ডার নং এবং মোবাইল নং">অর্ডার নং এবং মোবাইল নং</span>
+                            <span data-en="Order No. And Mobile No." data-bn="অর্ডার নম্বর ও মোবাইল নম্বর">অর্ডার নম্বর ও মোবাইল নম্বর</span>
                         </label>
                         <label class="radio-date">
                             <input type="radio" name="searchMode" value="date">
@@ -137,39 +137,35 @@
                         <div class="search-panel">
                             <div class="search-grid">
                                 <div class="form-group autocomplete-wrapper">
-                                    <label data-en="Mobile Number" data-bn="মোবাইল নাম্বার">মোবাইল নাম্বার</label>
+                                    <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
                                     <input type="text" id="mobileNo" autocomplete="off"
                                         data-en-placeholder="Mobile Number"
-                                        data-bn-placeholder="মোবাইল নাম্বার"
-                                        placeholder="মোবাইল নাম্বার">
+                                        data-bn-placeholder="মোবাইল নম্বর" placeholder="আরেকটি যোগ করুন">
                                     <div class="autocomplete-list" id="mobileNoSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group autocomplete-wrapper">
                                     <label data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
                                     <input type="text" id="customerName" autocomplete="off"
                                         data-en-placeholder="Customer Name"
-                                        data-bn-placeholder="কাস্টমারের নাম"
-                                        placeholder="কাস্টমারের নাম">
+                                        data-bn-placeholder="কাস্টমারের নাম" placeholder="?প্রতিষ্ঠার বছর">
                                     <div class="autocomplete-list" id="customerNameSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="Order Number" data-bn="অর্ডার নাম্বার">অর্ডার নাম্বার</label>
+                                    <label data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</label>
                                     <input type="text" id="orderNo"
                                         data-en-placeholder="Order Number"
-                                        data-bn-placeholder="অর্ডার নাম্বার"
-                                        placeholder="অর্ডার নাম্বার">
+                                        data-bn-placeholder="অর্ডার নম্বর" placeholder="আরেকটি যোগ করুন">
                                 </div>
                                 <div class="form-group">
                                     <label data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
                                     <input type="text" id="address"
                                         data-en-placeholder="Address"
-                                        data-bn-placeholder="ঠিকানা"
-                                        placeholder="ঠিকানা">
+                                        data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা">
                                 </div>
                                 <div>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
                                         <i class="fas fa-search"></i>
-                                        <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
                             </div>
@@ -181,17 +177,17 @@
                         <div class="search-panel">
                             <div class="search-grid-date">
                                 <div class="form-group">
-                                    <label data-en="From Date" data-bn="কোন তারিখ থেকে">কোন তারিখ থেকে</label>
+                                    <label data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
                                     <input type="date" id="startDate">
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="To Date" data-bn="কোন তারিখ পর্যন্ত">কোন তারিখ পর্যন্ত</label>
+                                    <label data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
                                     <input type="date" id="endDate">
                                 </div>
                                 <div>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
                                         <i class="fas fa-search"></i>
-                                        <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
                             </div>
@@ -206,7 +202,7 @@
                         </div>
                         <div class="legend-item">
                             <div class="legend-dot legend-overdue"></div>
-                            <span data-en="Date Over Delivery" data-bn="তারিখ পেরিয়ে গেছে">তারিখ পেরিয়ে গেছে</span>
+                            <span data-en="Date Over Delivery" data-bn="মেয়াদ উত্তীর্ণ ডেলিভারি">মেয়াদ উত্তীর্ণ ডেলিভারি</span>
                         </div>
                     </div>
 
@@ -225,11 +221,11 @@
                     <!-- Change Date Panel -->
                     <div class="change-date-panel" id="changeDatePanel">
                         <h5><i class="fas fa-calendar-alt me-2"></i>
-                            <span data-en="Change Selected Orders Delivery Date" data-bn="নির্বাচিত অর্ডারের ডেলিভারি তারিখ পরিবর্তন করুন">নির্বাচিত অর্ডারের ডেলিভারি তারিখ পরিবর্তন করুন</span>
+                            <span data-en="Change Selected Orders Delivery Date" data-bn="নির্বাচিত অর্ডারের ডেলিভারি তারিখ পরিবর্তন">নির্বাচিত অর্ডারের ডেলিভারি তারিখ পরিবর্তন</span>
                         </h5>
                         <div class="change-date-row">
                             <div class="form-group" style="margin:0;">
-                                <label data-en="New Delivery Date" data-bn="পরিবর্তিত তারিখ">পরিবর্তিত তারিখ</label>
+                                <label data-en="New Delivery Date" data-bn="নতুন ডেলিভারি তারিখ">নতুন ডেলিভারি তারিখ</label>
                                 <input type="date" id="newDeliveryDate" style="width:200px;">
                             </div>
                             <button type="button" class="btn-change" onclick="changeDeliveryDate()">
@@ -249,7 +245,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/change-delivery-date.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/change-delivery-date.js?v=2.1.6"></script>
 </body>
 </html>

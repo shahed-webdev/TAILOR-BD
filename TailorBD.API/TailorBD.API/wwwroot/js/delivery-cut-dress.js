@@ -74,7 +74,7 @@
         $('#paginationContainer').html('');
 
         var mode = $('input[name="searchMode"]:checked').val();
-        var url = '/api/delivery/delivered-orders?institutionId=' + institutionId + '&page=' + page + '&pageSize=' + pageSize;
+        var url = '/api/delivery/delivered-cut-dress?institutionId=' + institutionId + '&page=' + page + '&pageSize=' + pageSize;
 
         if (mode === 'orderNo') {
             var phone = $('#mobileNo').val().trim();

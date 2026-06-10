@@ -859,6 +859,136 @@ namespace TailorBD.API.Controllers
         }
 
         /// <summary>
+        /// Get customer item sell due records
+        /// </summary>
+        [HttpGet("item-sell-due")]
+        public async Task<ActionResult> GetItemSellDue([FromQuery] int customerId, [FromQuery] int institutionId)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                var list = new List<object>();
+                using var cmd = new SqlCommand(@"
+                    SELECT
+                        fs.FabricsSellingID   AS SellingId,
+                        fs.Selling_SN         AS SellingSN,
+                        fs.SellingDate,
+                        fs.SellingTotalPrice,
+                        fs.SellingDiscountAmount,
+                        fs.SellingPaidAmount - ISNULL(fs.SellingReturnAmount, 0) AS SellingPaidAmount,
+                        fs.SellingDueAmount,
+                        STUFF((
+                            SELECT ', ' + f2.FabricCode + ' (' + CAST(sl2.SellingQuantity AS NVARCHAR) + ')'
+                            FROM Fabrics_Selling_List sl2
+                            JOIN Fabrics f2 ON sl2.FabricID = f2.FabricID
+                            WHERE sl2.FabricsSellingID = fs.FabricsSellingID
+                            FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, '') AS ItemDetails
+                    FROM Fabrics_Selling fs
+                    WHERE fs.InstitutionID = @InstitutionID
+                      AND fs.CustomerID = @CustomerID
+                      AND fs.SellingDueAmount > 0
+                    ORDER BY fs.Selling_SN DESC", connection);
+                cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                cmd.Parameters.AddWithValue("@CustomerID", customerId);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    list.Add(new
+                    {
+                        sellingId        = reader.GetInt32(0),
+                        sellingSN        = Convert.ToInt32(reader.GetValue(1)),
+                        sellingDate      = reader.GetDateTime(2),
+                        totalPrice       = reader.IsDBNull(3) ? 0.0 : reader.GetDouble(3),
+                        discountAmount   = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
+                        paidAmount       = reader.IsDBNull(5) ? 0.0 : reader.GetDouble(5),
+                        dueAmount        = reader.IsDBNull(6) ? 0.0 : reader.GetDouble(6),
+                        itemDetails      = reader.IsDBNull(7) ? "" : reader.GetString(7)
+                    });
+                }
+
+                return Ok(new { success = true, data = list });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting item sell due");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Collect item sell due payment
+        /// </summary>
+        [HttpPost("collect-item-sell-due")]
+        public async Task<ActionResult> CollectItemSellDue([FromBody] CollectItemSellDueModel model)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
+                using var transaction = connection.BeginTransaction();
+
+                try
+                {
+                    foreach (var item in model.Payments)
+                    {
+                        if (item.PaidAmount <= 0 && item.DiscountAmount <= 0) continue;
+
+                        // Update Fabrics_Selling paid and discount amounts
+                        using (var updateCmd = new SqlCommand(@"
+                            UPDATE Fabrics_Selling
+                            SET SellingPaidAmount     = SellingPaidAmount     + @PaidAmount,
+                                SellingDiscountAmount = SellingDiscountAmount + @DiscountAmount
+                            WHERE FabricsSellingID = @FabricsSellingID",
+                            connection, transaction))
+                        {
+                            updateCmd.Parameters.AddWithValue("@PaidAmount", item.PaidAmount);
+                            updateCmd.Parameters.AddWithValue("@DiscountAmount", item.DiscountAmount);
+                            updateCmd.Parameters.AddWithValue("@FabricsSellingID", item.SellingId);
+                            await updateCmd.ExecuteNonQueryAsync();
+                        }
+
+                        if (item.PaidAmount > 0)
+                        {
+                            // Insert into Fabrics_Selling_PaymentRecord
+                            using var payCmd = new SqlCommand(@"
+                                INSERT INTO Fabrics_Selling_PaymentRecord
+                                    (FabricsSellingID, RegistrationID, InstitutionID, AccountID,
+                                     SellingPaidAmount, Payment_Situation, SellingPaid_Date, InsertDate)
+                                VALUES
+                                    (@FabricsSellingID, @RegistrationID, @InstitutionID, @AccountID,
+                                     @SellingPaidAmount, 'FabricsDuePaid', GETDATE(), GETDATE())",
+                                connection, transaction);
+                            payCmd.Parameters.AddWithValue("@FabricsSellingID", item.SellingId);
+                            payCmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
+                            payCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                            payCmd.Parameters.AddWithValue("@AccountID", item.AccountId.HasValue ? (object)item.AccountId.Value : DBNull.Value);
+                            payCmd.Parameters.AddWithValue("@SellingPaidAmount", item.PaidAmount);
+                            await payCmd.ExecuteNonQueryAsync();
+                        }
+                    }
+
+                    transaction.Commit();
+                    return Ok(new { success = true, message = "আইটেম সেল বাকি সফলভাবে সংগ্রহ হয়েছে" });
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error collecting item sell due");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Get customer list with search and pagination
         /// </summary>
         [HttpGet("customer-list")]
@@ -1104,6 +1234,22 @@ namespace TailorBD.API.Controllers
             public string Phone { get; set; } = "";
             public string Address { get; set; } = "";
             public string Description { get; set; } = "";
+        }
+
+        public class CollectItemSellDueModel
+        {
+            public int InstitutionId { get; set; }
+            public int RegistrationId { get; set; }
+            public int CustomerId { get; set; }
+            public List<ItemSellDuePaymentItem> Payments { get; set; } = new();
+        }
+
+        public class ItemSellDuePaymentItem
+        {
+            public int SellingId { get; set; }
+            public double PaidAmount { get; set; }
+            public double DiscountAmount { get; set; }
+            public int? AccountId { get; set; }
         }
     }
 }

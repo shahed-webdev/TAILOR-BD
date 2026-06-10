@@ -10,8 +10,10 @@
 
     // Initialize page
     $(document).ready(function() {
-        institutionId = parseInt(sessionStorage.getItem('institutionId'));
-        registrationId = parseInt(sessionStorage.getItem('registrationId'));
+        if (window.TailorAuth) window.TailorAuth.restore();
+
+        institutionId = parseInt(sessionStorage.getItem('institutionId'), 10);
+        registrationId = parseInt(sessionStorage.getItem('registrationId'), 10);
 
         if (!institutionId || !registrationId) {
             alert('Session expired. Please login again.');
@@ -103,18 +105,22 @@
         $.ajax({
             url: url,
             method: 'GET',
+            timeout: 60000,
             success: function(response) {
                 if (response.success && response.data && response.data.orders.length > 0) {
                     allOrders = response.data.orders;
                     currentPage = 1;
                     renderOrdersTable(allOrders, currentPage);
                 } else {
-                    container.html('<div class="empty-message">No orders found</div>');
+                    container.html('<div class="empty-message"><span class="lang-content" data-en="No ready-to-deliver orders found" data-bn="ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি">ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি</span></div>');
                 }
             },
-            error: function(xhr) {
+            error: function(xhr, status) {
                 console.error('Error loading orders:', xhr);
-                container.html('<div class="error-message">Error loading orders. Please try again.</div>');
+                const msg = status === 'timeout'
+                    ? 'অর্ডার লোড হতে অনেক সময় লাগছে। API সার্ভার রিস্টার্ট করে আবার চেষ্টা করুন।'
+                    : 'অর্ডার লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+                container.html('<div class="error-message">' + msg + '</div>');
             }
         });
     }
@@ -148,6 +154,22 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    function formatShortDate(dateString) {
+        if (!dateString) return '-';
+        const d = new Date(dateString);
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = String(d.getFullYear()).slice(-2);
+        return `${dd}/${mm}/${yy}`;
+    }
+
+    function clipCell(text, maxLen) {
+        if (!text || text === '-') return '-';
+        const s = String(text);
+        if (s.length <= maxLen) return s;
+        return s.substring(0, maxLen) + '…';
+    }
+
     function renderOrdersTable(orders, page) {
         page = page || 1;
         const container = $('#ordersTableContainer');
@@ -164,61 +186,76 @@
         const paginationHtml = renderPagination(totalOrders, page);
 
         let html = paginationHtml + `
-            <table>
+            <table class="dg-table">
+                <colgroup>
+                    <col class="col-chk">
+                    <col style="width:4%">
+                    <col style="width:9%">
+                    <col style="width:7%">
+                    <col style="width:8%">
+                    <col style="width:14%">
+                    <col style="width:5%">
+                    <col style="width:5%">
+                    <col style="width:7%">
+                    <col style="width:6%">
+                    <col style="width:7%">
+                    <col style="width:6%">
+                    <col class="col-chk">
+                    <col class="col-act">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th style="width:40px; text-align:center;">
-                            <input type="checkbox" id="selectAllOrders" title="Select All">
-                        </th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Order No." data-bn="অর্ডার নং">অর্ডার নং</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Phone" data-bn="মোবাইল">মোবাইল</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</span></th>
-                        <th style="min-width:200px; text-align:center;"><span class="lang-content" data-en="Dress Details" data-bn="অর্ডার লিস্ট - পোশাক - পরিমাণ">অর্ডার লিস্ট - পোশাক - পরিমাণ</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Order Date" data-bn="অর্ডার তারিখ">অর্ডার তারিখ</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Total" data-bn="মোট টাকা">মোট টাকা</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Paid" data-bn="নগদ পেইড">নগদ পেইড</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Due" data-bn="বাকি">বাকি</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Store" data-bn="যেখানে রেখেছিলেন">যেখানে রেখেছিলেন</span></th>
-                        <th style="min-width:150px; text-align:center;"><span class="lang-content" data-en="Special Details" data-bn="বিশেষ বিবরণ">বিশেষ বিবরণ</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Status" data-bn="স্ট্যাটাস">স্ট্যাটাস</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="SMS" data-bn="SMS">SMS</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</span></th>
-                        <th style="text-align:center;"><span class="lang-content" data-en="Action" data-bn="ডেলিভারী">ডেলিভারী</span></th>
+                        <th><input type="checkbox" id="selectAllOrders" title="Select All"></th>
+                        <th><span class="lang-content" data-en="No." data-bn="নং">নং</span></th>
+                        <th><span class="lang-content" data-en="Name" data-bn="নাম">নাম</span></th>
+                        <th><span class="lang-content" data-en="Phone" data-bn="মোবা.">মোবা.</span></th>
+                        <th><span class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</span></th>
+                        <th><span class="lang-content" data-en="Dress" data-bn="পোশাক">পোশাক</span></th>
+                        <th><span class="lang-content" data-en="Order" data-bn="অর্ডার">অর্ডার</span></th>
+                        <th><span class="lang-content" data-en="Del." data-bn="ডেলি.">ডেলি.</span></th>
+                        <th><span class="lang-content" data-en="Amt/Paid/Due" data-bn="মোট/পেইড/বাকি">মোট/পেইড/বাকি</span></th>
+                        <th><span class="lang-content" data-en="Store" data-bn="রাখা">রাখা</span></th>
+                        <th><span class="lang-content" data-en="Note" data-bn="নোট">নোট</span></th>
+                        <th><span class="lang-content" data-en="St." data-bn="স্ট.">স্ট.</span></th>
+                        <th>SMS</th>
+                        <th><span class="lang-content" data-en="Act." data-bn="কাজ">কাজ</span></th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
         pageOrders.forEach(order => {
-            const orderDate    = new Date(order.orderDate).toLocaleDateString('en-GB');
-            const deliveryDate = order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString('en-GB') : '-';
-            const isFullyCompleted = order.workStatus === 'completed';
+            const orderDate    = formatShortDate(order.orderDate);
+            const deliveryDate = formatShortDate(order.deliveryDate);
+            const isFullyCompleted = (order.workStatus || '').toLowerCase() === 'completed';
             const statusClass = isFullyCompleted ? 'status-ready' : 'status-partial';
             const statusText  = isFullyCompleted
                 ? '<span class="lang-content" data-en="Ready" data-bn="প্রস্তুত">প্রস্তুত</span>'
-                : '<span class="lang-content" data-en="Partial Ready" data-bn="আংশিক প্রস্তুত">আংশিক প্রস্তুত</span>';
+                : '<span class="lang-content" data-en="Part." data-bn="আংশিক">আংশিক</span>';
+            const dressFull = order.dressDetails || '-';
+            const addrFull  = order.address || '-';
+            const storeFull = order.storeDetails || '-';
+            const noteFull  = order.details || '-';
 
             html += `
                 <tr>
-                    <td style="text-align:center;">
-                        <input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}">
+                    <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
+                    <td><strong>${order.orderSerialNumber}</strong></td>
+                    <td><span class="cell-clip" title="${escapeHtml(order.customerName)}">${escapeHtml(clipCell(order.customerName, 18))}</span></td>
+                    <td><span class="cell-clip" title="${escapeHtml(order.phone || '')}">${escapeHtml(order.phone || '-')}</span></td>
+                    <td><span class="cell-clip" title="${escapeHtml(addrFull)}">${escapeHtml(clipCell(addrFull, 14))}</span></td>
+                    <td><span class="cell-wrap" title="${escapeHtml(dressFull)}">${escapeHtml(dressFull)}</span></td>
+                    <td>${orderDate}</td>
+                    <td>${deliveryDate}</td>
+                    <td class="money-stack">
+                        <div class="total">${order.orderAmount.toFixed(0)}</div>
+                        <div class="paid">${order.paidAmount.toFixed(0)}</div>
+                        <div class="due">${order.dueAmount.toFixed(0)}</div>
                     </td>
-                    <td style="text-align:center;"><strong>${order.orderSerialNumber}</strong></td>
-                    <td style="text-align:center;">${order.customerName}</td>
-                    <td style="text-align:center;">${order.phone || '-'}</td>
-                    <td style="text-align:center;">${order.address || '-'}</td>
-                    <td style="text-align:center; white-space:pre-wrap; font-size:12px;">${order.dressDetails || '-'}</td>
-                    <td style="text-align:center; white-space:nowrap;">${orderDate}</td>
-                    <td style="text-align:center; white-space:nowrap;">${deliveryDate}</td>
-                    <td style="text-align:center;">${order.orderAmount.toFixed(2)}</td>
-                    <td style="text-align:center;">${order.paidAmount.toFixed(2)}</td>
-                    <td style="text-align:center;"><strong>${order.dueAmount.toFixed(2)}</strong></td>
-                    <td style="text-align:center;">${order.storeDetails || '-'}</td>
-                    <td style="text-align:center; white-space:pre-wrap; font-size:12px;">${order.details || '-'}</td>
-                    <td style="text-align:center;"><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td style="text-align:center;">
+                    <td><span class="cell-clip" title="${escapeHtml(storeFull)}">${escapeHtml(clipCell(storeFull, 10))}</span></td>
+                    <td><span class="cell-clip" title="${escapeHtml(noteFull)}">${escapeHtml(clipCell(noteFull, 12))}</span></td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
                         <input type="checkbox" class="sms-checkbox"
                             data-order-id="${order.orderId}"
                             data-order-serial="${order.orderSerialNumber}"
@@ -227,15 +264,15 @@
                             data-masking="${escapeHtml(order.masking || '')}"
                             data-sms-balance="${order.smsBalance || 0}">
                     </td>
-                    <td style="text-align:center;">
-                        <button onclick="viewOrderDetails(${order.orderId})" class="btn-details-icon" title="বিস্তারিত দেখুন">
-                            <i class="fas fa-eye" style="font-size:18px; color:#007bff;"></i>
-                        </button>
-                    </td>
-                    <td style="text-align:center;">
-                        <button onclick="openPartialDeliveryModal(${order.orderId}, '${order.orderSerialNumber}')" class="btn-deliver-link btn" style="padding:2px 6px;" title="ডেলিভারি দিন">
-                            <i class="fas fa-check-circle" style="font-size:24px; color:#28a745;"></i>
-                        </button>
+                    <td class="col-act-cell">
+                        <div class="act-btns">
+                            <button onclick="viewOrderDetails(${order.orderId})" class="btn-icon-sm details" title="বিস্তারিত">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="openPartialDeliveryModal(${order.orderId}, '${order.orderSerialNumber}')" class="btn-icon-sm deliver" title="ডেলিভারি দিন">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -628,7 +665,16 @@
                     $('#pdAlertMsg').removeClass('alert-warning alert-danger').addClass('alert alert-success').text(res.message).show();
                     setTimeout(function() {
                         $('#partialDeliveryModal').modal('hide');
-                        window.location.href = `/money-receipt.html?orderId=${pdCurrentOrderId}`;
+                        var category = sessionStorage.getItem('category') || '';
+                        var canOpenReceipt = category !== 'Sub-Admin';
+                        if (!canOpenReceipt && window.TailorBD && typeof window.TailorBD.hasPageAccess === 'function') {
+                            canOpenReceipt = window.TailorBD.hasPageAccess('/money-receipt.html');
+                        }
+                        if (canOpenReceipt) {
+                            window.location.href = '/money-receipt.html?orderId=' + pdCurrentOrderId;
+                        } else {
+                            loadReadyOrders();
+                        }
                     }, 1000);
                 } else {
                     $('#pdAlertMsg').removeClass('alert-success').addClass('alert alert-danger').text(res.message || 'ব্যর্থ হয়েছে').show();

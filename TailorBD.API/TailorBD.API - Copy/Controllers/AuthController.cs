@@ -44,6 +44,7 @@ namespace TailorBD.API.Controllers
                         l.Password,
                         l.Category,
                         r.Name,
+                        r.Phone,
                         r.Validation,
                         i.InstitutionName
                     FROM LIU l
@@ -99,6 +100,7 @@ namespace TailorBD.API.Controllers
                             institutionId  = user.InstitutionID,
                             institutionName= user.InstitutionName ?? "",
                             name           = user.Name ?? user.UserName,
+                            phone          = user.Phone ?? "",
                             category       = user.Category ?? "User"
                         }
                     });
@@ -224,11 +226,10 @@ namespace TailorBD.API.Controllers
                 if (!currentValid)
                     return Ok(new { success = false, message = "বর্তমান পাসওয়ার্ড সঠিক নয়" });
 
-                var newHash = PasswordHelper.HashPassword(model.NewPassword);
-
+                // Save plain text so admin can view it; login handles both plain and hash
                 connection.Execute(
-                    "UPDATE LIU SET Password = @Hash WHERE LIUID = @Id",
-                    new { Hash = newHash, Id = user.LIUID });
+                    "UPDATE LIU SET Password = @Plain WHERE LIUID = @Id",
+                    new { Plain = model.NewPassword, Id = user.LIUID });
 
                 return Ok(new { success = true, message = "পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!" });
             }
@@ -273,6 +274,7 @@ namespace TailorBD.API.Controllers
         public string Password       { get; set; } = string.Empty;
         public string? Category      { get; set; }
         public string? Name          { get; set; }
+        public string? Phone         { get; set; }
         public string? Validation    { get; set; }
         public string? InstitutionName { get; set; }
     }

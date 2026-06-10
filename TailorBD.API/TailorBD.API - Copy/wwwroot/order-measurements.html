@@ -281,14 +281,17 @@
         // Load order measurements
         async function loadOrderMeasurements(orderId, institutionId) {
             try {
-                const response = await fetch(`/api/Orders/finish-order-details?orderId=${orderId}&institutionId=${institutionId}`);
+                const response = await fetch(`/api/Orders/money-receipt-details?orderId=${orderId}&institutionId=${institutionId}`);
                 const result = await response.json();
 
                 if (!result.success) {
                     throw new Error(result.message || 'Failed to load measurements');
                 }
 
-                orderData = result.data;
+                orderData = {
+                    customer: result.data.header,
+                    measurements: result.data.measurements || []
+                };
                 renderMeasurementsWithoutName();
                 renderMeasurementsWithName();
 

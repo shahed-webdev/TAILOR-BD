@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,12 +24,12 @@
     <div id="app-sidebar"></div>
 
     <!-- Main Content -->
-    <main class="main-content" id="mainContent">
+    <main class="main-content" id="mainContent" style="display:flex; flex-direction:column; height:100vh; overflow:hidden;">
         <!-- Navbar Container (Auto-loads from component) -->
-        <div id="app-navbar"></div>
+        <div id="app-navbar" style="flex-shrink:0;"></div>
 
         <!-- Dashboard Content -->
-        <div class="dashboard-content">
+        <div class="dashboard-content" style="padding:0; overflow:hidden; height:calc(100vh - 64px); display:flex; flex-direction:column;">
             <div class="shop-info-container">
                 <!-- Alert Messages -->
                 <div id="alertContainer"></div>
@@ -44,7 +44,7 @@
                         <input type="file" id="logoInput" accept="image/*" style="display: none;">
                         <button class="logo-upload-btn" onclick="document.getElementById('logoInput').click()">
                             <i class="fas fa-camera me-2"></i>
-                            <span class="lang-content" data-en="Update Logo" data-bn="লোগো আপডেট">Update Logo</span>
+                            <span class="lang-content" data-en="Update Logo" data-bn="লোগো আপডেট">লোগো আপডেট</span>
                         </button>
                     </div>
                     <div class="shop-header-info">
@@ -61,22 +61,22 @@
                     <div class="info-card">
                         <h3>
                             <i class="fas fa-info-circle"></i>
-                            <span class="lang-content" data-en="Basic Information" data-bn="মৌলিক তথ্য">Basic Information</span>
+                            <span class="lang-content" data-en="Basic Information" data-bn="মৌলিক তথ্য">মৌলিক তথ্য</span>
                         </h3>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Institution Name" data-bn="প্রতিষ্ঠানের নাম">Institution Name</label>
+                            <label class="form-label lang-content" data-en="Institution Name" data-bn="প্রতিষ্ঠানের নাম">প্রতিষ্ঠানের নাম</label>
                             <input type="text" class="form-control" id="institutionName" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Dialog Title" data-bn="ডায়লগ শিরোনাম">Dialog Title</label>
+                            <label class="form-label lang-content" data-en="Dialog Title" data-bn="ডায়লোগ শিরোনাম">ডায়লোগ শিরোনাম</label>
                             <input type="text" class="form-control" id="dialogTitle">
                         </div>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Established" data-bn="স্থাপিত">Established</label>
+                            <label class="form-label lang-content" data-en="Established" data-bn="প্রতিষ্ঠিত">প্রতিষ্ঠিত</label>
                             <input type="text" class="form-control" id="established" placeholder="e.g., 2020">
                         </div>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Staff" data-bn="স্টাফ">Staff</label>
+                            <label class="form-label lang-content" data-en="Staff" data-bn="স্টাফ">স্টাফ</label>
                             <input type="text" class="form-control" id="staff" placeholder="Number of staff">
                         </div>
                     </div>
@@ -85,18 +85,18 @@
                     <div class="info-card">
                         <h3>
                             <i class="fas fa-address-book"></i>
-                            <span class="lang-content" data-en="Contact Information" data-bn="যোগাযোগের তথ্য">Contact Information</span>
+                            <span class="lang-content" data-en="Contact Information" data-bn="যোগাযোগের তথ্য">যোগাযোগের তথ্য</span>
                         </h3>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Phone" data-bn="ফোন">Phone</label>
+                            <label class="form-label lang-content" data-en="Phone" data-bn="ফোন">ফোন</label>
                             <input type="tel" class="form-control" id="phone" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Email" data-bn="ই-মেইল">Email</label>
+                            <label class="form-label lang-content" data-en="Email" data-bn="ইমেইল">ইমেইল</label>
                             <input type="email" class="form-control" id="email">
                         </div>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Website" data-bn="ওয়েবসাইট">Website</label>
+                            <label class="form-label lang-content" data-en="Website" data-bn="ওয়েবসাইট">ওয়েবসাইট</label>
                             <input type="url" class="form-control" id="website" placeholder="https://example.com">
                         </div>
                     </div>
@@ -105,29 +105,29 @@
                     <div class="info-card">
                         <h3>
                             <i class="fas fa-map-marked-alt"></i>
-                            <span class="lang-content" data-en="Address Information" data-bn="ঠিকানার তথ্য">Address Information</span>
+                            <span class="lang-content" data-en="Address Information" data-bn="ঠিকানার তথ্য">ঠিকানার তথ্য</span>
                         </h3>
                         <div class="form-group">
-                            <label class="form-label lang-content" data-en="Address" data-bn="ঠিকানা">Address</label>
+                            <label class="form-label lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
                             <textarea class="form-control" id="address" rows="3" required></textarea>
                         </div>
                         <div class="info-row">
                             <div class="form-group">
-                                <label class="form-label lang-content" data-en="City" data-bn="সিটি">City</label>
+                                <label class="form-label lang-content" data-en="City" data-bn="শহর">শহর</label>
                                 <input type="text" class="form-control" id="city">
                             </div>
                             <div class="form-group">
-                                <label class="form-label lang-content" data-en="State" data-bn="স্টেট">State</label>
+                                <label class="form-label lang-content" data-en="State" data-bn="রাজ্য">রাজ্য</label>
                                 <input type="text" class="form-control" id="state">
                             </div>
                         </div>
                         <div class="info-row">
                             <div class="form-group">
-                                <label class="form-label lang-content" data-en="Local Area" data-bn="লোকাল এরিয়া">Local Area</label>
+                                <label class="form-label lang-content" data-en="Local Area" data-bn="স্থানীয় এলাকা">স্থানীয় এলাকা</label>
                                 <input type="text" class="form-control" id="localArea">
                             </div>
                             <div class="form-group">
-                                <label class="form-label lang-content" data-en="Postal Code" data-bn="পোস্টকোড">Postal Code</label>
+                                <label class="form-label lang-content" data-en="Postal Code" data-bn="পোস্টাল কোড">পোস্টাল কোড</label>
                                 <input type="text" class="form-control" id="postalCode">
                             </div>
                         </div>
@@ -138,11 +138,11 @@
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="loadShopInfo()">
                         <i class="fas fa-redo"></i>
-                        <span class="lang-content" data-en="Reset" data-bn="রিসেট">Reset</span>
+                        <span class="lang-content" data-en="Reset" data-bn="রিসেট">রিসেট</span>
                     </button>
                     <button type="button" class="btn btn-primary" id="saveBtn" onclick="saveShopInfo()">
                         <i class="fas fa-save"></i>
-                        <span class="lang-content" data-en="Save Changes" data-bn="পরিবর্তন সংরক্ষণ">Save Changes</span>
+                        <span class="lang-content" data-en="Save Changes" data-bn="পরিবর্তন সন্নিবেশ">পরিবর্তন সন্নিবেশ</span>
                     </button>
                 </div>
             </div>
@@ -157,10 +157,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Shared Components Loader (Must be loaded first) -->
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     
     <!-- Page-specific script -->
-    <script src="/js/tailor-info.js"></script>
+    <script src="/js/tailor-info.js?v=2.1.6"></script>
     
     <script>
         // Set page title

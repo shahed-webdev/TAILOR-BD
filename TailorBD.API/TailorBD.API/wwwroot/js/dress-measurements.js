@@ -311,8 +311,10 @@
         $('#customerPhoneDisplay').text(phone || 'N/A');
         $('#customerAddressDisplay').text(address || 'No address');
         
-        // Get order number from institution
-        getOrderNumber();
+        // Get order number from institution (new orders only)
+        if (!orderId) {
+            getOrderNumber();
+        }
     }
 
     function getOrderNumber() {
@@ -928,46 +930,52 @@
     // Load existing order details when adding to an existing order
     function loadExistingOrderDetails() {
         console.log('Loading existing order details for orderId:', orderId);
-        
+
         const institutionId = sessionStorage.getItem('institutionId');
 
         $.ajax({
-            url: `/api/orders/money-receipt-details?orderId=${orderId}&institutionId=${institutionId}`,
+            url: `/api/orders/by-order-id/${orderId}?institutionId=${institutionId}`,
+            method: 'GET',
+            success: function(orderResponse) {
+                if (orderResponse && orderResponse.success && orderResponse.data) {
+                    const serial = orderResponse.data.orderSerialNumber;
+                    if (serial != null) {
+                        $('#orderNumberDisplay').text(serial);
+                    }
+                }
+            }
+        });
+
+        $.ajax({
+            url: `/api/orders/${orderId}/items?institutionId=${institutionId}`,
             method: 'GET',
             success: function(response) {
-                console.log('Existing order details loaded:', response);
-                
-                if (response && response.success && response.data) {
-                    const data = response.data;
-                    const header = data.header;
-                    
-                    // Set order number
-                    $('#orderNumberDisplay').text(header.orderSerialNumber);
-                    
-                    // Add existing dresses to cart display
-                    orderCart = [];
-                    if (data.orderItems && data.orderItems.length > 0) {
-                        data.orderItems.forEach(item => {
-                            const dressId = item.dressID || item.DressID || null;
-                            
-                            orderCart.push({
-                                orderID:      orderId,
-                                orderListID:  item.orderListId,
-                                dressId:      dressId,
-                                dressName:    item.dressName,
-                                quantity:     item.dressQuantity,
-                                totalAmount:  item.amount
-                            });
+                console.log('Existing order items loaded:', response);
+
+                orderCart = [];
+                const items = (response && response.success && response.data) ? response.data : [];
+
+                if (items.length > 0) {
+                    items.forEach(function(item) {
+                        orderCart.push({
+                            orderID: parseInt(orderId, 10),
+                            orderListID: item.orderListID ?? item.orderListId,
+                            dressId: item.dressID ?? item.dressId,
+                            dressName: item.dress_Name ?? item.dressName,
+                            quantity: item.dressQuantity,
+                            totalAmount: item.amount ?? 0
                         });
-                        
-                        displayOrderCart();
-                        console.log('Loaded', orderCart.length, 'existing dresses into cart');
-                        console.log('Cart with dressIds:', orderCart.map(i => ({ dressName: i.dressName, dressId: i.dressId })));
-                    }
+                    });
+
+                    displayOrderCart();
+                    console.log('Loaded', orderCart.length, 'existing dresses into cart');
+                } else {
+                    console.warn('No order items returned for orderId:', orderId);
+                    $('#orderCartSection').hide();
                 }
             },
             error: function(xhr) {
-                console.error('Error loading existing order:', xhr);
+                console.error('Error loading existing order items:', xhr);
                 showAlert('error', 'অর্ডার লোড করতে সমস্যা হয়েছে');
             }
         });

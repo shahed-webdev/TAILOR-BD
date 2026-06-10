@@ -292,7 +292,7 @@
         </p>
 
         <div class="buttons">
-            <a href="/dashboard.html" class="btn btn-primary">
+            <a href="/dashboard.html" id="accessDeniedDashboardLink" class="btn btn-primary">
                 <i class="fas fa-home"></i>
                 <span class="lang-content" data-en="Go to Dashboard" data-bn="ড্যাশবোর্ডে ফিরুন">
                     ড্যাশবোর্ডে ফিরুন
@@ -317,7 +317,19 @@
         </div>
     </div>
 
+    <script src="/js/auth.js"></script>
     <script>
+        // Sub-Admin → sub-admin dashboard, not admin dashboard
+        (function () {
+            var cat = (window.TailorAuth && TailorAuth.get('category')) ||
+                      sessionStorage.getItem('category') ||
+                      localStorage.getItem('session_category');
+            var link = document.getElementById('accessDeniedDashboardLink');
+            if (link && cat === 'Sub-Admin') {
+                link.setAttribute('href', '/sub-admin-dashboard.html');
+            }
+        })();
+
         // Language Toggle
         let currentLang = 'bn'; // Default to Bengali
 

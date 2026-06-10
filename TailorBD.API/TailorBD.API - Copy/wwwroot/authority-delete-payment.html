@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পেমেন্ট ডিলিট - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <script src="/js/authority-layout.js?v=2.1.6" data-page="delete-payment"></script>
+    <style>
+        .ins-card {
+            background: #fff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ins-card:hover { border-color: #6366f1; box-shadow: 0 2px 12px rgba(99,102,241,.15); transform: translateY(-1px); }
+        .ins-card.selected { border-color: #6366f1; background: #ede9fe; }
+        .ins-card .ic-avatar {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg,#6366f1,#8b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .ins-card .ic-name { font-weight: 700; font-size: .9rem; color: #1e293b; }
+        .ins-card .ic-sub  { font-size: .75rem; color: #94a3b8; }
+        .panel-box {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+            padding: 22px 24px;
+            margin-bottom: 20px;
+        }
+        .panel-title {
+            font-size: 1rem; font-weight: 700; color: #1e293b;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+        }
+        .panel-title .pt-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: .9rem; flex-shrink: 0;
+        }
+        .selected-badge {
+            background: #ede9fe; color: #6366f1;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: .82rem; font-weight: 600;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .back-link { cursor: pointer; color: #6366f1; font-size: .85rem; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="auth-main">
+<div class="auth-content">
+
+    <!-- ── VIEW 1: প্রতিষ্ঠান তালিকা ── -->
+    <div id="viewList">
+        <div class="section-card">
+            <div class="section-title mb-3">
+                <div class="st-icon"><i class="fas fa-trash-alt"></i></div>
+                পেমেন্ট ডিলিট
+                <span class="badge bg-secondary ms-2 fw-normal" id="insListCount">0</span>
+            </div>
+            <p style="font-size:.85rem;color:#64748b;margin-bottom:16px;">
+                নিচের তালিকা থেকে প্রতিষ্ঠানের নামে ক্লিক করুন, তারপর অর্ডার বা আইটেম সেল পেমেন্ট ডিলিট করুন।
+            </p>
+
+            <!-- Search -->
+            <div class="input-group mb-3" style="max-width:320px;">
+                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" id="insSearchInput" class="form-control border-start-0 ps-0"
+                       placeholder="নাম / ফোন / ইউজারনেম..." oninput="filterInsList()">
+            </div>
+
+            <!-- List -->
+            <div id="insListContainer" class="row g-2">
+                <div class="col-12 text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── VIEW 2: নির্বাচিত প্রতিষ্ঠানের পেমেন্ট ডিলিট ── -->
+    <div id="viewDetail" style="display:none;">
+
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+            <span class="back-link" onclick="showListView()">
+                <i class="fas fa-arrow-left me-1"></i>ফিরে যান
+            </span>
+            <div class="selected-badge" id="selectedInsBadge">
+                <i class="fas fa-store"></i> <span id="selectedInsName">—</span>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- অর্ডার পেমেন্ট ডিলিট -->
+            <div class="col-md-6">
+                <div class="panel-box">
+                    <div class="panel-title">
+                        <div class="pt-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        অর্ডার পেমেন্ট ডিলিট
+                    </div>
+                    <p style="font-size:.83rem;color:#64748b;margin-bottom:14px;">
+                        অর্ডার সিরিয়াল নম্বর দিয়ে পেমেন্ট রেকর্ড খুঁজুন এবং ডিলিট করুন।
+                    </p>
+                    <div class="input-group mb-3">
+                        <input type="number" id="opOrderSN" class="form-control" placeholder="অর্ডার নম্বর (SN)">
+                        <button class="btn btn-danger px-3" onclick="searchOrderPayments()">
+                            <i class="fas fa-search"></i> খুঁজুন
+                        </button>
+                    </div>
+                    <div id="opResult"></div>
+                </div>
+            </div>
+
+            <!-- আইটেম সেল রশিদ ডিলিট -->
+            <div class="col-md-6">
+                <div class="panel-box">
+                    <div class="panel-title">
+                        <div class="pt-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        আইটেম সেল পেমেন্ট ডিলিট
+                    </div>
+                    <p style="font-size:.83rem;color:#64748b;margin-bottom:14px;">
+                        বিক্রয় SN দিয়ে আইটেম সেল পেমেন্ট রেকর্ড খুঁজুন এবং ডিলিট করুন।
+                    </p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="isSellingSN" class="form-control" placeholder="Selling SN">
+                        <button class="btn btn-warning px-3" onclick="searchItemSellPayments()">
+                            <i class="fas fa-search"></i> খুঁজুন
+                        </button>
+                    </div>
+                    <div id="isResult"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<div id="toastWrap"></div>
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script>
+'use strict';
+
+var allInstitutions = [];
+var selectedInsId   = 0;
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+function esc(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function fmtDate(d) {
+    if (!d) return '-';
+    const dt = d instanceof Date ? d : new Date(d);
+    return dt.toLocaleDateString('bn-BD', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function toast(msg, type) {
+    const id  = 'toast_' + Date.now();
+    const cls = type === 'success' ? 'bg-success' : type === 'warning' ? 'bg-warning text-dark' : 'bg-danger';
+    const el  = document.createElement('div');
+    el.id        = id;
+    el.className = 'toast align-items-center text-white border-0 ' + cls;
+    el.setAttribute('role', 'alert');
+    el.innerHTML = `<div class="d-flex"><div class="toast-body" style="font-size:.85rem;">${esc(msg)}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+    document.getElementById('toastWrap').appendChild(el);
+    const t = new bootstrap.Toast(el, { delay: 3500 });
+    t.show();
+    el.addEventListener('hidden.bs.toast', function() { el.remove(); });
+}
+
+// ── Load institution list ─────────────────────────────────────────────────────
+async function loadInstitutions() {
+    try {
+        const res  = await fetch('/api/institution/authority/list');
+        const data = await res.json();
+        allInstitutions = (data.success && data.data) ? data.data : [];
+        filterInsList();
+    } catch(e) {
+        document.getElementById('insListContainer').innerHTML =
+            '<div class="col-12 text-center text-danger py-3">লোড ব্যর্থ: ' + esc(e.message) + '</div>';
+    }
+}
+
+function filterInsList() {
+    const q = (document.getElementById('insSearchInput').value || '').toLowerCase().trim();
+    const filtered = allInstitutions.filter(function(s) {
+        return !q ||
+            (s.institutionName || '').toLowerCase().includes(q) ||
+            (s.phone || '').toLowerCase().includes(q) ||
+            (s.userName || '').toLowerCase().includes(q);
+    });
+
+    document.getElementById('insListCount').textContent = filtered.length;
+
+    if (!filtered.length) {
+        document.getElementById('insListContainer').innerHTML =
+            '<div class="col-12 text-center text-muted py-4">কোনো প্রতিষ্ঠান পাওয়া যায়নি</div>';
+        return;
+    }
+
+    const html = filtered.map(function(s) {
+        const initial = (s.institutionName || '?')[0].toUpperCase();
+        const isActive = s.validation === 'Valid';
+        const badge = isActive
+            ? '<span class="badge" style="background:#dcfce7;color:#16a34a;font-size:.7rem;">Active</span>'
+            : '<span class="badge" style="background:#fef3c7;color:#d97706;font-size:.7rem;">Deactive</span>';
+        return `
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="ins-card" onclick="selectInstitution(${s.institutionId}, '${esc(s.institutionName)}')">
+                    <div class="ic-avatar">${initial}</div>
+                    <div style="min-width:0;">
+                        <div class="ic-name text-truncate">${esc(s.institutionName)}</div>
+                        <div class="ic-sub">${esc(s.userName)} &bull; ${esc(s.phone)}</div>
+                        <div class="mt-1">${badge}</div>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+
+    document.getElementById('insListContainer').innerHTML = html;
+}
+
+// ── Select institution → show detail view ─────────────────────────────────────
+function selectInstitution(insId, insName) {
+    selectedInsId = insId;
+    document.getElementById('selectedInsName').textContent = insName + ' (ID: ' + insId + ')';
+
+    // Clear previous results
+    document.getElementById('opOrderSN').value  = '';
+    document.getElementById('isSellingSN').value = '';
+    document.getElementById('opResult').innerHTML = '';
+    document.getElementById('isResult').innerHTML = '';
+
+    document.getElementById('viewList').style.display   = 'none';
+    document.getElementById('viewDetail').style.display = '';
+}
+
+function showListView() {
+    document.getElementById('viewList').style.display   = '';
+    document.getElementById('viewDetail').style.display = 'none';
+}
+
+// ── Delete Order Payment ───────────────────────────────────────────────────────
+async function searchOrderPayments() {
+    const orderSN = parseInt(document.getElementById('opOrderSN').value) || 0;
+    const result  = document.getElementById('opResult');
+
+    if (!orderSN) {
+        result.innerHTML = '<div class="alert alert-warning py-2 small">অর্ডার নম্বর দিন</div>';
+        return;
+    }
+
+    result.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>খোঁজা হচ্ছে...</div>';
+
+    try {
+        const res  = await fetch('/api/institution/authority/' + selectedInsId + '/order-payments?orderSerialNumber=' + orderSN);
+        const data = await res.json();
+
+        if (!data.success) {
+            result.innerHTML = '<div class="alert alert-danger py-2 small">' + esc(data.message) + '</div>';
+            return;
+        }
+        if (!data.data || !data.data.length) {
+            result.innerHTML = '<div class="alert alert-info py-2 small">কোনো পেমেন্ট রেকর্ড পাওয়া যায়নি</div>';
+            return;
+        }
+
+        const rows = data.data.map(function(r) {
+            return `<tr>
+                <td>#${r.paymentRecordId}</td>
+                <td>(${r.customerNumber}) ${esc(r.customerName)}</td>
+                <td style="font-weight:600;">৳ ${parseFloat(r.amount||0).toFixed(2)}</td>
+                <td>${esc(r.paymentTimeStatus)}</td>
+                <td>${r.orderPaidDate ? fmtDate(r.orderPaidDate) : '-'}</td>
+                <td>${esc(r.accountName)}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="deleteOrderPayment(${r.paymentRecordId}, this)">
+                        <i class="fas fa-trash-alt"></i> ডিলিট
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+
+        result.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered" style="font-size:.82rem;">
+                    <thead class="table-danger text-white" style="background:#ef4444;">
+                        <tr>
+                            <th>ID</th><th>কাস্টমার</th><th>Amount</th>
+                            <th>Status</th><th>পেইড তারিখ</th><th>Account</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="opTbody">${rows}</tbody>
+                </table>
+            </div>`;
+    } catch(e) {
+        result.innerHTML = '<div class="alert alert-danger py-2 small">ত্রুটি: ' + esc(e.message) + '</div>';
+    }
+}
+
+async function deleteOrderPayment(paymentRecordId, btn) {
+    if (!confirm('এই পেমেন্ট রেকর্ড মুছে ফেলবেন? এটি অপরিবর্তনীয়।')) return;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    try {
+        const res  = await fetch('/api/institution/authority/' + selectedInsId + '/order-payment/' + paymentRecordId, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            btn.closest('tr').remove();
+            toast(data.message, 'success');
+        } else {
+            toast(data.message || 'ব্যর্থ হয়েছে', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-trash-alt"></i> ডিলিট';
+        }
+    } catch(e) {
+        toast('ত্রুটি: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash-alt"></i> ডিলিট';
+    }
+}
+
+// ── Delete Item Sell Payment ───────────────────────────────────────────────────
+async function searchItemSellPayments() {
+    const sellingSN = document.getElementById('isSellingSN').value.trim();
+    const result    = document.getElementById('isResult');
+
+    if (!sellingSN) {
+        result.innerHTML = '<div class="alert alert-warning py-2 small">Selling SN দিন</div>';
+        return;
+    }
+
+    result.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>খোঁজা হচ্ছে...</div>';
+
+    try {
+        const res  = await fetch('/api/institution/authority/' + selectedInsId + '/item-sell-payments?sellingSN=' + encodeURIComponent(sellingSN));
+        const data = await res.json();
+
+        if (!data.success) {
+            result.innerHTML = '<div class="alert alert-danger py-2 small">' + esc(data.message) + '</div>';
+            return;
+        }
+        if (!data.data || !data.data.length) {
+            result.innerHTML = '<div class="alert alert-info py-2 small">কোনো পেমেন্ট রেকর্ড পাওয়া যায়নি</div>';
+            return;
+        }
+
+        const rows = data.data.map(function(r) {
+            return `<tr>
+                <td>#${r.fabricSellingPaymentRecordId}</td>
+                <td>(${r.customerNumber}) ${esc(r.customerName)}</td>
+                <td style="font-weight:600;">৳ ${parseFloat(r.sellingPaidAmount||0).toFixed(2)}</td>
+                <td>${esc(r.paymentSituation)}</td>
+                <td>${r.sellingPaidDate ? fmtDate(r.sellingPaidDate) : '-'}</td>
+                <td>${esc(r.accountName)}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="deleteItemSellPayment(${r.fabricSellingPaymentRecordId}, this)">
+                        <i class="fas fa-trash-alt"></i> ডিলিট
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+
+        result.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered" style="font-size:.82rem;">
+                    <thead class="table-warning" style="background:#f97316;color:#fff;">
+                        <tr>
+                            <th>ID</th><th>কাস্টমার</th><th>Amount</th>
+                            <th>Situation</th><th>পেইড তারিখ</th><th>Account</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>`;
+    } catch(e) {
+        result.innerHTML = '<div class="alert alert-danger py-2 small">ত্রুটি: ' + esc(e.message) + '</div>';
+    }
+}
+
+async function deleteItemSellPayment(paymentRecordId, btn) {
+    if (!confirm('এই আইটেম সেল পেমেন্ট রেকর্ড মুছে ফেলবেন? এটি অপরিবর্তনীয়।')) return;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    try {
+        const res  = await fetch('/api/institution/authority/' + selectedInsId + '/item-sell-payment/' + paymentRecordId, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            btn.closest('tr').remove();
+            toast(data.message, 'success');
+        } else {
+            toast(data.message || 'ব্যর্থ হয়েছে', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-trash-alt"></i> ডিলিট';
+        }
+    } catch(e) {
+        toast('ত্রুটি: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash-alt"></i> ডিলিট';
+    }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    loadInstitutions();
+});
+</script>
+</body>
+</html>

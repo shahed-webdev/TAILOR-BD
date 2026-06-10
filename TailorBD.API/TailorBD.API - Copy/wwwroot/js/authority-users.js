@@ -305,6 +305,21 @@
         });
     };
 
+    // ── Toggle password visibility ────────────────────────────────────────────
+    window.togglePwd = function (liuId) {
+        var $span = $('#pwd-' + liuId);
+        var $btn  = $span.next('button').find('i');
+        if ($span.data('visible')) {
+            $span.text('••••••••');
+            $btn.removeClass('fa-eye-slash').addClass('fa-eye');
+            $span.data('visible', false);
+        } else {
+            $span.text($span.data('pwd') || '');
+            $btn.removeClass('fa-eye').addClass('fa-eye-slash');
+            $span.data('visible', true);
+        }
+    };
+
     // ── Logout ────────────────────────────────────────────────────────────────
     window.confirmLogout = function () {
         new bootstrap.Modal(document.getElementById('logoutModal')).show();

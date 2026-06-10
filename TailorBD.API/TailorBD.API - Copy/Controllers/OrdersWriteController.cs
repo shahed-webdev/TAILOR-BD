@@ -441,13 +441,12 @@ namespace TailorBD.API.Controllers
 
                 try
                 {
-                    // Update order delivery date, delivery status and discount
+                    // Update order delivery date and discount
                     using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(
                         @"UPDATE [Order] 
                           SET DeliveryDate        = @DeliveryDate,
-                              DeliveryStatus      = N'Delivered',
                               Update_DeliveryDate = GETDATE(),
-                              Discount = Discount + @NewDiscount
+                              Discount            = Discount + @NewDiscount
                           WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID",
                         connection, transaction))
                     {
@@ -458,19 +457,65 @@ namespace TailorBD.API.Controllers
                         await cmd.ExecuteNonQueryAsync();
                     }
 
+                    // Insert Order_Delivery_Date records and set DeliveryStatus = Delivered.
+                    if (model.IsDelivery)
+                    {
+                        using (var listCmd = new Microsoft.Data.SqlClient.SqlCommand(
+                            @"SELECT OrderListID,
+                                     CASE WHEN ReadyForDeliveryQuantity > 0 THEN ReadyForDeliveryQuantity ELSE DressQuantity END AS DeliveryQty
+                              FROM OrderList 
+                              WHERE OrderID = @OrderID",
+                            connection, transaction))
+                        {
+                            listCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                            using var listReader = await listCmd.ExecuteReaderAsync();
+                            var deliveryItems = new List<(int OrderListId, int Qty)>();
+                            while (await listReader.ReadAsync())
+                                deliveryItems.Add((listReader.GetInt32(0), listReader.GetInt32(1)));
+                            listReader.Close();
+
+                            foreach (var (orderListId, qty) in deliveryItems)
+                            {
+                                using var insCmd = new Microsoft.Data.SqlClient.SqlCommand(
+                                    @"INSERT INTO Order_Delivery_Date (InstitutionID, RegistrationID, OrderID, OrderListID, DQuantity)
+                                      VALUES (@InstitutionID, @RegistrationID, @OrderID, @OrderListID, @DQuantity)",
+                                    connection, transaction);
+                                insCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                                insCmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
+                                insCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                                insCmd.Parameters.AddWithValue("@OrderListID", orderListId);
+                                insCmd.Parameters.AddWithValue("@DQuantity", qty);
+                                await insCmd.ExecuteNonQueryAsync();
+                            }
+                        }
+
+                        // Set DeliveryStatus = Delivered unconditionally when delivering from delivery-give page
+                        using var statusCmd = new Microsoft.Data.SqlClient.SqlCommand(
+                            @"UPDATE [Order]
+                              SET DeliveryStatus = N'Delivered',
+                                  Update_DeliveryDate = GETDATE()
+                              WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID",
+                            connection, transaction);
+                        statusCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        statusCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                        await statusCmd.ExecuteNonQueryAsync();
+                    }
+
                     // Insert payment record if paid amount > 0
                     if (model.PaidAmount > 0)
                     {
+                        var paymentTimeStatus = model.IsDelivery ? "Order Delivered" : "ReAdvance";
                         using var payCmd = new Microsoft.Data.SqlClient.SqlCommand(
                             @"INSERT INTO Payment_Record (OrderID, CustomerID, RegistrationID, InstitutionID, Amount, Payment_TimeStatus, AccountID)
                               VALUES (@OrderID,
                                       (SELECT CustomerID FROM [Order] WHERE OrderID = @OrderID),
-                                      @RegistrationID, @InstitutionID, @Amount, 'Advance', @AccountID)",
+                                      @RegistrationID, @InstitutionID, @Amount, @PaymentTimeStatus, @AccountID)",
                             connection, transaction);
                         payCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
                         payCmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
                         payCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
                         payCmd.Parameters.AddWithValue("@Amount", model.PaidAmount);
+                        payCmd.Parameters.AddWithValue("@PaymentTimeStatus", paymentTimeStatus);
                         payCmd.Parameters.AddWithValue("@AccountID", (object?)model.AccountId ?? DBNull.Value);
                         await payCmd.ExecuteNonQueryAsync();
                     }

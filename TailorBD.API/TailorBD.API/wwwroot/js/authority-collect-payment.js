@@ -15,6 +15,21 @@
         TailorAuth.guardSubPage('collect-payment');
         loadSidebarProfile();
         loadData();
+
+        // data-attribute delegation — avoids onclick syntax errors when names contain apostrophes
+        $(document).on('click', '[data-action="collect"]', function () {
+            var insId = parseInt($(this).data('ins-id'), 10);
+            var ins   = allInstitutions.find(function (i) { return i.institutionId === insId; });
+            openCollectModal(insId, ins ? ins.institutionName : '');
+        });
+        $(document).on('click', '[data-action="renew"]', function () {
+            var insId = parseInt($(this).data('ins-id'), 10);
+            var ins   = allInstitutions.find(function (i) { return i.institutionId === insId; });
+            doRenew(insId, ins ? ins.institutionName : '');
+        });
+        $(document).on('click', '[data-action="view-invoices"]', function () {
+            viewInvoices(parseInt($(this).data('ins-id'), 10));
+        });
     });
 
     function loadSidebarProfile() {
@@ -155,9 +170,9 @@
                         '</div>' +
                     '</div>' +
                     '<div class="ins-card-footer">' +
-                        (hasDue ? '<button class="btn-sm-act btn-collect" onclick="openCollectModal(' + ins.institutionId + ',\'' + esc(ins.institutionName) + '\')"><i class="fas fa-hand-holding-usd"></i> পেমেন্ট কালেক্ট</button>' : '') +
-                        '<button class="btn-sm-act btn-renew-sm" onclick="doRenew(' + ins.institutionId + ',\'' + esc(ins.institutionName) + '\')"><i class="fas fa-redo"></i> Renew</button>' +
-                        '<button class="btn-sm-act btn-view-sm" onclick="viewInvoices(' + ins.institutionId + ')"><i class="fas fa-eye"></i> Invoice</button>' +
+                        (hasDue ? '<button type="button" class="btn-sm-act btn-collect" data-action="collect" data-ins-id="' + ins.institutionId + '"><i class="fas fa-hand-holding-usd"></i> পেমেন্ট কালেক্ট</button>' : '') +
+                        '<button type="button" class="btn-sm-act btn-renew-sm" data-action="renew" data-ins-id="' + ins.institutionId + '"><i class="fas fa-redo"></i> Renew</button>' +
+                        '<button type="button" class="btn-sm-act btn-view-sm" data-action="view-invoices" data-ins-id="' + ins.institutionId + '"><i class="fas fa-eye"></i> Invoice</button>' +
                     '</div>' +
                 '</div>'
             );
@@ -188,9 +203,9 @@
                 '<td><span style="font-weight:700;color:' + (hasDue ? '#ef4444' : '#10b981') + ';">৳ ' + fmtMoney(due) + '</span></td>' +
                 '<td>' + statusBadge + '</td>' +
                 '<td><div class="d-flex gap-1 flex-wrap">' +
-                    (hasDue ? '<button class="btn-sm-act btn-collect" style="padding:4px 10px;" onclick="openCollectModal(' + ins.institutionId + ',\'' + esc(ins.institutionName) + '\')"><i class="fas fa-hand-holding-usd"></i></button>' : '') +
-                    '<button class="btn-sm-act btn-renew-sm" style="padding:4px 10px;" onclick="doRenew(' + ins.institutionId + ',\'' + esc(ins.institutionName) + '\')"><i class="fas fa-redo"></i></button>' +
-                    '<button class="btn-sm-act btn-view-sm" style="padding:4px 10px;" onclick="viewInvoices(' + ins.institutionId + ')"><i class="fas fa-eye"></i></button>' +
+                    (hasDue ? '<button type="button" class="btn-sm-act btn-collect" style="padding:4px 10px;" data-action="collect" data-ins-id="' + ins.institutionId + '"><i class="fas fa-hand-holding-usd"></i></button>' : '') +
+                    '<button type="button" class="btn-sm-act btn-renew-sm" style="padding:4px 10px;" data-action="renew" data-ins-id="' + ins.institutionId + '"><i class="fas fa-redo"></i></button>' +
+                    '<button type="button" class="btn-sm-act btn-view-sm" style="padding:4px 10px;" data-action="view-invoices" data-ins-id="' + ins.institutionId + '"><i class="fas fa-eye"></i></button>' +
                 '</div></td>' +
                 '</tr>'
             );

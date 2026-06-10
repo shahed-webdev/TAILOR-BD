@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -46,8 +46,7 @@
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="mb-0 lang-content" data-en="Edit Order" data-bn="অর্ডার সম্পাদনা করুন">
-                            <i class="fas fa-edit me-2"></i>অর্ডার সম্পাদনা করুন
+                        <h5 class="mb-0" data-en="Edit Order" data-bn="অর্ডার সম্পাদনা"><i class="fas fa-edit me-2"></i>
                         </h5>
                         <small><span class="lang-content" data-en="Order Number:" data-bn="অর্ডার নম্বর:">অর্ডার নম্বর:</span> <span id="orderNumber">...</span></small>
                     </div>
@@ -65,7 +64,7 @@
                             <span id="customerPhone">...</span>
                         </div>
                         <div class="col-md-3">
-                            <strong><i class="fas fa-money-bill me-2"></i><span class="lang-content" data-en="Previously Paid:" data-bn="পূর্বে পরিশোধিত:">পূর্বে পরিশোধিত:</span></strong>
+                            <strong><i class="fas fa-money-bill me-2"></i><span class="lang-content" data-en="Previously Paid:" data-bn="আগে পরিশোধ:">আগে পরিশোধ:</span></strong>
                             <span id="previousPaidHeader" class="badge bg-success">৳0</span>
                         </div>
                         <div class="col-md-3">
@@ -79,8 +78,8 @@
             <!-- Add New Dress Section (Collapsed by default) -->
             <div class="card mb-4">
                 <div class="card-header" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#addDressSection">
-                    <h6 class="mb-0 lang-content" data-en="Add New Dress (Optional)" data-bn="নতুন পোশাক যুক্ত করুন (ঐচ্ছিক)">
-                        <i class="fas fa-plus-circle me-2"></i>নতুন পোশাক যুক্ত করুন (ঐচ্ছিক)
+                    <h6 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i><span class="lang-content" data-en="Add New Dress (Optional)" data-bn="নতুন ড্রেস যোগ করুন (ঐচ্ছিক)">নতুন ড্রেস যোগ করুন (ঐচ্ছিক)</span>
                         <i class="fas fa-chevron-down float-end"></i>
                     </h6>
                 </div>
@@ -88,14 +87,14 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-8">
-                                <label class="form-label lang-content" data-en="Select Dress" data-bn="পোশাক নির্বাচন করুন">পোশাক নির্বাচন করুন</label>
+                                <label class="form-label lang-content" data-en="Select Dress" data-bn="ড্রেস নির্বাচন করুন">ড্রেস নির্বাচন করুন</label>
                                 <select class="form-select" id="dressSelect" disabled>
                                     <option value="" class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</option>
                                 </select>
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button type="button" class="btn btn-primary w-100" id="btnAddDress" onclick="addDressToList()" disabled>
-                                    <i class="fas fa-plus me-2"></i><span class="lang-content" data-en="Add" data-bn="যুক্ত করুন">যুক্ত করুন</span>
+                                    <i class="fas fa-plus me-2"></i><span class="lang-content" data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
                                 </button>
                             </div>
                         </div>
@@ -106,7 +105,7 @@
             <!-- Order Items -->
             <div class="card mb-4">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0 lang-content" data-en="Order Items" data-bn="অর্ডার আইটেম সমূহ"><i class="fas fa-list me-2"></i>অর্ডার আইটেম সমূহ</h5>
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i><span class="lang-content" data-en="Order Items" data-bn="অর্ডারের আইটেম">অর্ডারের আইটেম</span></h5>
                 </div>
                 <div class="card-body">
                     <div id="orderItemsContainer">
@@ -126,7 +125,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <!--<h5 class="mb-0 lang-content" data-en="Previously Paid:" data-bn="পূর্বে পরিশোধিত:">পূর্বে পরিশোধিত: <span class="text-success" id="previousPaid">৳0</span></h5>-->
+                                <!--<h5 class="mb-0 lang-content" data-en="Previously Paid:" data-bn="আরেকটি যোগ করুন?:">আরেকটি যোগ করুন?: <span class="text-success" id="previousPaid">?0</span></h5>-->
                             </div>
                             <div>
                                 <button type="button" class="btn btn-lg btn-primary" onclick="submitOrderUpdate()">
@@ -146,9 +145,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title lang-content" data-en="Edit Payment" data-bn="পেমেন্ট সম্পাদনা">
-                        <i class="fas fa-money-bill me-2"></i>
-                        <span id="modalPaymentDressName">পেমেন্ট সম্পাদনা</span>
+                    <h5 class="modal-title"><i class="fas fa-money-bill me-2"></i><span class="lang-content" data-en="Edit Payment" data-bn="পেমেন্ট সম্পাদনা">পেমেন্ট সম্পাদনা</span> — <span id="modalPaymentDressName"></span>
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -156,17 +153,16 @@
                     <!-- Add Payment Form -->
                     <div class="card mb-3">
                         <div class="card-header bg-light">
-                            <h6 class="mb-0 lang-content" data-en="Add New Payment" data-bn="নতুন পেমেন্ট যুক্ত করুন"><i class="fas fa-plus me-2"></i>নতুন পেমেন্ট যুক্ত করুন</h6>
+                            <h6 class="mb-0"><i class="fas fa-plus me-2"></i><span class="lang-content" data-en="Add New Payment" data-bn="নতুন পেমেন্ট যোগ করুন">নতুন পেমেন্ট যোগ করুন</span></h6>
                         </div>
                         <div class="card-body">
                             <form id="addPaymentForm" onsubmit="addPayment(event)">
                                 <div class="row g-2">
                                     <div class="col-md-5">
-                                        <label class="form-label lang-content" data-en="For What" data-bn="কি বাবদ">কি বাবদ</label>
+                                        <label class="form-label lang-content" data-en="For What" data-bn="কিসের জন্য">কিসের জন্য</label>
                                         <input type="text" class="form-control" id="paymentFor"
                                                data-en-placeholder="e.g: Sewing, Fabric, Button etc."
-                                               data-bn-placeholder="যেমন: সেলাই, কাপড়, বোতাম ইত্যাদি"
-                                               placeholder="যেমন: সেলাই, কাপড়, বোতাম ইত্যাদি" required>
+                                               data-bn-placeholder="যেমন: মজুরি, কাপড়, বোতাম" placeholder="যেমন: মজুরি, কাপড়, বোতাম" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</label>
@@ -181,7 +177,7 @@
                                 </div>
                                 <div class="mt-2">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus me-1"></i><span class="lang-content" data-en="Add" data-bn="যুক্ত করুন">যুক্ত করুন</span>
+                                        <i class="fas fa-plus me-1"></i><span class="lang-content" data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
                                     </button>
                                 </div>
                             </form>
@@ -191,11 +187,11 @@
                     <!-- Existing Payments List -->
                     <div class="card">
                         <div class="card-header bg-light">
-                            <h6 class="mb-0 lang-content" data-en="Payment List" data-bn="পেমেন্ট তালিকা"><i class="fas fa-list me-2"></i>পেমেন্ট তালিকা</h6>
+                            <h6 class="mb-0"><i class="fas fa-list me-2"></i><span class="lang-content" data-en="Payment List" data-bn="পেমেন্ট তালিকা">পেমেন্ট তালিকা</span></h6>
                         </div>
                         <div class="card-body">
                             <div id="paymentsListContainer">
-                                <p class="text-center text-muted lang-content" data-en="No payments" data-bn="কোন পেমেন্ট নেই">কোন পেমেন্ট নেই</p>
+                                <p class="text-center text-muted lang-content" data-en="No payments" data-bn="কোনো পেমেন্ট নেই">কোনো পেমেন্ট নেই</p>
                             </div>
                         </div>
                     </div>
@@ -214,9 +210,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title lang-content" data-en="Edit Measurements" data-bn="মাপ সম্পাদনা">
-                        <i class="fas fa-ruler me-2"></i>
-                        <span id="modalMeasurementDressName">মাপ সম্পাদনা</span>
+                    <h5 class="modal-title"><i class="fas fa-ruler me-2"></i><span class="lang-content" data-en="Edit Measurements" data-bn="মাপ সম্পাদনা">মাপ সম্পাদনা</span> — <span id="modalMeasurementDressName"></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -234,8 +228,8 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
                     </button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                        <i class="fas fa-save me-1"></i><span class="lang-content" data-en="Save" data-bn="সংরক্ষণ করুন">সংরক্ষণ করুন</span>
+                    <button type="button" class="btn btn-primary" onclick="saveMeasurements()" data-bs-dismiss="modal">
+                        <i class="fas fa-save me-1"></i><span class="lang-content" data-en="Save" data-bn="সেভ করুন">সেভ করুন</span>
                     </button>
                 </div>
             </div>
@@ -247,9 +241,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title lang-content" data-en="Edit Styles" data-bn="স্টাইল সম্পাদনা">
-                        <i class="fas fa-paint-brush me-2"></i>
-                        <span id="modalStyleDressName">স্টাইল সম্পাদনা</span>
+                    <h5 class="modal-title"><i class="fas fa-paint-brush me-2"></i><span class="lang-content" data-en="Edit Styles" data-bn="স্টাইল সম্পাদনা">স্টাইল সম্পাদনা</span> — <span id="modalStyleDressName"></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -268,7 +260,7 @@
                         <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
                     </button>
                     <button type="button" class="btn btn-primary" onclick="saveStyles()" data-bs-dismiss="modal">
-                        <i class="fas fa-save me-1"></i><span class="lang-content" data-en="Save" data-bn="সংরক্ষণ করুন">সংরক্ষণ করুন</span>
+                        <i class="fas fa-save me-1"></i><span class="lang-content" data-en="Save" data-bn="সেভ করুন">সেভ করুন</span>
                     </button>
                 </div>
             </div>
@@ -283,10 +275,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Shared Components Loader (Must be loaded first) -->
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
 
     <!-- Page Specific JS -->
-    <script src="/js/order-edit.js"></script>
-    <script src="/js/order-edit-functions.js"></script>
+    <script src="/js/order-edit.js?v=2.1.6"></script>
+    <script src="/js/order-edit-functions.js?v=2.1.6"></script>
 </body>
 </html>

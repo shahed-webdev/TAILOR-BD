@@ -58,12 +58,13 @@ namespace TailorBD.API.Controllers
                     // Get measurement groups
                     using (var cmd = new SqlCommand())
                     {
-                        cmd.CommandText = @"SELECT DISTINCT MT.Measurement_GroupID, 
-                                          ISNULL(MT.Ascending, 99999) AS Ascending,
+                        cmd.CommandText = @"SELECT MT.Measurement_GroupID, 
+                                          MIN(ISNULL(MT.Ascending, 99999)) AS Ascending,
                                           (SELECT TOP 1 MeasurementType FROM Measurement_Type 
                                            WHERE MeasurementTypeID = MT.Measurement_GroupID) AS GroupName
                                           FROM Measurement_Type MT
                                           WHERE (MT.InstitutionID = @InstitutionID) AND (MT.DressID = @DressID) 
+                                          GROUP BY MT.Measurement_GroupID
                                           ORDER BY Ascending";
                         cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                         cmd.Parameters.AddWithValue("@DressID", dressId);
@@ -93,21 +94,22 @@ namespace TailorBD.API.Controllers
                                             FROM Measurement_Type 
                                             LEFT OUTER JOIN (
                                                 SELECT Measurement, MeasurementTypeID 
-                                                FROM Ordered_Measurement 
-                                                WHERE OrderListID = @OrderListID
-                                            ) AS OrderList_M 
-                                            ON Measurement_Type.MeasurementTypeID = OrderList_M.MeasurementTypeID 
-                                            LEFT OUTER JOIN (
-                                                SELECT Measurement, MeasurementTypeID 
-                                                FROM Customer_Measurement 
-                                                WHERE CustomerID = @CustomerID
-                                            ) AS Customer_M 
+                                                    FROM Ordered_Measurement 
+                                                    WHERE OrderListID = @OrderListID AND InstitutionID = @InstitutionID
+                                                ) AS OrderList_M 
+                                                ON Measurement_Type.MeasurementTypeID = OrderList_M.MeasurementTypeID 
+                                                LEFT OUTER JOIN (
+                                                    SELECT Measurement, MeasurementTypeID 
+                                                    FROM Customer_Measurement 
+                                                    WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID
+                                                ) AS Customer_M
                                             ON Measurement_Type.MeasurementTypeID = Customer_M.MeasurementTypeID 
                                             WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) 
                                             ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)";
                                         
                                         measurementCmd.Parameters.AddWithValue("@OrderListID", orderListId.Value);
                                         measurementCmd.Parameters.AddWithValue("@CustomerID", customerId);
+                                        measurementCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                                     }
                                     else
                                     {
@@ -120,13 +122,14 @@ namespace TailorBD.API.Controllers
                                             LEFT OUTER JOIN (
                                                 SELECT Measurement, MeasurementTypeID 
                                                 FROM Customer_Measurement 
-                                                WHERE CustomerID = @CustomerID
+                                                WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID
                                             ) AS Customer_M 
                                             ON Measurement_Type.MeasurementTypeID = Customer_M.MeasurementTypeID 
                                             WHERE (Measurement_Type.Measurement_GroupID = @Measurement_GroupID) 
                                             ORDER BY ISNULL(Measurement_Type.Measurement_Group_SerialNo, 99999)";
-                                        
+
                                         measurementCmd.Parameters.AddWithValue("@CustomerID", customerId);
+                                        measurementCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                                     }
                                     
                                     measurementCmd.CommandText = measurementQuery;

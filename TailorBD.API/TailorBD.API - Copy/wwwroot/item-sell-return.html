@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিক্রয় ফেরত - TailorBD</title>
+    <title data-en="Sales Return - TailorBD" data-bn="বিক্রয় ফেরত - TailorBD">বিক্রয় ফেরত - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -88,15 +88,15 @@
 
                 <!-- Title -->
                 <h5 style="font-weight:700;color:#6c7ae0;margin-bottom:16px;">
-                    <i class="fas fa-undo-alt me-2"></i><span data-bn="বিক্রয় ফেরত / পরিবর্তন" data-en="Sales Return / Exchange">বিক্রয় ফেরত / পরিবর্তন</span>
+                    <i class="fas fa-undo-alt me-2"></i><span data-bn="বিক্রয় ফেরত / এক্সচেঞ্জ" data-en="Sales Return / Exchange">বিক্রয় ফেরত / এক্সচেঞ্জ</span>
                 </h5>
 
                 <!-- Step 1: Search Receipt -->
                 <div class="card-box">
-                    <div class="section-title"><i class="fas fa-search"></i> <span data-bn="রশিদ নম্বর দিয়ে খুঁজুন" data-en="Search by Receipt Number">রশিদ নম্বর দিয়ে খুঁজুন</span></div>
+                    <div class="section-title"><i class="fas fa-search"></i> <span data-bn="রিসিট নম্বর দিয়ে খুঁজুন" data-en="Search by Receipt Number">রিসিট নম্বর দিয়ে খুঁজুন</span></div>
                     <div class="search-row">
                         <div>
-                            <label class="f-label" data-bn="রশিদ নং (SN)" data-en="Receipt No (SN)">রশিদ নং (SN)</label>
+                            <label class="f-label" data-bn="রিসিট নম্বর (SN)" data-en="Receipt No (SN)">রিসিট নম্বর (SN)</label>
                             <input type="number" id="inSN" class="f-control" data-bn-placeholder="যেমন: 74" data-en-placeholder="e.g: 74" placeholder="যেমন: 74" style="width:160px;"
                                 onkeydown="if(event.key==='Enter') findReceipt()">
                         </div>
@@ -112,16 +112,16 @@
 
                     <!-- Info chips -->
                     <div class="card-box">
-                        <div class="section-title"><i class="fas fa-receipt"></i> <span data-bn="রশিদের তথ্য" data-en="Receipt Info">রশিদের তথ্য</span></div>
+                        <div class="section-title"><i class="fas fa-receipt"></i> <span data-bn="রিসিট তথ্য" data-en="Receipt Info">রিসিট তথ্য</span></div>
                         <div class="receipt-info" id="receiptInfo"></div>
                     </div>
 
                     <!-- Return Items Table -->
                     <div class="card-box">
-                        <div class="section-title"><i class="fas fa-boxes"></i> <span data-bn="রাখার পরিমান লিখুন" data-en="Enter Return Quantity">রাখার পরিমান লিখুন</span></div>
+                        <div class="section-title"><i class="fas fa-boxes"></i> <span data-bn="ফেরতের পরিমাণ দিন" data-en="Enter Return Quantity">ফেরতের পরিমাণ দিন</span></div>
                         <p style="font-size:12px;color:#888;margin-bottom:10px;background:#fffbe6;border-left:3px solid #ffc107;padding:8px 12px;border-radius:5px;">
                             <i class="fas fa-info-circle" style="color:#ffc107;"></i>
-                            <strong data-bn="ফেরতের পরিমান" data-en="Return Quantity">ফেরতের পরিমান</strong> <span data-bn="দিন — কাস্টমার যতটা ফেরত দিবে। বাকিটা রাখা হিসেবে গণ্য হবে।পুরোটা রাখলে ০ দিন, সবটা ফেরত দিলে পূর্ণ পরিমান দিন。" data-en="— enter how much the customer returns. The rest will be kept. Enter 0 to keep all, enter full quantity to return all.">দিন — কাস্টমার যতটা ফেরত দিবে। বাকিটা রাখা হিসেবে গণ্য হবে।পুরোটা রাখলে ০ দিন, সবটা ফেরত দিলে পূর্ণ পরিমান দিন।</span>
+                            <strong data-bn="ফেরতের পরিমাণ" data-en="Return Quantity">ফেরতের পরিমাণ</strong> <span data-bn="কাস্টমার কতটুকু ফেরত দিচ্ছে তা লিখুন। বাকিটা রাখা হবে। সব রাখতে 0 দিন, সব ফেরত দিতে পূর্ণ পরিমাণ দিন।" data-en="Enter how much the customer returns. The rest will be kept. Enter 0 to keep all, enter full quantity to return all.">কাস্টমার কতটুকু ফেরত দিচ্ছে তা লিখুন। বাকিটা রাখা হবে। সব রাখতে 0 দিন, সব ফেরত দিতে পূর্ণ পরিমাণ দিন।</span>
                         </p>
                         <div style="overflow-x:auto;">
                             <table class="ret-tbl">
@@ -129,13 +129,13 @@
                                     <tr>
                                         <th>#</th>
                                         <th data-bn="কোড" data-en="Code">কোড</th>
-                                        <th data-bn="কাপড়ের নাম" data-en="Item Name">কাপড়ের নাম</th>
+                                        <th data-bn="আইটেমের নাম" data-en="Item Name">আইটেমের নাম</th>
                                         <th data-bn="ইউনিট" data-en="Unit">ইউনিট</th>
-                                        <th data-bn="বিক্রির পরিমান" data-en="Sold Qty">বিক্রির পরিমান</th>
-                                        <th data-bn="ফেরতের পরিমান" data-en="Return Qty">ফেরতের পরিমান</th>
-                                        <th data-bn="রাখার পরিমান" data-en="Kept Qty">রাখার পরিমান</th>
-                                        <th data-bn="ইউনিট মূল্য" data-en="Unit Price">ইউনিট মূল্য</th>
-                                        <th data-bn="রাখার মূল্য" data-en="Kept Value">রাখার মূল্য</th>
+                                        <th data-bn="বিক্রিত পরিমাণ" data-en="Sold Qty">বিক্রিত পরিমাণ</th>
+                                        <th data-bn="ফেরতের পরিমাণ" data-en="Return Qty">ফেরতের পরিমাণ</th>
+                                        <th data-bn="রাখা পরিমাণ" data-en="Kept Qty">রাখা পরিমাণ</th>
+                                        <th data-bn="একক মূল্য" data-en="Unit Price">একক মূল্য</th>
+                                        <th data-bn="রাখা মূল্য" data-en="Kept Value">রাখা মূল্য</th>
                                     </tr>
                                 </thead>
                                 <tbody id="returnItemsBody"></tbody>
@@ -147,18 +147,18 @@
                     <div class="card-box">
                         <div class="row g-4">
                             <div class="col-md-5">
-                                <div class="section-title"><i class="fas fa-calculator"></i> <span data-bn="হিসাব" data-en="Summary">হিসাব</span></div>
+                                <div class="section-title"><i class="fas fa-calculator"></i> <span data-bn="সারসংক্ষেপ" data-en="Summary">সারসংক্ষেপ</span></div>
                                 <div class="summary-box">
                                     <div class="sum-row">
                                         <span data-bn="মূল বিক্রয়" data-en="Original Sale">মূল বিক্রয়</span>
                                         <span id="sumOriginal">৳ 0.00</span>
                                     </div>
                                     <div class="sum-row">
-                                        <span data-bn="ফেরত পর মূল্য" data-en="Value After Return">ফেরত পর মূল্য</span>
+                                        <span data-bn="ফেরতের পরের মূল্য" data-en="Value After Return">ফেরতের পরের মূল্য</span>
                                         <span id="sumKeptAmt" style="color:#333;">৳ 0.00</span>
                                     </div>
                                     <div class="sum-row">
-                                        <span data-bn="ছাড়" data-en="Discount">ছাড়</span>
+                                        <span data-bn="ছাড়" data-en="Discount">ছাড়</span>
                                         <span id="sumDiscount" style="color:#fd7e14;">- ৳ 0.00</span>
                                     </div>
                                     <div class="sum-row total">
@@ -166,11 +166,11 @@
                                         <span id="sumNewTotal">৳ 0.00</span>
                                     </div>
                                     <div class="sum-row">
-                                        <span data-bn="পূর্বের পরিশোধ" data-en="Previous Paid">পূর্বের পরিশোধ</span>
+                                        <span data-bn="আগের পরিশোধ" data-en="Previous Paid">আগের পরিশোধ</span>
                                         <span id="sumOldPaid" style="color:#28a745;">- ৳ 0.00</span>
                                     </div>
                                     <div class="sum-row" id="sumNewPaidRow" style="display:none;">
-                                        <span data-bn="নতুন পরিশোধ" data-en="New Payment">নতুন পরিশোধ</span>
+                                        <span data-bn="নতুন পেমেন্ট" data-en="New Payment">নতুন পেমেন্ট</span>
                                         <span id="sumNewPaid" style="color:#28a745;">- ৳ 0.00</span>
                                     </div>
                                     <div class="sum-row total" style="color:#dc3545;">
@@ -182,7 +182,7 @@
                             </div>
 
                             <div class="col-md-7">
-                                <div class="section-title"><i class="fas fa-cog"></i> <span data-bn="ফেরতের তথ্য" data-en="Return Details">ফেরতের তথ্য</span></div>
+                                <div class="section-title"><i class="fas fa-cog"></i> <span data-bn="ফেরতের বিবরণ" data-en="Return Details">ফেরতের বিবরণ</span></div>
                                 <div class="form-grid">
                                     <div>
                                         <label class="f-label" data-bn="ছাড় (টাকা)" data-en="Discount (Tk)">ছাড় (টাকা)</label>
@@ -190,17 +190,17 @@
                                             style="width:100%;" oninput="recalculate()">
                                     </div>
                                     <div>
-                                        <label class="f-label" data-bn="একাউন্ট" data-en="Account">একাউন্ট</label>
+                                        <label class="f-label" data-bn="অ্যাকাউন্ট" data-en="Account">অ্যাকাউন্ট</label>
                                         <select id="inAccount" class="f-control" style="width:100%;"></select>
                                     </div>
                                     <div>
                                         <label class="f-label">
-                                            <span data-bn="নতুন পরিশোধ (টাকা)" data-en="New Payment (Tk)">নতুন পরিশোধ (টাকা)</span>
+                                            <span data-bn="নতুন পেমেন্ট (টাকা)" data-en="New Payment (Tk)">নতুন পেমেন্ট (টাকা)</span>
                                             <small id="paidHint" style="color:#6c7ae0;font-weight:400;"></small>
                                         </label>
                                         <input type="number" id="inNewPaid" class="f-control" value=""
-                                            data-bn-placeholder="খালি রাখলে ০" data-en-placeholder="Leave blank for 0"
-                                            placeholder="খালি রাখলে ০"
+                                            data-bn-placeholder="শূন্য রাখতে 0 লিখুন" data-en-placeholder="Leave blank for 0"
+                                            placeholder="শূন্য রাখতে 0 লিখুন"
                                             min="0" style="width:100%;" oninput="recalculate()">
                                     </div>
                                     <div>
@@ -229,7 +229,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     <script>
     (function () {
         let institutionId   = 0;
@@ -237,7 +237,7 @@
         let currentReceipt  = null;   // header
         let currentItems    = [];     // array of items from API
 
-        // ── Session ──────────────────────────────────────────────────────────
+        // -- Session ----------------------------------------------------------
         function getSession() {
             institutionId  = parseInt(sessionStorage.getItem('institutionId')
                            || localStorage.getItem('session_institutionId') || '0');
@@ -263,26 +263,26 @@
 
             // Update receipt info chips and account option on language change
             $(document).on('languageChanged', function (e, lang) {
-                $('#inAccount option[value="0"]').text(lang === 'en' ? 'Without Account' : 'একাউন্ট ছাড়া');
+                $('#inAccount option[value="0"]').text(lang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া');
                 if (currentReceipt) {
                     renderReceiptInfo(currentReceipt);
                 }
             });
         });
 
-        // ── Find Receipt ─────────────────────────────────────────────────────
+        // -- Find Receipt -----------------------------------------------------
         window.findReceipt = function () {
             getSession();
-            if (!institutionId) { showToast('সেশন পাওয়া যায়নি', 'error'); return; }
+            if (!institutionId) { showToast('প্রতিষ্ঠান লোড হয়নি', 'error'); return; }
             const sn = document.getElementById('inSN').value.trim();
-            if (!sn) { showToast('রশিদ নম্বর দিন', 'error'); return; }
+            if (!sn) { showToast('রিসিট নম্বর দিন', 'error'); return; }
 
             $('#findSpinner').removeClass('hidden');
             $('#receiptSection').addClass('hidden');
 
             $.get('/api/ItemSell/return-info?institutionId=' + institutionId + '&sellingSN=' + sn, function (res) {
                 $('#findSpinner').addClass('hidden');
-                if (!res.success) { showToast(res.message || 'রশিদ পাওয়া যায়নি', 'error'); return; }
+                if (!res.success) { showToast(res.message || 'রিসিট পাওয়া যায়নি', 'error'); return; }
 
                 currentReceipt = res.header;
                 currentItems   = res.items || [];
@@ -295,25 +295,25 @@
                 $('#receiptSection').removeClass('hidden');
             }).fail(function () {
                 $('#findSpinner').addClass('hidden');
-                showToast('সার্ভার এরর', 'error');
+                showToast('সার্ভার এরর হয়েছে', 'error');
             });
         };
 
-        // ── Render receipt info chips ─────────────────────────────────────────
+        // -- Render receipt info chips -----------------------------------------
         function renderReceiptInfo(h) {
             const hasDue      = parseFloat(h.SellingDueAmount) > 0;
             const hasDiscount = parseFloat(h.SellingDiscountAmount) > 0;
             const lang        = window.currentLang === 'en' ? 'en' : 'bn';
 
             const t = {
-                receipt:   lang === 'en' ? 'Receipt No'   : 'রশিদ নং',
+                receipt:   lang === 'en' ? 'Receipt No'   : 'রিসিট নম্বর',
                 date:      lang === 'en' ? 'Date'         : 'তারিখ',
                 customer:  lang === 'en' ? 'Customer'     : 'কাস্টমার',
                 total:     lang === 'en' ? 'Total Sale'   : 'মোট বিক্রয়',
                 discount:  lang === 'en' ? 'Discount'     : 'ছাড়',
-                paid:      lang === 'en' ? 'Paid'         : 'পরিশোধিত',
+                paid:      lang === 'en' ? 'Paid'         : 'পরিশোধ',
                 due:       lang === 'en' ? 'Due'          : 'বাকি',
-                prevReturn:lang === 'en' ? 'Prev Return'  : 'পূর্বে ফিরত'
+                prevReturn:lang === 'en' ? 'Prev Return'  : 'আগের ফেরত'
             };
 
             $('#receiptInfo').html(`
@@ -362,7 +362,7 @@
             }
         }
 
-        // ── Render return table ───────────────────────────────────────────────
+        // -- Render return table -----------------------------------------------
         function renderReturnTable(items) {
             const $body = $('#returnItemsBody').empty();
             items.forEach(function (item, i) {
@@ -393,18 +393,18 @@
             });
         }
 
-        // ── Load accounts into select ─────────────────────────────────────────
+        // -- Load accounts into select -----------------------------------------
         function loadAccounts(accounts) {
             const $sel = $('#inAccount').empty();
-            const noAccLabel = window.currentLang === 'en' ? 'Without Account' : 'একাউন্ট ছাড়া';
-            $sel.append('<option value="0" data-bn="একাউন্ট ছাড়া" data-en="Without Account">' + noAccLabel + '</option>');
+            const noAccLabel = window.currentLang === 'en' ? 'Without Account' : 'অ্যাকাউন্ট ছাড়া';
+            $sel.append('<option value="0" data-bn="অ্যাকাউন্ট ছাড়া" data-en="Without Account">অ্যাকাউন্ট ছাড়া</option>');
             (accounts || []).forEach(function (a) {
                 const isDefault = a.IsDefault || a.isDefault;
                 $sel.append(`<option value="${a.AccountID || a.accountID}" ${isDefault ? 'selected' : ''}>${esc(a.AccountName || a.accountName)}</option>`);
             });
         }
 
-        // ── Qty change ────────────────────────────────────────────────────────
+        // -- Qty change --------------------------------------------------------
         window.onQtyChange = function (inp) {
             const sold   = parseFloat(inp.dataset.sold);
             const retVal = parseFloat(inp.value);
@@ -420,11 +420,11 @@
             recalculate();
         };
 
-        // ── Recalculate summary ───────────────────────────────────────────────
+        // -- Recalculate summary -----------------------------------------------
         window.recalculate = function () {
             if (!currentReceipt) return;
 
-            // keptTotal = sum of (kept qty × unit price)
+            // keptTotal = sum of (kept qty � unit price)
             let keptTotal = 0;
             $('.ret-qty').each(function () {
                 const sold = parseFloat($(this).data('sold'));
@@ -467,20 +467,20 @@
             const $note = $('#refundNote');
             if (refund > 0) {
                 $note.removeClass('hidden');
-                $note.html('<i class="fas fa-arrow-circle-left me-1"></i> ক্যাশ ফেরত দিতে হবে: ৳ ' + fmt(refund));
+                $note.html('<i class="fas fa-arrow-circle-left me-1"></i> কাস্টমারকে ফেরত দিন: ৳ ' + fmt(refund));
                 $note.css('color', '#28a745');
             } else {
                 $note.addClass('hidden');
             }
         };
 
-        // ── Submit Return ─────────────────────────────────────────────────────
+        // -- Submit Return -----------------------------------------------------
         window.submitReturn = function () {
             getSession();
-            if (!institutionId) { showToast('সেশন পাওয়া যাচ্ছে না', 'error'); return; }
-            if (!currentReceipt) { showToast('রশিদ লোড করুন', 'error'); return; }
+            if (!institutionId) { showToast('প্রতিষ্ঠান লোড হয়নি', 'error'); return; }
+            if (!currentReceipt) { showToast('প্রথমে রিসিট খুঁজুন', 'error'); return; }
 
-            // Build return items — only items where return qty > 0
+            // Build return items � only items where return qty > 0
             let hasOver = false;
             const returnItems = [];
 
@@ -499,8 +499,8 @@
                 }
             });
 
-            if (hasOver) { showToast('রাখার পরিমান বিক্রির পরিমানের বেশি হতে পারবে না', 'error'); return; }
-            if (!returnItems.length) { showToast('কমপক্ষে একটি আইটেম ফেরত হওয়া দরকার', 'error'); return; }
+            if (hasOver) { showToast('ফেরতের পরিমাণ বিক্রিত পরিমাণের বেশি হতে পারবে না', 'error'); return; }
+            if (!returnItems.length) { showToast('অন্তত একটি আইটেমের ফেরত পরিমাণ দিন', 'error'); return; }
 
             const returnDate = document.getElementById('inReturnDate').value;
             if (!returnDate) { showToast('ফেরতের তারিখ দিন', 'error'); return; }
@@ -522,7 +522,7 @@
             };
 
             const $btn = $('#btnSubmit').prop('disabled', true)
-                .html('<span class="spin" style="width:18px;height:18px;border-width:2px;margin-right:6px;"></span>প্রক্রিয়া হচ্ছে...');
+                .html('<span class="spin" style="width:18px;height:18px;border-width:2px;margin-right:6px;"></span>প্রসেস হচ্ছে...');
 
             $.ajax({
                 url:         '/api/ItemSell/submit-return',
@@ -537,7 +537,7 @@
                         }, 1200);
                     } else {
                         $btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> ফেরত সম্পন্ন করুন');
-                        showToast(res.message || 'সমস্যা হয়েছে', 'error');
+                        showToast(res.message || 'সার্ভার এরর', 'error');
                     }
                 },
                 error: function (xhr) {
@@ -549,7 +549,7 @@
             });
         };
 
-        // ── Helpers ───────────────────────────────────────────────────────────
+        // -- Helpers -----------------------------------------------------------
         function fmt(v)  { return parseFloat(v || 0).toFixed(2); }
         function esc(s)  { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 

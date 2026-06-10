@@ -2,6 +2,9 @@
 (function() {
     'use strict';
 
+    // print-settings থেকে ফিরে এলে reload flag set করো
+    window._mrNeedsReload = false;
+
     // Global variables
     let orderData = null;
     let printSettings = null;
@@ -37,9 +40,23 @@
             return;
         }
 
-        // Load data
+        // Load print settings first, then load receipt data to avoid race condition
         loadPrintSettings();
         loadMoneyReceiptData();
+
+        // Auto-switch to measurement tab if tab=measurement is in URL
+        const tabParam = urlParams.get('tab');
+        if (tabParam === 'measurement') {
+            // Wait for Bootstrap to initialize, then switch tab
+            setTimeout(function() {
+                const measurementTabEl = document.querySelector('button[data-bs-target="#measurementTab"]');
+                if (measurementTabEl) {
+                    const tab = new bootstrap.Tab(measurementTabEl);
+                    tab.show();
+                    // Count is NOT incremented here - only increments when Print button is clicked
+                }
+            }, 500);
+        }
 
         // Setup print size selector
         $('#printSizeSelect').on('change', function() {
@@ -76,23 +93,21 @@
         // Hide Border checkbox functionality
         $('#hideBorderCheckbox').on('change', function() {
             if ($(this).is(':checked')) {
-                // Add hide-borders class to new structure
+                // Hide borders on measurement-groups-table inner tables (but keep separator lines)
+                $('.measurement-groups-table td table').css('border', 'none');
+                $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', 'none');
+                // Backward compatibility
                 $('.measurement-grid-container').addClass('hide-borders');
-                // Hide borders for new structure with inline styles
                 $('.measurement-grid-container table').css('border', 'none');
                 $('.measurement-grid-container table td').css('border', 'none');
-                // Also hide borders for old structure (backward compatibility)
-                $('.measurement-grid .measurement-item table').css('border', 'none');
-                $('.measurement-grid .measurement-item table td').css('border', 'none');
             } else {
-                // Remove hide-borders class from new structure
+                // Show borders on measurement-groups-table inner tables
+                $('.measurement-groups-table td table').css('border', '1px solid #666');
+                $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', '');
+                // Backward compatibility
                 $('.measurement-grid-container').removeClass('hide-borders');
-                // Show borders for new structure with inline styles
                 $('.measurement-grid-container table').css('border', '1px solid #666');
                 $('.measurement-grid-container table td').css('border', '1px solid #666');
-                // Also show borders for old structure (backward compatibility)
-                $('.measurement-grid .measurement-item table').css('border', '1px solid #666');
-                $('.measurement-grid .measurement-item table td').css('border', '1px solid #666');
             }
         });
 
@@ -255,7 +270,9 @@
     }
 
     function formatNumber(num) {
-        return parseFloat(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        const n = parseFloat(num);
+        const formatted = Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
+        return formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     function showAlert(type, message) {
@@ -355,39 +372,60 @@
         console.log('Applied print size:', size, 'inch =', widthInPixels, 'pixels');
     }
     
+    // Track whether count was already incremented for this page load
+    let measurementPrintCountIncremented = false;
+
     // Increment measurement print count
     async function incrementMeasurementPrintCount() {
+        if (measurementPrintCountIncremented) {
+            console.log('incrementMeasurementPrintCount: already incremented, skipping');
+            return;
+        }
+        measurementPrintCountIncremented = true;
+
         const institutionId = sessionStorage.getItem('institutionId');
-        
+        const token = window.TokenHelper ? window.TokenHelper.get() : (localStorage.getItem('tailorbd_jwt') || '');
+
+        console.log('incrementMeasurementPrintCount called:', { orderId, institutionId, hasToken: !!token });
+
+        if (!orderId || !institutionId) {
+            console.error('incrementMeasurementPrintCount: missing orderId or institutionId', { orderId, institutionId });
+            measurementPrintCountIncremented = false;
+            return;
+        }
+
+        const apiUrl = `/api/orders/${orderId}/increment-measurement-print?institutionId=${institutionId}`;
+        console.log('Calling API:', apiUrl);
+
         try {
-            const response = await fetch(`/api/orders/${orderId}/increment-measurement-print?institutionId=${institutionId}`, {
-                method: 'POST'
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: token ? { 'Authorization': 'Bearer ' + token } : {}
             });
-            
+
+            console.log('API response status:', response.status);
             const result = await response.json();
-            
+            console.log('API response body:', result);
+
             if (result.success) {
-                console.log('Measurement print count incremented successfully');
+                console.log('Measurement print count incremented successfully for orderId:', orderId);
             } else {
                 console.warn('Failed to increment measurement print count:', result.message);
+                measurementPrintCountIncremented = false;
             }
         } catch (error) {
             console.error('Error incrementing measurement print count:', error);
+            measurementPrintCountIncremented = false;
         }
     }
     
-    // Override window.print to increment count when printing measurement
+    // Override window.print to also increment count if measurement tab is active
     const originalPrint = window.print;
     window.print = function() {
-        // Check if measurement tab is active
         const activeTab = $('.tab-pane.active').attr('id');
-        
         if (activeTab === 'measurementTab') {
-            // Increment measurement print count
             incrementMeasurementPrintCount();
         }
-        
-        // Call original print function
         originalPrint.call(window);
     };
 
@@ -398,11 +436,16 @@
         $.ajax({
             url: `/api/institution/${institutionId}/print-settings`,
             method: 'GET',
+            cache: false,
             success: function(response) {
                 if (response.success && response.data) {
                     printSettings = response.data;
                     console.log('Print settings loaded:', printSettings);
                     applyPrintSettings();
+                    // Re-apply to receipt if already rendered (race condition fix)
+                    if (orderData && orderData.header) {
+                        displayMoneyReceipt();
+                    }
                 }
             },
             error: function(xhr) {
@@ -473,6 +516,7 @@
         $.ajax({
             url: `/api/orders/money-receipt-details?orderId=${orderId}&institutionId=${institutionId}`,
             method: 'GET',
+            cache: false,
             success: function(response) {
                 console.log('API Response received:', response);
                 
@@ -587,9 +631,7 @@
         
         // Display dates
         $('#orderDate').text(formatShortDate(header.orderDate));
-        $('#deliveryDate').text(header.updateDeliveryDate 
-            ? formatShortDate(header.updateDeliveryDate) 
-            : formatShortDate(header.deliveryDate));
+        $('#deliveryDate').text(formatShortDate(header.deliveryDate));
 
         // Generate barcode only if setting is enabled
         if (printSettings && printSettings.moneyReceipt && printSettings.moneyReceipt.showReceiptBarcode !== false) {
@@ -619,7 +661,25 @@
 
         // Display payment summary
         displayPaymentSummary();
-        
+
+        // Served By
+        const showServedBy = printSettings && printSettings.moneyReceipt && printSettings.moneyReceipt.showServedBy;
+        const servedByName = sessionStorage.getItem('name') || sessionStorage.getItem('username') || '';
+        const servedByPhone = sessionStorage.getItem('phone') || '';
+        if (showServedBy && servedByName) {
+            const displayText = servedByPhone ? `${servedByName}(${servedByPhone})` : servedByName;
+            $('#servedByName').text(displayText);
+            $('#servedBySection').show();
+        } else {
+            $('#servedBySection').hide();
+        }
+
+        // Re-apply font size to screen view after content is rendered
+        if (printSettings && printSettings.moneyReceipt && printSettings.moneyReceipt.fontSize) {
+            const fs = printSettings.moneyReceipt.fontSize + 'px';
+            document.documentElement.style.setProperty('--print-font-size', fs);
+        }
+
         console.log('Money receipt display completed');
     }
 
@@ -661,18 +721,18 @@
         const previousDue = orderData.previousDue || 0;
 
         $('#totalAmount').text('৳' + formatNumber(total));
-        $('#paidAmount').text(formatNumber(paid));
+        $('#paidAmount').text('৳' + formatNumber(paid));
         $('#dueAmount').text('৳' + formatNumber(due));
 
         // Show discount row if there's a discount
         if (discount > 0) {
-            $('#discountAmount').text(formatNumber(discount));
+            $('#discountAmount').text('৳' + formatNumber(discount));
             $('#discountRow').show();
         }
 
         // Show previous due and total due rows only if previous due > 0
         if (previousDue > 0) {
-            $('#previousDueAmount').text(formatNumber(previousDue));
+            $('#previousDueAmount').text('৳' + formatNumber(previousDue));
             $('#previousDueRow').show();
             const totalDue = due + previousDue;
             $('#totalDueAmount').text('৳' + formatNumber(totalDue));
@@ -735,7 +795,7 @@
         // Translate labels
         const labels = {
             orderNo: currentLang === 'en' ? 'Order No:' : 'অর্ডার নং:',
-            order: currentLang === 'en' ? 'Order:' : 'অর্ডা:',
+            order: currentLang === 'en' ? 'Order:' : 'তাং:',
             delivery: currentLang === 'en' ? 'Delivery:' : 'ডেলি:',
             style: currentLang === 'en' ? 'Style:' : 'স্টাইল:'
         };
@@ -831,18 +891,22 @@
             // PART 2: After all copy headers, show measurements and styles ONCE at the end
             const $detailsSection = $('<div class="measurement-details-section"></div>');
 
-            // Customer name AND phone (if enabled) - both show/hide together
+            // Customer name AND phone (if enabled separately)
             if (mSettings.printCustomerName) {
-                // Show name and phone in ONE line
-                const customerInfo = header.phone 
-                    ? `${header.customerName}, ${header.phone}` 
-                    : header.customerName;
-                
-                $detailsSection.append(`
-                    <div class="customer-name-section">
-                        ${customerInfo}
-                    </div>
-                `);
+                let customerLine = `<strong>${header.customerName}</strong>`;
+                const showPhone = mSettings.printCustomerPhone !== false;
+                if (showPhone && header.phone) {
+                    customerLine += `, ${header.phone}`;
+                }
+                if (mSettings.printCustomerAddress && header.address) {
+                    customerLine += `, ${header.address}`;
+                }
+                let customerHtml = `<div class="customer-name-section">${customerLine}</div>`;
+                $detailsSection.append(customerHtml);
+            } else if (mSettings.printCustomerPhone !== false && header.phone) {
+                // শুধু phone দেখানো (নাম ছাড়া)
+                let customerHtml = `<div class="customer-name-section">${header.phone}</div>`;
+                $detailsSection.append(customerHtml);
             }
 
             // Group measurements by groupID
@@ -860,58 +924,103 @@
                     groupMap.get(groupId).push(m);
                 });
 
-                // Build separate tables for each group (like old ASPX nested DataList)
-                const $measurementGrid = $('<div class="measurement-grid-container"></div>');
-                
+                // Build table with max 10 groups per row (like old ASPX - stays within page width)
+                const MAX_COLS_PER_ROW = 10;
+                const $outerTable = $('<table class="measurement-groups-table" style="width:100%; border-collapse:collapse; table-layout:fixed;"></table>');
+                const $outerTbody = $('<tbody></tbody>');
+
+                // Collect valid groups first
+                const validGroups = [];
                 groupOrder.forEach(groupId => {
                     const group = groupMap.get(groupId);
-                    
-                    // Create a table for this group - only if it has measurements
                     if (group && group.length > 0) {
-                        const $groupTable = $('<table></table>');
-                        const $tbody = $('<tbody></tbody>');
-                        
-                        // Add each measurement in the group as a row
-                        group.forEach(m => {
-                            // Only add rows with actual measurement values
-                            if (m.value && m.value.trim() !== '') {
-                                const $row = $('<tr></tr>');
-                                const $cell = $('<td></td>');
-                                
-                                if (mSettings.printMeasurementName) {
-                                    $cell.append(`<div style="font-size: ${(mSettings.fontSize || 14) - 2}px;">${m.type}</div>`);
-                                    $cell.append('<hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">');
-                                }
-                                
-                                $cell.append(`<div style="font-weight: bold; font-size: ${mSettings.fontSize || 14}px;">${m.value}</div>`);
-                                $row.append($cell);
-                                $tbody.append($row);
-                            }
-                        });
-                        
-                        // Only append table if it has rows
-                        if ($tbody.children().length > 0) {
-                            $groupTable.append($tbody);
-                            $measurementGrid.append($groupTable);
+                        const validMeasurements = group.filter(m => m.value && m.value.trim() !== '');
+                        if (validMeasurements.length > 0) {
+                            validGroups.push({ groupId, validMeasurements });
                         }
                     }
                 });
 
-                $detailsSection.append($measurementGrid);
+                // Split into rows of max MAX_COLS_PER_ROW
+                for (let rowStart = 0; rowStart < validGroups.length; rowStart += MAX_COLS_PER_ROW) {
+                    const rowGroups = validGroups.slice(rowStart, rowStart + MAX_COLS_PER_ROW);
+                    const $outerTr = $('<tr></tr>');
+
+                    rowGroups.forEach(({ validMeasurements }) => {
+                        const $td = $('<td style="padding:0 3px; vertical-align:top; overflow:hidden;"></td>');
+
+                        // Inner table for stacking multiple measurements - border on inner table, NOT td
+                        const $innerTable = $('<table style="width:100%; border:1px solid #666; border-collapse:collapse;"></table>');
+                        const $innerTbody = $('<tbody></tbody>');
+
+                        validMeasurements.forEach((m, idx) => {
+                            if (mSettings.printMeasurementName) {
+                                const $typeRow = $('<tr></tr>');
+                                const $typeCell = $(`<td style="text-align:center; padding:0; border:none; font-size:${mSettings.fontSize || 14}px; font-weight:bold;">${m.type}</td>`);
+                                $typeRow.append($typeCell);
+                                $innerTbody.append($typeRow);
+                            }
+
+                            const $valRow = $('<tr></tr>');
+                            const $valCell = $(`<td style="text-align:center; padding:2px 2px; border:none; font-size:${mSettings.fontSize || 14}px; font-weight:bold; word-break:break-all; overflow-wrap:break-word;">${m.value}</td>`);
+                            $valRow.append($valCell);
+                            $innerTbody.append($valRow);
+
+                            if (idx < validMeasurements.length - 1) {
+                                const $sepRow = $('<tr></tr>');
+                                const $sepCell = $('<td class="measurement-separator" style="padding:0; border:none; border-top:1px solid #000; line-height:0; font-size:0;"></td>');
+                                $sepRow.append($sepCell);
+                                $innerTbody.append($sepRow);
+                            }
+                        });
+
+                        $innerTable.append($innerTbody);
+                        $td.append($innerTable);
+                        $outerTr.append($td);
+                    });
+
+                    $outerTbody.append($outerTr);
+                }
+
+                $outerTable.append($outerTbody);
+                $detailsSection.append($outerTable);
             }
 
             // Styles
             console.log('Styles data for item:', item.dressName, item.styles);
             if (item.styles && item.styles.length > 0) {
-                let stylesText = item.styles.map(s => {
-                    if (mSettings.printStyleCategory && s.measurement) {
-                        return `${s.name} = ${s.measurement}`;
+                // Group styles by category (preserving order)
+                const catMap = new Map();
+                const catOrder = [];
+                item.styles.forEach(s => {
+                    const cat = s.categoryName || '';
+                    if (!catMap.has(cat)) {
+                        catMap.set(cat, []);
+                        catOrder.push(cat);
                     }
-                    return s.measurement ? `${s.measurement}` : s.name;
-                }).join(', ');
+                    catMap.get(cat).push(s);
+                });
+
+                // Build style text grouped by category (same format as old project)
+                const catParts = catOrder.map(cat => {
+                    const styleItems = catMap.get(cat).map(s => {
+                        let part = s.name;
+                        if (s.measurement && s.measurement.trim()) {
+                            part += ` = ${s.measurement}`;
+                        }
+                        return part;
+                    }).join(', ');
+
+                    if (mSettings.printStyleCategory && cat) {
+                        return `${cat}(${styleItems})`;
+                    }
+                    return `(${styleItems})`;
+                });
+
+                let stylesText = catParts.join(' ');
 
                 console.log('Generated styles text:', stylesText);
-                
+
                 if (stylesText) {
                     $detailsSection.append(`
                         <div class="styles-section">
@@ -942,14 +1051,20 @@
         if (mSettings.fontSize) {
             // Apply to measurement table
             $('.measurement-table').css('font-size', mSettings.fontSize + 'px');
-            
+
             // Apply to styles and details sections
             $('.styles-section').css('font-size', mSettings.fontSize + 'px');
             $('.details-section').css('font-size', mSettings.fontSize + 'px');
-            
+
             console.log('Applied fontSize:', mSettings.fontSize + 'px');
         }
-        
+
+        // Re-apply border hide state after render
+        if ($('#hideBorderCheckbox').is(':checked')) {
+            $('.measurement-groups-table td table').css('border', 'none');
+            $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', 'none');
+        }
+
         console.log('Measurements displayed successfully');
     }
 

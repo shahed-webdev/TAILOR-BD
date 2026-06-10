@@ -343,7 +343,7 @@
         }
 
         var s = document.createElement('script');
-        s.src = '/js/due-notice.js';
+        s.src = '/js/due-notice.js?v=2.2.0';
         document.body.appendChild(s);
     }
 
@@ -669,8 +669,7 @@
             return;
         }
 
-        $('#username, #sidebarUsername').text(username.toUpperCase());
-        $('#userAvatar').text(username.charAt(0).toUpperCase());
+        $('#sidebarUsername').text(username.toUpperCase());
 
         if (institutionId) {
             loadInstitutionInfo(institutionId);
@@ -701,8 +700,6 @@
 
                         if (profile.name) {
                             $('#sidebarUsername').text(profile.name.toUpperCase());
-                            $('#username').text(profile.name);
-                            $('#userAvatar').text(profile.name.charAt(0).toUpperCase());
                         }
                     }
                 },
@@ -814,6 +811,83 @@
             return;
         }
 
+        const pageAliases = {
+            '/ordrlist.html': '/order-list.html',
+            '/incompleteworks.html': '/incomplete-works.html',
+            '/add-customer-mesurement.html': '/add-customer.html',
+            '/damage-report.html': '/item-damage-add.html',
+            '/mesurement-printing-setting.html': '/print-settings.html',
+            '/map-print-setting.html': '/print-settings.html',
+            '/delivered-works.html': '/delivery-cut-dress.html'
+        };
+
+        function normalizePagePath(path) {
+            var norm = ('/' + String(path || '').replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
+            return pageAliases[norm] || norm;
+        }
+
+        function expandAllowedPages(baseSet) {
+            var expanded = new Set(baseSet);
+            baseSet.forEach(function(url) {
+                var canonical = normalizePagePath(url);
+                expanded.add(canonical);
+                expanded.add(canonical.replace(/\.html$/i, ''));
+                Object.keys(pageAliases).forEach(function(alias) {
+                    if (pageAliases[alias] === canonical) {
+                        expanded.add(alias);
+                        expanded.add(alias.replace(/\.html$/i, ''));
+                    }
+                });
+            });
+
+            // Order-list row actions inherit from order entry pages (legacy OrdrList behaviour)
+            var orderEntryPages = [
+                '/order-list.html',
+                '/new-order.html',
+                '/quick-order.html',
+                '/money-receipt.html'
+            ];
+            var orderWorkflowPages = [
+                '/update-order.html',
+                '/add-more-dress.html',
+                '/order-edit.html',
+                '/money-receipt.html',
+                '/finish-order.html',
+                '/dress-measurements.html'
+            ];
+            var hasOrderEntry = orderEntryPages.some(function(p) {
+                return expanded.has(p) || expanded.has(p.replace(/\.html$/i, ''));
+            });
+            if (hasOrderEntry) {
+                orderWorkflowPages.forEach(function(p) {
+                    expanded.add(p);
+                    expanded.add(p.replace(/\.html$/i, ''));
+                });
+            }
+
+            // Customer-list row actions inherit from customer pages (legacy behaviour)
+            var customerEntryPages = [
+                '/customer-list.html',
+                '/add-customer.html'
+            ];
+            var customerWorkflowPages = [
+                '/customer-details.html',
+                '/customer-measurement-print.html',
+                '/dress-measurements.html'
+            ];
+            var hasCustomerEntry = customerEntryPages.some(function(p) {
+                return expanded.has(p) || expanded.has(p.replace(/\.html$/i, ''));
+            });
+            if (hasCustomerEntry) {
+                customerWorkflowPages.forEach(function(p) {
+                    expanded.add(p);
+                    expanded.add(p.replace(/\.html$/i, ''));
+                });
+            }
+
+            return expanded;
+        }
+
         const alwaysAllowedPages = [
             '/sub-admin-dashboard.html',
             '/sub-admin-profile.html',
@@ -825,7 +899,7 @@
             url: `/api/access/permissions/${institutionId}/${registrationId}`,
             method: 'GET',
             success: function(response) {
-                const allowedHrefs = new Set();
+                let allowedHrefs = new Set();
                 alwaysAllowedPages.forEach(p => allowedHrefs.add(p));
 
                 if (response.success && response.data && response.data.length) {
@@ -834,15 +908,17 @@
                     response.data.forEach(p => {
                         const raw = (p.PageURL ?? p.pageURL ?? p.pageUrl ?? '').trim();
                         if (!raw) return;
-                        let url = (raw.startsWith('/') ? raw : '/' + raw).toLowerCase();
-                        url = url.replace(/\/+$/, '');
+                        let url = normalizePagePath(raw.startsWith('/') ? raw : '/' + raw);
                         allowedHrefs.add(url);
+                        allowedHrefs.add(url.replace(/\.html$/i, ''));
                     });
 
                     console.log('Allowed URLs:', [...allowedHrefs]);
                 } else {
                     console.warn('No permissions returned — only dashboard and invoice allowed');
                 }
+
+                allowedHrefs = expandAllowedPages(allowedHrefs);
 
                 $('.sidebar-menu li').show();
 
@@ -852,8 +928,8 @@
                     const href = $(this).attr('href');
                     if (!href || href === '#' || href.startsWith('javascript:')) return;
 
-                    let normHref = ('/' + href.replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
-                    const hasAccess = allowedHrefs.has(normHref);
+                    let normHref = normalizePagePath('/' + href.replace(/^\//, ''));
+                    const hasAccess = allowedHrefs.has(normHref) || allowedHrefs.has(normHref.replace(/\.html$/i, ''));
 
                     if (hasAccess) {
                         matchedCount++;
@@ -874,6 +950,8 @@
 
                 console.log(`Sidebar: ${matchedCount} links matched, ${hiddenCount} links hidden`);
 
+                window._subAdminAllowedPages = allowedHrefs;
+
                 const currentPage = ('/' + window.location.pathname.replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
                 // clean URL এবং .html ভার্শন উভয়ই বানাও
                 const currentPageHtml = currentPage.endsWith('.html') ? currentPage : currentPage + '.html';
@@ -889,9 +967,15 @@
                 ];
 
                 if (!skipGuard.includes(currentPage)) {
+                    var canonicalPage = normalizePagePath(currentPage);
+                    var canonicalPageHtml = canonicalPage.endsWith('.html') ? canonicalPage : canonicalPage + '.html';
+                    var canonicalPageClean = canonicalPage.replace(/\.html$/i, '');
                     const hasAccess = allowedHrefs.has(currentPage) ||
                                       allowedHrefs.has(currentPageHtml) ||
-                                      allowedHrefs.has(currentPageClean);
+                                      allowedHrefs.has(currentPageClean) ||
+                                      allowedHrefs.has(canonicalPage) ||
+                                      allowedHrefs.has(canonicalPageHtml) ||
+                                      allowedHrefs.has(canonicalPageClean);
                     if (!hasAccess) {
                         console.warn('Access denied for:', currentPage, '→ /access-denied.html');
                         window.location.replace('/access-denied.html');
@@ -1165,6 +1249,72 @@
         loadProfile: loadUserProfile,
         updateLanguage: window.updateLanguage,
         applyAccessControl: applyAccessControl
+    };
+
+    window.TailorBD = window.TailorBD || {};
+    window.TailorBD.printSizePref = {
+        validSizes: ['3', '3.5', '4', '4.5', '5'],
+        defaultSize: '4',
+
+        storageKey: function() {
+            var regId = sessionStorage.getItem('registrationId') ||
+                localStorage.getItem('session_registrationId') || '';
+            return 'tailorbd_printSize_' + regId;
+        },
+
+        normalize: function(size) {
+            var s = String(size || '').trim();
+            return this.validSizes.indexOf(s) >= 0 ? s : this.defaultSize;
+        },
+
+        get: function() {
+            try {
+                var saved = localStorage.getItem(this.storageKey());
+                if (saved) return this.normalize(saved);
+            } catch (e) { /* ignore */ }
+            return this.defaultSize;
+        },
+
+        save: function(size) {
+            var normalized = this.normalize(size);
+            try {
+                localStorage.setItem(this.storageKey(), normalized);
+            } catch (e) { /* ignore */ }
+            return normalized;
+        },
+
+        applyToSelect: function($select) {
+            var size = this.get();
+            if ($select && $select.length) {
+                $select.val(size);
+            }
+            return size;
+        }
+    };
+
+    window.TailorBD.resolvePageUrl = function(pagePath) {
+        var norm = ('/' + String(pagePath || '').replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
+        var aliases = {
+            '/ordrlist.html': '/order-list.html',
+            '/incompleteworks.html': '/incomplete-works.html',
+            '/add-customer-mesurement.html': '/add-customer.html',
+            '/damage-report.html': '/item-damage-add.html',
+            '/mesurement-printing-setting.html': '/print-settings.html',
+            '/map-print-setting.html': '/print-settings.html',
+            '/delivered-works.html': '/delivery-cut-dress.html'
+        };
+        return aliases[norm] || norm;
+    };
+    window.TailorBD.hasPageAccess = function(pagePath) {
+        var category = sessionStorage.getItem('category');
+        if (category !== 'Sub-Admin') return true;
+        if (!window._subAdminAllowedPages) return false;
+        var norm = window.TailorBD.resolvePageUrl(pagePath);
+        var normHtml = norm.endsWith('.html') ? norm : norm + '.html';
+        var normClean = norm.replace(/\.html$/i, '');
+        return window._subAdminAllowedPages.has(norm) ||
+               window._subAdminAllowedPages.has(normHtml) ||
+               window._subAdminAllowedPages.has(normClean);
     };
 
 })();

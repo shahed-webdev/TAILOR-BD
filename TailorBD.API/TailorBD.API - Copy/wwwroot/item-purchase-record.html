@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-en="Purchase Records - TailorBD" data-bn="আইটেম ক্রয়ের রেকর্ড - TailorBD">আইটেম ক্রয়ের রেকর্ড - TailorBD</title>
+    <title data-en="Purchase Records - TailorBD" data-bn="ক্রয় রেকর্ড - TailorBD">ক্রয় রেকর্ড - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -75,7 +75,7 @@
                 <!-- Page Title -->
                 <h5 style="font-weight:700; color:#6c7ae0; margin-bottom:16px;">
                     <i class="fas fa-list-alt me-2"></i>
-                    <span data-en="Item Purchase Records" data-bn="আইটেম ক্রয়ের রেকর্ড">আইটেম ক্রয়ের রেকর্ড</span>
+                    <span data-en="Item Purchase Records" data-bn="আইটেম ক্রয় রেকর্ড">আইটেম ক্রয় রেকর্ড</span>
                 </h5>
 
                 <!-- Filter -->
@@ -95,12 +95,11 @@
                         </div>
                         <div class="col-md-3 col-6">
                             <label class="f-label">
-                                <span data-en="Supplier" data-bn="সাপ্লায়ার">সাপ্লায়ার</span>
+                                <span data-en="Supplier" data-bn="সরবরাহকারী">সরবরাহকারী</span>
                             </label>
                             <input type="text" id="fSupplier" class="f-control"
                                 data-en-placeholder="Name or mobile..."
-                                data-bn-placeholder="নাম বা মোবাইল..."
-                                placeholder="নাম বা মোবাইল..."
+                                data-bn-placeholder="নাম বা মোবাইল..." placeholder="নাম বা মোবাইল..."
                                 oninput="debouncedSearch()">
                         </div>
                         <div class="col-md-3 col-6">
@@ -109,8 +108,7 @@
                             </label>
                             <input type="text" id="fBillNo" class="f-control"
                                 data-en-placeholder="Bill number..."
-                                data-bn-placeholder="বিল নম্বর..."
-                                placeholder="বিল নম্বর..."
+                                data-bn-placeholder="বিল নম্বর..." placeholder="বিল নম্বর..."
                                 oninput="debouncedSearch()">
                         </div>
                         <div class="col-12 d-flex gap-2">
@@ -134,7 +132,7 @@
                     </div>
                     <div class="s-card">
                         <div class="s-val green" id="sTotalPaid">৳ 0.00</div>
-                        <div class="s-lbl"><span data-en="Total Paid" data-bn="মোট পরিশোধিত">মোট পরিশোধিত</span></div>
+                        <div class="s-lbl"><span data-en="Total Paid" data-bn="মোট পরিশোধ">মোট পরিশোধ</span></div>
                     </div>
                     <div class="s-card">
                         <div class="s-val red" id="sTotalDue">৳ 0.00</div>
@@ -155,11 +153,11 @@
                                     <th>#</th>
                                     <th><span data-en="Purchase No" data-bn="ক্রয় নং">ক্রয় নং</span></th>
                                     <th><span data-en="Date" data-bn="তারিখ">তারিখ</span></th>
-                                    <th><span data-en="Bill No" data-bn="বিল নং">বিল নং</span></th>
-                                    <th><span data-en="Supplier" data-bn="সাপ্লায়ার">সাপ্লায়ার</span></th>
+                                    <th><span data-en="Bill No" data-bn="বিল নম্বর">বিল নম্বর</span></th>
+                                    <th><span data-en="Supplier" data-bn="সরবরাহকারী">সরবরাহকারী</span></th>
                                     <th><span data-en="Total" data-bn="মোট">মোট</span></th>
-                                    <th><span data-en="Discount" data-bn="ছাড়">ছাড়</span></th>
-                                    <th><span data-en="Paid" data-bn="পরিশোধিত">পরিশোধিত</span></th>
+                                    <th><span data-en="Discount" data-bn="ছাড়">ছাড়</span></th>
+                                    <th><span data-en="Paid" data-bn="পরিশোধ">পরিশোধ</span></th>
                                     <th><span data-en="Due" data-bn="বাকি">বাকি</span></th>
                                     <th><span data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</span></th>
                                 </tr>
@@ -178,7 +176,7 @@
                         </button>
                         <span class="pag-info" id="pagInfo"></span>
                         <button class="pag-btn" id="btnNext" onclick="loadRecords(currentPage+1)">
-                            <span data-en="Next" data-bn="পরবর্তী">পরবর্তী</span>
+                            <span data-en="Next" data-bn="পরে">পরে</span>
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -190,7 +188,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/item-purchase-record.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/item-purchase-record.js?v=2.1.6"></script>
 </body>
 </html>

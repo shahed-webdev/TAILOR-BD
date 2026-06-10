@@ -137,11 +137,20 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/auth.js"></script>
     <script>
     (function () {
+        function getDashboardUrl() {
+            var path = (window.TailorAuth && typeof TailorAuth.getHomeUrl === 'function')
+                ? TailorAuth.getHomeUrl()
+                : '/dashboard.html';
+            return window.location.origin + path;
+        }
+
         // ── URL থেকে order_id পড়া ────────────────────────────────────────
         var params  = new URLSearchParams(window.location.search);
-        var orderId = params.get('order_id') || params.get('orderId') || params.get('sp_order_id') || '';
+        var orderId = params.get('order_id') || params.get('orderId') || params.get('sp_order_id')
+            || params.get('customer_order_id') || params.get('merchant_order_id') || '';
 
         if (!orderId) {
             showResult('failed', null, 'Order ID পাওয়া যায়নি।');
@@ -223,15 +232,16 @@
                 : '');
 
             // ── Footer buttons ──
+            var dashboardUrl = getDashboardUrl();
             var btns = '';
             if (type === 'success') {
-                btns += '<a href="/dashboard.html" class="btn-home"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
+                btns += '<a href="' + dashboardUrl + '" class="btn-home"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
             } else if (type === 'failed') {
-                btns += '<a href="/due-invoice.html" class="btn-home"><i class="fas fa-redo"></i> আবার চেষ্টা করুন</a>';
-                btns += '<a href="/dashboard.html" class="btn-invoice"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
+                btns += '<a href="' + window.location.origin + '/due-invoice.html" class="btn-home"><i class="fas fa-redo"></i> আবার চেষ্টা করুন</a>';
+                btns += '<a href="' + dashboardUrl + '" class="btn-invoice"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
             } else {
-                btns += '<a href="/due-invoice.html" class="btn-invoice"><i class="fas fa-file-invoice"></i> ইনভয়েস পেজ</a>';
-                btns += '<a href="/dashboard.html" class="btn-home"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
+                btns += '<a href="' + window.location.origin + '/due-invoice.html" class="btn-invoice"><i class="fas fa-file-invoice"></i> ইনভয়েস পেজ</a>';
+                btns += '<a href="' + dashboardUrl + '" class="btn-home"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>';
             }
             $footer.html(btns);
         }

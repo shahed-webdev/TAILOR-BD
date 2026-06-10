@@ -32,10 +32,12 @@ namespace TailorBD.API.Services
     // ── Checkout initiation result ────────────────────────────────────────────
     public class SpCheckoutResult
     {
-        public bool   Success      { get; set; }
-        public string CheckoutUrl  { get; set; } = "";
-        public string OrderId      { get; set; } = "";
-        public string Message      { get; set; } = "";
+        public bool   Success          { get; set; }
+        public string CheckoutUrl      { get; set; } = "";
+        public string OrderId          { get; set; } = "";
+        public string MerchantOrderId  { get; set; } = "";
+        public string SpOrderId        { get; set; } = "";
+        public string Message          { get; set; } = "";
     }
 
     // ── Verify/callback response ──────────────────────────────────────────────
@@ -197,9 +199,11 @@ namespace TailorBD.API.Services
 
                     return new SpCheckoutResult
                     {
-                        Success     = true,
-                        CheckoutUrl = checkoutUrl,
-                        OrderId     = spOrderId.Length > 0 ? spOrderId : orderId
+                        Success         = true,
+                        CheckoutUrl     = checkoutUrl,
+                        MerchantOrderId = orderId,
+                        SpOrderId       = spOrderId.Length > 0 ? spOrderId : orderId,
+                        OrderId         = spOrderId.Length > 0 ? spOrderId : orderId
                     };
                 }
             }
@@ -257,10 +261,14 @@ namespace TailorBD.API.Services
                     amt = amProp.ValueKind == JsonValueKind.Number ? amProp.GetDouble()
                         : double.TryParse(amProp.GetString(), out var da) ? da : 0;
 
-                var isSuccess = payStatus == "Completed"
-                    || payStatus == "Paid"
-                    || spStatus  == "Paid Successfully"
-                    || spStatus  == "Success";
+                var spCode = elem.TryGetProperty("sp_code", out var scEl) ? GetStringValue(scEl) : "";
+
+                var isSuccess = payStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase)
+                    || payStatus.Equals("Paid", StringComparison.OrdinalIgnoreCase)
+                    || payStatus.Equals("Success", StringComparison.OrdinalIgnoreCase)
+                    || spStatus.Equals("Paid Successfully", StringComparison.OrdinalIgnoreCase)
+                    || spStatus.Equals("Success", StringComparison.OrdinalIgnoreCase)
+                    || spCode == "1000";
 
                 return new SpVerifyResult
                 {

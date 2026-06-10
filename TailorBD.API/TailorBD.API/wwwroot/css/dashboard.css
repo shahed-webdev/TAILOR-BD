@@ -16,7 +16,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Poppins', 'Noto Sans Bengali', sans-serif; background: var(--light-color); color: var(--text-color); }
+body { font-family: 'Poppins', 'Noto Sans Bengali', sans-serif; background: var(--light-color); color: var(--text-color); overflow-x: hidden; }
 .bn-font { font-family: 'Noto Sans Bengali', sans-serif; }
 
 /* SIDEBAR */
@@ -74,18 +74,71 @@ body { font-family: 'Poppins', 'Noto Sans Bengali', sans-serif; background: var(
 
 
 /* MAIN CONTENT */
-.main-content { margin-left: var(--sidebar-width); min-height: 100vh; transition: all .3s ease; }
-.main-content.full-width { margin-left: 0; }
+.main-content {
+    margin-left: var(--sidebar-width) !important;
+    width: calc(100vw - var(--sidebar-width)) !important;
+    max-width: calc(100vw - var(--sidebar-width)) !important;
+    min-width: 0;
+    min-height: 100vh;
+    transition: margin-left .3s ease, width .3s ease;
+}
+.main-content.full-width { margin-left: 0; width: 100%; max-width: 100%; }
+
+/* NAVBAR CONTAINER */
+#app-navbar {
+    box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 999;
+}
+
+/* Navbar placed directly under body (outside main-content) */
+body > #app-navbar {
+    margin-left: var(--sidebar-width) !important;
+    width: calc(100vw - var(--sidebar-width)) !important;
+    max-width: calc(100vw - var(--sidebar-width)) !important;
+    transition: margin-left .3s ease, width .3s ease;
+}
+
+/* Navbar inside main-content — parent already offset */
+.main-content > #app-navbar {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.sidebar.collapsed ~ #app-navbar,
+.sidebar.collapsed ~ .main-content {
+    margin-left: 70px !important;
+    width: calc(100vw - 70px) !important;
+    max-width: calc(100vw - 70px) !important;
+}
 
 /* NAVBAR */
-.navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,.05); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 999; flex-wrap: nowrap; }
-.navbar-left { display: flex; align-items: center; gap: 20px; }
-.menu-toggle { font-size: 1.5rem; cursor: pointer; color: var(--dark-color); }
-.institution-info { display: flex; align-items: center; gap: 15px; padding: 8px 15px; border-radius: 12px; position: relative; z-index: 999; }
-.institution-logo { width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: white; padding: 4px; border: 2px solid rgba(102,126,234,.3); }
-.institution-details { display: flex; flex-direction: column; }
-.institution-name { font-size: 1.1rem; font-weight: 700; margin: 0; line-height: 1.2; background: linear-gradient(135deg,#0f172a,#1e3a5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.navbar-right { display: flex; align-items: center; gap: 12px; }
+.navbar {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 999;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    gap: 6px;
+    overflow: hidden;
+}
+.navbar-left { display: flex; align-items: center; gap: 12px; flex: 1 1 0; min-width: 0; overflow: hidden; }
+.menu-toggle { font-size: 1.5rem; cursor: pointer; color: var(--dark-color); flex-shrink: 0; }
+.institution-info { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; position: relative; z-index: 999; min-width: 0; flex: 1 1 auto; overflow: hidden; max-width: 100%; }
+.institution-logo { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; background: white; padding: 4px; border: 2px solid rgba(102,126,234,.3); flex-shrink: 0; }
+.institution-details { display: flex; flex-direction: column; min-width: 0; overflow: hidden; flex: 1; }
+.institution-name { font-size: 1rem; font-weight: 700; margin: 0; line-height: 1.2; background: linear-gradient(135deg,#0f172a,#1e3a5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.navbar-right { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; flex-shrink: 0; }
 
 /* Dashboard Back Button */
 .dashboard-back-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; background: linear-gradient(135deg,#1e3a5f,#0f172a); color: white; text-decoration: none; border-radius: 50px; font-size: .88rem; font-weight: 600; transition: all .3s; box-shadow: 0 2px 8px rgba(15,23,42,.35); white-space: nowrap; }
@@ -101,7 +154,7 @@ body { font-family: 'Poppins', 'Noto Sans Bengali', sans-serif; background: var(
 .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 8px 15px; border-radius: 50px; transition: all .3s; border: 1px solid #e2e8f0; }
 .user-info:hover { background: var(--light-color); border-color: #1e3a5f; }
 .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#1e3a5f,#0f172a); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; flex-shrink: 0; }
-.user-info span { font-size: .95rem; font-weight: 600; color: var(--dark-color); white-space: nowrap; }
+.user-info span { font-size: .95rem; font-weight: 600; color: var(--dark-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
 
 /* Logout Button */
 .logout-btn { background: linear-gradient(135deg,#ef4444,#dc2626); border: none; padding: 10px 18px; border-radius: 50px; color: white; font-weight: 600; cursor: pointer; transition: all .3s; display: flex; align-items: center; gap: 7px; font-size: .88rem; box-shadow: 0 2px 8px rgba(239,68,68,.3); white-space: nowrap; }
@@ -226,6 +279,46 @@ body:not(.modal-open) .modal-backdrop { display: none !important; }
     background: rgba(255,255,255,0.15);
     padding-left: 22px;
     color: #fff;
+}
+
+/* ═══ MEDIUM DESKTOP (≤1280px) — compact navbar ═══ */
+@media (max-width: 1280px) {
+    .navbar { padding: 8px 10px; }
+    .institution-logo { width: 38px; height: 38px; }
+    .institution-name { font-size: .92rem; }
+    .dashboard-back-btn, .lang-btn, .logout-btn { padding: 7px 12px; font-size: .8rem; }
+    .user-info { padding: 5px 10px; }
+    .user-info span { max-width: 90px; }
+}
+
+/* ═══ SMALL DESKTOP (≤1100px) — icon-only action buttons ═══ */
+@media (max-width: 1100px) {
+    .user-info span { display: none; }
+    .dashboard-back-btn span, .lang-btn .lang-content, .logout-btn span { display: none; }
+    .dashboard-back-btn, .lang-btn, .logout-btn {
+        width: 34px; height: 34px; padding: 0;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        gap: 0; box-shadow: none;
+    }
+    .dashboard-back-btn i, .lang-btn i, .logout-btn i { font-size: .95rem; margin: 0 !important; }
+    .lang-btn .me-2 { display: none; }
+    .user-info { padding: 2px; gap: 0; border: none; background: transparent; border-radius: 50%; }
+    .user-avatar { width: 32px; height: 32px; font-size: .8rem; }
+}
+
+/* ═══ TABLET (≤992px) — full width layout ═══ */
+@media (max-width: 992px) {
+    body > #app-navbar {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 }
 
 /* ═══ MOBILE (≤768px) ═══ */

@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মানি রিসিট - TailorBD</title>
+    <title>মনি রিসিট - TailorBD</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,6 +18,27 @@
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
     <link href="/css/money-receipt.css" rel="stylesheet">
+
+    <!-- bfcache & stale-tab fix: inline so it always runs regardless of JS file cache -->
+    <script>
+        // bfcache fix: Chrome-compatible — setTimeout + href assignment
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                setTimeout(function() {
+                    window.location.href = window.location.href;
+                }, 0);
+            }
+        });
+        // stale-tab fix: অন্য tab থেকে ফিরে এলে data reload
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && window._mrNeedsReload) {
+                window._mrNeedsReload = false;
+                setTimeout(function() {
+                    window.location.href = window.location.href;
+                }, 0);
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Loading Spinner -->
@@ -42,7 +63,7 @@
 
             <!-- Page Header -->
             <div class="page-header no-print mb-3">
-                <h1 class="lang-content" data-en="Money Receipt" data-bn="মানি রিসিট">মানি রিসিট</h1>
+                <h1 class="lang-content" data-en="Money Receipt" data-bn="মনি রিসিট">মনি রিসিট</h1>
             </div>
 
             <!-- Action Bar -->
@@ -50,7 +71,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <button class="btn btn-primary me-2" onclick="window.print()">
-                            <i class="fas fa-print me-2"></i><span class="lang-content" data-en="Print" data-bn="প্রিন্ট করুন">প্রিন্ট করুন</span>
+                            <i class="fas fa-print me-2"></i><span class="lang-content" data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
                         </button>
                         <button class="btn btn-secondary me-2" onclick="goBack()">
                             <i class="fas fa-arrow-left me-2"></i><span class="lang-content" data-en="Go Back" data-bn="ফিরে যান">ফিরে যান</span>
@@ -61,8 +82,8 @@
                         <button class="btn btn-success me-2" onclick="shareAsPDF()" title="Share as PDF">
                             <i class="fas fa-share-alt me-2"></i><span class="lang-content" data-en="Share PDF" data-bn="পিডিএফ শেয়ার">পিডিএফ শেয়ার</span>
                         </button>
-                        <a href="/print-settings.html" class="btn btn-outline-primary">
-                            <i class="fas fa-cog me-2"></i><span class="lang-content" data-en="Print Settings" data-bn="প্রিন্ট সেটিং">প্রিন্ট সেটিং</span>
+                        <a href="/print-settings.html" class="btn btn-outline-primary" onclick="window._mrNeedsReload=true;">
+                            <i class="fas fa-cog me-2"></i><span class="lang-content" data-en="Print Settings" data-bn="প্রিন্ট সেটিংস">প্রিন্ট সেটিংস</span>
                         </a>
                     </div>
                     <div class="print-size-controls">
@@ -82,12 +103,12 @@
             <ul class="nav nav-tabs no-print" id="receiptTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="receipt-tab" data-bs-toggle="tab" data-bs-target="#receiptTab" type="button" role="tab">
-                        <i class="fas fa-receipt me-2"></i><span class="lang-content" data-en="Money Receipt" data-bn="মানি রিসিট">মানি রিসিট</span>
+                        <i class="fas fa-receipt me-2"></i><span class="lang-content" data-en="Money Receipt" data-bn="মনি রিসিট">মনি রিসিট</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="measurement-tab" data-bs-toggle="tab" data-bs-target="#measurementTab" type="button" role="tab">
-                        <i class="fas fa-ruler me-2"></i><span class="lang-content" data-en="Measurement" data-bn="মাপ">মাপ</span>
+                        <i class="fas fa-ruler me-2"></i><span class="lang-content" data-en="Measurement" data-bn="মাপজোখ">মাপজোখ</span>
                     </button>
                 </li>
             </ul>
@@ -113,7 +134,7 @@
                             <div class="customer-order-container">
                                 <!-- Customer Info - Left Side -->
                                 <div class="customer-info-box">
-                                    <h6 class="info-title lang-content" data-en="Customer Information" data-bn="কাস্টমারের তথ্য">কাস্টমারের তথ্য</h6>
+                                    <h6 class="info-title lang-content" data-en="Customer Information" data-bn="কাস্টমার তথ্য">কাস্টমার তথ্য</h6>
                                     <p><strong class="lang-content" data-en="Name:" data-bn="নাম:">নাম:</strong> <span id="customerName">...</span></p>
                                     <p><strong class="lang-content" data-en="Mobile:" data-bn="মোবাইল:">মোবাইল:</strong> <span id="customerPhone">...</span></p>
                                     <p><strong class="lang-content" data-en="Address:" data-bn="ঠিকানা:">ঠিকানা:</strong> <span id="customerAddress">...</span></p>
@@ -121,9 +142,9 @@
                                 
                                 <!-- Order Info - Right Side -->
                                 <div class="order-info-box">
-                                    <h6 class="info-title lang-content" data-en="Order Information" data-bn="অর্ডারের তথ্য">অর্ডারের তথ্য</h6>
+                                    <h6 class="info-title lang-content" data-en="Order Information" data-bn="অর্ডার তথ্য">অর্ডার তথ্য</h6>
                                     <p><strong class="lang-content" data-en="Order No:" data-bn="অর্ডার নং:">অর্ডার নং:</strong> <span id="orderSerialNumber">...</span></p>
-                                    <p><strong class="lang-content" data-en="Order Date:" data-bn="অর্ডার:">অর্ডার:</strong> <span id="orderDate">...</span></p>
+                                    <p><strong class="lang-content" data-en="Order Date:" data-bn="অর্ডারের তারিখ:">অর্ডারের তারিখ:</strong> <span id="orderDate">...</span></p>
                                     <p><strong class="lang-content" data-en="Delivery:" data-bn="ডেলিভারি:">ডেলিভারি:</strong> <span id="deliveryDate">...</span></p>
                                 </div>
                             </div>
@@ -138,9 +159,9 @@
                         <table class="table receipt-table">
                             <thead>
                                 <tr>
-                                    <th class="lang-content" data-en="Dress" data-bn="পোশাক">পোশাক</th>
-                                    <th class="lang-content" data-en="Description" data-bn="বিবরণ">বিবরণ</th>
-                                    <th class="text-center lang-content" data-en="Quantity" data-bn="পরিমান">পরিমান</th>
+                                    <th class="lang-content" data-en="Dress" data-bn="ড্রেস">ড্রেস</th>
+                                    <th class="lang-content" data-en="For" data-bn="বিবরণ">বিবরণ</th>
+                                    <th class="text-center lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</th>
                                     <th class="text-end lang-content" data-en="Price" data-bn="মূল্য">মূল্য</th>
                                     <th class="text-end lang-content" data-en="Total" data-bn="মোট">মোট</th>
                                 </tr>
@@ -156,24 +177,24 @@
                         <div class="payment-summary">
                             <table class="summary-table">
                                 <tr>
-                                    <td class="lang-content" data-en="Total:" data-bn="সর্বমোট:">সর্বমোট:</td>
+                                    <td class="lang-content" data-en="Total:" data-bn="মোট:">মোট:</td>
                                     <td class="text-end"><strong id="totalAmount">৳0.00</strong></td>
                                 </tr>
                                 <tr id="discountRow" style="display: none;">
-                                    <td class="lang-content" data-en="Discount:" data-bn="ডিসকাউন্ট:">ডিসকাউন্ট:</td>
-                                    <td class="text-end">৳<span id="discountAmount">0.00</span></td>
+                                    <td class="lang-content" data-en="Discount:" data-bn="ছাড়:">ছাড়:</td>
+                                    <td class="text-end"><span id="discountAmount">0.00</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="lang-content" data-en="Paid:" data-bn="পরিশোধিত:">পরিশোধিত:</td>
-                                    <td class="text-end">৳<span id="paidAmount">0.00</span></td>
+                                    <td class="lang-content" data-en="Paid:" data-bn="পরিশোধ:">পরিশোধ:</td>
+                                    <td class="text-end"><span id="paidAmount">0.00</span></td>
                                 </tr>
                                 <tr class="total-row">
                                     <td><strong class="lang-content" data-en="Due:" data-bn="বাকি:">বাকি:</strong></td>
                                     <td class="text-end"><strong id="dueAmount">৳0.00</strong></td>
                                 </tr>
                                 <tr id="previousDueRow" style="display: none;">
-                                    <td class="lang-content" data-en="Previous Due:" data-bn="পূর্বের বাকি:">পূর্বের বাকি:</td>
-                                    <td class="text-end">৳<span id="previousDueAmount">0.00</span></td>
+                                    <td class="lang-content" data-en="Previous Due:" data-bn="আগের বাকি:">আগের বাকি:</td>
+                                    <td class="text-end"><span id="previousDueAmount">0.00</span></td>
                                 </tr>
                                 <tr id="totalDueRow" style="display: none;" class="total-row">
                                     <td><strong class="lang-content" data-en="Total Due:" data-bn="মোট বাকি:">মোট বাকি:</strong></td>
@@ -182,9 +203,15 @@
                             </table>
                         </div>
 
-                        <!-- Footer -->
+                        <!-- Footer: Served By + Powered By on one line -->
                         <div class="receipt-footer">
-                            <p class="lang-content" data-en="Made with TailorBD" data-bn="TailorBD দিয়ে তৈরী">TailorBD দিয়ে তৈরী</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                                <span id="servedBySection" style="display:none; font-size:var(--print-font-size,11px); color:#444;">
+                                    <span class="lang-content" data-en="Served by:" data-bn="সার্ভ করেছেন:">সার্ভ করেছেন:</span>
+                                    <strong id="servedByName"></strong>
+                                </span>
+                                <span class="lang-content" data-en="Made with TailorBD" data-bn="TailorBD দিয়ে তৈরি" style="font-size:11px; color:#666;">TailorBD দিয়ে তৈরি</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -205,16 +232,16 @@
                     <div class="no-print measurement-controls" id="measurementControls" style="display: none;">
                         <div class="d-flex flex-wrap align-items-center gap-3">
                             <div class="d-flex align-items-center gap-2">
-                                <label class="mb-0"><strong class="lang-content" data-en="Print Options:" data-bn="প্রিন্ট অপশন:">প্রিন্ট অপশন:</strong></label>
+                            <label class="mb-0"><strong class="lang-content" data-en="Print Options:" data-bn="প্রিন্ট অপশন:">প্রিন্ট অপশন:</strong></label>
                                 <select class="form-select form-select-sm" id="measurementPageSize" style="width: auto;"></select>
                             </div>
                             <div class="d-flex align-items-center gap-2" id="measurementPager" style="display: none;">
                                 <button class="btn btn-outline-secondary btn-sm" id="measurementPrevBtn">
-                                    <span class="lang-content" data-en="Previous" data-bn="পূর্ববর্তী">পূর্ববর্তী</span>
+                                    <span class="lang-content" data-en="Previous" data-bn="আগে">আগে</span>
                                 </button>
                                 <span class="page-info" id="measurementPageInfo"></span>
                                 <button class="btn btn-outline-secondary btn-sm" id="measurementNextBtn">
-                                    <span class="lang-content" data-en="Next" data-bn="পরবর্তী">পরবর্তী</span>
+                                    <span class="lang-content" data-en="Next" data-bn="পরে">পরে</span>
                                 </button>
                             </div>
                         </div>
@@ -239,10 +266,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
+    <!-- Auth (must load before app-components to restore session data) -->
+    <script src="/js/auth.js"></script>
+
     <!-- App Components -->
-    <script src="/js/app-components.js"></script>
-    
+    <script src="/js/app-components.js?v=2.1.7"></script>
+
     <!-- Money Receipt JS -->
-    <script src="/js/money-receipt.js"></script>
+    <script src="/js/money-receipt.js?v=2.1.6"></script>
 </body>
 </html>

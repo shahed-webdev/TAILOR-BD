@@ -251,7 +251,8 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ── Page access check (HTML pages only) ──────────────────────────────────
+// ── Page access check (HTML pages only) — runs after static files; ───────
+// HTML is served directly; this guards non-static fall-through paths only.
 app.UseMiddleware<PageAccessMiddleware>();
 
 app.MapControllers();

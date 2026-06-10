@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিক্রয় রশিদ - TailorBD</title>
+    <title>পরবর্তী ধাপ? - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
         #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
         @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} }
 
-        /* ── Action Bar (no-print) ─────────────────── */
+        /* -- Action Bar (no-print) ------------------- */
         .action-bar {
             display: flex;
             align-items: center;
@@ -66,10 +66,10 @@
         .print-size-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; }
         .print-size-wrap select { padding: 5px 8px; border: 1.5px solid #ddd; border-radius: 7px; font-size: 13px; font-family: inherit; }
 
-        /* ── Page body layout ───────────────────────── */
+        /* -- Page body layout ------------------------- */
         .page-body { display: flex; justify-content: center; padding: 0 16px 40px; }
 
-        /* ── Receipt Card ──────────────────────────── */
+        /* -- Receipt Card ---------------------------- */
         .receipt {
             width: 100%;
             max-width: 384px;
@@ -80,7 +80,7 @@
             transition: max-width .2s;
         }
 
-        /* Header — no background, just text center */
+        /* Header � no background, just text center */
         .receipt-header {
             background: #fff;
             color: #222;
@@ -213,7 +213,7 @@
         /* Loading overlay */
         .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.7); z-index: 2000; display: flex; align-items: center; justify-content: center; }
 
-        /* ── PRINT ──────────────────────────────────── */
+        /* -- PRINT ------------------------------------ */
         @media print {
             @page {
                 size: var(--print-width) auto;
@@ -291,20 +291,20 @@
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-box">
             <div class="modal-title">
-                <span><i class="fas fa-cog me-2" style="color:#6c7ae0;"></i>প্রিন্ট সেটিং</span>
+                <span><i class="fas fa-cog me-2" style="color:#6c7ae0;"></i>ইনভয়েস দেখুন</span>
                 <button class="modal-close" onclick="closeSettings()">&times;</button>
             </div>
 
             <div class="setting-row">
-                <span>দোকানের নাম</span>
+                <span>দোকানের নাম দেখাবে?</span>
                 <input type="checkbox" id="sShowShopName" style="width:18px;height:18px;cursor:pointer;">
             </div>
             <div class="setting-row">
-                <span>রশিদ বারকোড</span>
+                <span>বারকোড দেখাবে?</span>
                 <input type="checkbox" id="sShowBarcode" style="width:18px;height:18px;cursor:pointer;">
             </div>
             <div class="setting-row">
-                <span>উপরের স্পেস</span>
+                <span>উপরে ফাঁকা জায়গা</span>
                 <div style="display:flex;align-items:center;gap:4px;">
                     <input type="number" id="sTopSpace" min="0" max="200" value="0" style="width:70px;">
                     <span style="font-size:12px;color:#888;">px</span>
@@ -324,12 +324,12 @@
                 </select>
             </div>
             <div class="setting-row" style="align-items:flex-start;padding-top:10px;">
-                <span style="padding-top:4px;">পাদলেখ (Powered By)</span>
-                <textarea id="sPoweredBy" placeholder="TailorBD দিয়ে তৈরী"></textarea>
+                <span style="padding-top:4px;">Powered By লেখা</span>
+                <textarea id="sPoweredBy" placeholder="যেমন: tailorbd.com"></textarea>
             </div>
 
             <button class="btn-save-settings" onclick="saveSettings()">
-                <i class="fas fa-save me-2"></i>সেটিং সংরক্ষণ করুন
+                <i class="fas fa-save me-2"></i>সেটিং সেভ করুন
             </button>
         </div>
     </div>
@@ -350,19 +350,19 @@
                         <i class="fas fa-share-alt"></i> শেয়ার
                     </button>
                     <a class="btn-action btn-new" href="/item-sell.html">
-                        <i class="fas fa-plus"></i> নতুন বিক্রি
+                        <i class="fas fa-plus"></i> নতুন বিক্রয়
                     </a>
                     <a class="btn-action btn-back" href="/item-sell-record.html">
-                        <i class="fas fa-history"></i> রেকর্ড
+                        <i class="fas fa-history"></i> বিক্রয় রেকর্ড
                     </a>
                     <a class="btn-action" href="#" id="btnReturnLink"
                        style="background:#fff3f3;color:#dc3545;border:1.5px solid #f5c6cb;">
-                        <i class="fas fa-undo-alt"></i> ফেরত
+                        <i class="fas fa-undo-alt"></i> রিটার্ন
                     </a>
                 </div>
                 <div class="action-right">
                     <div class="print-size-wrap">
-                        <span>সাইজ:</span>
+                        <span>প্রিন্ট সাইজ:</span>
                         <select id="printSizeSelect">
                             <option value="3">3 inch</option>
                             <option value="3.5">3.5 inch</option>
@@ -382,7 +382,7 @@
                 <div class="receipt" id="receipt">
                     <div class="spin-wrap" id="spinWrap">
                         <div class="spin"></div>
-                        <div>রশিদ লোড হচ্ছে...</div>
+                        <div>ইনভয়েস লোড হচ্ছে...</div>
                     </div>
                 </div>
             </div>
@@ -395,7 +395,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     <script>
     (function () {
         const params    = new URLSearchParams(window.location.search);
@@ -428,7 +428,7 @@
             }).catch(function (err) {
                 console.error('Invoice load error:', err);
                 document.getElementById('receipt').innerHTML =
-                    '<div style="text-align:center;padding:40px;color:#dc3545;"><i class="fas fa-exclamation-circle fa-2x"></i><br>রশিদ লোড করতে সমস্যা হয়েছে</div>';
+                    '<div style="text-align:center;padding:40px;color:#dc3545;"><i class="fas fa-exclamation-circle fa-2x"></i><br>ইনভয়েস লোড করতে সমস্যা হয়েছে</div>';
             });
         }
 
@@ -449,7 +449,7 @@
             });
         });
 
-        // ── Print settings ────────────────────────────
+        // -- Print settings ----------------------------
         function loadPrintSettings(institutionId) {
             if (!institutionId) { printSettings = defaultSettings(); return Promise.resolve(); }
             return fetch('/api/institution/' + institutionId + '/print-settings')
@@ -462,10 +462,10 @@
         }
 
         function defaultSettings() {
-            return { showShopName: true, showReceiptBarcode: false, topSpace: 0, fontSize: 12, poweredByInfo: 'TailorBD দিয়ে তৈরী' };
+            return { showShopName: true, showReceiptBarcode: false, topSpace: 0, fontSize: 12, poweredByInfo: 'Provided by: tailorbd.com' };
         }
 
-        // ── Invoice data ──────────────────────────────
+        // -- Invoice data ------------------------------
         function loadInvoice() {
             if (!sellingId) return Promise.reject('no id');
             return fetch('/api/ItemSell/invoice?sellingId=' + sellingId)
@@ -479,7 +479,7 @@
                 });
         }
 
-        // ── Render ────────────────────────────────────
+        // -- Render ------------------------------------
         function renderReceipt() {
             if (!receiptData || !receiptData.header) return;
             const h     = receiptData.header;
@@ -524,23 +524,23 @@
 
             const custRight = h.CustomerName
                 ? `<div class="info-val">${esc(h.CustomerName)}</div>${h.CustomerPhone ? '<div>' + esc(h.CustomerPhone) + '</div>' : ''}`
-                : `<div style="color:#aaa;font-size:10.5px;">${lang==='en'?'Walk-in':'সাধারণ ক্রেতা'}</div>`;
+                : `<div style="color:#aaa;font-size:10.5px;">${lang==='en'?'Walk-in':'রাহাপথের গ্রাহক'}</div>`;
 
             const barcodeBlock = s.showReceiptBarcode
                 ? `<div class="barcode-section"><svg id="receiptBarcode"></svg></div>` : '';
 
-            const poweredBy = s.poweredByInfo || 'TailorBD দিয়ে তৈরী';
+            const poweredBy = s.poweredByInfo || 'Provided by: tailorbd.com';
 
             const html = `
             ${headerBlock}
             <div class="info-row">
                 <div class="info-left">
-                    <div class="info-label">${lang==='en'?'Receipt':'রশিদ'}</div>
+                    <div class="info-label">${lang==='en'?'Receipt':'রসিদ'}</div>
                     <div class="info-val">#${h.SellingSN}</div>
                     <div>${dt}</div>
                 </div>
                 <div class="info-right">
-                    <div class="info-label">${lang==='en'?'Customer':'কাস্টমার'}</div>
+                    <div class="info-label">${lang==='en'?'Customer':'গ্রাহক'}</div>
                     ${custRight}
                 </div>
             </div>
@@ -549,8 +549,8 @@
                 <table class="inv-table" style="font-size:${s.fontSize || 12}px;">
                     <thead><tr>
                         <th>#</th>
-                        <th>${lang==='en'?'Item':'আইটেম'}</th>
-                        <th>${lang==='en'?'Qty':'পরিমান'}</th>
+                        <th>${lang==='en'?'Item':'পোশাক'}</th>
+                        <th>${lang==='en'?'Qty':'পরিমাণ'}</th>
                         <th>${lang==='en'?'Rate':'দর'}</th>
                         <th>${lang==='en'?'Total':'মোট'}</th>
                     </tr></thead>
@@ -563,15 +563,15 @@
                     <span class="val">৳${fmt(h.SellingTotalPrice)}</span>
                 </div>
                 ${hasDiscount ? `<div class="total-row disc"><span class="lbl">${lang==='en'?'Discount':'ছাড়'}</span><span class="val">- ৳${fmt(h.SellingDiscountAmount)}</span></div>` : ''}
-                ${hasPaid ? `<div class="total-row paid"><span class="lbl">${lang==='en'?'Paid':'পরিশোধ'}</span><span class="val">৳${fmt(h.SellingPaidAmount)}</span></div>` : ''}
+                ${hasPaid ? `<div class="total-row paid"><span class="lbl">${lang==='en'?'Paid':'পেইড'}</span><span class="val">৳${fmt(h.SellingPaidAmount)}</span></div>` : ''}
                 <hr class="divider">
                 <div class="total-row ${isDue ? 'due' : 'due-zero'}">
-                    <span class="lbl">${isDue ? (lang==='en'?'Due':'বাকি') : (lang==='en'?'Fully Paid ✓':'সম্পূর্ণ পরিশোধিত ✓')}</span>
+                    <span class="lbl">${isDue ? (lang==='en'?'Due':'বাকি') : (lang==='en'?'Fully Paid':'সম্পূর্ণ পরিশোধিত ধন্যবাদ')}</span>
                     <span class="val">৳${fmt(h.SellingDueAmount)}</span>
                 </div>
             </div>
             <div class="receipt-footer">
-                <div class="thank-you">${lang==='en'?'Thank you for your purchase!':'ক্রয়ের জন্য ধন্যবাদ!'}</div>
+                <div class="thank-you">${lang==='en'?'Thank you for your purchase!':'আমাদের সাথে কেনাকাটার জন্য ধন্যবাদ!'}</div>
                 <div class="powered-by">${esc(poweredBy)}</div>
             </div>`;
 
@@ -600,7 +600,7 @@
             }
         }
 
-        // ── Print size ────────────────────────────────
+        // -- Print size --------------------------------
         function applyPrintSize(size) {
             const map   = { '3':'3in','3.5':'3.5in','4':'4in','4.5':'4.5in','5':'5in' };
             const pxMap = { '3':288,'3.5':336,'4':384,'4.5':432,'5':480 };
@@ -612,7 +612,7 @@
             applyPrintSize(this.value);
         });
 
-        // ── Settings modal ────────────────────────────
+        // -- Settings modal ----------------------------
         window.openSettings = function () {
             const s = printSettings || defaultSettings();
             document.getElementById('sShowShopName').checked = s.showShopName !== false;
@@ -647,16 +647,16 @@
                 if (res.success) {
                     printSettings = Object.assign(printSettings || {}, updated);
                     closeSettings();
-                    showToast('সেটিং সংরক্ষিত হয়েছে', 'success');
+                    showToast('সেটিং সেভ হয়েছে', 'success');
                     renderReceipt();
                 } else { showToast(res.message || 'Save failed', 'error'); }
             })
             .catch(function () { showToast('Save failed', 'error'); });
         };
 
-        // ── PDF Download ──────────────────────────────
+        // -- PDF Download ------------------------------
         window.downloadPDF = function () {
-            if (!receiptData) { showToast('রশিদ লোড হয়নি', 'error'); return; }
+            if (!receiptData) { showToast('ডেটা লোড হয়নি', 'error'); return; }
             showToast('PDF তৈরি হচ্ছে...', 'info');
             captureReceipt().then(function (canvas) {
                 const { jsPDF } = window.jspdf;
@@ -666,31 +666,31 @@
                 const pdfH      = canvas.height / pxPerMm;
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfW, pdfH] });
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
-                pdf.save('রশিদ-' + (receiptData.header.SellingSN || 'receipt') + '.pdf');
-                showToast('PDF ডাউনলোড সম্পন্ন', 'success');
+                pdf.save('মোট?-' + (receiptData.header.SellingSN || 'receipt') + '.pdf');
+                showToast('PDF ডাউনলোড হয়েছে', 'success');
             }).catch(function () { showToast('PDF তৈরিতে সমস্যা হয়েছে', 'error'); });
         };
 
-        // ── Share ─────────────────────────────────────
+        // -- Share -------------------------------------
         window.shareAsPDF = function () {
-            if (!receiptData) { showToast('রশিদ লোড হয়নি', 'error'); return; }
-            showToast('শেয়ারের জন্য প্রস্তুত হচ্ছে...', 'info');
+            if (!receiptData) { showToast('ডেটা লোড হয়নি', 'error'); return; }
+            showToast('শেয়ার তৈরি হচ্ছে...', 'info');
             captureReceipt().then(function (canvas) {
                 const sn = receiptData.header.SellingSN || 'receipt';
                 canvas.toBlob(function (blob) {
-                    const file = new File([blob], 'রশিদ-' + sn + '.png', { type: 'image/png' });
+                    const file = new File([blob], 'মোট?-' + sn + '.png', { type: 'image/png' });
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        navigator.share({ title: 'বিক্রয় রশিদ #' + sn, files: [file] })
-                            .catch(function (e) { if (e.name !== 'AbortError') showToast('শেয়ার বাতিল', 'info'); });
+                        navigator.share({ title: 'পরবর্তী ধাপ? #' + sn, files: [file] })
+                            .catch(function (e) { if (e.name !== 'AbortError') showToast('শেয়ার বাতিল হয়েছে', 'info'); });
                     } else {
                         const link = document.createElement('a');
-                        link.download = 'রশিদ-' + sn + '.png';
+                        link.download = 'রসিদ-' + sn + '.png';
                         link.href = canvas.toDataURL('image/png');
                         link.click();
                         showToast('ছবি ডাউনলোড হয়েছে', 'info');
                     }
                 }, 'image/png');
-            }).catch(function () { showToast('শেয়ারে সমস্যা হয়েছে', 'error'); });
+            }).catch(function () { showToast('শেয়ার তৈরিতে সমস্যা হয়েছে', 'error'); });
         };
 
         function captureReceipt() {
@@ -707,7 +707,7 @@
                 });
         }
 
-        // ── Helpers ───────────────────────────────────
+        // -- Helpers -----------------------------------
         function fmt(n)  { return Number(n||0).toLocaleString('en-BD', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
         function fmtQ(n) { return Number(n||0).toLocaleString('en-BD', { maximumFractionDigits:3 }); }
         function esc(s)  { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }

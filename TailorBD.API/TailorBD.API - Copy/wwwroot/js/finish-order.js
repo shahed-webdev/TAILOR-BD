@@ -40,8 +40,7 @@
 
         // Initialize datepicker
         $('#deliveryDate').datepicker({
-            dateFormat: 'yy-mm-dd',
-            minDate: 0,
+            dateFormat: 'dd-mm-yy',
             changeMonth: true,
             changeYear: true
         });
@@ -170,7 +169,10 @@
             console.log('Found deliveryDate:', deliveryDateValue);
             const deliveryDate = deliveryDateValue.split('T')[0]; // Get date part only (YYYY-MM-DD)
             console.log('Setting delivery date to:', deliveryDate);
-            $('#deliveryDate').val(deliveryDate);
+            // Parse yyyy-MM-dd and set as Date object so datepicker handles any format correctly
+            const parts = deliveryDate.split('-');
+            const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            $('#deliveryDate').datepicker('setDate', dateObj);
         } else {
             console.log('No delivery date found in orderData');
             console.log('Tried properties: deliveryDate, DeliveryDate, delivery_date, Delivery_Date');
@@ -338,7 +340,15 @@
 
     // Submit order
     window.submitOrder = function() {
-        const deliveryDate = $('#deliveryDate').val();
+        const deliveryDateRaw = $('#deliveryDate').val();
+        // Convert from dd-mm-yyyy to yyyy-MM-dd for API
+        let deliveryDate = deliveryDateRaw;
+        if (deliveryDateRaw && deliveryDateRaw.includes('-')) {
+            const parts = deliveryDateRaw.split('-');
+            if (parts.length === 3 && parts[0].length === 2) {
+                deliveryDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+        }
         
         // Get new payments from input fields (only send new amounts, not total)
         const newDiscount = parseFloat($('#discountAmount').val()) || 0;
@@ -365,6 +375,7 @@
         }
 
         // Prepare data - send only new amounts (NOT total)
+        const isDelivery = urlParams.get('delivery') === 'true';
         const data = {
             orderId: parseInt(orderId),
             institutionId: parseInt(sessionStorage.getItem('institutionId')),
@@ -372,7 +383,8 @@
             deliveryDate: deliveryDate,
             discount: newDiscount,  // Only new discount
             paidAmount: newPaid,    // Only new paid amount
-            accountId: accountId
+            accountId: accountId,
+            isDelivery: isDelivery
         };
 
         console.log('Submitting order with NEW payments only:', data);

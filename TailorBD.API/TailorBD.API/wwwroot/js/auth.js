@@ -64,13 +64,18 @@
             return false;
         }
 
+        function getHomeForCategory(cat) {
+            if (cat === 'Authority') return '/authority-profile.html';
+            if (cat === 'Sub-Authority') return '/authority-sub-profile.html';
+            if (cat === 'Sub-Admin') return '/sub-admin-dashboard.html';
+            if (cat === 'Admin' || cat === 'Full-Admin') return '/dashboard.html';
+            return '/login.html';
+        }
+
         if (requiredCategory === 'Authority') {
             // Allow both Authority and Sub-Authority
             if (category !== 'Authority' && category !== 'Sub-Authority') {
-                var home = category === 'Admin' || category === 'Sub-Admin'
-                    ? '/dashboard.html'
-                    : '/login.html';
-                window.location.replace(home);
+                window.location.replace(getHomeForCategory(category));
                 return false;
             }
             return true;
@@ -78,10 +83,7 @@
 
         if (requiredCategory && category !== requiredCategory) {
             // Wrong role — bounce to their own home page
-            var home2 = category === 'Authority'     ? '/authority-profile.html'
-                      : category === 'Sub-Authority' ? '/authority-sub-profile.html'
-                      : '/dashboard.html';
-            window.location.replace(home2);
+            window.location.replace(getHomeForCategory(category));
             return false;
         }
 
@@ -136,6 +138,17 @@
             });
     }
 
+    // Home/dashboard path for current user role
+    function getHomeUrl() {
+        restoreSession();
+        var category = sessionStorage.getItem('category');
+        if (category === 'Authority') return '/authority-profile.html';
+        if (category === 'Sub-Authority') return '/authority-sub-profile.html';
+        if (category === 'Sub-Admin') return '/sub-admin-dashboard.html';
+        if (category === 'Admin' || category === 'Full-Admin') return '/dashboard.html';
+        return '/dashboard.html';
+    }
+
     // ?? Public API ????????????????????????????????????????????????????????????
     window.TailorAuth = {
         restore:       restoreSession,
@@ -143,7 +156,8 @@
         guardSubPage:  guardSubPage,
         logout:        logout,
         get:           get,
-        set:           set
+        set:           set,
+        getHomeUrl:    getHomeUrl
     };
 
     // Run restore immediately (synchronous — no DOMContentLoaded needed)

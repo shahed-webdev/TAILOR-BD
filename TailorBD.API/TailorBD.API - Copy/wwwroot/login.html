@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - TailorBD | টেইলরবিডি লগইন</title>
+    <title>Login - TailorBD | লগইন</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,9 +16,9 @@
     <!-- Custom CSS -->
     <link href="/css/login.css" rel="stylesheet">
     <!-- Auth utility -->
-    <script src="/js/auth.js"></script>
+    <script src="/js/auth.js?v=2.1.6"></script>
     <script>
-        // URL Masking — /login.html → /login
+        // URL Masking � /login.html ? /login
         if (window.location.pathname.endsWith('.html')) {
             history.replaceState(null, document.title,
                 window.location.pathname.slice(0, -5) + window.location.search + window.location.hash);
@@ -27,15 +27,15 @@
 </head>
 <body>
     <button class="lang-toggle" onclick="toggleLanguage()">
-        <i class="fas fa-language"></i> <span id="langText">বাংলা</span>
+        <i class="fas fa-language"></i> <span id="langText">English</span>
     </button>
 
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
                 <img src="/images/logo.png" alt="TailorBD" style="height:60px;width:auto;object-fit:contain;margin-bottom:10px;">
-                <h2 class="lang-content" data-en="Welcome Back" data-bn="স্বাগতম">Welcome Back</h2>
-                <p class="lang-content" data-en="Login to your TailorBD account" data-bn="আপনার টেইলরবিডি অ্যাকাউন্টে লগইন করুন">Login to your TailorBD account</p>
+                <h2 class="lang-content" data-en="Welcome Back" data-bn="স্বাগতম">স্বাগতম</h2>
+                <p class="lang-content" data-en="Login to your TailorBD account" data-bn="আপনার TailorBD অ্যাকাউন্টে লগইন করুন">আপনার TailorBD অ্যাকাউন্টে লগইন করুন</p>
             </div>
 
             <div class="login-body">
@@ -44,7 +44,7 @@
 
                 <form id="loginForm">
                     <div class="form-group">
-                        <label class="form-label lang-content" data-en="Username" data-bn="ইউজারনেম">Username</label>
+                        <label class="form-label lang-content" data-en="Username" data-bn="ইউজারনেম">ইউজারনেম</label>
                         <div class="input-group">
                             <i class="fas fa-user"></i>
                             <input type="text" class="form-control" id="username" name="username" required 
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label lang-content" data-en="Password" data-bn="পাসওয়ার্ড">Password</label>
+                        <label class="form-label lang-content" data-en="Password" data-bn="পাসওয়ার্ড">পাসওয়ার্ড</label>
                         <div class="input-group">
                             <i class="fas fa-lock"></i>
                             <input type="password" class="form-control" id="password" name="password" required 
@@ -62,19 +62,18 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-login lang-content" data-en="Login" data-bn="লগইন">
-                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    <button type="submit" class="btn-login lang-content" data-en="Login" data-bn="লগইন"><i class="fas fa-sign-in-alt me-2"></i> লগইন
                     </button>
                 </form>
 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <p class="mt-3 lang-content" data-en="Logging in..." data-bn="লগইন হচ্ছে...">Logging in...</p>
+                    <p class="mt-3 lang-content" data-en="Logging in..." data-bn="লগইন হচ্ছে...">লগইন হচ্ছে...</p>
                 </div>
 
                 <div class="links">
-                    <p class="lang-content" data-en="Forgot your password?" data-bn="পাসওয়ার্ড ভুলে গেছেন?">Forgot your password?</p>
-                    <p class="lang-content" data-en="Contact Support: +88 01739144141" data-bn="সহায়তা যোগাযোগ: +৮৮ ০১৭৩৯১৪৪১৪১">Contact Support: +88 01739144141</p>
+                    <p class="lang-content" data-en="Forgot your password?" data-bn="পাসওয়ার্ড ভুলে গেছেন?">পাসওয়ার্ড ভুলে গেছেন?</p>
+                    <p class="lang-content" data-en="Contact Support: +88 01739144141" data-bn="সাপোর্ট: +৮৮ ০১৭৩৯১৪৪১৪১">সাপোর্ট: +৮৮ ০১৭৩৯১৪৪১৪১</p>
                 </div>
             </div>
         </div>
@@ -82,7 +81,7 @@
         <div class="back-home">
             <a href="/">
                 <i class="fas fa-arrow-left"></i>
-                <span class="lang-content" data-en="Back to Home" data-bn="হোমে ফিরে যান">Back to Home</span>
+                <span class="lang-content" data-en="Back to Home" data-bn="হোম পেজে ফিরুন">হোম পেজে ফিরুন</span>
             </a>
         </div>
     </div>
@@ -160,7 +159,7 @@
             const password = $('#password').val();
 
             if (!username || !password) {
-                showError(currentLang === 'en' ? 'Please enter username and password' : 'দয়া করে ইউজারনেম এবং পাসওয়ার্ড দিন');
+                showError(currentLang === 'en' ? 'Please enter username and password' : 'ইউজারনেম ও পাসওয়ার্ড দিন');
                 return;
             }
 
@@ -184,15 +183,16 @@
                     console.log('Login response:', response);
                     
                     if (response.success) {
-                        showSuccess(currentLang === 'en' ? 'Login successful! Redirecting...' : 'লগইন সফল! রিডাইরেক্ট করা হচ্ছে...');
+                        showSuccess(currentLang === 'en' ? 'Login successful! Redirecting...' : 'লগইন সফল! রিডাইরেক্ট হচ্ছে...');
                         
-                        // ── JWT token save করুন ──────────────────────────
+                        // -- JWT token save করা হচ্ছে --------------------------
                         if (response.token) {
                             localStorage.setItem('tailorbd_jwt', response.token);
                         }
 
                         TailorAuth.set('username',       response.data.username);
                         TailorAuth.set('name',           response.data.name || response.data.username);
+                        TailorAuth.set('phone',          response.data.phone || '');
                         TailorAuth.set('registrationId', response.data.registrationId);
                         TailorAuth.set('institutionId',  response.data.institutionId);
                         TailorAuth.set('institutionName',response.data.institutionName);
@@ -225,7 +225,7 @@
                     if (xhr.status === 429) {
                         msg = currentLang === 'en'
                             ? 'Too many login attempts. Please wait a minute.'
-                            : 'অনেক বেশি চেষ্টা করা হয়েছে। কিছুক্ষণ অপেক্ষা করুন।';
+                            : 'অনেকবার চেষ্টা হয়েছে। একটু অপেক্ষা করুন।';
                     }
                     showError(msg);
                     $('#loading').hide();

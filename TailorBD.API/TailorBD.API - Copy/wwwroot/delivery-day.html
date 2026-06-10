@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ডেলিভারির তারিখ - TailorBD</title>
+    <title>ডেলিভারির দিন - TailorBD</title>
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -89,10 +89,10 @@
             <div class="container">
                 <div class="content">
                     <h2><i class="fas fa-calendar-day me-2" style="color:#6c7ae0;"></i>
-                        <span class="lang-content" data-en="Delivery Day" data-bn="ডেলিভারির তারিখ">ডেলিভারির তারিখ</span>
+                        <span class="lang-content" data-en="Delivery Day" data-bn="ডেলিভারির দিন">ডেলিভারির দিন</span>
                     </h2>
                     <p style="color:#666; font-size:14px; margin-bottom:15px;">
-                        <span class="lang-content" data-en="Orders pending delivery - search by delivery date" data-bn="ডেলিভারি তারিখ অনুযায়ী পেন্ডিং অর্ডারসমূহ">ডেলিভারি তারিখ অনুযায়ী পেন্ডিং অর্ডারসমূহ</span>
+                        <span class="lang-content" data-en="Orders pending delivery - search by delivery date" data-bn="ডেলিভারি তারিখ অনুসারে অপেক্ষমান অর্ডার খুঁজুন">ডেলিভারি তারিখ অনুসারে অপেক্ষমান অর্ডার খুঁজুন</span>
                     </p>
 
                     <!-- Stats -->
@@ -107,7 +107,7 @@
                         </div>
                         <div class="stat-card orange">
                             <div class="stat-value" id="overdueOrders">0</div>
-                            <div class="stat-label" data-en="Overdue" data-bn="তারিখ অতিক্রান্ত">তারিখ অতিক্রান্ত</div>
+                            <div class="stat-label" data-en="Overdue" data-bn="মেয়াদ উত্তীর্ণ">মেয়াদ উত্তীর্ণ</div>
                         </div>
                     </div>
 
@@ -116,17 +116,17 @@
                         <div class="search-panel">
                             <div class="search-grid">
                                 <div class="form-group">
-                                    <label data-en="From Date" data-bn="কোন তারিখ থেকে">কোন তারিখ থেকে</label>
+                                    <label data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
                                     <input type="date" id="startDate">
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="To Date" data-bn="কোন তারিখ পর্যন্ত">কোন তারিখ পর্যন্ত</label>
+                                    <label data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
                                     <input type="date" id="endDate">
                                 </div>
                                 <div>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
                                         <i class="fas fa-search"></i>
-                                        <span data-en="Search" data-bn="খুঁজুন">খুঁজুন</span>
+                                        <span data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
                             </div>
@@ -136,7 +136,7 @@
                     <!-- Legend -->
                     <div class="legend">
                         <div class="legend-item"><div class="legend-box today"></div><span data-en="Today's Delivery" data-bn="আজকের ডেলিভারি">আজকের ডেলিভারি</span></div>
-                        <div class="legend-item"><div class="legend-box overdue"></div><span data-en="Overdue" data-bn="তারিখ অতিক্রান্ত">তারিখ অতিক্রান্ত</span></div>
+                        <div class="legend-item"><div class="legend-box overdue"></div><span data-en="Overdue" data-bn="মেয়াদ উত্তীর্ণ">মেয়াদ উত্তীর্ণ</span></div>
                     </div>
 
                     <!-- Orders Table -->
@@ -159,7 +159,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
-    <script src="/js/delivery-day.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
+    <script src="/js/delivery-day.js?v=2.1.6"></script>
 </body>
 </html>

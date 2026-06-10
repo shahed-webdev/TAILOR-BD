@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>সাব-অ্যাডমিন প্রবেশাধিকার নিয়ন্ত্রণ - TailorBD</title>
+    <title>সাব-অ্যাডমিন অ্যাক্সেস ম্যানেজমেন্ট - TailorBD</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -206,8 +206,8 @@
             <!-- Page Header -->
             <div class="page-header">
                 <div>
-                    <h1 class="lang-content" data-en="Manage Sub Admin Access" data-bn="সাব-অ্যাডমিন প্রবেশাধিকার নিয়ন্ত্রণ">সাব-অ্যাডমিন প্রবেশাধিকার নিয়ন্ত্রণ</h1>
-                    <p class="lang-content" data-en="Control page access and permissions for sub admins" data-bn="সাব-অ্যাডমিনদের পেজ এক্সেস এবং অনুমতি নিয়ন্ত্রণ করুন">সাব-অ্যাডমিনদের পেজ এক্সেস এবং অনুমতি নিয়ন্ত্রণ করুন</p>
+                    <h1 class="lang-content" data-en="Manage Sub Admin Access" data-bn="সাব-অ্যাডমিন অ্যাক্সেস ম্যানেজমেন্ট">সাব-অ্যাডমিন অ্যাক্সেস ম্যানেজমেন্ট</h1>
+                    <p class="lang-content" data-en="Control page access and permissions for sub admins" data-bn="সাব-অ্যাডমিনদের পেজ অ্যাক্সেস ও অনুমতি নিয়ন্ত্রণ করুন">সাব-অ্যাডমিনদের পেজ অ্যাক্সেস ও অনুমতি নিয়ন্ত্রণ করুন</p>
                 </div>
             </div>
 
@@ -230,11 +230,11 @@
                                 <strong id="selectedName">-</strong>
                             </div>
                             <div class="stat-item">
-                                <span class="lang-content" data-en="Username" data-bn="ইউজারনাম">ইউজারনাম</span>
+                                <span class="lang-content" data-en="Username" data-bn="ইউজারনেম">ইউজারনেম</span>
                                 <strong id="selectedUsername">-</strong>
                             </div>
                             <div class="stat-item">
-                                <span class="lang-content" data-en="Total Access" data-bn="মোট এক্সেস">মোট এক্সেস</span>
+                                <span class="lang-content" data-en="Total Access" data-bn="মোট অ্যাক্সেস">মোট অ্যাক্সেস</span>
                                 <span class="badge bg-primary" id="totalAccessCount">0</span>
                             </div>
                         </div>
@@ -267,7 +267,7 @@
                     <div class="stats-card">
                         <h5 class="mb-3">
                             <i class="fas fa-bolt me-2"></i>
-                            <span class="lang-content" data-en="Quick Actions" data-bn="দ্রুত অ্যাকশন">দ্রুত অ্যাকশন</span>
+                            <span class="lang-content" data-en="Quick Actions" data-bn="দ্রুত কার্যক্রম">দ্রুত কার্যক্রম</span>
                         </h5>
                         <div class="d-grid gap-2">
                             <button class="btn btn-success" onclick="selectAllPages()">
@@ -280,7 +280,7 @@
                             </button>
                             <button class="btn btn-primary" onclick="savePermissions()">
                                 <i class="fas fa-save me-2"></i>
-                                <span class="lang-content" data-en="Save Changes" data-bn="পরিবর্তন সংরক্ষণ">পরিবর্তন সংরক্ষণ</span>
+                                <span class="lang-content" data-en="Save Changes" data-bn="পরিবর্তন সন্নিবেশ">পরিবর্তন সন্নিবেশ</span>
                             </button>
                         </div>
                     </div>
@@ -299,7 +299,7 @@
                     <div class="permission-tree" id="permissionsTree">
                         <div class="text-center py-5 text-muted">
                             <i class="fas fa-user-lock fa-3x mb-3"></i>
-                            <p class="lang-content" data-en="Select a sub admin to manage permissions" data-bn="অনুমতি পরিচালনা করতে একটি সাব-অ্যাডমিন নির্বাচন করুন">অনুমতি পরিচালনা করতে একটি সাব-অ্যাডমিন নির্বাচন করুন</p>
+                            <p class="lang-content" data-en="Select a sub admin to manage permissions" data-bn="অনুমতি পরিচালনা করতে একজন সাব-অ্যাডমিন নির্বাচন করুন">অনুমতি পরিচালনা করতে একজন সাব-অ্যাডমিন নির্বাচন করুন</p>
                         </div>
                     </div>
                 </div>
@@ -317,9 +317,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
     <!-- App Components -->
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     
     <!-- Access Management JS -->
-    <script src="/js/access-management.js"></script>
+    <script src="/js/access-management.js?v=2.1.6"></script>
 </body>
 </html>

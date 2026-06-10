@@ -5,7 +5,7 @@
     let institutionId = null;
     let registrationId = null;
     let currentPage = 1;
-    const pageSize = 25;
+    const pageSize = 100;
     let totalCount = 0;
     let dueSortOrder = null; // null = no sort, 'asc', 'desc'
 
@@ -184,6 +184,7 @@
         const container = $('#ordersTableContainer');
         container.html(`<div class="loading"><span>${t('loading')}</span></div>`);
         $('#paginationContainer').html('');
+        $('#paginationContainerTop').html('');
         $('#summaryText').text('');
 
         const mode = $('input[name="searchMode"]:checked').val();
@@ -275,7 +276,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width:36px;"></th>
                         <th data-en="${lang.en.colOrderNo}" data-bn="${lang.bn.colOrderNo}">${t('colOrderNo')}</th>
                         <th data-en="${lang.en.colName}" data-bn="${lang.bn.colName}">${t('colName')}</th>
                         <th data-en="${lang.en.colMobile}" data-bn="${lang.bn.colMobile}">${t('colMobile')}</th>
@@ -303,11 +303,6 @@
 
             html += `
                 <tr>
-                    <td class="center">
-                        <button class="btn-print" title="Print" onclick="printOrder(${order.orderId})">
-                            <i class="fas fa-print"></i>
-                        </button>
-                    </td>
                     <td class="center order-no">${order.orderSerialNumber}</td>
                     <td>
                         <span class="customer-number">${escapeHtml(customerNo)}</span>
@@ -320,7 +315,11 @@
                     <td class="center">${deliveryDate}</td>
                     <td class="center">${deliveredOn}</td>
                     <td class="number ${dueClass}">${(order.dueAmount || 0).toFixed(2)}</td>
-                    <td>${escapeHtml(order.orderDetails || '')}</td>
+                    <td class="center">
+                        <button class="btn-print" title="Print" onclick="printOrder(${order.orderId})">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </td>
                 </tr>
             `;
         });
@@ -332,10 +331,11 @@
     }
 
     function renderPagination(page) {
-        const container = $('#paginationContainer');
+        const topContainer = $('#paginationContainerTop');
+        const bottomContainer = $('#paginationContainer');
         const totalPages = Math.ceil(totalCount / pageSize);
 
-        if (totalPages <= 1) { container.html(''); return; }
+        if (totalPages <= 1) { topContainer.html(''); bottomContainer.html(''); return; }
 
         let html = '';
         html += `<button ${page === 1 ? 'disabled' : ''} onclick="changePage(1)" data-en="First" data-bn="প্রথম">${t('btnFirst')}</button>`;
@@ -352,7 +352,8 @@
         html += `<button ${page === totalPages ? 'disabled' : ''} onclick="changePage(${page + 1})"><i class="fas fa-chevron-right"></i></button>`;
         html += `<button ${page === totalPages ? 'disabled' : ''} onclick="changePage(${totalPages})" data-en="Last" data-bn="শেষ">${t('btnLast')}</button>`;
 
-        container.html(html);
+        topContainer.html(html);
+        bottomContainer.html(html);
         if (window.updateLanguage) window.updateLanguage();
     }
 

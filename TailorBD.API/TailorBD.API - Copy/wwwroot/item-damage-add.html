@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-en="Fabric Damage - TailorBD" data-bn="কাপড় ক্ষতি - TailorBD">কাপড় ক্ষতি - TailorBD</title>
+    <title data-en="Fabric Damage - TailorBD" data-bn="আইট৅ম ড্যামেজ - TailorBD">আইট৅ম ড্যামেজ - TailorBD</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -104,11 +104,11 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 style="font-weight:700;color:#e74c3c;margin:0;">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        <span data-en="Fabric Damage Management" data-bn="কাপড় ক্ষতি ব্যবস্থাপনা">কাপড় ক্ষতি ব্যবস্থাপনা</span>
+                        <span data-en="Fabric Damage Management" data-bn="আইটেম ড্যামেজ হিসাব">আইট৅ম ড্যামেজ হিসাব</span>
                     </h5>
                     <button class="btn-danger3" onclick="openAddModal()">
                         <i class="fas fa-plus"></i>
-                        <span data-en="Record Damage" data-bn="ক্ষতি যোগ করুন">ক্ষতি যোগ করুন</span>
+                        <span data-en="Record Damage" data-bn="ড্যামেজ যোগ করুন">ড্যামেজ যোগ করুন</span>
                     </button>
                 </div>
 
@@ -126,7 +126,7 @@
                         <div class="card-box">
                             <div class="sec-title">
                                 <i class="fas fa-chart-bar"></i>
-                                <span data-en="Most Damaged Fabrics" data-bn="সবচেয়ে বেশি ক্ষতিগ্রস্ত কাপড়">সবচেয়ে বেশি ক্ষতিগ্রস্ত কাপড়</span>
+                                <span data-en="Most Damaged Fabrics" data-bn="সর্বাধিক ক্ষতিগ্রস্ত আইটেম">সর্বাধিক ক্ষতিগ্রস্ত আইটেম</span>
                             </div>
                             <div class="top-fab-grid" id="topFabGrid"></div>
                         </div>
@@ -150,25 +150,25 @@
                             <input type="date" id="filterFrom" class="f-control" style="width:160px;" onchange="loadRecords(1)">
                         </div>
                         <div>
-                            <label class="f-label" data-en="To Date" data-bn="শেষ তারিখ">শেষ তারিখ</label>
+                            <label class="f-label" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
                             <input type="date" id="filterTo" class="f-control" style="width:160px;" onchange="loadRecords(1)">
                         </div>
                         <div style="flex:1;min-width:160px;">
-                            <label class="f-label" data-en="Search Fabric" data-bn="কাপড় খুঁজুন">কাপড় খুঁজুন</label>
+                            <label class="f-label" data-en="Search Fabric" data-bn="আইট৅ম খুঁজুন">আইট৅ম খুঁজুন</label>
                             <div style="position:relative;">
                                 <i class="fas fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#ccc;font-size:13px;"></i>
                                 <input type="text" id="filterFabric" class="f-control" style="padding-left:32px;"
-                                    data-bn-placeholder="কোড বা নামে খুঁজুন"
-                                    data-en-placeholder="Search by code or name"
-                                    placeholder="কোড বা নামে খুঁজুন"
-                                    oninput="debounceSearch()">
+                                data-bn-placeholder="কোড বা নাম দিয়ে খুঁজুন"
+                                data-en-placeholder="Search by code or name"
+                                placeholder="কোড বা নাম দিয়ে খুঁজুন"
+                                oninput="debounceSearch()">
                             </div>
                         </div>
                         <div>
                             <label class="f-label">&nbsp;</label>
                             <button class="btn-outline2" onclick="clearFilters()">
                                 <i class="fas fa-times"></i>
-                                <span data-en="Clear" data-bn="রিসেট">রিসেট</span>
+                                <span data-en="Clear" data-bn="পরিষ্কার">পরিষ্কার</span>
                             </button>
                         </div>
                     </div>
@@ -177,7 +177,7 @@
 
                     <div class="sec-title">
                         <i class="fas fa-list"></i>
-                        <span data-en="Damage Records" data-bn="ক্ষতির রেকর্ড">ক্ষতির রেকর্ড</span>
+                        <span data-en="Damage Records" data-bn="ড্যামেজ রেকর্ড">ড্যামেজ রেকর্ড</span>
                     </div>
 
                     <div id="tblSpinner" style="text-align:center;padding:30px;">
@@ -189,9 +189,9 @@
                                 <tr>
                                     <th>#</th>
                                     <th data-en="Code" data-bn="কোড">কোড</th>
-                                    <th data-en="Fabric Name" data-bn="কাপড়ের নাম">কাপড়ের নাম</th>
-                                    <th data-en="Unit" data-bn="ইউনিট">ইউনিট</th>
-                                    <th data-en="Damage Qty" data-bn="ক্ষতির পরিমাণ">ক্ষতির পরিমাণ</th>
+                                    <th data-en="Fabric Name" data-bn="আইটেমের নাম">আইট৅মের নাম</th>
+                                    <th data-en="Unit" data-bn="একক">একক</th>
+                                    <th data-en="Damage Qty" data-bn="ড্যামেজ পরিমাণ">ড্যামেজ পরিমাণ</th>
                                     <th data-en="Price (&#2547;)" data-bn="মূল্য (&#2547;)">মূল্য (&#2547;)</th>
                                     <th data-en="Date" data-bn="তারিখ">তারিখ</th>
                                     <th data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
@@ -201,7 +201,7 @@
                         </table>
                         <div id="noRecMsg" style="display:none;text-align:center;color:#bbb;padding:30px;font-size:14px;">
                             <i class="fas fa-check-circle fa-2x mb-2" style="display:block;color:#28a745;"></i>
-                            <span data-en="No damage records found" data-bn="কোনো ক্ষতির রেকর্ড নেই">কোনো ক্ষতির রেকর্ড নেই</span>
+                            <span data-en="No damage records found" data-bn="কোনো ড্যামেজ রেকর্ড নেই">কোনো ড্যামেজ রেকর্ড নেই</span>
                         </div>
                         <div class="pager" id="pagerWrap"></div>
                     </div>
@@ -218,7 +218,7 @@
                 <div class="modal-header red">
                     <h5 class="modal-title">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        <span data-en="Record Fabric Damage" data-bn="কাপড়ের ক্ষতির রেকর্ড যোগ করুন">কাপড়ের ক্ষতির রেকর্ড যোগ করুন</span>
+                        <span data-en="Record Fabric Damage" data-bn="আইটেম ড্যামেজ যোগ করুন">আইটেম ড্যামেজ যোগ করুন</span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -227,22 +227,22 @@
                     <!-- Fabric Picker -->
                     <div class="mb-3">
                         <label class="f-label">
-                            <span data-en="Select Fabric" data-bn="কাপড় সিলেক্ট করুন">কাপড় সিলেক্ট করুন</span>
+                            <span data-en="Select Fabric" data-bn="আইটেম নির্বাচন করুন">আইটেম নির্বাচন করুন</span>
                             <span style="color:#e74c3c;">*</span>
                         </label>
                         <div class="fab-search-wrap">
                             <input type="text" id="fabSearchInput" class="f-control"
-                                data-bn-placeholder="কোড বা নামে খুঁজুন"
+                                data-bn-placeholder="কোড বা নাম দিয়ে খুঁজুন"
                                 data-en-placeholder="Search by code or name"
-                                placeholder="কোড বা নামে খুঁজুন"
+                                placeholder="কোড বা নাম দিয়ে খুঁজুন"
                                 oninput="searchFabrics()" autocomplete="off">
                             <div class="fab-dropdown" id="fabDropdown"></div>
                         </div>
                         <div class="fab-selected" id="fabSelected">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <div class="fab-sel-name" id="selFabName">—</div>
-                                    <div class="fab-sel-meta" id="selFabMeta">—</div>
+                                    <div class="fab-sel-name" id="selFabName">�</div>
+                                    <div class="fab-sel-meta" id="selFabMeta">�</div>
                                 </div>
                                 <button type="button" onclick="clearFabric()" style="background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;line-height:1;">&#x2715;</button>
                             </div>
@@ -250,7 +250,7 @@
                                 <div style="font-size:11px;color:#888;margin-bottom:3px;">
                                     <span data-en="Current Stock" data-bn="বর্তমান স্টক">বর্তমান স্টক</span>:
                                     <strong id="selFabStock">0</strong>
-                                    <span id="selFabUnit">—</span>
+                                    <span id="selFabUnit">�</span>
                                 </div>
                                 <div class="stock-bar-wrap">
                                     <div class="stock-bar" id="stockBar" style="width:100%;"></div>
@@ -262,7 +262,7 @@
                     <!-- Quantity -->
                     <div class="mb-3">
                         <label class="f-label">
-                            <span data-en="Damage Quantity" data-bn="ক্ষতির পরিমাণ">ক্ষতির পরিমাণ</span>
+                            <span data-en="Damage Quantity" data-bn="ড্যামেজ পরিমাণ">ড্যামেজ পরিমাণ</span>
                             <span style="color:#e74c3c;">*</span>
                             <span id="unitLabel" style="color:#6c7ae0;font-weight:700;"></span>
                         </label>
@@ -276,7 +276,7 @@
 
                     <!-- Price -->
                     <div class="mb-3">
-                        <label class="f-label" data-en="Total Damage Price (&#2547;)" data-bn="মোট ক্ষতির মূল্য (&#2547;)">মোট ক্ষতির মূল্য (&#2547;)</label>
+                        <label class="f-label" data-en="Total Damage Price (&#2547;)" data-bn="মোট ড্যামেজ মূল্য (&#2547;)">মোট ড্যামেজ মূল্য (&#2547;)</label>
                         <input type="number" id="dmgPrice" class="f-control" min="0" step="0.01"
                             data-bn-placeholder="মূল্য লিখুন (ঐচ্ছিক)"
                             data-en-placeholder="Enter price (optional)"
@@ -287,7 +287,7 @@
 
                     <!-- Date -->
                     <div class="mb-3">
-                        <label class="f-label" data-en="Damage Date" data-bn="ক্ষতির তারিখ">ক্ষতির তারিখ</label>
+                        <label class="f-label" data-en="Damage Date" data-bn="ড্যামেজের তারিখ">ড্যামেজের তারিখ</label>
                         <input type="date" id="dmgDate" class="f-control">
                     </div>
 
@@ -299,7 +299,7 @@
                     </button>
                     <button type="button" class="btn-danger3" id="submitDmgBtn" onclick="submitDamage()">
                         <i class="fas fa-check"></i>
-                        <span data-en="Save Record" data-bn="রেকর্ড সংরক্ষণ করুন">রেকর্ড সংরক্ষণ করুন</span>
+                        <span data-en="Save Record" data-bn="রেকর্ড সেভ করুন">রেকর্ড সেভ করুন</span>
                     </button>
                 </div>
             </div>
@@ -308,7 +308,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/app-components.js"></script>
+    <script src="/js/app-components.js?v=2.1.7"></script>
     <script>
     (function () {
         var institutionId  = 0;
@@ -368,7 +368,7 @@
             applyLang();
         }
 
-        /* ── SUMMARY ── */
+        /* -- SUMMARY -- */
         function loadSummary() {
             getSession();
             if (!institutionId) return;
@@ -385,10 +385,10 @@
             var lang = getLang();
             var L = {
                 total:      lang === 'en' ? 'Total Records'      : 'মোট রেকর্ড',
-                totalQty:   lang === 'en' ? 'Total Damage Qty'   : 'মোট ক্ষতির পরিমাণ',
-                totalPrice: lang === 'en' ? 'Total Damage Price'  : 'মোট ক্ষতির মূল্য',
-                fabrics:    lang === 'en' ? 'Affected Fabrics'   : 'ক্ষতিগ্রস্ত কাপড়',
-                thisMonth:  lang === 'en' ? 'This Month'         : 'এই মাসে'
+                totalQty:   lang === 'en' ? 'Total Damage Qty'   : 'মোট ড্যামেজ পরিমাণ',
+                totalPrice: lang === 'en' ? 'Total Damage Price'  : 'মোট ড্যামেজ মূল্য',
+                fabrics:    lang === 'en' ? 'Affected Fabrics'   : 'ক্ষতিগ্রস্ত আইট৅ম',
+                thisMonth:  lang === 'en' ? 'This Month'         : 'এই মাস'
             };
             $('#kpiRow').html(
                 chip('', s.TotalRecords,         L.total,      'red',    'red') +
@@ -406,7 +406,7 @@
         function renderTopFabrics(data) {
             var lang = getLang();
             if (!data.length) {
-                $('#topFabGrid').html('<p style="color:#bbb;font-size:13px;">' + (lang === 'en' ? 'No data' : 'কোনো ডেটা নেই') + '</p>');
+                $('#topFabGrid').html('<p style="color:#bbb;font-size:13px;">' + (lang === 'en' ? 'No data' : 'দোকান নাম? মোট') + '</p>');
                 return;
             }
             var h = '';
@@ -430,7 +430,7 @@
             $('#quickInfoArea').html(
                 infoRow(lang === 'en' ? 'Avg Price/Record' : 'গড় মূল্য/রেকর্ড',  '&#2547;' + fmt(avgPrice)) +
                 infoRow(lang === 'en' ? 'Avg Qty/Record'   : 'গড় পরিমাণ/রেকর্ড', fmt(avgQty)) +
-                infoRow(lang === 'en' ? 'Total Affected'   : 'মোট ক্ষতিগ্রস্ত',  s.TotalFabrics + ' ' + (lang === 'en' ? 'fabrics' : 'ধরনের কাপড়')) +
+                infoRow(lang === 'en' ? 'Total Affected'   : 'মোট ক্ষতিগ্রস্ত',  s.TotalFabrics + ' ' + (lang === 'en' ? 'fabrics' : 'আইটেম')) +
                 infoRow(lang === 'en' ? 'This Month Loss'  : 'এই মাসের ক্ষতি',    '&#2547;' + fmt(s.ThisMonthPrice))
             );
         }
@@ -440,7 +440,7 @@
                 '<span style="color:#888;">' + lbl + '</span><strong style="color:#333;">' + val + '</strong></div>';
         }
 
-        /* ── RECORDS TABLE ── */
+        /* -- RECORDS TABLE -- */
         window.loadRecords = function (page) {
             getSession();
             if (!institutionId) return;
@@ -479,7 +479,7 @@
                     '<td style="font-weight:700;color:#e74c3c;">' + fmt(d.DamageQuantity) + '</td>' +
                     '<td style="font-weight:700;color:#fd7e14;">' + (d.DamagePrice > 0 ? '&#2547;' + fmt(d.DamagePrice) : '<span style="color:#ccc;">\u2014</span>') + '</td>' +
                     '<td style="font-size:12px;color:#888;">' + (d.DamageDate || '\u2014') + '</td>' +
-                    '<td><button class="btn-sm-del" onclick="deleteDamage(' + d.DamageID + ')" title="' + (lang === 'en' ? 'Delete' : 'ডিলিট') + '"><i class="fas fa-trash"></i></button></td>' +
+                    '<td><button class="btn-sm-del" onclick="deleteDamage(' + d.DamageID + ')" title="' + (lang === 'en' ? 'Delete' : 'মুছুন') + '"><i class="fas fa-trash"></i></button></td>' +
                     '</tr>');
             });
         }
@@ -548,7 +548,7 @@
             $('#selFabName').text(f.FabricCode + ' \u2014 ' + f.FabricsName);
             var lang = getLang();
             $('#selFabMeta').text(
-                (lang === 'en' ? 'Unit: ' : 'ইউনিট: ') + (f.UnitName || '\u2014') +
+                (lang === 'en' ? 'Unit: ' : 'একক: ') + (f.UnitName || '\u2014') +
                 ' | ' + (lang === 'en' ? 'Buying Price: ' : 'ক্রয় মূল্য: ') + '\u09f3' + fmt(f.BuyingUnitPrice || 0)
             );
             $('#selFabStock').text(fmt(f.StockQty));
@@ -580,11 +580,11 @@
             var remain = stock - qty;
             $hint.addClass('show').removeClass('ok warn err');
             if (qty > stock) {
-                $hint.addClass('err').text('\u26a0 স্টকের (' + fmt(stock) + ') চেয়ে বেশি দেওয়া যাবে না');
+                $hint.addClass('err').text('\u26a0 স্টক অতিরিক্ত! বর্তমান স্টক (' + fmt(stock) + ') এর বেশি দেওয়া যাবে না।');
             } else if (remain < stock * 0.2) {
-                $hint.addClass('warn').text('বাকি থাকবে: ' + fmt(remain) + ' ' + (selectedFabric.UnitName || ''));
+                $hint.addClass('warn').text('সতর্কতা! অবশিষ্ট স্টক: ' + fmt(remain) + ' ' + (selectedFabric.UnitName || ''));
             } else {
-                $hint.addClass('ok').text('বাকি থাকবে: ' + fmt(remain) + ' ' + (selectedFabric.UnitName || ''));
+                $hint.addClass('ok').text('অবশিষ্ট স্টক: ' + fmt(remain) + ' ' + (selectedFabric.UnitName || ''));
             }
             calcUnitPrice();
         };
@@ -593,7 +593,7 @@
             var qty   = parseFloat($('#dmgQty').val())   || 0;
             var price = parseFloat($('#dmgPrice').val()) || 0;
             if (qty > 0 && price > 0) {
-                $('#unitPriceHint').text('প্রতি ইউনিট: \u09f3' + fmt(price / qty));
+                $('#unitPriceHint').text('ইউনিট মূল্য: \u09f3' + fmt(price / qty));
             } else {
                 $('#unitPriceHint').text('');
             }
@@ -609,10 +609,10 @@
         };
 
         window.submitDamage = function () {
-            if (!selectedFabric) { showToast('কাপড় সিলেক্ট করুন', 'error'); return; }
+            if (!selectedFabric) { showToast('আইটেম নির্বাচন করুন', 'error'); return; }
             var qty = parseFloat($('#dmgQty').val()) || 0;
-            if (qty <= 0) { showToast('পরিমাণ ০ এর বেশি হতে হবে', 'error'); return; }
-            if (qty > parseFloat(selectedFabric.StockQty)) { showToast('স্টকের চেয়ে বেশি দেওয়া যাবে না', 'error'); return; }
+            if (qty <= 0) { showToast('ড্যামেজ পরিমাণ লিখুন', 'error'); return; }
+            if (qty > parseFloat(selectedFabric.StockQty)) { showToast('পরিমাণ স্টকের চেয়ে বেশি হতে পারবে না', 'error'); return; }
 
             getSession();
             var $btn = $('#submitDmgBtn').prop('disabled', true);
@@ -635,7 +635,7 @@
                     $btn.prop('disabled', false).html(origHtml);
                     if (res.success) {
                         bootstrap.Modal.getInstance(document.getElementById('addDamageModal')).hide();
-                        showToast('ক্ষতির রেকর্ড যোগ হয়েছে', 'success');
+                        showToast('ড্যামেজ রেকর্ড সেভ হয়েছে!', 'success');
                         loadSummary();
                         loadRecords(currentPage);
                     } else {
@@ -644,27 +644,27 @@
                 },
                 error: function () {
                     $btn.prop('disabled', false).html(origHtml);
-                    showToast('সার্ভার এরর', 'error');
+                    showToast('সার্ভার সমস্যা হয়েছে', 'error');
                 }
             });
         };
 
         window.deleteDamage = function (id) {
-            if (!confirm('এই রেকর্ড ডিলিট করবেন?')) return;
+            if (!confirm('আপনি কি এই রেকর্ডটি মুছে ফেলতে চান?')) return;
             getSession();
             $.ajax({
                 url: '/api/ItemPurchase/delete-damage?damageId=' + id + '&institutionId=' + institutionId,
                 method: 'DELETE',
                 success: function (res) {
                     if (res.success) {
-                        showToast('রেকর্ড ডিলিট হয়েছে', 'success');
+                        showToast('রেকর্ড মুছে ফেলা হয়েছে!', 'success');
                         loadSummary();
                         loadRecords(currentPage);
                     } else {
-                        showToast(res.message || 'ডিলিট হয়নি', 'error');
+                        showToast(res.message || 'সমস্যা হয়েছে', 'error');
                     }
                 },
-                error: function () { showToast('সার্ভার এরর', 'error'); }
+                error: function () { showToast('সার্ভার সমস্যা হয়েছে', 'error'); }
             });
         };
 
