@@ -8,7 +8,7 @@
     // Global variables
     let orderData = null;
     let printSettings = null;
-    let measurementPageSize = 'all';
+    let measurementPageSize = 1;
     let measurementPageIndex = 0;
 
     // URL Parameters
@@ -53,7 +53,8 @@
                 if (measurementTabEl) {
                     const tab = new bootstrap.Tab(measurementTabEl);
                     tab.show();
-                    // Count is NOT incremented here - only increments when Print button is clicked
+                    $('#measurementTabTools').show();
+                    scheduleMeasurementLayoutFit();
                 }
             }, 500);
         }
@@ -65,6 +66,9 @@
                 : $(this).val();
             $('body').attr('data-print-size', size);
             applyPrintSizeToScreen(size);
+            if (orderData && orderData.measurements) {
+                displayMeasurements();
+            }
         });
 
         // Measurement paging controls
@@ -117,6 +121,15 @@
             : '4';
         $('body').attr('data-print-size', savedPrintSize);
         applyPrintSizeToScreen(savedPrintSize);
+
+        $('button[data-bs-target="#measurementTab"]').on('shown.bs.tab', function () {
+            $('#measurementTabTools').show();
+            scheduleMeasurementLayoutFit();
+        });
+
+        $('button[data-bs-target="#receiptTab"]').on('shown.bs.tab', function () {
+            $('#measurementTabTools').hide();
+        });
         
         // Update language content after components are loaded
         setTimeout(function() {
@@ -181,12 +194,7 @@
             $pageSize.append(`<option value="${i}">${optionText}</option>`);
         }
 
-        // Default to 1 per page (legacy behavior)
-        if (measurementPageSize === 'all') {
-            measurementPageSize = 1;
-        }
-
-        $pageSize.val(measurementPageSize.toString());
+        $pageSize.val(measurementPageSize === 'all' ? 'all' : String(measurementPageSize));
 
         const totalPages = getMeasurementTotalPages();
         if (measurementPageSize === 'all' || totalPages <= 1) {
@@ -314,36 +322,106 @@
         return document.querySelector('.measurements-main-container') || document.querySelector('.measurement-container');
     }
 
-    function createPdfFromElement(element, filename) {
-        const sizeInInches = parseFloat(getSelectedPrintSize()) || 4;
-        const widthMm = sizeInInches * 25.4;
+    const PDF_A4_WIDTH_MM = 210;
+    const PDF_A4_HEIGHT_MM = 297;
+    const PDF_MARGIN_MM = 10;
 
-        return html2canvas(element, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff'
-        }).then(canvas => {
-            const { jsPDF } = window.jspdf;
-            const heightMm = (canvas.height * widthMm) / canvas.width;
-            const pdf = new jsPDF({
-                orientation: 'p',
-                unit: 'mm',
-                format: [widthMm, heightMm]
+    function waitForFonts() {
+        if (document.fonts && document.fonts.ready) {
+            return document.fonts.ready.catch(function () { return undefined; });
+        }
+        return Promise.resolve();
+    }
+
+    function captureForPdf(element) {
+        document.body.classList.add('pdf-export-mode');
+
+        return waitForFonts().then(function () {
+            return new Promise(function (resolve) {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(resolve);
+                });
             });
+        }).then(function () {
+            const width = Math.max(element.scrollWidth, element.offsetWidth, 1);
+            const height = Math.max(element.scrollHeight, element.offsetHeight, 1);
 
-            const imgData = canvas.toDataURL('image/png');
-            pdf.addImage(imgData, 'PNG', 0, 0, widthMm, heightMm);
-
-            return {
-                pdf,
-                filename
-            };
+            return html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                width: width,
+                height: height,
+                scrollX: 0,
+                scrollY: 0,
+                onclone: function (clonedDoc) {
+                    clonedDoc.body.classList.add('pdf-export-mode');
+                    const sidebar = clonedDoc.getElementById('app-sidebar');
+                    if (sidebar) sidebar.style.display = 'none';
+                    const navbar = clonedDoc.getElementById('app-navbar');
+                    if (navbar) navbar.style.display = 'none';
+                    const main = clonedDoc.querySelector('.main-content');
+                    if (main) main.style.marginLeft = '0';
+                    clonedDoc.querySelectorAll('.no-print').forEach(function (el) {
+                        el.style.display = 'none';
+                    });
+                    clonedDoc.querySelectorAll('.receipt-container, .measurements-main-container, .measurement-container, .measurement-item-container').forEach(function (el) {
+                        el.style.overflow = 'visible';
+                        el.style.background = '#ffffff';
+                    });
+                    clonedDoc.querySelectorAll('#receiptInstitutionName, .receipt-header .institution-name').forEach(function (el) {
+                        el.style.background = 'none';
+                        el.style.backgroundImage = 'none';
+                        el.style.webkitBackgroundClip = 'border-box';
+                        el.style.backgroundClip = 'border-box';
+                        el.style.webkitTextFillColor = '#000';
+                        el.style.color = '#000';
+                    });
+                }
+            });
+        }).finally(function () {
+            document.body.classList.remove('pdf-export-mode');
         });
     }
 
-    function goBack() {
-        window.history.back();
+    function addCanvasToA4Pdf(pdf, canvas, contentWidthMm) {
+        const margin = PDF_MARGIN_MM;
+        const pageUsableHeight = PDF_A4_HEIGHT_MM - (margin * 2);
+        const xOffset = (PDF_A4_WIDTH_MM - contentWidthMm) / 2;
+        const imgWidth = contentWidthMm;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const imgData = canvas.toDataURL('image/png');
+
+        if (imgHeight <= pageUsableHeight) {
+            pdf.addImage(imgData, 'PNG', xOffset, margin, imgWidth, imgHeight);
+            return;
+        }
+
+        let rendered = 0;
+        let pageIndex = 0;
+        while (rendered < imgHeight) {
+            if (pageIndex > 0) pdf.addPage();
+            pdf.addImage(imgData, 'PNG', xOffset, margin - rendered, imgWidth, imgHeight);
+            rendered += pageUsableHeight;
+            pageIndex++;
+        }
+    }
+
+    function createPdfFromElement(element, filename) {
+        const sizeInInches = parseFloat(getSelectedPrintSize()) || 4;
+        const contentWidthMm = sizeInInches * 25.4;
+
+        return captureForPdf(element).then(function (canvas) {
+            if (!canvas || canvas.width < 2 || canvas.height < 2) {
+                throw new Error('Empty canvas');
+            }
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            addCanvasToA4Pdf(pdf, canvas, contentWidthMm);
+            return { pdf, filename };
+        });
     }
 
     // Apply print size to screen for preview
@@ -478,15 +556,83 @@
         });
     }
 
-    // Scale measurement tables to fit selected paper width (scale up or down)
-    function fitMeasurementTablesToPaper() {
-        const borderReserve = 4;
-        const $main = $('.measurements-main-container').first();
-        let availableWidth = $main.length ? ($main.innerWidth() - borderReserve) : 0;
-        if (!availableWidth || availableWidth < 80) {
-            availableWidth = getPrintWidthPixels() - 16;
-        }
+    function getMeasurementSettingFontSize() {
+        const settingFs = printSettings && printSettings.measurement && printSettings.measurement.fontSize;
+        if (settingFs && settingFs > 0) return settingFs;
+        const cssVar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--measurement-font-size'));
+        return cssVar > 0 ? cssVar : 12;
+    }
 
+    function getStyleSettingFontSize() {
+        const settingFs = printSettings && printSettings.measurement && printSettings.measurement.styleFontSize;
+        if (settingFs && settingFs > 0) return settingFs;
+        const cssVar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--style-font-size'));
+        if (cssVar > 0) return cssVar;
+        return getMeasurementSettingFontSize();
+    }
+
+    function scheduleMeasurementLayoutFit() {
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                applyPrintSizeToScreen(getSelectedPrintSize());
+            });
+        });
+    }
+
+    function getMeasurementTargetWidth() {
+        const borderReserve = 4;
+        const containerPadding = 8;
+        return getPrintWidthPixels() - containerPadding - borderReserve;
+    }
+
+    function getMeasurementLabelFontSize(valueFontPx) {
+        const vf = valueFontPx > 0 ? valueFontPx : 12;
+        return Math.max(9, Math.round(vf * 0.85));
+    }
+
+    function getMaxMeasurementColsPerRow(fontPx) {
+        const fs = fontPx > 0 ? fontPx : 12;
+        if (fs <= 12) return 8;
+        if (fs <= 14) return 7;
+        if (fs <= 18) return 6;
+        return 5;
+    }
+
+    function measureTableSize($table) {
+        const el = $table[0];
+        return {
+            w: Math.ceil(Math.max(el.getBoundingClientRect().width, el.scrollWidth, el.offsetWidth, 1)),
+            h: Math.ceil(Math.max(el.getBoundingClientRect().height, el.scrollHeight, el.offsetHeight, 1))
+        };
+    }
+
+    function applyMeasurementCellStyles($table, valueFontPx) {
+        const labelFontPx = getMeasurementLabelFontSize(valueFontPx);
+        $table.find('.measurement-type-cell').css({
+            fontSize: labelFontPx + 'px',
+            color: '#000',
+            padding: '2px 1px',
+            lineHeight: '1.25',
+            overflow: 'hidden',
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+            maxWidth: '100%'
+        });
+        $table.find('.measurement-value-cell').css({
+            fontSize: valueFontPx + 'px',
+            color: '#000',
+            padding: '3px 1px',
+            lineHeight: '1.25',
+            overflow: 'hidden',
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+            maxWidth: '100%'
+        });
+    }
+
+    function fitMeasurementTablesToPaper() {
         $('.measurement-table-fit').each(function () {
             const $wrap = $(this);
             let $table = $wrap.find('.measurement-groups-table').first();
@@ -497,41 +643,51 @@
                 $existingBox.replaceWith($table);
             }
 
-            $table.css({ transform: 'none', width: 'auto', display: 'table' });
-            $wrap.css({ height: 'auto', width: '100%', padding: 0 });
+            const targetWidth = getMeasurementTargetWidth();
+            const settingFont = getMeasurementSettingFontSize();
 
-            const tableEl = $table[0];
-            const tableWidth = Math.ceil(Math.max(
-                tableEl.getBoundingClientRect().width,
-                tableEl.scrollWidth,
-                tableEl.offsetWidth,
-                1
-            ));
-            const tableHeight = Math.ceil(Math.max(
-                tableEl.getBoundingClientRect().height,
-                tableEl.scrollHeight,
-                tableEl.offsetHeight,
-                1
-            ));
-            const scale = (availableWidth - borderReserve) / tableWidth;
-            const scaledW = Math.ceil(tableWidth * scale) + borderReserve;
-            const scaledH = Math.ceil(tableHeight * scale) + 2;
-
-            $table.wrap('<div class="measurement-table-scale-box"></div>');
-            const $scaleBox = $table.parent();
-
-            $scaleBox.css({
-                width: scaledW + 'px',
-                height: scaledH + 'px',
-                margin: '0 auto',
-                overflow: 'visible'
+            $wrap.css({
+                height: 'auto',
+                width: '100%',
+                maxWidth: targetWidth + 'px',
+                padding: 0,
+                overflow: 'hidden',
+                boxSizing: 'border-box'
             });
+
+            const $colCells = $table.find('> tbody > tr > td');
+            const colCount = Math.max($colCells.length, 1);
+            const colWidth = (100 / colCount) + '%';
+
             $table.css({
-                transform: 'scale(' + scale + ')',
-                transformOrigin: 'top left',
-                width: tableWidth + 'px'
+                transform: 'none',
+                width: '100%',
+                maxWidth: '100%',
+                display: 'table',
+                tableLayout: 'fixed'
             });
-            $wrap.css('height', scaledH + 'px');
+            $colCells.css({
+                width: colWidth,
+                maxWidth: colWidth,
+                padding: '0 1px',
+                verticalAlign: 'top',
+                boxSizing: 'border-box',
+                overflow: 'hidden',
+                background: '#fff'
+            });
+            $table.find('.measurement-group-inner').css({
+                width: '100%',
+                maxWidth: '100%',
+                tableLayout: 'fixed'
+            });
+            $table.find('.measurement-group-inner td').css({
+                maxWidth: 0,
+                width: '100%',
+                boxSizing: 'border-box'
+            });
+
+            applyMeasurementCellStyles($table, settingFont);
+            $wrap.css('height', 'auto');
         });
     }
 
@@ -622,9 +778,12 @@
                     printSettings = response.data;
                     console.log('Print settings loaded:', printSettings);
                     applyPrintSettings();
-                    // Re-apply to receipt if already rendered (race condition fix)
+                    // Re-apply if data already rendered (race condition fix)
                     if (orderData && orderData.header) {
                         displayMoneyReceipt();
+                    }
+                    if (orderData && orderData.measurements) {
+                        displayMeasurements();
                     }
                 }
             },
@@ -680,6 +839,10 @@
                 document.documentElement.style.setProperty('--measurement-top-space', mSettings.topSpace + 'px');
                 console.log('Set measurement top space:', mSettings.topSpace + 'px');
             }
+            const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
+            const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+            document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+            document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
         }
 
         setTimeout(autoFitReceiptTextBlocks, 0);
@@ -966,7 +1129,8 @@
                     printStyleCategory: false,
                     printBarcode: false,
                     topSpace: 0,
-                    fontSize: 14
+                    fontSize: 12,
+                    styleFontSize: 14
                 }
             };
         }
@@ -1003,8 +1167,7 @@
         const labels = {
             orderNo: currentLang === 'en' ? 'Order No:' : 'অর্ডার নং:',
             order: currentLang === 'en' ? 'Order:' : 'তাং:',
-            delivery: currentLang === 'en' ? 'Delivery:' : 'ডেলি:',
-            style: currentLang === 'en' ? 'Style:' : 'স্টাইল:'
+            delivery: currentLang === 'en' ? 'Delivery:' : 'ডেলি:'
         };
 
         // Create measurement copies based on settings
@@ -1130,8 +1293,9 @@
                     groupMap.get(groupId).push(m);
                 });
 
-                const MAX_COLS_PER_ROW = 10;
-                const fontSize = mSettings.fontSize || 14;
+                const fontSize = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
+                const labelFont = getMeasurementLabelFontSize(fontSize);
+                const MAX_COLS_PER_ROW = getMaxMeasurementColsPerRow(fontSize);
                 const $outerTable = $('<table class="measurement-groups-table"></table>');
                 const $outerTbody = $('<tbody></tbody>');
 
@@ -1159,13 +1323,13 @@
                         validMeasurements.forEach((m, idx) => {
                             if (mSettings.printMeasurementName) {
                                 const $typeRow = $('<tr></tr>');
-                                const $typeCell = $(`<td class="measurement-type-cell" style="font-size:${fontSize}px;">${m.type}</td>`);
+                                const $typeCell = $(`<td class="measurement-type-cell" style="font-size:${labelFont}px;color:#000;">${m.type}</td>`);
                                 $typeRow.append($typeCell);
                                 $innerTbody.append($typeRow);
                             }
 
                             const $valRow = $('<tr></tr>');
-                            const $valCell = $(`<td class="measurement-value-cell" style="font-size:${fontSize}px;">${m.value}</td>`);
+                            const $valCell = $(`<td class="measurement-value-cell" style="font-size:${fontSize}px;color:#000;">${m.value}</td>`);
                             $valRow.append($valCell);
                             $innerTbody.append($valRow);
 
@@ -1229,7 +1393,7 @@
                 if (stylesText) {
                     $detailsSection.append(`
                         <div class="styles-section">
-                            ${labels.style} ${stylesText}
+                            ${stylesText}
                         </div>
                     `);
                 }
@@ -1252,17 +1416,16 @@
 
         $container.append($mainContainer);
 
-        // Apply measurement print settings (fontSize only, topSpace comes from CSS variable)
-        if (mSettings.fontSize) {
-            // Apply to measurement table
-            $('.measurement-table').css('font-size', mSettings.fontSize + 'px');
-
-            // Apply to styles and details sections
-            $('.styles-section').css('font-size', mSettings.fontSize + 'px');
-            $('.details-section').css('font-size', mSettings.fontSize + 'px');
-
-            console.log('Applied fontSize:', mSettings.fontSize + 'px');
-        }
+        const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
+        const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+        document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+        document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
+        $('.measurement-groups-table').each(function () {
+            applyMeasurementCellStyles($(this), mFont);
+        });
+        $('.measurement-details-section').css('font-size', mFont + 'px');
+        $('.styles-section, .details-section').css('font-size', sFont + 'px');
+        console.log('Applied measurement fontSize:', mFont + 'px', 'style fontSize:', sFont + 'px');
 
         // Re-apply border hide state after render
         if ($('#hideBorderCheckbox').is(':checked')) {
@@ -1270,7 +1433,7 @@
             $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', 'none');
         }
 
-        setTimeout(fitMeasurementTablesToPaper, 0);
+        scheduleMeasurementLayoutFit();
 
         console.log('Measurements displayed successfully');
     }
@@ -1304,7 +1467,7 @@
             .then(({ pdf, filename: outputName }) => {
                 pdf.save(outputName);
                 $('#loadingSpinner').hide();
-                showAlert('success', 'পিডিএফ সফলভাবে ডাউনলোড হয়েছে');
+                showAlert('success', 'A4 পিডিএফ সফলভাবে ডাউনলোড হয়েছে');
             })
             .catch(error => {
                 console.error('Error generating PDF:', error);

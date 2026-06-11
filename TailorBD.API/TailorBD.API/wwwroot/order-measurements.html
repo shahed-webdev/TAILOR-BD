@@ -241,34 +241,72 @@
     <script>
         let orderData = null;
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
+            restoreSessionFromLocalStorage();
+
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('orderId');
 
             if (!orderId) {
                 alert('Order ID not found');
-                window.close();
                 return;
             }
 
-            const authData = getAuthData();
-            if (!authData) {
-                alert('Authentication required');
-                window.close();
+            const institutionId = getInstitutionId(urlParams);
+            if (!institutionId) {
+                alert('Authentication required. Please login again.');
+                window.location.href = '/login.html';
                 return;
             }
 
-            await loadOrderMeasurements(parseInt(orderId), authData.institutionId);
+            await loadOrderMeasurements(parseInt(orderId, 10), institutionId);
         });
 
-        // Switch tabs
-        function switchTab(tabName) {
-            // Update tabs
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        function restoreSessionFromLocalStorage() {
+            if (!sessionStorage.getItem('institutionId') && localStorage.getItem('session_isLoggedIn') === 'true') {
+                sessionStorage.setItem('username', localStorage.getItem('session_username') || '');
+                sessionStorage.setItem('registrationId', localStorage.getItem('session_registrationId') || '');
+                sessionStorage.setItem('institutionId', localStorage.getItem('session_institutionId') || '');
+                sessionStorage.setItem('institutionName', localStorage.getItem('session_institutionName') || '');
+                sessionStorage.setItem('isLoggedIn', 'true');
+            }
+        }
 
-            // Activate selected tab
+        function getInstitutionId(urlParams) {
+            const fromUrl = urlParams && urlParams.get('institutionId');
+            if (fromUrl && parseInt(fromUrl, 10) > 0) {
+                return parseInt(fromUrl, 10);
+            }
+
+            const fromSession = sessionStorage.getItem('institutionId');
+            if (fromSession && parseInt(fromSession, 10) > 0) {
+                return parseInt(fromSession, 10);
+            }
+
+            const fromLocal = localStorage.getItem('session_institutionId');
+            if (fromLocal && parseInt(fromLocal, 10) > 0) {
+                return parseInt(fromLocal, 10);
+            }
+
+            const authData = localStorage.getItem('authData');
+            if (authData) {
+                try {
+                    const parsed = JSON.parse(authData);
+                    if (parsed.institutionId && parseInt(parsed.institutionId, 10) > 0) {
+                        return parseInt(parsed.institutionId, 10);
+                    }
+                } catch (e) {
+                    console.error('Error parsing authData:', e);
+                }
+            }
+
+            return 0;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(function (tab) { tab.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function (content) { content.classList.remove('active'); });
+
             if (tabName === 'withoutName') {
                 document.querySelectorAll('.tab')[0].classList.add('active');
                 document.getElementById('withoutName').classList.add('active');
@@ -278,39 +316,56 @@
             }
         }
 
-        // Load order measurements
+        function getAuthHeaders() {
+            const token = (window.TokenHelper && window.TokenHelper.get)
+                ? window.TokenHelper.get()
+                : (localStorage.getItem('tailorbd_jwt') || '');
+            return token ? { 'Authorization': 'Bearer ' + token } : {};
+        }
+
+        function clearLoadingState(container) {
+            container.classList.remove('loading');
+        }
+
+        function showLoadError(message) {
+            const html = '<div class="error-message">মাপ লোড করতে সমস্যা হয়েছে: ' + escapeHtml(message) + '</div>';
+            const withoutName = document.getElementById('measurementsWithoutName');
+            const withName = document.getElementById('measurementsWithName');
+            clearLoadingState(withoutName);
+            clearLoadingState(withName);
+            withoutName.innerHTML = html;
+            withName.innerHTML = html;
+        }
+
         async function loadOrderMeasurements(orderId, institutionId) {
             try {
-                const response = await fetch(`/api/Orders/finish-order-details?orderId=${orderId}&institutionId=${institutionId}`);
+                const response = await fetch(
+                    '/api/orders/money-receipt-details?orderId=' + orderId + '&institutionId=' + institutionId,
+                    { headers: getAuthHeaders() }
+                );
                 const result = await response.json();
 
-                if (!result.success) {
+                if (!response.ok || !result.success) {
                     throw new Error(result.message || 'Failed to load measurements');
                 }
 
-                orderData = result.data;
+                orderData = {
+                    customer: result.data.header || {},
+                    measurements: result.data.measurements || []
+                };
+
                 renderMeasurementsWithoutName();
                 renderMeasurementsWithName();
-
             } catch (error) {
                 console.error('Error loading measurements:', error);
-                document.getElementById('measurementsWithoutName').innerHTML = `
-                    <div class="error-message">
-                        মাপ লোড করতে সমস্যা হয়েছে: ${error.message}
-                    </div>
-                `;
-                document.getElementById('measurementsWithName').innerHTML = ``
-                    <div class="error-message">
-                        মাপ লোড করতে সমস্যা হয়েছে: ${error.message}
-                    </div>
-                `;
+                showLoadError(error.message || 'Unknown error');
             }
         }
 
-        // Render measurements without names
         function renderMeasurementsWithoutName() {
             const container = document.getElementById('measurementsWithoutName');
-            
+            clearLoadingState(container);
+
             if (!orderData.measurements || orderData.measurements.length === 0) {
                 container.innerHTML = '<div class="empty-message">কোন মাপ পাওয়া যায়নি</div>';
                 return;
@@ -318,17 +373,17 @@
 
             let html = '';
 
-            orderData.measurements.forEach(item => {
-                html += ``
+            orderData.measurements.forEach(function (item) {
+                html += `
                     <div class="order-item">
                         <div class="order-header">
                             <div class="order-header-item">
-                                <label>${item.dressName}</label>
-                                <span class="value">${item.dressQuantity} P.</span>
+                                <label>${escapeHtml(item.dressName || '')}</label>
+                                <span class="value">${escapeHtml(String(item.dressQuantity || ''))} P.</span>
                             </div>
                             <div class="order-header-item">
                                 <label>অর্ডার নং:</label>
-                                <span class="value">${orderData.customer.orderSerialNumber} (${item.orderListSerialNumber})</span>
+                                <span class="value">${escapeHtml(String(orderData.customer.orderSerialNumber || ''))} (${escapeHtml(String(item.orderListSerialNumber || ''))})</span>
                             </div>
                             <div class="order-header-item">
                                 <label>ডেলিভারী:</label>
@@ -351,10 +406,10 @@
             container.innerHTML = html;
         }
 
-        // Render measurements with names
         function renderMeasurementsWithName() {
             const container = document.getElementById('measurementsWithName');
-            
+            clearLoadingState(container);
+
             if (!orderData.measurements || orderData.measurements.length === 0) {
                 container.innerHTML = '<div class="empty-message">কোন মাপ পাওয়া যায়নি</div>';
                 return;
@@ -362,17 +417,17 @@
 
             let html = '';
 
-            orderData.measurements.forEach(item => {
-                html += ``
+            orderData.measurements.forEach(function (item) {
+                html += `
                     <div class="order-item">
-                         <div class="order-header">
+                        <div class="order-header">
                             <div class="order-header-item">
-                                        <label>${item.dressName}</label>
-                                <span class="value">${item.dressQuantity} P.</span>
+                                <label>${escapeHtml(item.dressName || '')}</label>
+                                <span class="value">${escapeHtml(String(item.dressQuantity || ''))} P.</span>
                             </div>
                             <div class="order-header-item">
                                 <label>অর্ডার নং:</label>
-                                <span class="value">${orderData.customer.orderSerialNumber} (${item.orderListSerialNumber})</span>
+                                <span class="value">${escapeHtml(String(orderData.customer.orderSerialNumber || ''))} (${escapeHtml(String(item.orderListSerialNumber || ''))})</span>
                             </div>
                             <div class="order-header-item">
                                 <label>ডেলিভারী:</label>
@@ -393,24 +448,26 @@
             container.innerHTML = html;
         }
 
-        // Render measurements without names
         function renderMeasurements(measurements) {
             if (!measurements || measurements.length === 0) return '';
 
-            return measurements.map(m => `
+            return measurements.map(function (m) {
+                return `
                 <div class="measurement-item">
-                    <span class="measurement-value">${m.value}</span>
-                    <span class="measurement-label">${m.type}</span>
+                    <span class="measurement-value">${escapeHtml(m.value || '')}</span>
+                    <span class="measurement-label">${escapeHtml(m.type || '')}</span>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
-        // Render measurements with names
         function renderMeasurementsWithNames(measurements) {
             if (!measurements || measurements.length === 0) return '';
 
-            const measurementText = measurements.map(m => `(${m.type}=${m.value})`).join(' ');
-            
+            const measurementText = measurements.map(function (m) {
+                return '(' + escapeHtml(m.type || '') + '=' + escapeHtml(m.value || '') + ')';
+            }).join(' ');
+
             return `
                 <div style="padding: 15px; background: white; border-radius: 4px; border: 1px solid #dee2e6;">
                     ${measurementText}
@@ -418,71 +475,48 @@
             `;
         }
 
-        // Render styles
         function renderStyles(styles) {
             if (!styles || styles.length === 0) return '';
 
-            const styleItems = styles.map(s => {
-                const measurement = s.measurement ? ` = ${s.measurement}` : '';
-                return `<span class="style-item">${s.name}${measurement}</span>`;
+            const styleItems = styles.map(function (s) {
+                const measurement = s.measurement ? ' = ' + escapeHtml(s.measurement) : '';
+                return '<span class="style-item">' + escapeHtml(s.name || '') + measurement + '</span>';
             }).join('');
 
-            return `
-                <div class="styles-section">
-                    ${styleItems}
-                </div>
-            `;
+            return '<div class="styles-section">' + styleItems + '</div>';
         }
 
-        // Render styles with names
         function renderStylesWithNames(styles) {
             if (!styles || styles.length === 0) return '';
 
-            const styleText = styles.map(s => {
-                const measurement = s.measurement ? ` = ${s.measurement}` : '';
-                return `${s.name}${measurement}`;
+            const styleText = styles.map(function (s) {
+                const measurement = s.measurement ? ' = ' + escapeHtml(s.measurement) : '';
+                return escapeHtml(s.name || '') + measurement;
             }).join(', ');
 
-            return `
-                <div class="styles-section">
-                    ${styleText}
-                </div>
-            `;
+            return '<div class="styles-section">' + styleText + '</div>';
         }
 
-        // Render details
         function renderDetails(details) {
             if (!details) return '';
-
-            return `
-                <div class="details-section">
-                    ${details}
-                </div>
-            `;
+            return '<div class="details-section">' + escapeHtml(details) + '</div>';
         }
 
-        // Format date helper
         function formatDate(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
+            if (isNaN(date.getTime())) return escapeHtml(String(dateString));
             const day = date.getDate();
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const month = monthNames[date.getMonth()];
-            const year = date.getFullYear();
-            return `${day} ${month} ${year}`;
+            return day + ' ' + monthNames[date.getMonth()] + ' ' + date.getFullYear();
         }
 
-        // Get auth data helper
-        function getAuthData() {
-            const authData = localStorage.getItem('authData');
-            if (!authData) return null;
-
-            try {
-                return JSON.parse(authData);
-            } catch (error) {
-                console.error('Error parsing auth data:', error);
-                return null;
-            }
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
         }
     </script>
 </body>

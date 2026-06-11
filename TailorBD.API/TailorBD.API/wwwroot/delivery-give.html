@@ -70,6 +70,41 @@
             text-overflow: ellipsis;
         }
         .dg-table tbody tr:hover { background-color: #f8f9fa; }
+        .dg-table tbody tr.row-today { background-color: #d4edda; }
+        .dg-table tbody tr.row-overdue { background-color: #f8d7da; }
+        .dg-table tbody tr.row-today:hover { background-color: #c3e6cb; }
+        .dg-table tbody tr.row-overdue:hover { background-color: #f5c6cb; }
+
+        .delivery-filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .delivery-filter-bar .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-right: 4px;
+        }
+        .df-btn {
+            padding: 5px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            color: #444;
+            transition: all 0.15s;
+        }
+        .df-btn:hover { border-color: #6c7ae0; color: #6c7ae0; }
+        .df-btn.active { font-weight: 600; }
+        .df-btn.df-all.active { background: #6c7ae0; color: white; border-color: #6c7ae0; }
+        .df-btn.df-today.active { background: #d4edda; color: #155724; border-color: #28a745; }
+        .df-btn.df-overdue.active { background: #f8d7da; color: #721c24; border-color: #dc3545; }
+        .df-btn.df-normal.active { background: #f8f9fa; color: #333; border-color: #adb5bd; }
         .dg-table .cell-clip {
             display: block;
             max-width: 100%;
@@ -164,6 +199,67 @@
         .ui-menu-item { padding: 8px 12px; cursor: pointer; }
         .ui-menu-item:hover, .ui-menu-item.ui-state-active { background: #6c7ae0; color: white; border: none; }
         .ui-helper-hidden-accessible { display: none; }
+
+        /* Partial Delivery Modal — mobile */
+        #partialDeliveryModal .modal-body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            max-height: 65vh;
+        }
+        .pd-item-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        .pd-item-card .pd-item-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        .pd-item-card .pd-item-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .pd-item-card .pd-item-stats span strong { color: #555; }
+        .pd-item-card .pd-item-qty {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #e9ecef;
+        }
+        .pd-item-card .pd-item-qty label {
+            font-weight: 600;
+            font-size: 13px;
+            margin: 0;
+            color: #28a745;
+        }
+        .pd-item-card .pd-qty-input { max-width: 90px; }
+        #partialDeliveryModal .table .pd-qty-input {
+            width: 70px;
+            display: inline-block;
+        }
+        @media (max-width: 767.98px) {
+            #partialDeliveryModal .modal-body { max-height: none; flex: 1 1 auto; }
+            #partialDeliveryModal .modal-header .modal-title { font-size: 1rem; }
+            #partialDeliveryModal .modal-header .modal-title small { display: block; margin: 2px 0 0 0 !important; font-size: 0.85rem; }
+            #partialDeliveryModal .modal-footer {
+                flex-direction: column-reverse;
+                gap: 8px;
+                padding: 12px;
+            }
+            #partialDeliveryModal .modal-footer .btn { width: 100%; margin: 0; }
+            #partialDeliveryModal .form-label { font-size: 13px; }
+            #partialDeliveryModal .form-control,
+            #partialDeliveryModal .form-select { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -252,6 +348,23 @@
                         <div id="smsStatusMsg" style="display:none; margin-top:8px; font-size:13px;"></div>
                     </div>
 
+                    <!-- Delivery Date Filter -->
+                    <div id="deliveryFilterBar" class="delivery-filter-bar" style="display:none;">
+                        <span class="filter-label lang-content" data-en="Filter:" data-bn="ফিল্টার:">ফিল্টার:</span>
+                        <button type="button" class="df-btn df-all active" data-filter="all" onclick="setDeliveryFilter('all')">
+                            <span class="lang-content" data-en="All" data-bn="সব">সব</span> (<span id="dfCountAll">0</span>)
+                        </button>
+                        <button type="button" class="df-btn df-today" data-filter="today" onclick="setDeliveryFilter('today')">
+                            <span class="lang-content" data-en="Today" data-bn="আজকে">আজকে</span> (<span id="dfCountToday">0</span>)
+                        </button>
+                        <button type="button" class="df-btn df-overdue" data-filter="overdue" onclick="setDeliveryFilter('overdue')">
+                            <span class="lang-content" data-en="Overdue" data-bn="অতিক্রান্ত">অতিক্রান্ত</span> (<span id="dfCountOverdue">0</span>)
+                        </button>
+                        <button type="button" class="df-btn df-normal" data-filter="normal" onclick="setDeliveryFilter('normal')">
+                            <span class="lang-content" data-en="Upcoming" data-bn="সাধারণ">সাধারণ</span> (<span id="dfCountNormal">0</span>)
+                        </button>
+                    </div>
+
                     <!-- Orders Table -->
                     <div class="table-wrapper">
                         <div id="ordersTableContainer">
@@ -291,7 +404,7 @@
 
     <!-- Partial Delivery Modal -->
     <div class="modal fade" id="partialDeliveryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header" style="background:#28a745; color:white;">
                     <h5 class="modal-title"><i class="fas fa-truck me-2"></i>
@@ -300,7 +413,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:invert(1);"></button>
                 </div>
-                <div class="modal-body" id="partialDeliveryModalBody" style="overflow-x:auto; overflow-y:auto; max-height:65vh;">
+                <div class="modal-body" id="partialDeliveryModalBody">
                     <div class="text-center p-4">
                         <div class="spinner-border text-success" role="status"></div>
                     </div>
@@ -323,6 +436,6 @@
     <!-- App Components (sidebar, navbar, modals, session) -->
     <script src="/js/app-components.js?v=2.1.5"></script>
     <!-- Delivery Give Page Logic -->
-    <script src="/js/delivery-give.js?v=2.2.5"></script>
+    <script src="/js/delivery-give.js?v=2.2.8"></script>
 </body>
 </html>

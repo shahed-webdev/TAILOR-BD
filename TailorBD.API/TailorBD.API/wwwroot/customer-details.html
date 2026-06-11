@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/measurement-fraction-bar.css">
     <style>
         #app-navbar { margin-left: 260px; transition: margin-left 0.3s ease; }
         .container { max-width: 100%; padding: 10px; }
@@ -220,6 +221,30 @@
                             </a>
                         </div>
                         <div class="dress-legend"><span>★</span> সবুজ রঙে চিহ্নিত পোশাকে আগে থেকে মাপ আছে</div>
+                        <div class="measurement-fraction-bar" id="measurementFractionBar" style="display:none;">
+                            <span class="fraction-bar-label">
+                                <i class="fas fa-divide me-1"></i>
+                                <span data-en="Fractions — click a box first, then tap:" data-bn="ভগ্নাংশ — আগে মাপ ঘরে ক্লিক, তারপর বাটন:">ভগ্নাংশ — আগে মাপ ঘরে ক্লিক, তারপর বাটন:</span>
+                            </span>
+                            <div class="fraction-btn-group">
+                                <button type="button" class="fraction-btn" data-char="½" title="হাফ">
+                                    <span class="fraction-char">½</span>
+                                    <span class="fraction-name" data-en="Half" data-bn="হাফ">হাফ</span>
+                                </button>
+                                <button type="button" class="fraction-btn" data-char="¼" title="সোয়া">
+                                    <span class="fraction-char">¼</span>
+                                    <span class="fraction-name" data-en="Quarter" data-bn="সোয়া">সোয়া</span>
+                                </button>
+                                <button type="button" class="fraction-btn" data-char="¾" title="পোয়া">
+                                    <span class="fraction-char">¾</span>
+                                    <span class="fraction-name" data-en="Three-qtr" data-bn="পোয়া">পোয়া</span>
+                                </button>
+                                <button type="button" class="fraction-btn" data-char="⅛" title="আট">
+                                    <span class="fraction-char">⅛</span>
+                                    <span class="fraction-name" data-en="Eighth" data-bn="আট">আট</span>
+                                </button>
+                            </div>
+                        </div>
                         <div id="measurementArea"><div class="empty-msg">পোশাক নির্বাচন করুন</div></div>
                         <div id="measureSaveMsg" class="alert-msg"></div>
                     </div>
@@ -325,6 +350,7 @@
     </script>
     <script src="/js/auth.js"></script>
     <script src="/js/app-components.js?v=2.2.8"></script>
-    <script src="/js/customer-details.js?v=2.1.7"></script>
+    <script src="/js/measurement-fraction-bar.js?v=1.0.0"></script>
+    <script src="/js/customer-details.js?v=2.1.8"></script>
 </body>
 </html>

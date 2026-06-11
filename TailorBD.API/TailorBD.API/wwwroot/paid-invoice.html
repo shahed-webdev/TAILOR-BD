@@ -192,8 +192,9 @@
             white-space: nowrap;
         }
         .rcpt-table thead th:last-child,
-        .rcpt-table thead th:nth-child(3),
-        .rcpt-table thead th:nth-child(4) { text-align: right; }
+        .rcpt-table thead th:nth-child(4),
+        .rcpt-table thead th:nth-child(5),
+        .rcpt-table thead th:nth-child(6) { text-align: right; }
         .rcpt-table tbody td {
             padding: 7px 12px;
             font-size: .78rem;
@@ -202,8 +203,11 @@
             white-space: nowrap;
         }
         .rcpt-table tbody td:last-child,
-        .rcpt-table tbody td:nth-child(3),
-        .rcpt-table tbody td:nth-child(4) { text-align: right; color: #ea580c; font-weight: 600; }
+        .rcpt-table tbody td:nth-child(4),
+        .rcpt-table tbody td:nth-child(5),
+        .rcpt-table tbody td:nth-child(6) { text-align: right; color: #ea580c; font-weight: 600; }
+        .rcpt-table tbody td:nth-child(3) { white-space: nowrap; text-align: center; color: #64748b; font-weight: 500; font-size: .72rem; }
+        .rcpt-table tbody td:nth-child(2) { white-space: nowrap; }
         .rcpt-table tbody td:nth-child(1) { color: #16a34a; font-weight: 700; }
         .rcpt-table tbody tr:nth-child(even) { background: #f8fafc; }
         .rcpt-table tfoot td {
@@ -259,6 +263,76 @@
         }
         .rcpt-sig-line { width: 130px; border-top: 1.5px solid #94a3b8; margin: 0 0 3px auto; }
         .rcpt-sig-label { font-size: .68rem; color: #64748b; }
+
+        /* PAID stamp — circular rubber-stamp style */
+        .paid-stamp {
+            position: relative;
+            width: 118px;
+            height: 118px;
+            margin: 10px auto;
+            transform: rotate(-14deg);
+            border-radius: 50%;
+            border: 4px solid #16a34a;
+            color: #16a34a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.52;
+            pointer-events: none;
+            user-select: none;
+            font-family: 'Poppins', Arial, sans-serif;
+            text-transform: uppercase;
+            box-shadow:
+                0 0 0 3px #fff inset,
+                0 0 0 7px #16a34a,
+                0 0 0 9px rgba(22, 163, 74, 0.25);
+            background:
+                radial-gradient(circle at 30% 28%, rgba(255,255,255,0.35) 0%, transparent 45%),
+                radial-gradient(circle, rgba(22,163,74,0.07) 0%, transparent 72%);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .paid-stamp::before {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            border-radius: 50%;
+            border: 2px solid #16a34a;
+            opacity: 0.75;
+        }
+        .paid-stamp::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: repeating-radial-gradient(
+                circle at 50% 50%,
+                transparent 0,
+                transparent 3px,
+                rgba(22, 163, 74, 0.12) 3px,
+                rgba(22, 163, 74, 0.12) 4px
+            );
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .paid-stamp-main {
+            position: relative;
+            z-index: 1;
+            font-size: 1.35rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+        .paid-stamp-sub {
+            position: relative;
+            z-index: 1;
+            font-size: 0.48rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            margin-top: 5px;
+            line-height: 1;
+        }
 
         /* Footer bar */
         .rcpt-footer-bar {
@@ -321,7 +395,7 @@
     <!-- Money Receipt Print Area -->
     <div id="receiptPrintArea"></div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/app-components.js?v=2.1.9"></script>
     <script>
@@ -363,11 +437,39 @@
     }
 
     var fmt = function(n) { return (n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }); };
+    var fmtDec = function(n) { return (n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
     var fmtDate = function(d) {
         if (!d) return '-';
         var dt = new Date(d);
         return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     };
+    var fmtBillingPeriod = function(inv) {
+        if (!inv) return '-';
+        var start = inv.issuDate ? new Date(inv.issuDate) : null;
+        var end   = inv.endDate  ? new Date(inv.endDate)  : null;
+        if (!start && !end) return '-';
+        if (start && end) {
+            var s = fmtDate(inv.issuDate);
+            var e = fmtDate(inv.endDate);
+            return s === e ? s : (s + ' — ' + e);
+        }
+        return start ? fmtDate(inv.issuDate) : fmtDate(inv.endDate);
+    };
+    var fmtInvoiceDescription = function(inv) {
+        var text = (inv && inv.invoice_For) ? String(inv.invoice_For) : '-';
+        text = text.replace(/^Auto Monthly Renewal\s*[—\-]\s*/i, '').trim();
+        return text || '-';
+    };
+    function calcGatewayCharge(g, baseAmount) {
+        var isOnline = (g.payment_Method || '').toLowerCase().indexOf('online') !== -1;
+        if (!isOnline) return { charge: 0, rate: 0, isOnline: false };
+        var isSmsType = g.invoices && g.invoices.some(function(inv) {
+            return (inv.invoice_For || '').toLowerCase().indexOf('sms') !== -1;
+        });
+        var rate = isSmsType ? 0.019 : 0.01;
+        var charge = Math.round((baseAmount || 0) * rate * 100) / 100;
+        return { charge: charge, rate: rate, isOnline: true, isSmsType: isSmsType };
+    }
 
     function renderPayments(groups) {
         var $body = $('#invoiceBody');
@@ -376,11 +478,15 @@
         groups.forEach(function(g, idx) {
             var amt = g.totalAmount || 0;
             var invCount = g.invoices ? g.invoices.length : 0;
+            var gw = calcGatewayCharge(g, amt);
+            var displayAmt = gw.isOnline
+                ? '<strong style="color:#16a34a;">৳' + fmt(amt) + '</strong><br><small style="color:#ea580c;font-size:.7rem;"><i class="fas fa-university"></i> +৳' + fmtDec(gw.charge) + ' গেটওয়ে চার্জ</small>'
+                : '<strong style="color:#16a34a;">৳' + fmt(amt) + '</strong>';
 
             var row = '<tr>' +
                 '<td>' + (idx + 1) + '</td>' +
                 '<td>' + fmtDate(g.paidDate) + '</td>' +
-                '<td><strong style="color:#16a34a;">৳' + fmt(amt) + '</strong></td>' +
+                '<td>' + displayAmt + '</td>' +
                 '<td>' + (g.payment_Method || '-') + '</td>' +
                 '<td>' + (g.collected_By || '-') + '</td>' +
                 '<td><span class="inv-count-badge">' + invCount + ' ইনভয়েস</span></td>' +
@@ -410,8 +516,7 @@
         var html = '<tr class="detail-row"><td colspan="7"><div style="padding:4px 0;">';
         html += '<table class="detail-table"><thead><tr>' +
             '<th>ইনভয়েসের বিষয়</th>' +
-            '<th>ইসুয়ের তারিখ</th>' +
-            '<th>শেষ তারিখ</th>' +
+            '<th>বিলিং প্রিয়ড</th>' +
             '<th>মোট</th>' +
             '<th>ছাড়</th>' +
             '<th>পরিশোধ</th>' +
@@ -421,16 +526,20 @@
         g.invoices.forEach(function(inv) {
             totalPaidInGroup += (inv.paidAmount || 0);
             html += '<tr>' +
-                '<td>' + (inv.invoice_For || '-') + '</td>' +
-                '<td>' + fmtDate(inv.issuDate) + '</td>' +
-                '<td>' + fmtDate(inv.endDate) + '</td>' +
+                '<td>' + fmtInvoiceDescription(inv) + '</td>' +
+                '<td>' + fmtBillingPeriod(inv) + '</td>' +
                 '<td>৳' + fmt(inv.invoiceTotalAmount) + '</td>' +
                 '<td>৳' + fmt(inv.discount) + '</td>' +
                 '<td><strong style="color:#16a34a;">৳' + fmt(inv.paidAmount) + '</strong></td>' +
                 '</tr>';
         });
 
-        html += '<tr style="border-top:2px solid #e2e8f0;"><td colspan="5"><strong>মোট পরিশোধ</strong></td><td class="detail-total">৳' + fmt(totalPaidInGroup) + '</td></tr>';
+        var gw = calcGatewayCharge(g, totalPaidInGroup);
+        html += '<tr style="border-top:2px solid #e2e8f0;"><td colspan="4"><strong>মোট পরিশোধ</strong></td><td class="detail-total">৳' + fmt(totalPaidInGroup) + '</td></tr>';
+        if (gw.isOnline) {
+            html += '<tr><td colspan="4" style="color:#ea580c;"><i class="fas fa-university me-1"></i>গেটওয়ে চার্জ (' + (gw.isSmsType ? '1.9%' : '1%') + ')</td><td style="color:#ea580c;font-weight:700;">৳' + fmtDec(gw.charge) + '</td></tr>';
+            html += '<tr><td colspan="4"><strong>সর্বমোট</strong></td><td class="detail-total">৳' + fmtDec(totalPaidInGroup + gw.charge) + '</td></tr>';
+        }
         html += '</tbody></table>';
         html += '</div></td></tr>';
 
@@ -460,13 +569,17 @@
                 invRows +=
                     '<tr>' +
                     '<td>' + (i + 1) + '</td>' +
-                    '<td>' + (inv.invoice_For || '-') + '</td>' +
+                    '<td>' + fmtInvoiceDescription(inv) + '</td>' +
+                    '<td style="white-space:nowrap;font-size:.72rem;color:#64748b;">' + fmtBillingPeriod(inv) + '</td>' +
                     '<td>1</td>' +
                     '<td>৳' + fmt(inv.invoiceTotalAmount) + '</td>' +
                     '<td>৳' + fmt(inv.paidAmount) + '</td>' +
                     '</tr>';
             });
         }
+
+        var gw = calcGatewayCharge(g, totalPaid);
+        var grandTotal = totalPaid + gw.charge;
 
         var html =
         '<div class="rcpt">' +
@@ -502,15 +615,16 @@
             '<thead><tr>' +
                 '<th>SN</th>' +
                 '<th>Description</th>' +
+                '<th>Billing Period</th>' +
                 '<th>Unit</th>' +
                 '<th>Unit Price</th>' +
                 '<th>Line Total</th>' +
             '</tr></thead>' +
             '<tbody>' + invRows + '</tbody>' +
-            '<tfoot><tr>' +
-                '<td colspan="4">মোট পরিশোধিত</td>' +
-                '<td>৳' + fmt(totalPaid) + '</td>' +
-            '</tr></tfoot>' +
+            '<tfoot>' +
+                (gw.isOnline ? '<tr style="color:#ea580c;"><td colspan="5"><i class="fas fa-university me-1"></i>গেটওয়ে চার্জ (' + (gw.isSmsType ? '1.9%' : '1%') + ')</td><td>৳' + fmtDec(gw.charge) + '</td></tr>' : '') +
+                (gw.isOnline ? '<tr style="background:#f0fdf4;font-weight:800;"><td colspan="5">সর্বমোট পরিশোধ</td><td>৳' + fmtDec(grandTotal) + '</td></tr>' : '') +
+            '</tfoot>' +
         '</table>' +
 
         // ── Bottom section ────────────────────────────────────────
@@ -523,12 +637,8 @@
                     '<i class="fas fa-info-circle"></i> এই রিসিটটি কম্পিউটার দ্বারা তৈরি।' +
                 '</div>' +
             '</div>' +
-            '<div class="rcpt-bottom-right">' +
-                '<table class="rcpt-summary">' +
-                    '<tr><td>Total:</td><td>৳' + fmt(totalPaid) + '</td></tr>' +
-                    '<tr><td>Paid:</td><td>৳' + fmt(amt) + '</td></tr>' +
-                    '<tr class="rcpt-sum-total"><td>Total Paid (' + invCount + ' inv):</td><td>৳' + fmt(amt) + '</td></tr>' +
-                '</table>' +
+            '<div class="rcpt-bottom-right" style="display:flex;align-items:center;justify-content:center;">' +
+                '<div class="paid-stamp"><span class="paid-stamp-main">PAID</span><span class="paid-stamp-sub">Thank You</span></div>' +
             '</div>' +
         '</div>' +
 

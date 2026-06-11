@@ -105,7 +105,8 @@
         $('#printStyleCategory').prop('checked', ms.printStyleCategory);
         $('#printBarcode').prop('checked', ms.printBarcode || false);
         $('#measurementTopSpace').val(ms.topSpace);
-        $('#measurementFontSize').val(ms.fontSize);
+        $('#measurementFontSize').val(ms.fontSize && ms.fontSize > 0 ? ms.fontSize : 12);
+        $('#styleFontSize').val(ms.styleFontSize && ms.styleFontSize > 0 ? ms.styleFontSize : (ms.fontSize && ms.fontSize > 0 ? ms.fontSize : 14));
 
         // Receipt settings
         const rs = settings.moneyReceipt;
@@ -135,7 +136,8 @@
             printStyleCategory: $('#printStyleCategory').is(':checked'),
             printBarcode: $('#printBarcode').is(':checked'),
             topSpace: parseInt($('#measurementTopSpace').val()) || 0,
-            fontSize: parseInt($('#measurementFontSize').val()) || 14
+            fontSize: parseInt($('#measurementFontSize').val()) || 12,
+            styleFontSize: parseInt($('#styleFontSize').val()) || 14
         };
 
         console.log('Saving measurement settings:', settings);

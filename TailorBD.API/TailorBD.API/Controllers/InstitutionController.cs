@@ -254,6 +254,7 @@ namespace TailorBD.API.Controllers
                         Print_Barcode,
                         Print_TopSpace, 
                         Print_Font_Size,
+                        Print_Style_Font_Size,
                         M_Receipt_ShopName,
                         M_Receipt_ServedBy,
                         M_Receipt_Barcode,
@@ -326,7 +327,10 @@ namespace TailorBD.API.Controllers
                             printStyleCategory = SafeGetBoolean("Print_S_Category"),
                             printBarcode = SafeGetBoolean("Print_Barcode"),
                             topSpace = SafeGetInt32("Print_TopSpace"),
-                            fontSize = SafeGetInt32("Print_Font_Size")
+                            fontSize = SafeGetInt32("Print_Font_Size") is var mfs && mfs > 0 ? mfs : 12,
+                            styleFontSize = SafeGetInt32("Print_Style_Font_Size") is var sfs && sfs > 0
+                                ? sfs
+                                : (SafeGetInt32("Print_Font_Size") is var mfs2 && mfs2 > 0 ? mfs2 : 12)
                         },
                         moneyReceipt = new
                         {
@@ -393,7 +397,8 @@ namespace TailorBD.API.Controllers
                         Print_S_Category = @Print_S_Category,
                         Print_Barcode = @Print_Barcode,
                         Print_TopSpace = @Print_TopSpace,
-                        Print_Font_Size = @Print_Font_Size
+                        Print_Font_Size = @Print_Font_Size,
+                        Print_Style_Font_Size = @Print_Style_Font_Size
                     WHERE InstitutionID = @InstitutionID";
 
                 using var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
@@ -410,6 +415,7 @@ namespace TailorBD.API.Controllers
                 command.Parameters.AddWithValue("@Print_Barcode", settings.PrintBarcode);
                 command.Parameters.AddWithValue("@Print_TopSpace", settings.TopSpace);
                 command.Parameters.AddWithValue("@Print_Font_Size", settings.FontSize);
+                command.Parameters.AddWithValue("@Print_Style_Font_Size", settings.StyleFontSize);
 
                 await command.ExecuteNonQueryAsync();
 
@@ -1603,6 +1609,7 @@ namespace TailorBD.API.Controllers
         public bool PrintBarcode { get; set; }
         public int TopSpace { get; set; }
         public int FontSize { get; set; }
+        public int StyleFontSize { get; set; }
     }
 
     public class MoneyReceiptPrintSettingsModel

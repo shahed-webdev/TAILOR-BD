@@ -147,6 +147,10 @@
         if (mSettings.topSpace !== undefined) {
             document.documentElement.style.setProperty('--measurement-top-space', mSettings.topSpace + 'px');
         }
+        const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
+        const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+        document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+        document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
         if (printSettings.moneyReceipt && printSettings.moneyReceipt.fontSize) {
             document.documentElement.style.setProperty('--print-font-size', printSettings.moneyReceipt.fontSize + 'px');
         }
@@ -242,8 +246,8 @@
                     if (valid.length > 0) validGroups.push({ gId, valid });
                 });
 
-                const MAX_COLS = 10;
-                const fontSize = (mSettings.fontSize || 14) + 'px';
+                const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
+                const MAX_COLS = getMaxMeasurementColsPerRow(mFont);
                 const $outerTable = $('<table class="measurement-groups-table"></table>');
                 const $outerTbody = $('<tbody></tbody>');
 
@@ -259,12 +263,12 @@
                         valid.forEach(function (m, idx) {
                             if (mSettings.printMeasurementName) {
                                 const $typeRow = $('<tr></tr>');
-                                $typeRow.append(`<td class="measurement-type-cell" style="font-size:${fontSize};">${escapeHtml(m.type)}</td>`);
+                                $typeRow.append(`<td class="measurement-type-cell">${escapeHtml(m.type)}</td>`);
                                 $innerTbody.append($typeRow);
                             }
 
                             const $valRow = $('<tr></tr>');
-                            $valRow.append(`<td class="measurement-value-cell" style="font-size:${fontSize};">${escapeHtml(m.value)}</td>`);
+                            $valRow.append(`<td class="measurement-value-cell">${escapeHtml(m.value)}</td>`);
                             $innerTbody.append($valRow);
 
                             if (idx < valid.length - 1) {
@@ -307,7 +311,7 @@
 
                 const stylesText = catParts.join(' ');
                 if (stylesText) {
-                    $detailsSection.append(`<div class="styles-section">স্টাইল: ${stylesText}</div>`);
+                    $detailsSection.append(`<div class="styles-section">${stylesText}</div>`);
                 }
             }
 
@@ -321,6 +325,13 @@
         });
 
         $container.append($mainWrap);
+
+        const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
+        const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+        document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+        document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
+        $('.measurement-type-cell, .measurement-value-cell').css({ fontSize: mFont + 'px', color: '#000' });
+        $('.styles-section, .details-section').css('font-size', sFont + 'px');
 
         // Apply border hide state after render
         if ($('#hideBorderCheckbox').is(':checked')) {
@@ -349,102 +360,130 @@
         const px = map[size] || 384;
         const widthInInches = parseFloat(size) || 4;
         document.documentElement.style.setProperty('--print-width', widthInInches + 'in');
-        $('.measurements-main-container').css({ 'max-width': px + 'px', 'width': '100%' });
+        $('.measurements-main-container').css({ 'max-width': px + 'px', 'width': '100%', 'margin': '0 auto' });
         $('body').attr('data-print-size', size);
-        fitMeasurementTablesToPaper();
-    }
-
-    function getPrintWidthPixels() {
-        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480 };
-        const size = getSelectedPrintSize();
-        return map[size] || 384;
-    }
-
-    function fitMeasurementTablesToPaper() {
-        const borderReserve = 4;
-        const $main = $('.measurements-main-container').first();
-        let availableWidth = $main.length ? ($main.innerWidth() - borderReserve) : 0;
-        if (!availableWidth || availableWidth < 80) {
-            availableWidth = getPrintWidthPixels() - 16;
-        }
-
-        $('.measurement-table-fit').each(function () {
-            const $wrap = $(this);
-            let $table = $wrap.find('.measurement-groups-table').first();
-            if (!$table.length) return;
-
-            const $existingBox = $table.parent('.measurement-table-scale-box');
-            if ($existingBox.length) {
-                $existingBox.replaceWith($table);
-            }
-
-            $table.css({ transform: 'none', width: 'auto', display: 'table' });
-            $wrap.css({ height: 'auto', width: '100%', padding: 0 });
-
-            const tableEl = $table[0];
-            const tableWidth = Math.ceil(Math.max(
-                tableEl.getBoundingClientRect().width,
-                tableEl.scrollWidth,
-                tableEl.offsetWidth,
-                1
-            ));
-            const tableHeight = Math.ceil(Math.max(
-                tableEl.getBoundingClientRect().height,
-                tableEl.scrollHeight,
-                tableEl.offsetHeight,
-                1
-            ));
-            const scale = (availableWidth - borderReserve) / tableWidth;
-            const scaledW = Math.ceil(tableWidth * scale) + borderReserve;
-            const scaledH = Math.ceil(tableHeight * scale) + 2;
-
-            $table.wrap('<div class="measurement-table-scale-box"></div>');
-            const $scaleBox = $table.parent();
-
-            $scaleBox.css({
-                width: scaledW + 'px',
-                height: scaledH + 'px',
-                margin: '0 auto',
-                overflow: 'visible'
-            });
-            $table.css({
-                transform: 'scale(' + scale + ')',
-                transformOrigin: 'top left',
-                width: tableWidth + 'px'
-            });
-            $wrap.css('height', scaledH + 'px');
-        });
     }
 
     // ── PDF helpers ───────────────────────────────────────────────
+
+    const PDF_A4_WIDTH_MM = 210;
+    const PDF_A4_HEIGHT_MM = 297;
+    const PDF_MARGIN_MM = 10;
 
     function getSelectedPrintSize() {
         return $('#printSizeSelect').val() || '4';
     }
 
+    function getPdfCaptureElement() {
+        return document.querySelector('#cmpPrintContainer .measurements-main-container')
+            || document.getElementById('cmpPrintContainer');
+    }
+
+    function waitForFonts() {
+        if (document.fonts && document.fonts.ready) {
+            return document.fonts.ready.catch(function () { return undefined; });
+        }
+        return Promise.resolve();
+    }
+
+    function captureForPdf(element) {
+        document.body.classList.add('pdf-export-mode');
+
+        return waitForFonts().then(function () {
+            return new Promise(function (resolve) {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(resolve);
+                });
+            });
+        }).then(function () {
+            const width = Math.max(element.scrollWidth, element.offsetWidth, 1);
+            const height = Math.max(element.scrollHeight, element.offsetHeight, 1);
+
+            return html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                width: width,
+                height: height,
+                scrollX: 0,
+                scrollY: 0,
+                onclone: function (clonedDoc) {
+                    clonedDoc.body.classList.add('pdf-export-mode');
+                    const sidebar = clonedDoc.getElementById('app-sidebar');
+                    if (sidebar) sidebar.style.display = 'none';
+                    const navbar = clonedDoc.getElementById('app-navbar');
+                    if (navbar) navbar.style.display = 'none';
+                    const main = clonedDoc.querySelector('.main-content');
+                    if (main) main.style.marginLeft = '0';
+                    clonedDoc.querySelectorAll('.no-print').forEach(function (el) {
+                        el.style.display = 'none';
+                    });
+                    const cloneTarget = clonedDoc.querySelector('#cmpPrintContainer .measurements-main-container')
+                        || clonedDoc.getElementById('cmpPrintContainer');
+                    if (cloneTarget) {
+                        cloneTarget.style.overflow = 'visible';
+                        cloneTarget.style.background = '#ffffff';
+                    }
+                }
+            });
+        }).finally(function () {
+            document.body.classList.remove('pdf-export-mode');
+        });
+    }
+
+    function addCanvasToA4Pdf(pdf, canvas, contentWidthMm) {
+        const margin = PDF_MARGIN_MM;
+        const pageUsableHeight = PDF_A4_HEIGHT_MM - (margin * 2);
+        const xOffset = (PDF_A4_WIDTH_MM - contentWidthMm) / 2;
+        const imgWidth = contentWidthMm;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const imgData = canvas.toDataURL('image/png');
+
+        if (imgHeight <= pageUsableHeight) {
+            pdf.addImage(imgData, 'PNG', xOffset, margin, imgWidth, imgHeight);
+            return;
+        }
+
+        let rendered = 0;
+        let pageIndex = 0;
+        while (rendered < imgHeight) {
+            if (pageIndex > 0) pdf.addPage();
+            pdf.addImage(imgData, 'PNG', xOffset, margin - rendered, imgWidth, imgHeight);
+            rendered += pageUsableHeight;
+            pageIndex++;
+        }
+    }
+
     function createPdfFromElement(element) {
         const sizeInInches = parseFloat(getSelectedPrintSize()) || 4;
-        const widthMm = sizeInInches * 25.4;
-        return html2canvas(element, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' })
-            .then(function (canvas) {
-                const { jsPDF } = window.jspdf;
-                const heightMm = (canvas.height * widthMm) / canvas.width;
-                const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: [widthMm, heightMm] });
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, widthMm, heightMm);
-                return pdf;
-            });
+        const contentWidthMm = sizeInInches * 25.4;
+
+        return captureForPdf(element).then(function (canvas) {
+            if (!canvas || canvas.width < 2 || canvas.height < 2) {
+                throw new Error('Empty canvas');
+            }
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            addCanvasToA4Pdf(pdf, canvas, contentWidthMm);
+            return pdf;
+        });
     }
 
     window.downloadPDF = function () {
-        const element = document.getElementById('cmpPrintContainer');
-        if (!element) return;
+        const element = getPdfCaptureElement();
+        if (!element || !element.querySelector('.measurement-item-container, .cmp-slip')) {
+            showAlert('error', 'প্রিন্ট করার মতো কোনো মাপ পাওয়া যায়নি');
+            return;
+        }
         $('#loadingSpinner').show();
         const custName = (pageData && pageData.customer && pageData.customer.customerName) ? pageData.customer.customerName : 'Customer';
         createPdfFromElement(element)
             .then(function (pdf) {
                 pdf.save(`Measurement_${custName}.pdf`);
                 $('#loadingSpinner').hide();
-                showAlert('success', 'পিডিএফ সফলভাবে ডাউনলোড হয়েছে');
+                showAlert('success', 'A4 পিডিএফ সফলভাবে ডাউনলোড হয়েছে');
             })
             .catch(function () {
                 $('#loadingSpinner').hide();
@@ -453,8 +492,11 @@
     };
 
     window.shareAsPDF = function () {
-        const element = document.getElementById('cmpPrintContainer');
-        if (!element) return;
+        const element = getPdfCaptureElement();
+        if (!element || !element.querySelector('.measurement-item-container, .cmp-slip')) {
+            showAlert('error', 'শেয়ার করার মতো কোনো মাপ পাওয়া যায়নি');
+            return;
+        }
         $('#loadingSpinner').show();
         const custName = (pageData && pageData.customer && pageData.customer.customerName) ? pageData.customer.customerName : 'Customer';
         const filename = `Measurement_${custName}.pdf`;
@@ -472,7 +514,7 @@
                 }
                 $('#loadingSpinner').hide();
                 pdf.save(filename);
-                showAlert('info', 'পিডিএফ ডাউনলোড করা হয়েছে');
+                showAlert('info', 'A4 পিডিএফ ডাউনলোড করা হয়েছে');
             })
             .catch(function () {
                 $('#loadingSpinner').hide();
@@ -489,8 +531,17 @@
             printMasterCopy: true,
             printMeasurementName: false,
             printStyleCategory: false,
-            fontSize: 14
+            fontSize: 12,
+            styleFontSize: 14
         };
+    }
+
+    function getMaxMeasurementColsPerRow(fontPx) {
+        const fs = fontPx > 0 ? fontPx : 12;
+        if (fs <= 12) return 8;
+        if (fs <= 14) return 7;
+        if (fs <= 18) return 6;
+        return 5;
     }
 
     function showAlert(type, message) {

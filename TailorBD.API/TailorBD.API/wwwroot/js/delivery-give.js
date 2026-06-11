@@ -6,6 +6,7 @@
     let registrationId = null;
     let allOrders = [];
     let currentPage = 1;
+    let deliveryFilter = 'all';
     const PAGE_SIZE = 100;
 
     // Initialize page
@@ -108,10 +109,14 @@
             timeout: 60000,
             success: function(response) {
                 if (response.success && response.data && response.data.orders.length > 0) {
-                    allOrders = response.data.orders;
+                    allOrders = sortOrdersByDeliveryPriority(response.data.orders);
+                    deliveryFilter = 'all';
                     currentPage = 1;
-                    renderOrdersTable(allOrders, currentPage);
+                    updateDeliveryFilterBar();
+                    renderOrdersTable(getFilteredOrders(), currentPage);
                 } else {
+                    allOrders = [];
+                    $('#deliveryFilterBar').hide();
                     container.html('<div class="empty-message"><span class="lang-content" data-en="No ready-to-deliver orders found" data-bn="ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি">ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি</span></div>');
                 }
             },
@@ -147,20 +152,107 @@
     }
 
     window.goToPage = function(page) {
-        const totalPages = Math.ceil(allOrders.length / PAGE_SIZE);
+        const filtered = getFilteredOrders();
+        const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
         if (page < 1 || page > totalPages) return;
         currentPage = page;
-        renderOrdersTable(allOrders, currentPage);
+        renderOrdersTable(filtered, currentPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    window.setDeliveryFilter = function(filter) {
+        deliveryFilter = filter;
+        currentPage = 1;
+        updateDeliveryFilterBar();
+        renderOrdersTable(getFilteredOrders(), currentPage);
+    };
+
+    function getDeliveryCategory(deliveryDateStr) {
+        if (!deliveryDateStr) return 'normal';
+        const today = localDateStr(new Date());
+        const dd = localDateStr(parseLocalDate(deliveryDateStr));
+        if (dd === today) return 'today';
+        if (dd < today) return 'overdue';
+        return 'normal';
+    }
+
+    function sortOrdersByDeliveryPriority(orders) {
+        const priority = { today: 0, overdue: 1, normal: 2 };
+        return orders.slice().sort(function(a, b) {
+            const catA = getDeliveryCategory(a.deliveryDate);
+            const catB = getDeliveryCategory(b.deliveryDate);
+            if (priority[catA] !== priority[catB]) {
+                return priority[catA] - priority[catB];
+            }
+            const dateA = a.deliveryDate ? localDateStr(parseLocalDate(a.deliveryDate)) : '';
+            const dateB = b.deliveryDate ? localDateStr(parseLocalDate(b.deliveryDate)) : '';
+            if (catA === 'overdue') return dateA.localeCompare(dateB);
+            return dateA.localeCompare(dateB);
+        });
+    }
+
+    function getFilteredOrders() {
+        if (deliveryFilter === 'all') return allOrders;
+        return allOrders.filter(function(o) {
+            return getDeliveryCategory(o.deliveryDate) === deliveryFilter;
+        });
+    }
+
+    function getDeliveryCounts() {
+        const counts = { all: allOrders.length, today: 0, overdue: 0, normal: 0 };
+        allOrders.forEach(function(o) {
+            counts[getDeliveryCategory(o.deliveryDate)]++;
+        });
+        return counts;
+    }
+
+    function updateDeliveryFilterBar() {
+        if (!allOrders.length) {
+            $('#deliveryFilterBar').hide();
+            return;
+        }
+        const counts = getDeliveryCounts();
+        $('#deliveryFilterBar').show();
+        $('#dfCountAll').text(counts.all);
+        $('#dfCountToday').text(counts.today);
+        $('#dfCountOverdue').text(counts.overdue);
+        $('#dfCountNormal').text(counts.normal);
+        $('#deliveryFilterBar .df-btn').removeClass('active');
+        $('#deliveryFilterBar .df-btn[data-filter="' + deliveryFilter + '"]').addClass('active');
+    }
+
     function formatShortDate(dateString) {
         if (!dateString) return '-';
-        const d = new Date(dateString);
+        const d = parseLocalDate(dateString);
+        if (!d) return '-';
         const dd = String(d.getDate()).padStart(2, '0');
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const yy = String(d.getFullYear()).slice(-2);
         return `${dd}/${mm}/${yy}`;
+    }
+
+    function localDateStr(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function parseLocalDate(dateStr) {
+        if (!dateStr) return null;
+        const s = String(dateStr).split('T')[0];
+        const parts = s.split('-');
+        if (parts.length !== 3) return null;
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+
+    function getDeliveryRowClass(deliveryDateStr) {
+        if (!deliveryDateStr) return '';
+        const today = localDateStr(new Date());
+        const dd = localDateStr(parseLocalDate(deliveryDateStr));
+        if (dd === today) return 'row-today';
+        if (dd < today) return 'row-overdue';
+        return '';
     }
 
     function clipCell(text, maxLen) {
@@ -175,7 +267,11 @@
         const container = $('#ordersTableContainer');
 
         if (!orders || orders.length === 0) {
-            container.html('<div class="empty-message"><span class="lang-content" data-en="No ready-to-deliver orders found" data-bn="ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি">ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি</span></div>');
+            const msg = allOrders.length > 0 && deliveryFilter !== 'all'
+                ? (window.currentLang === 'en' ? 'No orders in this filter' : 'এই ফিল্টারে কোনো অর্ডার পাওয়া যায়নি')
+                : '<span class="lang-content" data-en="No ready-to-deliver orders found" data-bn="ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি">ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি</span>';
+            container.html('<div class="empty-message">' + msg + '</div>');
+            if (window.updateLanguage) window.updateLanguage();
             return;
         }
 
@@ -227,6 +323,7 @@
         pageOrders.forEach(order => {
             const orderDate    = formatShortDate(order.orderDate);
             const deliveryDate = formatShortDate(order.deliveryDate);
+            const rowClass     = getDeliveryRowClass(order.deliveryDate);
             const isFullyCompleted = (order.workStatus || '').toLowerCase() === 'completed';
             const statusClass = isFullyCompleted ? 'status-ready' : 'status-partial';
             const statusText  = isFullyCompleted
@@ -238,7 +335,7 @@
             const noteFull  = order.details || '-';
 
             html += `
-                <tr>
+                <tr class="${rowClass}">
                     <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
                     <td><strong>${order.orderSerialNumber}</strong></td>
                     <td><span class="cell-clip" title="${escapeHtml(order.customerName)}">${escapeHtml(clipCell(order.customerName, 18))}</span></td>
@@ -541,31 +638,48 @@
         const showAccount = data.accounts && data.accounts.length > 0;
 
         let itemsHtml = '';
+        let itemsCardsHtml = '';
         (data.items || []).forEach(item => {
             const maxDeliver = item.remainingQty;
             const defaultQty = Math.min(item.readyQty > 0 ? item.readyQty : item.remainingQty, maxDeliver);
+            const qtyInput = maxDeliver > 0
+                ? `<input type="number" class="form-control form-control-sm pd-qty-input text-center"
+                        data-orderlist-id="${item.orderListId}"
+                        data-max="${maxDeliver}"
+                        value="${defaultQty}" min="0" max="${maxDeliver}">`
+                : '<span class="text-muted">-</span>';
+
             itemsHtml += `
             <tr>
                 <td><strong>${item.dressName}</strong></td>
                 <td class="text-center">${item.totalQty}</td>
                 <td class="text-center text-success">${item.deliveredQty}</td>
                 <td class="text-center text-warning">${item.remainingQty}</td>
-                <td class="text-center">
-                    ${maxDeliver > 0
-                        ? `<input type="number" class="form-control form-control-sm pd-qty-input text-center"
-                                data-orderlist-id="${item.orderListId}"
-                                data-max="${maxDeliver}"
-                                value="${defaultQty}" min="0" max="${maxDeliver}"
-                                style="width:70px; display:inline-block;">`
-                        : '<span class="text-muted">-</span>'
-                    }
-                </td>
+                <td class="text-center">${qtyInput}</td>
             </tr>`;
+
+            itemsCardsHtml += `
+            <div class="pd-item-card">
+                <div class="pd-item-name">${item.dressName}</div>
+                <div class="pd-item-stats">
+                    <span><strong>মোট:</strong> ${item.totalQty}</span>
+                    <span><strong>পূর্বে:</strong> <span class="text-success">${item.deliveredQty}</span></span>
+                    <span><strong>বাকি:</strong> <span class="text-warning">${item.remainingQty}</span></span>
+                </div>
+                <div class="pd-item-qty">
+                    <label>এখন দিন</label>
+                    ${qtyInput}
+                </div>
+            </div>`;
         });
 
+        const deliveryDateInput = (deliveryDateVal && String(deliveryDateVal).includes('T'))
+            ? String(deliveryDateVal).split('T')[0]
+            : deliveryDateVal;
+
         const html = `
-        <div class="table-responsive mb-3">
-            <table class="table table-sm table-bordered mb-0" style="min-width:500px;">
+        <div class="table-responsive mb-3 d-none d-md-block">
+            <table class="table table-sm table-bordered mb-0">
                 <thead class="table-success">
                     <tr>
                         <th>পোশাক</th>
@@ -578,16 +692,17 @@
                 <tbody>${itemsHtml}</tbody>
             </table>
         </div>
+        <div class="pd-items-mobile d-md-none mb-3">${itemsCardsHtml}</div>
         <div class="row g-2">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold"><i class="fas fa-calendar me-1"></i>ডেলিভারি তারিখ <span class="text-danger">*</span></label>
-                <input type="date" id="pdDeliveryDate" class="form-control" value="${deliveryDateVal}">
+                <input type="date" id="pdDeliveryDate" class="form-control" value="${deliveryDateInput}">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold"><i class="fas fa-percentage me-1"></i>ছাড় (টাকা)</label>
                 <input type="number" id="pdDiscount" class="form-control" value="0" min="0" step="0.01">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold d-flex justify-content-between">
                     <span><i class="fas fa-money-bill me-1"></i>নগদ পরিশোধ</span>
                     <small class="text-muted">বাকি: <span id="pdDueDisplay">${dueAmount}</span></small>
@@ -595,7 +710,7 @@
                 <input type="number" id="pdPaidAmount" class="form-control" value="${dueAmount}" min="0" step="0.01">
             </div>
             ${showAccount ? `
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold"><i class="fas fa-university me-1"></i>অ্যাকাউন্ট</label>
                 <select id="pdAccount" class="form-select">${accountOptions}</select>
             </div>` : '<input type="hidden" id="pdAccount" value="">'}
@@ -621,7 +736,7 @@
 
         const items = [];
         let anySelected = false;
-        $('.pd-qty-input').each(function() {
+        $('.pd-qty-input:visible').each(function() {
             const qty = parseInt($(this).val()) || 0;
             const max = parseInt($(this).data('max')) || 0;
             if (qty > max) {

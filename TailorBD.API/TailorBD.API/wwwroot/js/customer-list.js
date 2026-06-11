@@ -186,7 +186,7 @@
                 : `<span class="due-zero">0</span>`;
 
             const photoUrl = `/api/Customers/${c.customerId}/photo?institutionId=${institutionId}`;
-            const photoHtml = `<div class="cust-photo-wrap" onclick="openPhotoModal(${c.customerId})" title="ছবি পরিবর্তন করতে ক্লিক করুন">
+            const photoHtml = `<div class="cust-photo-wrap" data-cname="${escapeAttr(c.customerName)}" data-cphone="${escapeAttr(c.phone || '')}" onclick="openPhotoModal(${c.customerId}, this)" title="ছবি পরিবর্তন করতে ক্লিক করুন">
                 <img class="cust-photo" src="${photoUrl}" alt="ছবি"
                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                 <span class="cust-photo-placeholder" style="display:none;"><i class="fas fa-user"></i></span>
@@ -208,8 +208,8 @@
                     <span class="customer-number">(${c.customerNumber})</span>${escapeHtml(c.customerName)}
                 </td>
                 <td class="view-cell">${escapeHtml(c.phone || '-')}</td>
-                <td class="view-cell">${escapeHtml(c.address || '-')}</td>
-                <td class="view-cell">${escapeHtml(c.description || '-')}</td>
+                <td class="view-cell col-address">${escapeHtml(c.address || '-')}</td>
+                <td class="view-cell col-desc">${escapeHtml(c.description || '-')}</td>
                 <td>${dueHtml}</td>
                 <td>${c.date ? formatDate(c.date) : '-'}</td>
                 <td class="view-cell">${photoHtml}</td>
@@ -225,8 +225,8 @@
                 <td></td>
                 <td><input class="edit-input" id="edit_name_${c.customerId}" value="${escapeAttr(c.customerName)}" placeholder="নাম"></td>
                 <td><input class="edit-input" id="edit_phone_${c.customerId}" value="${escapeAttr(c.phone)}" placeholder="মোবাইল"></td>
-                <td><input class="edit-input" id="edit_address_${c.customerId}" value="${escapeAttr(c.address)}" placeholder="ঠিকানা"></td>
-                <td><input class="edit-input" id="edit_desc_${c.customerId}" value="${escapeAttr(c.description)}" placeholder="বিবরণ"></td>
+                <td class="col-address"><input class="edit-input" id="edit_address_${c.customerId}" value="${escapeAttr(c.address)}" placeholder="ঠিকানা"></td>
+                <td class="col-desc"><input class="edit-input" id="edit_desc_${c.customerId}" value="${escapeAttr(c.description)}" placeholder="বিবরণ"></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -245,7 +245,7 @@
         }
 
         $('#customerTableContainer').html(`
-            <table>
+            <table class="customer-list-table">
                 <thead>
                     <tr>
                         <th style="width:80px;" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
@@ -253,8 +253,8 @@
                         <th class="sortable" data-sort="customerNumber" data-en="No." data-bn="কাস্টমার নং">কাস্টমার নং${sortIcon('customerNumber')}</th>
                         <th class="sortable" data-sort="customerName" data-en="Name" data-bn="নাম">নাম${sortIcon('customerName')}</th>
                         <th class="sortable" data-sort="phone" data-en="Mobile" data-bn="মোবাইল">মোবাইল${sortIcon('phone')}</th>
-                        <th data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
-                        <th data-en="Description" data-bn="বিবরণ">বিবরণ</th>
+                        <th class="col-address" data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
+                        <th class="col-desc" data-en="Description" data-bn="বিবরণ">বিবরণ</th>
                         <th class="sortable" data-sort="customerDue" data-en="Due" data-bn="বাকি টাকা">বাকি টাকা${sortIcon('customerDue')}</th>
                         <th class="sortable" data-sort="date" data-en="Reg. Date" data-bn="নিবন্ধনের তারিখ">নিবন্ধনের তারিখ${sortIcon('date')}</th>
                         <th style="width:70px;" data-en="Photo" data-bn="ছবি">ছবি</th>
@@ -373,13 +373,17 @@
         });
     };
 
-    window.openPhotoModal = function (customerId) {
+    window.openPhotoModal = function (customerId, el) {
         photoTargetId = customerId;
         photoFile = null;
         $('#photoFileInput').val('');
         $('#photoPreviewImg').hide().attr('src', '');
         $('#photoPlaceholder').show();
         $('#btnSavePhoto').prop('disabled', false);
+
+        const $el = el ? $(el) : null;
+        $('#photoModalCustomerName').text($el ? ($el.data('cname') || '-') : '-');
+        $('#photoModalCustomerPhone').text($el ? ($el.data('cphone') || '-') : '-');
 
         // Load existing photo
         var img = new Image();

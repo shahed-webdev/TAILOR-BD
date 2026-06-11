@@ -144,8 +144,31 @@
                 }, 600);
             });
 
+        // Price form — Enter key adds item (same as "+ যোগ করুন" button)
+        $('#priceFor, #priceAmount').on('keydown', function(e) {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+
+            const priceFor = $('#priceFor').val().trim();
+            const priceAmount = parseFloat($('#priceAmount').val());
+
+            if (this.id === 'priceFor' && priceFor && (!priceAmount || priceAmount <= 0)) {
+                $('#priceAmount').focus();
+                return;
+            }
+
+            addPrice();
+        });
+
         // Disable back button
         preventBackNavigation();
+
+        if (window.MeasurementFractionBar) {
+            MeasurementFractionBar.init({
+                barSelector: '#measurementFractionBar',
+                inputSelector: '#measurementGrid .measurement-input'
+            });
+        }
     }
 
     // icon states for fabric input
@@ -625,9 +648,10 @@
 
         displayPriceList();
         
-        // Clear inputs
+        // Clear inputs and focus for next entry
         $('#priceFor').val('');
         $('#priceAmount').val('');
+        $('#priceFor').focus();
     };
 
     function displayPriceList() {

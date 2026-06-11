@@ -416,12 +416,16 @@
     }
 
     function selectSearchCustomer(customer) {
-        const name = customer.customerName || customer.CustomerName || '';
+        const no    = (customer.customerNumber || customer.CustomerNumber || '').toString();
+        const name  = customer.customerName   || customer.CustomerName   || '';
+        const phone = (customer.phone          || customer.Phone          || '').toString();
+
+        $('#searchCustomerNo').val(no);
         $('#searchCustomerName').val(name);
-        $('#searchCustomerNo').val(''); $('#searchCustomerPhone').val('');
+        $('#searchCustomerPhone').val(phone);
         $('#searchNoList, #searchNameList, #searchPhoneList').removeClass('show').empty();
         searchFocus = -1;
-        loadCustomerTable(1, '', name, '');
+        loadCustomerTable(1, no, name, phone);
     }
 
     function handleSearchKeyboard(e, listSelector) {

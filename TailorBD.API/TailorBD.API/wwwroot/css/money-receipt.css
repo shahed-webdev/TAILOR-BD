@@ -2,6 +2,7 @@
 :root {
     --print-width: 4in;
     --measurement-top-space: 0px;
+    --style-font-size: 14px;
 }
 
 body {
@@ -64,10 +65,135 @@ body {
     border-color: #1e7e34;
 }
 
+.action-bar-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .print-size-controls {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.print-size-controls .form-select {
+    width: auto;
+    min-width: 100px;
+}
+
+.receipt-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.receipt-tabs-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px 16px;
+    background: white;
+    padding: 10px 15px 0;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.receipt-tabs-bar .nav-tabs {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+    flex: 1 1 auto;
+}
+
+.measurement-tab-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    padding-bottom: 8px;
+}
+
+.measurement-border-check {
+    white-space: nowrap;
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 6px 12px;
+    box-shadow: 0 2px 6px rgba(255, 193, 7, 0.35);
+}
+
+.measurement-border-check .form-check-input {
+    width: 1.15em;
+    height: 1.15em;
+    margin-top: 0.15em;
+    border: 2px solid #ff9800;
+    cursor: pointer;
+}
+
+.measurement-border-check .form-check-input:checked {
+    background-color: #ff9800;
+    border-color: #e65100;
+}
+
+.measurement-border-check .form-check-label {
+    font-weight: 700;
+    color: #e65100;
+    cursor: pointer;
+    padding-left: 2px;
+}
+
+.measurement-pager-bar {
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 4px 10px;
+    box-shadow: 0 2px 6px rgba(255, 193, 7, 0.35);
+}
+
+.measurement-pager-btn {
+    background: #fff;
+    border: 2px solid #ff9800 !important;
+    color: #e65100 !important;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 4px 12px;
+    min-width: 52px;
+}
+
+.measurement-pager-btn:hover:not(:disabled) {
+    background: #ff9800;
+    color: #fff !important;
+    border-color: #e65100 !important;
+}
+
+.measurement-pager-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.measurement-page-info {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e65100;
+    white-space: nowrap;
+    padding: 0 4px;
+}
+
+.measurement-controls {
+    display: flex;
+    align-items: center;
 }
 
 .nav-tabs {
@@ -125,14 +251,21 @@ body {
     color: #000 !important;
 }
 
-.institution-name {
+.receipt-header .institution-name,
+.receipt-container .institution-name,
+#receiptInstitutionName {
     font-size: 24px;
     font-weight: bold;
     margin: 0;
-    padding: 0px 0;
+    padding: 0;
     color: #000 !important;
     font-family: 'Noto Sans Bengali', sans-serif;
+    background: none !important;
+    background-image: none !important;
     background-color: transparent !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #000 !important;
     display: block;
     line-height: 1.4;
     min-height: 1em;
@@ -141,14 +274,18 @@ body {
 /* Receipt page specific id to avoid conflicts with navbar/sidebar */
 #receiptInstitutionName {
     color: #000 !important;
-
 }
 
 @media print {
+    .receipt-header .institution-name,
+    .receipt-container .institution-name,
     #receiptInstitutionName {
-        color: #000 !important;
-      
+        background: none !important;
+        background-image: none !important;
+        -webkit-background-clip: border-box !important;
+        background-clip: border-box !important;
         -webkit-text-fill-color: #000 !important;
+        color: #000 !important;
     }
 }
 
@@ -528,7 +665,7 @@ body {
 .customer-name-section {
     text-align: center;
     font-weight: bold;
-    font-size: 14px;
+    font-size: var(--measurement-font-size, 14px);
     color: #000;
     padding-bottom: 5px;
 }
@@ -755,7 +892,7 @@ body {
 .styles-section {
     padding-bottom: 5px;
     padding-top: 5px;
-    font-size: 14px;
+    font-size: var(--style-font-size, 14px);
     font-style: italic;
     color: #000;
     page-break-inside: avoid;
@@ -766,12 +903,186 @@ body {
 .details-section {
     margin: 2px 0 0 0;
     padding-bottom: 0;
-    font-size: 14px;
+    font-size: var(--style-font-size, 14px);
     font-style: italic;
     color: #000;
     page-break-inside: avoid;
     page-break-after: avoid;
     height: auto;
+}
+
+/* Mobile / Tablet Screen */
+@media (max-width: 991.98px) {
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    .dashboard-content {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .page-header {
+        margin-bottom: 12px;
+    }
+
+    .page-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .action-bar {
+        padding: 12px;
+    }
+
+    .action-bar-inner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .action-buttons .btn {
+        margin: 0 !important;
+        width: 100%;
+        font-size: 12px;
+        padding: 8px 6px;
+        white-space: normal;
+        line-height: 1.25;
+    }
+
+    .action-buttons .btn-print-settings {
+        grid-column: 1 / -1;
+    }
+
+    .print-size-controls {
+        width: 100%;
+        justify-content: space-between;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+        margin-top: 2px;
+    }
+
+    .print-size-controls .form-select {
+        flex: 1;
+        max-width: none;
+    }
+
+    .nav-tabs {
+        padding: 8px 10px 0;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .receipt-tabs-bar {
+        padding: 8px 10px 0;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .measurement-tab-tools {
+        width: 100%;
+        padding-bottom: 8px;
+        border-top: 1px solid #eee;
+        padding-top: 8px;
+    }
+
+    .measurement-controls {
+        width: 100%;
+    }
+
+    .nav-tabs .nav-item {
+        flex-shrink: 0;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 8px 14px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .tab-content {
+        border-radius: 0 0 6px 6px;
+    }
+
+    .receipt-container {
+        margin: 8px 0;
+        padding: 0 10px 12px;
+        max-width: 100%;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+    }
+
+    .institution-name {
+        font-size: 18px;
+    }
+
+    .customer-order-container {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .customer-info-box,
+    .order-info-box {
+        padding: 6px 8px;
+    }
+
+    .receipt-table {
+        min-width: 280px;
+        font-size: 11px;
+    }
+
+    .receipt-table thead th {
+        font-size: 10px;
+        white-space: normal;
+        line-height: 1.2;
+        padding: 4px 2px;
+    }
+
+    .receipt-table tbody td {
+        font-size: 10px;
+        padding: 4px 2px;
+    }
+
+    .payment-summary .summary-table {
+        font-size: 12px;
+    }
+
+    .measurement-controls {
+        padding: 0 4px;
+    }
+
+    .measurement-controls .d-flex {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .measurement-controls .form-select {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    #measurementPager {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .measurement-container {
+        padding: 0 4px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 /* Print Styles */
@@ -877,21 +1188,42 @@ body {
 
     .measurement-table-fit {
         width: 100% !important;
-        overflow: visible;
+        max-width: 100% !important;
+        overflow: hidden !important;
         padding: 0;
         box-sizing: border-box;
     }
 
+    .measurement-groups-table > tbody > tr > td,
+    .measurement-groups-table .measurement-type-cell,
+    .measurement-groups-table .measurement-value-cell {
+        overflow: hidden !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .measurement-groups-table {
+        table-layout: fixed !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     .measurement-table-scale-box {
         margin: 0 auto !important;
-        overflow: visible !important;
+        overflow: hidden !important;
     }
 
     .measurement-groups-table .measurement-type-cell,
     .measurement-groups-table .measurement-value-cell {
-        white-space: nowrap !important;
-        word-break: keep-all !important;
-        overflow-wrap: normal !important;
+        color: #000 !important;
+        -webkit-text-fill-color: #000 !important;
+        font-weight: 700 !important;
+        -webkit-font-smoothing: auto !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        overflow: hidden !important;
     }
 
     /* Apply top margin from settings - directly to receipt header */
@@ -902,10 +1234,17 @@ body {
         background-color: white !important;
     }
     
-    .institution-name,
+    .receipt-header .institution-name,
+    .receipt-container .institution-name,
+    #receiptInstitutionName,
     .institution-subtitle,
     .institution-contact {
          color: #000 !important;
+         background: none !important;
+         background-image: none !important;
+         -webkit-background-clip: border-box !important;
+         background-clip: border-box !important;
+         -webkit-text-fill-color: #000 !important;
     }
 
     /* Apply font size from settings */
@@ -1238,35 +1577,112 @@ body.print-size-5 .receipt-table tbody td {
 
 .measurement-table-fit {
     width: 100%;
-    overflow: visible;
+    max-width: 100%;
+    overflow: hidden;
     padding: 0;
     box-sizing: border-box;
 }
 
 .measurement-table-scale-box {
     margin: 0 auto;
-    overflow: visible;
+    overflow: hidden;
 }
 
-.measurement-groups-table { border-collapse: collapse; table-layout: auto; width: auto; }
-.measurement-groups-table > tbody > tr > td { padding: 0 1px; vertical-align: top; width: auto; }
-.measurement-groups-table > tbody > tr > td table.measurement-group-inner { border: 1px solid #666; border-collapse: collapse; width: auto; table-layout: auto; }
-.measurement-groups-table .measurement-type-cell,
-.measurement-groups-table .measurement-value-cell {
-    padding: 2px 4px;
+.measurement-groups-table { border-collapse: collapse; table-layout: fixed; width: 100%; max-width: 100%; }
+.measurement-groups-table > tbody > tr > td {
+    padding: 0 1px;
+    vertical-align: top;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: #fff;
+}
+.measurement-groups-table > tbody > tr > td table.measurement-group-inner {
+    border: 1px solid #666;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+}
+.measurement-groups-table .measurement-group-inner td {
+    max-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.measurement-groups-table .measurement-type-cell {
+    padding: 2px 1px;
     text-align: center;
     border: none;
-    font-weight: bold;
-    white-space: nowrap;
-    word-break: keep-all;
-    overflow-wrap: normal;
+    font-weight: 600;
+    color: #000;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    box-sizing: border-box;
+    line-height: 1.25;
 }
-.measurement-groups-table .measurement-type-cell { padding-top: 0; padding-bottom: 0; }
+.measurement-groups-table .measurement-value-cell {
+    padding: 3px 1px;
+    text-align: center;
+    border: none;
+    font-weight: 700;
+    color: #000;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    box-sizing: border-box;
+    line-height: 1.25;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+    text-rendering: optimizeLegibility;
+}
 .measurement-groups-table .measurement-separator {
     padding: 0;
     border: none;
     border-top: 1px solid #000;
     line-height: 0;
     font-size: 0;
+    height: 1px;
 }
 
+/* PDF export — A4 capture like print preview */
+body.pdf-export-mode #app-sidebar,
+body.pdf-export-mode #app-navbar,
+body.pdf-export-mode .no-print,
+body.pdf-export-mode #loadingSpinner,
+body.pdf-export-mode .nav-tabs,
+body.pdf-export-mode .receipt-tabs-bar,
+body.pdf-export-mode .measurement-tab-tools,
+body.pdf-export-mode .action-bar,
+body.pdf-export-mode .page-header {
+    display: none !important;
+}
+
+body.pdf-export-mode .main-content {
+    margin-left: 0 !important;
+}
+
+body.pdf-export-mode .dashboard-content {
+    padding: 0 !important;
+}
+
+body.pdf-export-mode .receipt-container,
+body.pdf-export-mode .measurements-main-container,
+body.pdf-export-mode .measurement-container,
+body.pdf-export-mode .measurement-item-container,
+body.pdf-export-mode .tab-content {
+    overflow: visible !important;
+    box-shadow: none !important;
+    background: #fff !important;
+}
+
+body.pdf-export-mode .receipt-header .institution-name,
+body.pdf-export-mode #receiptInstitutionName {
+    background: none !important;
+    background-image: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #000 !important;
+    color: #000 !important;
+}

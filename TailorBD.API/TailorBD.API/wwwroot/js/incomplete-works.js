@@ -433,7 +433,7 @@ async function renderOrdersTable(orders) {
             <tr class="${rowClass}" data-order-id="${order.orderId}">
                 <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
                 <td>
-                    <a href="order-measurements.html?orderId=${order.orderId}" class="view-measurement-link" target="_blank" title="${lang === 'en' ? 'View measurement' : 'মাপ দেখুন'}">
+                    <a href="order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}" class="view-measurement-link" target="_blank" title="${lang === 'en' ? 'View measurement' : 'মাপ দেখুন'}">
                         ${order.orderSerialNumber}
                     </a>
                 </td>
@@ -456,7 +456,7 @@ async function renderOrdersTable(orders) {
                 </td>
                 <td><input type="checkbox" class="sms-checkbox" data-order-id="${order.orderId}"></td>
                 <td>
-                    <i class="fas fa-print print-icon" onclick="window.open('order-measurements.html?orderId=${order.orderId}', '_blank')" title="${lang === 'en' ? 'Print' : 'প্রিন্ট'}"></i>
+                    <i class="fas fa-print print-icon" onclick="window.open('order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}', '_blank')" title="${lang === 'en' ? 'Print' : 'প্রিন্ট'}"></i>
                 </td>
             </tr>
         `;

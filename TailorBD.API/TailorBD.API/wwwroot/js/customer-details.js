@@ -40,13 +40,23 @@
         $(document).on('change', '#dressSelect', function () {
             const dressId = parseInt($(this).val());
             if (dressId > 0) loadMeasurements(dressId);
-            else $('#measurementArea').html('<div class="empty-msg">পোষাক নির্বাচন করুন</div>');
+            else {
+                $('#measurementArea').html('<div class="empty-msg">পোষাক নির্বাচন করুন</div>');
+                $('#measurementFractionBar').hide();
+            }
         });
 
         // Style checkbox highlight
         $(document).on('change', '.style-checkbox', function () {
             $(this).closest('.style-item').toggleClass('checked', this.checked);
         });
+
+        if (window.MeasurementFractionBar) {
+            MeasurementFractionBar.init({
+                barSelector: '#measurementFractionBar',
+                inputSelector: '#measurementArea .meas-input, #measurementArea .style-meas-input'
+            });
+        }
     });
 
     function loadCustomerProfile() {
@@ -96,6 +106,7 @@
 
     function loadMeasurements(dressId) {
         $('#measurementArea').html('<div class="loading">লোড হচ্ছে...</div>');
+        $('#measurementFractionBar').hide();
         $.get(`/api/customer-page/measurement-types?institutionId=${institutionId}&dressId=${dressId}&customerId=${customerId}`, function (r) {
             if (!r.success) { $('#measurementArea').html('<div class="empty-msg">লোড করতে সমস্যা হয়েছে</div>'); return; }
             const d = r.data;
@@ -103,6 +114,8 @@
                 $('#measurementArea').html('<div class="empty-msg">এই পোষাকের জন্য কোনো মাপের টেমপ্লেট যুক্ত করা হয়নি। <a href="#">মাপ যুক্ত করুন</a></div>');
                 return;
             }
+
+            $('#measurementFractionBar').show();
 
             let html = `<div class="measurement-section" id="measureGroups">`;
             d.groups.forEach(function (g) {

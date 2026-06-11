@@ -613,23 +613,23 @@ namespace TailorBD.API.Controllers
                     };
                 }
 
-                // Get order items (dress rows — payment optional for legacy orders)
+                // Get order items — one row per payment line; description = payment "For" (e.g. মুজুরি)
                 var itemsQuery = @"
                     SELECT
                         OL.OrderListID,
                         OL.DressID,
                         Dress.Dress_Name AS dressName,
                         OL.DressQuantity AS dressQuantity,
-                        OL.Details AS details,
-                        ISNULL(SUM(OP.Amount), 0) AS amount,
-                        ISNULL(SUM(OP.Unit), 0) AS unit,
-                        ISNULL(SUM(OP.UnitPrice), 0) AS unitPrice
+                        ISNULL(OP.Details, OL.Details) AS details,
+                        ISNULL(OP.Unit, 0) AS unit,
+                        ISNULL(OP.UnitPrice, 0) AS unitPrice,
+                        ISNULL(OP.Amount, 0) AS amount
                     FROM OrderList OL
                     INNER JOIN Dress ON OL.DressID = Dress.DressID
                     LEFT JOIN Order_Payment OP ON OL.OrderListID = OP.OrderListID
                         AND OP.InstitutionID = OL.InstitutionID
                     WHERE OL.OrderID = @OrderID AND OL.InstitutionID = @InstitutionID
-                    GROUP BY OL.OrderListID, OL.DressID, Dress.Dress_Name, OL.DressQuantity, OL.Details";
+                    ORDER BY OL.OrderListID";
 
                 var orderItems = new List<object>();
                 using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(itemsQuery, connection))
@@ -747,23 +747,23 @@ namespace TailorBD.API.Controllers
                     };
                 }
 
-                // 2. Order items (dress rows — payment optional for legacy orders)
+                // 2. Order items — one row per payment line; description = payment "For" (e.g. মুজুরি)
                 var itemsQuery = @"
                     SELECT
                         OL.OrderListID,
                         OL.DressID,
                         Dress.Dress_Name     AS dressName,
                         OL.DressQuantity     AS dressQuantity,
-                        OL.Details           AS details,
-                        ISNULL(SUM(OP.Amount), 0) AS amount,
-                        ISNULL(SUM(OP.Unit), 0)   AS unit,
-                        ISNULL(SUM(OP.UnitPrice), 0) AS unitPrice
+                        ISNULL(OP.Details, OL.Details) AS details,
+                        ISNULL(OP.Unit, 0)       AS unit,
+                        ISNULL(OP.UnitPrice, 0)  AS unitPrice,
+                        ISNULL(OP.Amount, 0)     AS amount
                     FROM OrderList OL
                     INNER JOIN Dress ON OL.DressID = Dress.DressID
                     LEFT JOIN Order_Payment OP ON OL.OrderListID = OP.OrderListID
                         AND OP.InstitutionID = OL.InstitutionID
                     WHERE OL.OrderID = @OrderID AND OL.InstitutionID = @InstitutionID
-                    GROUP BY OL.OrderListID, OL.DressID, Dress.Dress_Name, OL.DressQuantity, OL.Details";
+                    ORDER BY OL.OrderListID";
 
                 var orderItems = new List<object>();
                 using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(itemsQuery, connection))

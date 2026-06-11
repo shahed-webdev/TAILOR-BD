@@ -171,14 +171,16 @@ namespace TailorBD.API.Controllers
                 var groupRows = await conn.QueryAsync(
                     @"SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending
                       FROM Measurement_Type
-                      WHERE InstitutionID=@I AND DressID=@D
+                      WHERE InstitutionID=@I AND DressID=@D AND Measurement_GroupID IS NOT NULL
                       ORDER BY Ascending",
                     new { I = institutionId, D = dressId });
 
                 var measurementGroups = new List<object>();
                 foreach (var grow in groupRows)
                 {
-                    int gid = (int)((IDictionary<string, object>)grow)["Measurement_GroupID"];
+                    var groupDict = (IDictionary<string, object>)grow;
+                    if (groupDict["Measurement_GroupID"] == null || groupDict["Measurement_GroupID"] == DBNull.Value) continue;
+                    int gid = Convert.ToInt32(groupDict["Measurement_GroupID"]);
 
                     var measurements = (await conn.QueryAsync(
                         @"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
@@ -196,6 +198,27 @@ namespace TailorBD.API.Controllers
                         .ToList();
 
                     measurementGroups.Add(new { MeasurementGroupId = gid, Measurements = measurements });
+                }
+
+                var orphanRows = (await conn.QueryAsync(
+                    @"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
+                             ISNULL(cm.Measurement,'') AS Measurement
+                      FROM Measurement_Type mt
+                      LEFT JOIN (
+                          SELECT MeasurementTypeID, Measurement FROM Customer_Measurement
+                          WHERE CustomerID=@C
+                      ) cm ON mt.MeasurementTypeID = cm.MeasurementTypeID
+                      WHERE mt.InstitutionID=@I AND mt.DressID=@D AND mt.Measurement_GroupID IS NULL
+                      ORDER BY ISNULL(mt.Ascending,99999), mt.MeasurementTypeID",
+                    new { C = customerId, I = institutionId, D = dressId }))
+                    .Select(row => (IDictionary<string, object>)row)
+                    .Select(dict => new Dictionary<string, object>(dict))
+                    .ToList();
+
+                foreach (var orphan in orphanRows)
+                {
+                    var orphanId = Convert.ToInt32(orphan["MeasurementTypeID"]);
+                    measurementGroups.Add(new { MeasurementGroupId = orphanId, Measurements = new List<Dictionary<string, object>> { orphan } });
                 }
 
                 // Style groups

@@ -18,6 +18,7 @@
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
     <link href="/css/dress-measurements.css" rel="stylesheet">
+    <link href="/css/measurement-fraction-bar.css" rel="stylesheet">
 </head>
 <body>
     <!-- Sidebar Container -->
@@ -121,6 +122,30 @@
                         <span data-en="Measurements" data-bn="মাপজোখ">মাপজোখ</span>
                     </div>
                     <div class="card-body">
+                        <div class="measurement-fraction-bar" id="measurementFractionBar">
+                            <span class="fraction-bar-label">
+                                <i class="fas fa-divide me-1"></i>
+                                <span data-en="Fractions — click a box first, then tap:" data-bn="ভগ্নাংশ — আগে মাপ ঘরে ক্লিক, তারপর বাটন:">ভগ্নাংশ — আগে মাপ ঘরে ক্লিক, তারপর বাটন:</span>
+                            </span>
+                            <div class="fraction-btn-group">
+                                <button type="button" class="fraction-btn" data-char="½" title="হাফ (Half)">
+                                    <span class="fraction-char">½</span>
+                                    <span class="fraction-name" data-en="Half" data-bn="হাফ">হাফ</span>
+                                </button>
+                                <button type="button" class="fraction-btn" data-char="¼" title="সোয়া (Quarter)">
+                                    <span class="fraction-char">¼</span>
+                                    <span class="fraction-name" data-en="Quarter" data-bn="সোয়া">সোয়া</span>
+                                </button>
+                                <button type="button" class="fraction-btn" data-char="¾" title="পোয়া (Three-quarter)">
+                                    <span class="fraction-char">¾</span>
+                                    <span class="fraction-name" data-en="Three-qtr" data-bn="পোয়া">পোয়া</span>
+                                </button>
+                                <button type="button" class="fraction-btn" data-char="⅛" title="আট (Eighth)">
+                                    <span class="fraction-char">⅛</span>
+                                    <span class="fraction-name" data-en="Eighth" data-bn="আট">আট</span>
+                                </button>
+                            </div>
+                        </div>
                         <div class="row" id="measurementGrid">
                             <!-- Measurement groups will be loaded here -->
                         </div>
@@ -274,6 +299,7 @@
     <script src="/js/app-components.js?v=2.2.7"></script>
     
     <!-- Dress Measurements JS -->
-    <script src="/js/dress-measurements.js?v=2.2.8"></script>
+    <script src="/js/measurement-fraction-bar.js?v=1.0.0"></script>
+    <script src="/js/dress-measurements.js?v=2.3.1"></script>
 </body>
 </html>

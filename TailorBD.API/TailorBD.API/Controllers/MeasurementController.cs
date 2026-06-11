@@ -355,7 +355,7 @@ namespace TailorBD.API.Controllers
                 var orderDetails = connection.QueryFirstOrDefault<string>(detailsQuery, 
                     new { CustomerId = customerId, DressId = dressId, InstitutionId = institutionId }) ?? "";
 
-                // Get measurement groups
+                // Get measurement groups (exclude NULL — orphans handled separately)
                 var measurementGroupsQuery = @"
                     SELECT 
                         Measurement_GroupID as MeasurementGroupId, 
@@ -363,17 +363,14 @@ namespace TailorBD.API.Controllers
                     FROM Measurement_Type 
                     WHERE InstitutionID = @InstitutionId 
                     AND DressID = @DressId 
+                    AND Measurement_GroupID IS NOT NULL
                     GROUP BY Measurement_GroupID
                     ORDER BY Ascending";
                 
                 var groups = connection.Query<dynamic>(measurementGroupsQuery, 
                     new { InstitutionId = institutionId, DressId = dressId }).ToList();
 
-                // Get measurements for each group
-                var measurementGroups = new List<object>();
-                foreach (var group in groups)
-                {
-                    var measurementsQuery = @"
+                const string measurementsQuery = @"
                         SELECT 
                             mt.MeasurementTypeID, 
                             mt.MeasurementType, 
@@ -388,6 +385,12 @@ namespace TailorBD.API.Controllers
                         WHERE mt.Measurement_GroupID = @GroupId 
                         ORDER BY ISNULL(mt.Measurement_Group_SerialNo, 99999)";
 
+                // Get measurements for each group
+                var measurementGroups = new List<object>();
+                foreach (var group in groups)
+                {
+                    if (group.MeasurementGroupId == null) continue;
+
                     var measurements = connection.Query<dynamic>(measurementsQuery, 
                         new { GroupId = (int)group.MeasurementGroupId, CustomerId = customerId, InstitutionId = institutionId }).ToList();
                     
@@ -395,6 +398,36 @@ namespace TailorBD.API.Controllers
                     {
                         MeasurementGroupId = group.MeasurementGroupId,
                         Measurements = measurements
+                    });
+                }
+
+                // Orphan measurements (NULL group) — show individually so page never crashes
+                var orphanMeasurementsQuery = @"
+                        SELECT 
+                            mt.MeasurementTypeID, 
+                            mt.MeasurementType, 
+                            ISNULL(cm.Measurement, '') as Measurement, 
+                            mt.Measurement_Group_SerialNo 
+                        FROM Measurement_Type mt
+                        LEFT OUTER JOIN (
+                            SELECT Measurement, MeasurementTypeID 
+                            FROM Customer_Measurement 
+                            WHERE CustomerID = @CustomerId AND InstitutionID = @InstitutionId
+                        ) AS cm ON mt.MeasurementTypeID = cm.MeasurementTypeID 
+                        WHERE mt.InstitutionID = @InstitutionId 
+                        AND mt.DressID = @DressId 
+                        AND mt.Measurement_GroupID IS NULL
+                        ORDER BY ISNULL(mt.Ascending, 99999), mt.MeasurementTypeID";
+
+                var orphanMeasurements = connection.Query<dynamic>(orphanMeasurementsQuery,
+                    new { InstitutionId = institutionId, DressId = dressId, CustomerId = customerId }).ToList();
+
+                foreach (var orphan in orphanMeasurements)
+                {
+                    measurementGroups.Add(new
+                    {
+                        MeasurementGroupId = orphan.MeasurementTypeID,
+                        Measurements = new[] { orphan }
                     });
                 }
 
