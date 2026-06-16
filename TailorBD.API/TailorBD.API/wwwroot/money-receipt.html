@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মনি রিসিট - TailorBD</title>
+    <title>মানি রিসিট - TailorBD</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
     
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link href="/css/money-receipt.css?v=2.2.50" rel="stylesheet">
-    <link href="/css/measurement-fraction-bar.css?v=1.9.0" rel="stylesheet">
+    <link href="/css/money-receipt.css?v=2.2.58" rel="stylesheet">
+    <link href="/css/measurement-fraction-bar.css?v=1.9.4" rel="stylesheet">
 
     <!-- bfcache & stale-tab fix: inline so it always runs regardless of JS file cache -->
     <script>
@@ -64,7 +64,7 @@
 
             <!-- Page Header -->
             <div class="page-header no-print mb-3">
-                <h1 class="lang-content" data-en="Money Receipt" data-bn="মনি রিসিট">মনি রিসিট</h1>
+                <h1 class="lang-content" data-en="Money Receipt" data-bn="মানি রিসিট">মানি রিসিট</h1>
             </div>
 
             <!-- Action Bar -->
@@ -107,7 +107,7 @@
                 <ul class="nav nav-tabs" id="receiptTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="receipt-tab" data-bs-toggle="tab" data-bs-target="#receiptTab" type="button" role="tab">
-                            <i class="fas fa-receipt me-2"></i><span class="lang-content" data-en="Money Receipt" data-bn="মনি রিসিট">মনি রিসিট</span>
+                            <i class="fas fa-receipt me-2"></i><span class="lang-content" data-en="Money Receipt" data-bn="মানি রিসিট">মানি রিসিট</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -161,23 +161,26 @@
 
                         <!-- Customer Info -->
                         <div class="customer-section">
-                            <div class="customer-order-container">
-                                <!-- Customer Info - Left Side -->
-                                <div class="customer-info-box">
-                                    <h6 class="info-title lang-content" data-en="Customer Information" data-bn="কাস্টমার তথ্য">কাস্টমার তথ্য</h6>
-                                    <p><strong class="lang-content" data-en="Name:" data-bn="নাম:">নাম:</strong> <span id="customerName">...</span></p>
-                                    <p><strong class="lang-content" data-en="Mobile:" data-bn="মোবাইল:">মোবাইল:</strong> <span id="customerPhone">...</span></p>
-                                    <p><strong class="lang-content" data-en="Address:" data-bn="ঠিকানা:">ঠিকানা:</strong> <span id="customerAddress">...</span></p>
-                                </div>
-                                
-                                <!-- Order Info - Right Side -->
-                                <div class="order-info-box">
-                                    <h6 class="info-title lang-content" data-en="Order Information" data-bn="অর্ডার তথ্য">অর্ডার তথ্য</h6>
-                                    <p><strong class="lang-content" data-en="Order No:" data-bn="অর্ডার নং:">অর্ডার নং:</strong> <span id="orderSerialNumber">...</span></p>
-                                    <p><strong class="lang-content" data-en="Order Date:" data-bn="অর্ডারের তারিখ:">অর্ডারের তারিখ:</strong> <span id="orderDate">...</span></p>
-                                    <p><strong class="lang-content" data-en="Delivery:" data-bn="ডেলিভারি:">ডেলিভারি:</strong> <span id="deliveryDate">...</span></p>
-                                </div>
-                            </div>
+                            <table class="customer-order-table" role="presentation">
+                                <tr>
+                                    <td class="customer-info-cell">
+                                        <div class="customer-info-box">
+                                            <h6 class="info-title lang-content" data-en="Customer Information" data-bn="কাস্টমার তথ্য">কাস্টমার তথ্য</h6>
+                                            <p><strong class="lang-content" data-en="Name:" data-bn="নাম:">নাম:</strong> <span id="customerName">...</span></p>
+                                            <p><strong class="lang-content" data-en="Mobile:" data-bn="মোবাইল:">মোবাইল:</strong> <span id="customerPhone">...</span></p>
+                                            <p><strong class="lang-content" data-en="Address:" data-bn="ঠিকানা:">ঠিকানা:</strong> <span id="customerAddress">...</span></p>
+                                        </div>
+                                    </td>
+                                    <td class="order-info-cell">
+                                        <div class="order-info-box">
+                                            <h6 class="info-title lang-content" data-en="Order Information" data-bn="অর্ডার তথ্য">অর্ডার তথ্য</h6>
+                                            <p class="receipt-order-no-row"><strong class="lang-content" data-en="Order No:" data-bn="অর্ডার নং:">অর্ডার নং:</strong> <span id="orderSerialNumber" class="receipt-order-no">...</span></p>
+                                            <p><strong class="lang-content" data-en="Order Date:" data-bn="অর্ডার তাং:">অর্ডার তাং:</strong> <span id="orderDate">...</span></p>
+                                            <p><strong class="lang-content" data-en="Delivery:" data-bn="ডেলিভারি:">ডেলিভারি:</strong> <span id="deliveryDate">...</span></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
 
                         <!-- Barcode Section -->

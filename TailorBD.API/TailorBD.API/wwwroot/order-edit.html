@@ -17,7 +17,7 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/dashboard.css">
-    <link rel="stylesheet" href="/css/Editorder.css?v=2.2.2">
+    <link rel="stylesheet" href="/css/Editorder.css?v=2.3.2">
     <link href="/css/measurement-fraction-bar.css?v=1.9.0" rel="stylesheet">
 
     
@@ -86,19 +86,11 @@
                 </div>
                 <div id="addDressSection" class="collapse">
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <label class="form-label lang-content" data-en="Select Dress" data-bn="ড্রেস নির্বাচন করুন">ড্রেস নির্বাচন করুন</label>
-                                <select class="form-select" id="dressSelect" disabled>
-                                    <option value="" class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button type="button" class="btn btn-primary w-100" id="btnAddDress" onclick="addDressToList()" disabled>
-                                    <i class="fas fa-plus me-2"></i><span class="lang-content" data-en="Add" data-bn="যোগ করুন">যোগ করুন</span>
-                                </button>
-                            </div>
-                        </div>
+                        <label class="form-label lang-content" data-en="Select Dress" data-bn="ড্রেস নির্বাচন করুন">ড্রেস নির্বাচন করুন</label>
+                        <select class="form-select" id="dressSelect" disabled onchange="onDressSelectChange()">
+                            <option value="" class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</option>
+                        </select>
+                        <small class="text-muted d-block mt-1 lang-content" data-en="Select a dress to add it to the order automatically" data-bn="ড্রেস সিলেক্ট করলেই অর্ডার লিস্টে যোগ হবে">ড্রেস সিলেক্ট করলেই অর্ডার লিস্টে যোগ হবে</small>
                     </div>
                 </div>
             </div>
@@ -157,6 +149,12 @@
                             <h6 class="mb-0"><i class="fas fa-plus me-2"></i><span class="lang-content" data-en="Add New Payment" data-bn="নতুন পেমেন্ট যোগ করুন">নতুন পেমেন্ট যোগ করুন</span></h6>
                         </div>
                         <div class="card-body">
+                            <div id="savedPricesWrap" class="mb-3" style="display:none">
+                                <label class="form-label lang-content" data-en="Saved Making Charges" data-bn="নির্ধারিত মুজুরী">নির্ধারিত মুজুরী</label>
+                                <select class="form-select" id="savedPriceSelect" onchange="applySavedPrice()">
+                                    <option value="" class="lang-content" data-en="[ Select ]" data-bn="[ নির্বাচন করুন ]">[ নির্বাচন করুন ]</option>
+                                </select>
+                            </div>
                             <form id="addPaymentForm" onsubmit="addPayment(event)">
                                 <div class="row g-2">
                                     <div class="col-md-5">
@@ -263,7 +261,7 @@
 
     <!-- Style Modal -->
     <div class="modal fade" id="styleModal" tabindex="-1">
-        <div class="modal-dialog modal-xl oe-style-modal-dialog">
+        <div class="modal-dialog oe-style-modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-paint-brush me-2"></i><span class="lang-content" data-en="Edit Styles" data-bn="স্টাইল সম্পাদনা">স্টাইল সম্পাদনা</span> — <span id="modalStyleDressName"></span>
@@ -305,7 +303,7 @@
 
     <!-- Page Specific JS -->
     <script src="/js/measurement-fraction-bar.js?v=1.9.0"></script>
-    <script src="/js/order-edit.js?v=2.2.0"></script>
-    <script src="/js/order-edit-functions.js?v=2.2.2"></script>
+    <script src="/js/order-edit.js?v=2.3.3"></script>
+    <script src="/js/order-edit-functions.js?v=2.3.0"></script>
 </body>
 </html>

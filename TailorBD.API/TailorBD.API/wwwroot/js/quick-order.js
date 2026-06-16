@@ -12,19 +12,38 @@ customer: { id: 0, clothForId: 1, name: '', phone: '', photo: '' },
     paymentMethods: [],
     discountLimit: 0,
     activeIndex: null, // which dress we are editing payment/measurement/style for
-    searchTimer: null
+    searchTimer: null,
+    addDressInProgress: false
 };
+
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
 
 const STORE_KEY = 'qo-data';
 
 function saveStore() {
-    localStorage.setItem(STORE_KEY, JSON.stringify(qo));
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+        orderNumber: qo.orderNumber,
+        customer: qo.customer,
+        dresses: qo.dresses,
+        paymentMethods: qo.paymentMethods,
+        discountLimit: qo.discountLimit
+    }));
 }
 function loadStore() {
     try {
         const d = localStorage.getItem(STORE_KEY);
         if (d) qo = Object.assign(qo, JSON.parse(d));
     } catch (_) {}
+    qo.addDressInProgress = false;
+    qo.activeIndex = null;
+    qo.searchTimer = null;
 }
 
 /* ───────────────────────────────────────────────
@@ -143,7 +162,7 @@ async function loadDresses() {
             const name = d.dressName || d.DressName || d.dress_Name;
             const hasMeasurement = d.isMeasurementAvailable || d.IsMeasurementAvailable;
             const cls = hasMeasurement ? ' class="dress-has-measurement"' : '';
-            return `<option value="${id}" data-name="${name}"${cls}>${hasMeasurement ? '📏 ' : ''}${name}</option>`;
+            return `<option value="${id}" data-name="${escapeHtml(name)}"${cls}>${hasMeasurement ? '📏 ' : ''}${escapeHtml(name)}</option>`;
         }).join(''));
 }
 
@@ -405,17 +424,32 @@ window.addNewCustomer = async function () {
 /* ───────────────────────────────────────────────
    Dress List
 ─────────────────────────────────────────────── */
+window.onDressSelectChange = async function () {
+    const sel = document.getElementById('dressSelect');
+    if (!sel || !sel.value) return;
+    await addDressToList();
+};
+
 window.addDressToList = async function () {
     const sel = $('#dressSelect');
-    const dressId = +sel.val();
+    const dressId = parseInt(sel.val(), 10);
     if (!dressId) return;
-    const dressName = sel.find(':selected').data('name') || sel.find(':selected').text();
 
-    if (qo.dresses.some(d => d.dressId === dressId)) {
-        showAlert(window.currentLang === 'en' ? 'Dress already added' : 'পোশাকটি ইতিমধ্যে যুক্ত', 'warning');
+    if (qo.addDressInProgress) {
+        showAlert(window.currentLang === 'en' ? 'Adding dress, please wait...' : 'পোশাক যুক্ত হচ্ছে, অপেক্ষা করুন...', 'info');
         return;
     }
 
+    const dressName = sel.find(':selected').attr('data-name')
+        || sel.find(':selected').text().replace(/^📏\s*/, '').trim();
+
+    if (qo.dresses.some(d => d.dressId === dressId)) {
+        showAlert(window.currentLang === 'en' ? 'Dress already added' : 'পোশাকটি ইতিমধ্যে যুক্ত', 'warning');
+        sel.val('');
+        return;
+    }
+
+    qo.addDressInProgress = true;
     try {
         const data = await getMeasurementsStyles(dressId);
         qo.dresses.push({
@@ -429,9 +463,13 @@ window.addDressToList = async function () {
         });
         saveStore();
         renderAll();
+        sel.val('');
     } catch (err) {
         console.error('addDressToList error:', err);
         showAlert(window.currentLang === 'en' ? 'Failed to add dress. Please try again.' : 'পোশাক যুক্ত করা যায়নি। আবার চেষ্টা করুন।', 'danger');
+        sel.val('');
+    } finally {
+        qo.addDressInProgress = false;
     }
 };
 
@@ -590,6 +628,8 @@ function renderPaymentLists() {
 window.openMeasurement = function (idx) {
     qo.activeIndex = idx;
     const d = qo.dresses[idx];
+    const lang = window.currentLang === 'en';
+    const ph = lang ? 'meas...' : 'মাপ...';
     $('#measurementModalTitle').text(d.dressName);
     const $body = $('#measurementModalBody').empty();
 
@@ -600,15 +640,20 @@ window.openMeasurement = function (idx) {
             const typeName = m.MeasurementType || m.measurementType;
             const value = m.Measurement || m.measurement || '';
             return `
-            <div class="mb-2">
-                <input type="text" class="form-control form-control-sm meas-input" value="${value}" placeholder="${typeName}"
+            <div class="measurement-item">
+                <label class="measurement-label">${escapeHtml(typeName)}</label>
+                <input type="text" class="form-control form-control-sm meas-input" value="${escapeHtml(value)}" placeholder="${ph}"
                        data-id="${typeId}"
                        onchange="updateMeasurement(${idx}, '${typeId}', this.value)">
             </div>`;
         }).join('');
 
-        $body.append(`<div class="col-sm-4 col-lg-3 mb-3"><div class="border rounded p-2 h-100" style="background:#f8f9fa">${fields}</div></div>`);
+        $body.append(`<div class="col-sm-4 col-lg-3 mb-3"><div class="border rounded p-2 h-100 qo-measurement-group">${fields}</div></div>`);
     });
+
+    if (window.MeasurementFractionBar && MeasurementFractionBar.enhanceInputs) {
+        MeasurementFractionBar.enhanceInputs(document.getElementById('measurementModalBody'));
+    }
 
     new bootstrap.Modal(document.getElementById('measurementModal')).show();
 };

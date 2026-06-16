@@ -18,6 +18,7 @@ let allDresses = [];
 let currentEditingIndex = null;
 let deletedOrderListIds = [];
 let deletedOrderPaymentIds = [];
+let addDressInProgress = false;
 
 // API Configuration
 const API_BASE_URL = '/api/orders';
@@ -353,25 +354,13 @@ async function loadDresses() {
                 const option = document.createElement('option');
                 option.value = dress.DressID || dress.dressID;
                 option.textContent = dress.Dress_Name || dress.dress_Name;
-                if (dress.IsMeasurementAvailable || dress.isMeasurementAvailable) {
-                    option.classList.add('text-success');
-                }
                 dressSelect.appendChild(option);
             });
 
             console.log('✅ Dropdown populated with', allDresses.length, 'options');
-            console.log('   Dropdown HTML:', dressSelect.innerHTML.substring(0, 200));
             
             dressSelect.disabled = false;
-            console.log('✅ Dropdown enabled, disabled =', dressSelect.disabled);
-            
-            const btnAddDress = document.getElementById('btnAddDress');
-            if (btnAddDress) {
-                btnAddDress.disabled = false;
-                console.log('✅ Add button enabled');
-            } else {
-                console.error('❌ btnAddDress not found');
-            }
+            await markCustomerDressMeasurements();
             
             // Re-render items with updated dress IDs
             if (orderItems.length > 0) {
@@ -386,22 +375,49 @@ async function loadDresses() {
     }
 }
 
+async function markCustomerDressMeasurements() {
+    const dressSelect = document.getElementById('dressSelect');
+    if (!dressSelect || !orderData.customerId) return;
+
+    try {
+        const response = await fetch(`/api/measurement/customer-dresses-with-measurements?customerId=${orderData.customerId}&institutionId=${institutionId}`);
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            dressSelect.querySelectorAll('option.has-measurement').forEach(function (opt) {
+                opt.classList.remove('has-measurement');
+            });
+            result.data.forEach(function (dressId) {
+                const opt = dressSelect.querySelector('option[value="' + dressId + '"]');
+                if (opt) opt.classList.add('has-measurement');
+            });
+        }
+    } catch (error) {
+        console.log('Could not load customer dress measurements:', error);
+    }
+}
+
+async function onDressSelectChange() {
+    const dressSelect = document.getElementById('dressSelect');
+    if (!dressSelect || !dressSelect.value || addDressInProgress) return;
+    await addDressToList();
+}
+
 // Add Dress to List
 async function addDressToList() {
     const dressSelect = document.getElementById('dressSelect');
-    const dressId = parseInt(dressSelect.value);
+    const dressId = parseInt(dressSelect.value, 10);
 
-    if (!dressId) {
-        alert('অনুগ্রহ করে একটি পোশাক নির্বাচন করুন');
-        return;
-    }
+    if (!dressId) return;
 
     // Check if already added
     if (orderItems.some(item => item.dress.dressId === dressId)) {
         alert('এই পোশাকটি ইতিমধ্যে যুক্ত করা হয়েছে');
+        dressSelect.value = '';
         return;
     }
 
+    addDressInProgress = true;
     showLoading();
     try {
         // Get dress details
@@ -458,8 +474,10 @@ async function addDressToList() {
     } catch (error) {
         console.error('Error adding dress:', error);
         alert('পোশাক যুক্ত করতে সমস্যা হয়েছে');
+        dressSelect.value = '';
     } finally {
         hideLoading();
+        addDressInProgress = false;
     }
 }
 
@@ -637,7 +655,7 @@ function updatePreviousPaid() {
 }
 
 // Open Payment Modal
-function openPaymentModal(index) {
+async function openPaymentModal(index) {
     console.log('💰 Opening payment modal for dress index:', index);
     
     currentEditingIndex = index;
@@ -657,6 +675,8 @@ function openPaymentModal(index) {
     // Reset form
     document.getElementById('addPaymentForm').reset();
     document.getElementById('paymentQuantity').value = item.quantity; // Default to dress quantity
+
+    await loadSavedPricesForPayment(item.dress.dressId);
     
     // Render payments list
     renderPaymentsList();
@@ -664,6 +684,55 @@ function openPaymentModal(index) {
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
     modal.show();
+}
+
+async function loadSavedPricesForPayment(dressId) {
+    const wrap = document.getElementById('savedPricesWrap');
+    const select = document.getElementById('savedPriceSelect');
+    if (!wrap || !select) return;
+
+    const isEn = window.currentLang === 'en';
+    const placeholder = isEn ? '[ Select ]' : '[ নির্বাচন করুন ]';
+
+    try {
+        const response = await fetch(`/api/Dresses/${dressId}/prices?institutionId=${institutionId}`);
+        if (!response.ok) throw new Error('Failed to load prices');
+        const result = await response.json();
+        const prices = result?.data || [];
+
+        if (prices.length) {
+            select.innerHTML = `<option value="">${placeholder}</option>` +
+                prices.map(p => {
+                    const priceFor = p.priceFor || p.PriceFor || p.Price_For || '';
+                    const price = p.price || p.Price || 0;
+                    const safeFor = typeof escapeHtml === 'function' ? escapeHtml(priceFor) : priceFor;
+                    return `<option value="${price}" data-for="${safeFor}">${safeFor} — ৳${price}</option>`;
+                }).join('');
+            wrap.style.display = '';
+        } else {
+            select.innerHTML = `<option value="">${placeholder}</option>`;
+            wrap.style.display = 'none';
+        }
+    } catch (error) {
+        console.warn('Could not load saved prices:', error);
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        wrap.style.display = 'none';
+    }
+}
+
+function applySavedPrice() {
+    const select = document.getElementById('savedPriceSelect');
+    if (!select || !select.value || currentEditingIndex === null) return;
+
+    const option = select.options[select.selectedIndex];
+    const priceFor = option.getAttribute('data-for') || '';
+    const unitPrice = parseFloat(select.value);
+
+    document.getElementById('paymentFor').value = priceFor;
+    document.getElementById('paymentUnitPrice').value = unitPrice;
+
+    addPayment({ preventDefault: function () {} });
+    select.value = '';
 }
 
 // Render Payments List

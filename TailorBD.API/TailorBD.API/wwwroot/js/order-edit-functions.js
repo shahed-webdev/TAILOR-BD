@@ -277,10 +277,12 @@ function renderStyles() {
             </div>
         `).join('');
 
+        const styleCount = group.styles.length;
+
         return `
             <div class="oe-style-category">
                 <div class="oe-style-category-header">${escapeHtml(group.groupName)}</div>
-                <div class="oe-style-grid">${styleCards}</div>
+                <div class="oe-style-grid" data-style-count="${styleCount}">${styleCards}</div>
             </div>
         `;
     }).join('');

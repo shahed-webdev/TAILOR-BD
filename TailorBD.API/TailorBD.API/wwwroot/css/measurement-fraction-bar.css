@@ -87,12 +87,12 @@
 :root {
     --measurement-fraction-scale: 0.72;
     --measurement-fraction-weight: 700;
-    --measurement-fraction-gap: 1px;
-    --measurement-fraction-line-thickness: 2.5px;
+    --measurement-fraction-gap: 0.07em;
+    --measurement-fraction-line-thickness: 1.5px;
     --measurement-fraction-line-width: 1.25em;
 }
 
-/* Stacked fraction — smaller than main digits, bold for print clarity */
+/* Stacked fraction — equal gap above/below the bar */
 .meas-fraction-stack {
     display: inline-flex;
     flex-direction: column;
@@ -103,11 +103,11 @@
     font-size: calc(1em * var(--measurement-fraction-scale, 0.72));
     font-weight: var(--measurement-fraction-weight, 700);
     line-height: 1;
-    gap: 0;
+    gap: var(--measurement-fraction-gap, 0.07em);
     margin: 0 0.05em;
-    position: relative;
-    top: -0.04em;
     color: inherit;
+    width: var(--measurement-fraction-line-width, 1.25em);
+    min-width: 0.75em;
 }
 
 .meas-f-stack-top,
@@ -115,27 +115,31 @@
     display: block;
     font-size: 1em;
     font-weight: inherit;
-    line-height: 0.9;
+    line-height: 1;
     padding: 0;
     margin: 0;
     color: inherit;
 }
 
-/* border-top survives print/PDF better than a 1–2px background bar */
 .meas-f-stack-line {
     display: block;
-    width: var(--measurement-fraction-line-width, 1.25em);
+    width: 100%;
     min-width: 0.75em;
-    height: 0;
-    line-height: 0;
+    height: var(--measurement-fraction-line-thickness, 1.5px);
+    min-height: var(--measurement-fraction-line-thickness, 1.5px);
     border: none;
-    border-top: var(--measurement-fraction-line-thickness, 2.5px) solid currentColor;
-    background: transparent;
-    margin: var(--measurement-fraction-gap, 1px) 0;
+    background: currentColor;
+    margin: 0;
     border-radius: 0;
     flex-shrink: 0;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+}
+
+@media print {
+    :root {
+        --measurement-fraction-line-thickness: 2px;
+    }
 }
 
 /* Legacy unicode fallback */

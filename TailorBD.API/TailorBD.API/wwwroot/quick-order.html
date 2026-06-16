@@ -7,7 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link href="/css/quick-order.css?v=2.2.0" rel="stylesheet">
+    <link href="/css/quick-order.css?v=2.2.1" rel="stylesheet">
     <link href="/css/measurement-fraction-bar.css?v=1.8.1" rel="stylesheet">
 </head>
 <body>
@@ -70,21 +70,11 @@
             <div class="add-dress-card mb-4">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <i class="fas fa-tshirt text-primary"></i>
-                    <span class="fw-semibold text-muted small" data-en="Select and add a dress to the order" data-bn="পোশাক নির্বাচন করে অর্ডারে যোগ করুন">পোশাক নির্বাচন করে অর্ডারে যোগ করুন</span>
+                    <span class="fw-semibold text-muted small" data-en="Select a dress to add to the order" data-bn="পোশাক সিলেক্ট করলেই অর্ডারে যোগ হবে">পোশাক সিলেক্ট করলেই অর্ডারে যোগ হবে</span>
                 </div>
-                <div class="row g-2 align-items-center">
-                    <div class="col">
-                        <select class="form-select" id="dressSelect">
-                        <option value="" data-en="[ Select Dress ]" data-bn="[ পোশাক নির্বাচন করুন ]">[ পোশাক নির্বাচন করুন ]</option>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn-add-dress" onclick="addDressToList()">
-                            <i class="fas fa-plus me-1"></i>
-                            <span data-en="Add Dress" data-bn="পোশাক যোগ করুন">পোশাক যোগ করুন</span>
-                        </button>
-                    </div>
-                </div>
+                <select class="form-select" id="dressSelect" onchange="onDressSelectChange()">
+                    <option value="" data-en="[ Select Dress ]" data-bn="[ পোশাক নির্বাচন করুন ]">[ পোশাক নির্বাচন করুন ]</option>
+                </select>
             </div>
 
             <!-- Dress List Table -->
@@ -381,7 +371,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/app-components.js?v=2.1.9"></script>
     <script src="/js/measurement-fraction-bar.js?v=1.8.1"></script>
-    <script src="/js/quick-order.js?v=2.1.8"></script>
+    <script src="/js/quick-order.js?v=2.2.1"></script>
 
     <!-- Shared Modals -->
     <div id="app-modals"></div>

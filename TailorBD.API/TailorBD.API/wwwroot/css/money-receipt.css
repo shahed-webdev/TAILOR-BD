@@ -322,26 +322,59 @@ body {
 
 /* Customer Section */
 .customer-section {
-    margin: 0px 0;
-    padding: 4px;
+    margin: 0;
+    padding: 2px 0;
     border-bottom: 1px solid #ddd;
     background-color: white !important;
 }
 
-.customer-order-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    margin-bottom: 0;
+.customer-order-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 2px 0;
+    table-layout: fixed;
+    margin: 0;
     background-color: white !important;
+}
+
+.customer-info-cell,
+.order-info-cell {
+    width: 50%;
+    vertical-align: top;
+    padding: 0;
 }
 
 .customer-info-box,
 .order-info-box {
     border: 1px solid #ddd;
-    padding: 3px 5px;
+    padding: 2px 3px;
     font-size: var(--print-font-size, 12px);
     background-color: white !important;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.order-info-box p {
+    white-space: nowrap;
+}
+
+.receipt-order-no-row strong {
+    font-weight: 600;
+}
+
+.receipt-order-no,
+#orderSerialNumber.receipt-order-no,
+.order-info-box p span.receipt-order-no {
+    font-weight: 700;
+    font-size: inherit;
+    color: #000;
+    letter-spacing: 0.01em;
+}
+
+.customer-info-box p span,
+.order-info-box p span {
+    color: #333;
+    font-weight: 600;
 }
 
 .info-title {
@@ -1062,9 +1095,8 @@ body {
         font-size: 18px;
     }
 
-    .customer-order-container {
-        grid-template-columns: 1fr;
-        gap: 6px;
+    .customer-order-table {
+        border-spacing: 2px 0;
     }
 
     .customer-info-box,
@@ -1135,6 +1167,10 @@ body {
         margin-bottom: 0;
     }
 
+    :root {
+        --measurement-fraction-line-thickness: 2px;
+    }
+
     html {
         height: auto;
         margin: 0;
@@ -1201,7 +1237,7 @@ body {
     .receipt-container {
         max-width: var(--print-width, 800px);
         margin: 0 auto !important;
-        padding: 0 20px 20px 20px !important;
+        padding: 0 6px 12px 6px !important;
         border: none !important;
         box-shadow: none !important;
         page-break-inside: avoid;
@@ -1368,7 +1404,7 @@ body {
     .measurement-value-cell .meas-fraction-stack,
     .measurement-value-cell .meas-fraction-char {
         font-size: calc(1em * var(--measurement-fraction-scale, 0.72)) !important;
-        font-weight: 800 !important;
+        font-weight: var(--measurement-fraction-weight, 700) !important;
         color: #000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1376,18 +1412,20 @@ body {
 
     .measurement-value-cell .meas-f-stack-top,
     .measurement-value-cell .meas-f-stack-bot {
-        font-weight: 800 !important;
+        font-weight: var(--measurement-fraction-weight, 700) !important;
         color: #000 !important;
-        text-shadow: 0.35px 0 0 #000, -0.35px 0 0 #000 !important;
+        text-shadow: none !important;
+        line-height: 1 !important;
     }
 
     .measurement-value-cell .meas-f-stack-line {
-        width: var(--measurement-fraction-line-width, 1.25em) !important;
+        width: 100% !important;
         min-width: 0.75em !important;
-        height: 0 !important;
+        height: var(--measurement-fraction-line-thickness, 1.5px) !important;
+        min-height: var(--measurement-fraction-line-thickness, 1.5px) !important;
+        margin: 0 !important;
         border: none !important;
-        border-top: 3px solid #000 !important;
-        background: transparent !important;
+        background: #000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
@@ -1449,16 +1487,54 @@ body {
         border-collapse: collapse;
     }
 
+    .customer-order-table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        border-collapse: separate !important;
+        border-spacing: 2px 0 !important;
+    }
+
+    .customer-section {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .customer-info-cell,
+    .order-info-cell {
+        width: 50% !important;
+        vertical-align: top !important;
+    }
+
+    .order-info-box p {
+        white-space: nowrap !important;
+    }
+
+    .receipt-order-no,
+    #orderSerialNumber.receipt-order-no,
+    .order-info-box p span.receipt-order-no {
+        font-weight: 700 !important;
+        font-size: inherit !important;
+        color: #000 !important;
+    }
+
+    .customer-info-box p span,
+    .order-info-box p span {
+        color: #333 !important;
+        font-weight: 600 !important;
+    }
+
+    .receipt-table thead th,
     .receipt-table th {
-        background-color: #686868 !important;
-        color: white !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        background: #000 !important;
+        background-color: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
     
     /* Print size specific adjustments */
     [data-print-size="3"] .receipt-container {
-        padding: 0 10px 10px 10px !important;
+        padding: 0 4px 8px 4px !important;
         font-size: 11px !important;
     }
     
@@ -1469,7 +1545,7 @@ body {
     }
     
     [data-print-size="3"] .customer-section {
-        padding: 5px;
+        padding: 0 !important;
     }
     
     [data-print-size="3"] .institution-name {
@@ -1521,7 +1597,7 @@ body {
     [data-print-size="3"] .receipt-table td:nth-child(5) { width: 24%; }
     
     [data-print-size="3.5"] .receipt-container {
-        padding: 0 12px 12px 12px !important;
+        padding: 0 5px 10px 5px !important;
         font-size: 12px !important;
     }
     
@@ -1532,7 +1608,7 @@ body {
     }
     
     [data-print-size="3.5"] .customer-section {
-        padding: 5px;
+        padding: 0 !important;
     }
     
     [data-print-size="3.5"] .institution-name {
@@ -1585,7 +1661,7 @@ body {
     
     /* 4 inch print adjustments */
     [data-print-size="4"] .receipt-container {
-        padding: 0 15px 15px 15px !important;
+        padding: 0 6px 12px 6px !important;
         font-size: 13px !important;
     }
     
@@ -1951,11 +2027,14 @@ body.print-size-6-5 .receipt-table tbody td {
 .measurement-value-cell .meas-f-stack-bot {
     font-weight: 800;
     color: #000;
+    line-height: 1;
 }
 
 .measurement-value-cell .meas-f-stack-line {
-    border-top-width: var(--measurement-fraction-line-thickness, 2.5px);
-    border-top-color: #000;
+    height: var(--measurement-fraction-line-thickness, 1.5px);
+    min-height: var(--measurement-fraction-line-thickness, 1.5px);
+    border: none;
+    background: #000;
 }
 
 .measurement-separator {
@@ -1968,6 +2047,10 @@ body.print-size-6-5 .receipt-table tbody td {
 }
 
 /* PDF export — A4 capture like print preview */
+body.pdf-export-mode {
+    --measurement-fraction-line-thickness: 2px;
+}
+
 body.pdf-export-mode #app-sidebar,
 body.pdf-export-mode #app-navbar,
 body.pdf-export-mode .no-print,
@@ -2010,22 +2093,55 @@ body.pdf-export-mode #receiptInstitutionName {
 
 body.pdf-export-mode .measurement-value-cell .meas-fraction-stack,
 body.pdf-export-mode .measurement-value-cell .meas-fraction-char {
-    font-weight: 800 !important;
+    font-weight: var(--measurement-fraction-weight, 700) !important;
     color: #000 !important;
 }
 
 body.pdf-export-mode .measurement-value-cell .meas-f-stack-top,
 body.pdf-export-mode .measurement-value-cell .meas-f-stack-bot {
-    font-weight: 800 !important;
+    font-weight: var(--measurement-fraction-weight, 700) !important;
     color: #000 !important;
-    text-shadow: 0.35px 0 0 #000, -0.35px 0 0 #000 !important;
+    text-shadow: none !important;
+}
+
+body.pdf-export-mode .receipt-order-no,
+body.pdf-export-mode #orderSerialNumber.receipt-order-no,
+body.pdf-export-mode .order-info-box p span.receipt-order-no {
+    font-weight: 700 !important;
+    font-size: inherit !important;
+    color: #000 !important;
+}
+
+body.pdf-export-mode .customer-info-box p span,
+body.pdf-export-mode .order-info-box p span {
+    color: #333 !important;
+    font-weight: 600 !important;
+}
+
+body.pdf-export-mode .customer-order-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+body.pdf-export-mode .customer-info-cell,
+body.pdf-export-mode .order-info-cell {
+    width: 50% !important;
+    vertical-align: top !important;
+}
+
+body.pdf-export-mode .receipt-table thead th {
+    background: #000 !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
 }
 
 body.pdf-export-mode .measurement-value-cell .meas-f-stack-line {
-    height: 0 !important;
+    height: var(--measurement-fraction-line-thickness, 1.5px) !important;
+    min-height: var(--measurement-fraction-line-thickness, 1.5px) !important;
     border: none !important;
-    border-top: 3px solid #000 !important;
-    background: transparent !important;
+    background: #000 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
 }

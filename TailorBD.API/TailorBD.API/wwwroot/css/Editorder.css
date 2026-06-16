@@ -188,24 +188,39 @@
     max-width: none;
 }
 
-/* Style modal — categories side-by-side, compact grid like dress-measurements */
+/* Style modal — always single column, scroll down only */
 #styleModal .oe-style-modal-dialog {
-    max-width: min(1100px, 98vw);
+    width: 100%;
+    max-width: min(420px, 96vw);
     margin: 0.75rem auto;
 }
 
+#styleModal .modal-content {
+    width: 100%;
+    overflow: hidden;
+}
+
+#styleModal .modal-header .modal-title {
+    white-space: normal;
+    line-height: 1.35;
+}
+
 #styleModal .modal-body {
-    max-height: none;
-    overflow: visible;
-    padding: 0.75rem 1rem 1rem;
+    max-height: calc(100vh - 180px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0.65rem 0.75rem;
     background: #f8f9fa;
 }
 
+#stylesContainer {
+    width: 100%;
+}
+
 .oe-styles-layout {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 14px;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     width: 100%;
 }
 
@@ -214,28 +229,36 @@
     border: 2px solid #e9ecef;
     border-radius: 10px;
     overflow: hidden;
+    width: 100%;
 }
 
 .oe-style-category-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
-    padding: 8px 12px;
-    font-size: 0.9rem;
+    padding: 7px 10px;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
 .oe-style-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
-    gap: 8px;
-    padding: 10px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.oe-style-check .form-check-label {
+    font-size: 0.8rem;
+    line-height: 1.3;
 }
 
 .oe-style-card {
     background: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    padding: 8px 6px;
+    padding: 8px 8px;
     min-width: 0;
 }
 
@@ -266,9 +289,24 @@
 .oe-style-meas {
     margin-top: 6px;
     width: 100%;
-    font-size: 13px;
-    padding: 4px 6px;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+    padding: 3px 6px;
     text-align: center;
+    color: #333;
+}
+
+#styleModal .oe-style-meas::placeholder,
+#styleModal .style-meas-input.oe-style-meas::placeholder {
+    font-size: 11px;
+    font-weight: 400;
+    color: #b8bcc2;
+    opacity: 1;
+}
+
+#styleModal .oe-style-meas:disabled::placeholder {
+    color: #ced4da;
 }
 
 .style-category {
@@ -387,6 +425,17 @@
         border-color: #667eea;
         box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
+
+#addDressSection #dressSelect option {
+    color: #212529;
+    font-weight: 400;
+}
+
+#addDressSection #dressSelect option.has-measurement {
+    color: #15803d;
+    font-weight: 600;
+    background-color: #ecfdf5;
+}
 
 .btn-delete-order {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
@@ -594,6 +643,7 @@
 
     /* Style Modal - Mobile */
     #styleModal .oe-style-modal-dialog {
+        width: auto !important;
         max-width: calc(100% - 1rem);
         margin: 0.5rem auto;
         display: flex;
@@ -622,13 +672,17 @@
         border-top: 1px solid #dee2e6;
     }
 
-    .oe-styles-layout {
-        grid-template-columns: 1fr;
-        gap: 12px;
+    #stylesContainer {
+        width: 100%;
+        margin: 0;
+    }
+
+    .oe-style-category {
+        width: 100%;
     }
 
     .oe-style-grid {
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        grid-template-columns: minmax(0, 1fr);
         gap: 6px;
         padding: 8px;
     }

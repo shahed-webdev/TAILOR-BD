@@ -576,6 +576,40 @@
     background: linear-gradient(135deg, #009688, #00796b) !important;
 }
 
+/* ── Measurement modal ───────────────────────────────────── */
+#measurementModal .qo-measurement-group {
+    background: #f8f9fa;
+}
+
+#measurementModal .measurement-item {
+    margin-bottom: 10px;
+}
+
+#measurementModal .measurement-item:last-child {
+    margin-bottom: 0;
+}
+
+#measurementModal .measurement-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 4px;
+    display: block;
+}
+
+#measurementModal .meas-input {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#measurementModal .meas-input::placeholder,
+#measurementModal .meas-input-mirror-wrap > .meas-input::placeholder {
+    font-size: 11px;
+    font-weight: 400;
+    color: #b8bcc2;
+    opacity: 1;
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
     .main-content,
