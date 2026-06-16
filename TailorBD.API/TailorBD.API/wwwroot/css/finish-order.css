@@ -325,20 +325,34 @@
     border-color: #6366f1;
 }
 
+/* Compact table header labels (mobile) */
+.fo-th-short {
+    display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-    .customer-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .customer-badges {
-        justify-content: center;
+    .main-content,
+    .dashboard-content {
+        overflow-x: hidden;
+        max-width: 100%;
+        padding: 10px 12px;
+        box-sizing: border-box;
     }
 
     .page-header {
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
+        margin-bottom: 12px !important;
+    }
+
+    .page-header h1 {
+        font-size: 1.35rem;
+        margin-bottom: 0;
+    }
+
+    .page-header p {
+        display: none;
     }
 
     .page-header > div:last-child {
@@ -347,10 +361,168 @@
 
     .page-header button {
         width: 100%;
+        padding: 10px 16px;
+        font-size: 14px;
     }
 
-    .table-responsive {
+    .customer-info-card {
+        padding: 12px;
+        margin-bottom: 12px !important;
+    }
+
+    .customer-header {
+        flex-direction: row;
+        text-align: left;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .customer-avatar-large {
+        width: 52px;
+        height: 52px;
+        font-size: 20px;
+        border-width: 2px;
+    }
+
+    .customer-details h3 {
+        font-size: 1.05rem;
+        margin-bottom: 6px;
+    }
+
+    .customer-badges {
+        justify-content: flex-start;
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .badge {
+        font-size: 10px;
+        padding: 3px 7px;
+    }
+
+    .customer-address {
+        font-size: 12px;
+    }
+
+    .order-details-card,
+    .payment-card {
+        margin-bottom: 12px !important;
+    }
+
+    .order-details-card .card-body,
+    .payment-card .card-body {
+        padding: 10px;
+    }
+
+    .card-header {
+        padding: 10px 12px;
         font-size: 14px;
+    }
+
+    .fo-th-long {
+        display: none;
+    }
+
+    .fo-th-short {
+        display: inline;
+    }
+
+    .order-details-card .table-responsive {
+        overflow-x: visible;
+        margin: 0;
+    }
+
+    .order-details-card .table {
+        table-layout: fixed;
+        width: 100%;
+        font-size: 11px;
+        margin-bottom: 0;
+    }
+
+    .order-details-card .table thead th {
+        padding: 6px 2px;
+        font-size: 10px;
+        line-height: 1.2;
+        white-space: normal;
+        word-break: break-word;
+        vertical-align: middle;
+    }
+
+    .order-details-card .table thead th:nth-child(1) { width: 30%; }
+    .order-details-card .table thead th:nth-child(2) { width: 16%; }
+    .order-details-card .table thead th:nth-child(3) { width: 12%; }
+    .order-details-card .table thead th:nth-child(4) { width: 21%; }
+    .order-details-card .table thead th:nth-child(5) { width: 21%; }
+
+    .order-details-card .table tbody td {
+        padding: 6px 2px;
+        font-size: 11px;
+        line-height: 1.25;
+        white-space: normal;
+        word-break: break-word;
+        vertical-align: middle;
+    }
+
+    .order-details-card .table tbody td strong {
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    .order-details-card .table tfoot td {
+        padding: 8px 4px;
+        font-size: 12px;
+    }
+
+    .order-details-card .table tfoot strong {
+        font-size: 12px;
+    }
+
+    .payment-card .form-label {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 2px;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .payment-card .form-label > span:first-child i {
+        font-size: 11px;
+    }
+
+    .previous-amount-label {
+        white-space: normal;
+        font-size: 10px;
+        padding: 2px 6px;
+        align-self: stretch;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 8px 10px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+
+    #discountLimitText {
+        font-size: 10px;
+        line-height: 1.2;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .due-amount-display {
+        padding: 12px 10px;
+        margin-bottom: 10px !important;
+    }
+
+    .due-amount-display h5 {
+        font-size: 0.95rem;
+        line-height: 1.35;
+    }
+
+    .btn-lg {
+        padding: 12px 16px;
+        font-size: 15px;
     }
 }
 

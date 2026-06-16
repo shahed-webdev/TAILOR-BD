@@ -116,9 +116,27 @@ namespace TailorBD.API.Controllers
                                         measurementQuery = @"
                                             SELECT Measurement_Type.MeasurementTypeID, 
                                                    Measurement_Type.MeasurementType, 
-                                                   Customer_M.Measurement, 
+                                                   COALESCE(NULLIF(LTRIM(RTRIM(latest_om.Measurement)), ''), NULLIF(LTRIM(RTRIM(Customer_M.Measurement)), ''), '') AS Measurement, 
                                                    Measurement_Type.Measurement_Group_SerialNo 
                                             FROM Measurement_Type 
+                                            LEFT OUTER JOIN (
+                                                SELECT MeasurementTypeID, Measurement
+                                                FROM (
+                                                    SELECT om.MeasurementTypeID, om.Measurement,
+                                                           ROW_NUMBER() OVER (
+                                                               PARTITION BY om.MeasurementTypeID
+                                                               ORDER BY o.OrderDate DESC, ol.OrderListID DESC
+                                                           ) AS rn
+                                                    FROM Ordered_Measurement om
+                                                    INNER JOIN OrderList ol ON om.OrderListID = ol.OrderListID AND ol.InstitutionID = om.InstitutionID
+                                                    INNER JOIN [Order] o ON ol.OrderID = o.OrderID AND o.InstitutionID = om.InstitutionID
+                                                    WHERE om.CustomerID = @CustomerID
+                                                      AND om.InstitutionID = @InstitutionID
+                                                      AND ol.DressID = @DressID
+                                                      AND ISNULL(LTRIM(RTRIM(om.Measurement)), '') <> ''
+                                                ) ranked
+                                                WHERE rn = 1
+                                            ) AS latest_om ON Measurement_Type.MeasurementTypeID = latest_om.MeasurementTypeID
                                             LEFT OUTER JOIN (
                                                 SELECT Measurement, MeasurementTypeID 
                                                 FROM Customer_Measurement 
@@ -130,6 +148,7 @@ namespace TailorBD.API.Controllers
 
                                         measurementCmd.Parameters.AddWithValue("@CustomerID", customerId);
                                         measurementCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                                        measurementCmd.Parameters.AddWithValue("@DressID", dressId);
                                     }
                                     
                                     measurementCmd.CommandText = measurementQuery;
@@ -222,9 +241,29 @@ namespace TailorBD.API.Controllers
                                         styleQuery = @"
                                             SELECT Dress_Style.Dress_StyleID, 
                                                    Dress_Style.Dress_Style_Name, 
-                                                   Customer_DS.DressStyleMesurement, 
-                                                   CAST(CASE WHEN Customer_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck 
+                                                   COALESCE(NULLIF(LTRIM(RTRIM(latest_ods.DressStyleMesurement)), ''), NULLIF(LTRIM(RTRIM(Customer_DS.DressStyleMesurement)), ''), '') AS DressStyleMesurement, 
+                                                   CAST(CASE WHEN latest_ods.Dress_StyleID IS NOT NULL OR Customer_DS.Dress_StyleID IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS IsCheck 
                                             FROM Dress_Style 
+                                            LEFT OUTER JOIN (
+                                                SELECT Dress_StyleID, DressStyleMesurement
+                                                FROM (
+                                                    SELECT ods.Dress_StyleID, ods.DressStyleMesurement,
+                                                           ROW_NUMBER() OVER (
+                                                               PARTITION BY ods.Dress_StyleID
+                                                               ORDER BY
+                                                                   CASE WHEN ISNULL(LTRIM(RTRIM(ods.DressStyleMesurement)), '') <> '' THEN 0 ELSE 1 END,
+                                                                   o.OrderDate DESC,
+                                                                   ol.OrderListID DESC
+                                                           ) AS rn
+                                                    FROM Ordered_Dress_Style ods
+                                                    INNER JOIN OrderList ol ON ods.OrderListID = ol.OrderListID
+                                                    INNER JOIN [Order] o ON ol.OrderID = o.OrderID
+                                                    WHERE ods.CustomerID = @CustomerID
+                                                      AND ol.InstitutionID = @InstitutionID
+                                                      AND ol.DressID = @DressID
+                                                ) ranked
+                                                WHERE rn = 1
+                                            ) AS latest_ods ON Dress_Style.Dress_StyleID = latest_ods.Dress_StyleID
                                             LEFT OUTER JOIN (
                                                 SELECT DressStyleMesurement, Dress_StyleID 
                                                 FROM Customer_Dress_Style 
@@ -235,6 +274,8 @@ namespace TailorBD.API.Controllers
                                             ORDER BY ISNULL(Dress_Style.StyleSerial, 99999)";
                                         
                                         styleCmd.Parameters.AddWithValue("@CustomerID", customerId);
+                                        styleCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+                                        styleCmd.Parameters.AddWithValue("@DressID", dressId);
                                     }
                                     
                                     styleCmd.CommandText = styleQuery;

@@ -44,7 +44,7 @@
         h2 {
             color: #2c3e50;
             margin-bottom: 15px;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 600;
         }
 
@@ -56,11 +56,11 @@
         .work-complete-container h2 {
             margin-bottom: 10px;
             color: #333;
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 600;
         }
 
-        .dashboard-content { padding: 12px 14px; }
+        .dashboard-content { padding: 12px 14px; font-size: 1rem; }
 
         /* Search Section */
         .search-section {
@@ -77,11 +77,13 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 16px;
         }
 
         .search-tabs input[type="radio"] {
             margin-right: 6px;
+            width: 16px;
+            height: 16px;
         }
 
         .search-form {
@@ -101,15 +103,15 @@
             margin-bottom: 4px;
             color: #555;
             font-weight: 500;
-            font-size: 12px;
+            font-size: 15px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 6px 8px;
+            padding: 8px 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 15px;
         }
 
         .form-group input:focus {
@@ -118,14 +120,14 @@
         }
 
         .btn-search {
-            padding: 7px 16px;
+            padding: 9px 18px;
             background: #6c7ae0;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 500;
-            font-size: 13px;
+            font-size: 16px;
         }
 
         .btn-search:hover {
@@ -152,7 +154,7 @@
             font-weight: 600;
             color: #2c3e50;
             margin-bottom: 10px;
-            font-size: 13px;
+            font-size: 16px;
         }
 
         /* Legend */
@@ -167,12 +169,12 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 11px;
+            font-size: 14px;
         }
 
         .legend-box {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border-radius: 3px;
             border: 1px solid #ddd;
         }
@@ -205,19 +207,19 @@
             table-layout: fixed;
             border-collapse: collapse;
             background: white;
-            font-size: 12px;
-            line-height: 1.3;
+            font-size: 15px;
+            line-height: 1.35;
             border: 1px solid #aeb6c2;
         }
 
         .iw-table th {
             background: #6c7ae0;
             color: white;
-            padding: 2px 1px;
+            padding: 4px 3px;
             text-align: center;
             font-weight: 600;
-            font-size: 10px;
-            line-height: 1.2;
+            font-size: 13px;
+            line-height: 1.25;
             white-space: normal;
             word-break: break-word;
             vertical-align: middle;
@@ -225,7 +227,7 @@
         }
 
         .iw-table td {
-            padding: 1px 2px;
+            padding: 3px 4px;
             border: 1px solid #c5cad3;
             vertical-align: middle;
             text-align: center;
@@ -240,18 +242,54 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            font-size: 11px;
+            font-size: 14px;
         }
 
         .iw-table input[type="checkbox"] {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             margin: 0;
             cursor: pointer;
         }
 
-        .iw-table .col-chk { width: 24px; }
-        .iw-table .col-act { width: 32px; }
+        .iw-table .col-chk { width: 28px; max-width: 28px; }
+        .iw-table .col-order-no { width: 58px; min-width: 58px; }
+        .iw-table .col-name { width: 15%; min-width: 130px; }
+        .iw-table .col-phone { width: 100px; min-width: 100px; }
+        .iw-table .col-sms { width: 30px; max-width: 30px; }
+        .iw-table .col-print { width: 32px; max-width: 32px; }
+        .iw-table .col-date { width: 62px; min-width: 62px; }
+        .iw-table td.col-order-no-cell,
+        .iw-table th.col-order-no-head,
+        .iw-table td.col-phone-cell,
+        .iw-table th.col-phone-head,
+        .iw-table td.col-date-cell,
+        .iw-table th.col-date-head {
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            padding: 2px 3px;
+        }
+        .iw-table td.col-date-cell,
+        .iw-table th.col-date-head {
+            font-size: 13px;
+        }
+        .iw-table td.col-name-cell {
+            text-align: left;
+            overflow: visible;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
+            padding: 2px 5px;
+        }
+        .iw-table td.col-name-cell .cell-name {
+            display: block;
+            white-space: normal;
+            word-break: break-word;
+            overflow: visible;
+            text-overflow: unset;
+            font-size: 14px;
+        }
 
         /* Row Colors — keep tint but borders stay visible */
         .iw-table tr.today td { background-color: #d4edda !important; }
@@ -263,7 +301,7 @@
         .order-list-nested {
             width: 100%;
             margin: 0;
-            font-size: 10px;
+            font-size: 13px;
             table-layout: fixed;
             border-collapse: collapse;
             border: 1px solid #aeb6c2;
@@ -271,7 +309,7 @@
 
         .order-list-nested th,
         .order-list-nested td {
-            padding: 1px 2px;
+            padding: 2px 3px;
             border: 1px solid #aeb6c2;
             text-align: center;
             vertical-align: middle;
@@ -280,30 +318,30 @@
         .order-list-nested th {
             background: #f0f0f0;
             color: #333;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 600;
-            line-height: 1.15;
+            line-height: 1.2;
         }
 
-        .order-list-nested td { font-size: 10px; }
+        .order-list-nested td { font-size: 13px; }
 
         /* Input Fields - Compact */
         .store-input, .details-input {
             width: 100%;
-            padding: 2px 3px;
+            padding: 3px 5px;
             border: 1px solid #ddd;
             border-radius: 2px;
-            font-size: 11px;
+            font-size: 14px;
             box-sizing: border-box;
         }
 
         .pending-input {
-            width: 34px;
-            padding: 1px;
+            width: 40px;
+            padding: 2px;
             border: 1px solid #ddd;
             border-radius: 2px;
             text-align: center;
-            font-size: 10px;
+            font-size: 13px;
         }
 
         /* View Measurement Link */
@@ -311,7 +349,7 @@
             color: #6c7ae0;
             text-decoration: none;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 14px;
             white-space: nowrap;
         }
 
@@ -321,7 +359,7 @@
         .print-icon {
             color: #6c7ae0;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 16px;
             line-height: 1;
             display: inline-flex;
             align-items: center;
@@ -336,7 +374,7 @@
             text-align: center;
             padding: 24px;
             color: #666;
-            font-size: 12px;
+            font-size: 15px;
         }
 
         .loading:before {
@@ -369,6 +407,7 @@
             text-align: center;
             padding: 40px;
             color: #666;
+            font-size: 16px;
         }
 
         /* Complete Button */
@@ -382,14 +421,14 @@
             padding: 6px 0;
         }
         .iw-page-info {
-            font-size: 11px;
+            font-size: 14px;
             color: #64748b;
             white-space: nowrap;
         }
         .iw-pagination-bar .pagination .page-link {
             color: #6c7ae0;
-            font-size: 11px;
-            padding: 3px 10px;
+            font-size: 14px;
+            padding: 5px 12px;
         }
         .iw-pagination-bar .pagination .page-item.active .page-link {
             background-color: #6c7ae0;
@@ -409,7 +448,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .btn-complete:hover:not(:disabled) {
@@ -427,7 +466,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             z-index: 9999 !important;
-            font-size: 12px;
+            font-size: 15px;
             border: 1px solid #6c7ae0;
             border-radius: 4px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
@@ -447,8 +486,8 @@
 
         /* Responsive */
         @media (max-width: 1400px) {
-            .iw-table { font-size: 11px; }
-            .order-list-nested { font-size: 9px; }
+            .iw-table { font-size: 14px; }
+            .order-list-nested { font-size: 12px; }
         }
 
         @media (max-width: 768px) {
@@ -583,6 +622,6 @@
     <script src="/js/app-components.js?v=2.1.9"></script>
     
     <!-- Incomplete Works JS -->
-    <script src="/js/incomplete-works.js?v=2.2.2"></script>
+    <script src="/js/incomplete-works.js?v=2.2.4"></script>
 </body>
 </html>

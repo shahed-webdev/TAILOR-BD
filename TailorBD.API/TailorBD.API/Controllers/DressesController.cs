@@ -167,7 +167,7 @@ namespace TailorBD.API.Controllers
                         new { C = customerId, D = dressId, I = institutionId }) ?? "";
                 }
 
-                // Measurement groups — include Ascending in SELECT for DISTINCT + ORDER BY
+                // Measurement groups ï¿½ include Ascending in SELECT for DISTINCT + ORDER BY
                 var groupRows = await conn.QueryAsync(
                     @"SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending
                       FROM Measurement_Type
@@ -184,15 +184,33 @@ namespace TailorBD.API.Controllers
 
                     var measurements = (await conn.QueryAsync(
                         @"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
-                                 ISNULL(cm.Measurement,'') AS Measurement
+                                 COALESCE(NULLIF(LTRIM(RTRIM(latest_om.Measurement)), ''), NULLIF(LTRIM(RTRIM(cm.Measurement)), ''), '') AS Measurement
                           FROM Measurement_Type mt
                           LEFT JOIN (
+                              SELECT MeasurementTypeID, Measurement
+                              FROM (
+                                  SELECT om.MeasurementTypeID, om.Measurement,
+                                         ROW_NUMBER() OVER (
+                                             PARTITION BY om.MeasurementTypeID
+                                             ORDER BY o.OrderDate DESC, ol.OrderListID DESC
+                                         ) AS rn
+                                  FROM Ordered_Measurement om
+                                  INNER JOIN OrderList ol ON om.OrderListID = ol.OrderListID AND ol.InstitutionID = om.InstitutionID
+                                  INNER JOIN [Order] o ON ol.OrderID = o.OrderID AND o.InstitutionID = om.InstitutionID
+                                  WHERE om.CustomerID = @C
+                                    AND om.InstitutionID = @I
+                                    AND ol.DressID = @D
+                                    AND ISNULL(LTRIM(RTRIM(om.Measurement)), '') <> ''
+                              ) ranked
+                              WHERE rn = 1
+                          ) latest_om ON mt.MeasurementTypeID = latest_om.MeasurementTypeID
+                          LEFT JOIN (
                               SELECT MeasurementTypeID, Measurement FROM Customer_Measurement
-                              WHERE CustomerID=@C
+                              WHERE CustomerID=@C AND InstitutionID=@I
                           ) cm ON mt.MeasurementTypeID = cm.MeasurementTypeID
                           WHERE mt.Measurement_GroupID=@G
                           ORDER BY ISNULL(mt.Measurement_Group_SerialNo,99999)",
-                        new { C = customerId, G = gid }))
+                        new { C = customerId, I = institutionId, D = dressId, G = gid }))
                         .Select(row => (IDictionary<string, object>)row)
                         .Select(dict => new Dictionary<string, object>(dict))
                         .ToList();
@@ -202,11 +220,29 @@ namespace TailorBD.API.Controllers
 
                 var orphanRows = (await conn.QueryAsync(
                     @"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
-                             ISNULL(cm.Measurement,'') AS Measurement
+                             COALESCE(NULLIF(LTRIM(RTRIM(latest_om.Measurement)), ''), NULLIF(LTRIM(RTRIM(cm.Measurement)), ''), '') AS Measurement
                       FROM Measurement_Type mt
                       LEFT JOIN (
+                          SELECT MeasurementTypeID, Measurement
+                          FROM (
+                              SELECT om.MeasurementTypeID, om.Measurement,
+                                     ROW_NUMBER() OVER (
+                                         PARTITION BY om.MeasurementTypeID
+                                         ORDER BY o.OrderDate DESC, ol.OrderListID DESC
+                                     ) AS rn
+                              FROM Ordered_Measurement om
+                              INNER JOIN OrderList ol ON om.OrderListID = ol.OrderListID AND ol.InstitutionID = om.InstitutionID
+                              INNER JOIN [Order] o ON ol.OrderID = o.OrderID AND o.InstitutionID = om.InstitutionID
+                              WHERE om.CustomerID = @C
+                                AND om.InstitutionID = @I
+                                AND ol.DressID = @D
+                                AND ISNULL(LTRIM(RTRIM(om.Measurement)), '') <> ''
+                          ) ranked
+                          WHERE rn = 1
+                      ) latest_om ON mt.MeasurementTypeID = latest_om.MeasurementTypeID
+                      LEFT JOIN (
                           SELECT MeasurementTypeID, Measurement FROM Customer_Measurement
-                          WHERE CustomerID=@C
+                          WHERE CustomerID=@C AND InstitutionID=@I
                       ) cm ON mt.MeasurementTypeID = cm.MeasurementTypeID
                       WHERE mt.InstitutionID=@I AND mt.DressID=@D AND mt.Measurement_GroupID IS NULL
                       ORDER BY ISNULL(mt.Ascending,99999), mt.MeasurementTypeID",
@@ -241,16 +277,36 @@ namespace TailorBD.API.Controllers
                     var styles = (await conn.QueryAsync(
                         @"SELECT ds.Dress_StyleID AS DressStyleId,
                                  ds.Dress_Style_Name AS DressStyleName,
-                                 ISNULL(cds.DressStyleMesurement,'') AS DressStyleMesurement,
-                                 CAST(CASE WHEN cds.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck
+                                 COALESCE(NULLIF(LTRIM(RTRIM(latest_ods.DressStyleMesurement)), ''), NULLIF(LTRIM(RTRIM(cds.DressStyleMesurement)), ''), '') AS DressStyleMesurement,
+                                 CAST(CASE WHEN latest_ods.Dress_StyleID IS NOT NULL OR cds.Dress_StyleID IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS IsCheck
                           FROM Dress_Style ds
+                          LEFT JOIN (
+                              SELECT Dress_StyleID, DressStyleMesurement
+                              FROM (
+                                  SELECT ods.Dress_StyleID, ods.DressStyleMesurement,
+                                         ROW_NUMBER() OVER (
+                                             PARTITION BY ods.Dress_StyleID
+                                             ORDER BY
+                                                 CASE WHEN ISNULL(LTRIM(RTRIM(ods.DressStyleMesurement)), '') <> '' THEN 0 ELSE 1 END,
+                                                 o.OrderDate DESC,
+                                                 ol.OrderListID DESC
+                                         ) AS rn
+                                  FROM Ordered_Dress_Style ods
+                                  INNER JOIN OrderList ol ON ods.OrderListID = ol.OrderListID
+                                  INNER JOIN [Order] o ON ol.OrderID = o.OrderID
+                                  WHERE ods.CustomerID = @C
+                                    AND ol.InstitutionID = @I
+                                    AND ol.DressID = @D
+                              ) ranked
+                              WHERE rn = 1
+                          ) latest_ods ON ds.Dress_StyleID = latest_ods.Dress_StyleID
                           LEFT JOIN (
                               SELECT Dress_StyleID, DressStyleMesurement FROM Customer_Dress_Style
                               WHERE CustomerID=@C
                           ) cds ON ds.Dress_StyleID = cds.Dress_StyleID
                           WHERE ds.Dress_Style_CategoryID=@Cat
                           ORDER BY ISNULL(ds.StyleSerial,99999)",
-                        new { C = customerId, Cat = catId }))
+                        new { C = customerId, I = institutionId, D = dressId, Cat = catId }))
                         .Select(row => (IDictionary<string, object>)row)
                         .Select(dict => new Dictionary<string, object>(dict))
                         .ToList();

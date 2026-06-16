@@ -252,11 +252,11 @@
         const registrationId = sessionStorage.getItem('registrationId');
 
         const data = {
-            accountID: parseInt(accountId),
-            institutionID: parseInt(institutionId),
-            registrationID: parseInt(registrationId),
+            accountId: parseInt(accountId),
+            institutionId: parseInt(institutionId),
+            registrationId: parseInt(registrationId),
             amount: amount,
-            type: type, // 'deposit' or 'withdraw'
+            type: type,
             note: note,
             date: date
         };
@@ -268,7 +268,7 @@
             data: JSON.stringify(data),
             success: function(response) {
                 if (response.success) {
-                    showAlert('success', `${type === 'deposit' ? 'Deposit' : 'Withdrawal'} successful!`);
+                    showAlert('success', response.message || `${type === 'deposit' ? 'Deposit' : 'Withdrawal'} successful!`);
                     transactionModal.hide();
                     loadAccounts();
                 } else {
@@ -277,7 +277,8 @@
             },
             error: function(xhr) {
                 console.error('Transaction error:', xhr);
-                showAlert('error', 'Transaction failed');
+                const response = xhr.responseJSON;
+                showAlert('error', (response && response.message) ? response.message : 'Transaction failed');
             }
         });
     };

@@ -59,6 +59,8 @@
     function setupEventListeners() {
         // Calculate due amount on discount/paid amount change
         $('#discountAmount, #paidAmount').on('input', calculateDueAmount);
+
+        setupAutoClearZeroInputs('#discountAmount, #paidAmount');
         
         // Listen for language change events
         $(document).on('click', '#langToggle', function() {
@@ -68,6 +70,21 @@
                     calculateDueAmount();
                 }
             }, 100);
+        });
+    }
+
+    function setupAutoClearZeroInputs(selectors) {
+        $(selectors).on('focus', function () {
+            const raw = $.trim($(this).val());
+            if (raw === '' || parseFloat(raw) === 0) {
+                $(this).val('');
+            }
+        }).on('blur', function () {
+            const raw = $.trim($(this).val());
+            if (raw === '' || isNaN(parseFloat(raw))) {
+                $(this).val(0);
+            }
+            calculateDueAmount();
         });
     }
 
@@ -158,8 +175,6 @@
         // Try different property names for delivery date
         const deliveryDateValue = orderData.customer.deliveryDate 
             || orderData.customer.DeliveryDate 
-            || orderData.customer.updateDeliveryDate
-            || orderData.customer.Update_DeliveryDate
             || orderData.deliveryDate 
             || orderData.DeliveryDate
             || (orderData.customer && orderData.customer.delivery_date)

@@ -99,7 +99,8 @@
     border-radius: 5px;
     padding: 0.25rem 0.5rem;
     transition: all 0.3s;
-    font-size: 0.875rem;
+    font-size: 17px;
+    font-weight: 600;
 }
 
     .measurement-input:focus {
@@ -122,55 +123,153 @@
     z-index: 1050 !important;
 }
 
-/* Compact measurement modal styles */
-#measurementModal .modal-dialog {
-    max-width: 500px;
-    margin: 1.75rem auto;
+/* Compact measurement modal — wide grid, all fields visible */
+#measurementModal .oe-measurement-modal-dialog {
+    max-width: min(980px, 96vw);
+    margin: 0.75rem auto;
 }
 
 #measurementModal .modal-body {
-    max-height: 70vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 1.5rem 2rem;
+    max-height: none;
+    overflow: visible;
+    padding: 0.75rem 1rem 1rem;
     background: #f8f9fa;
 }
 
-#measurementModal .form-label {
-    margin-bottom: 0.25rem;
-    font-weight: 500;
-    text-align: center;
+#measurementModal .measurement-fraction-bar {
+    margin-bottom: 12px;
+}
+
+.oe-measurements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+#measurementModal .measurement-group.oe-measurement-group {
+    background: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 0;
+}
+
+#measurementModal .measurement-group .measurement-item {
+    margin-bottom: 10px;
+}
+
+#measurementModal .measurement-group .measurement-item:last-child {
+    margin-bottom: 0;
+}
+
+#measurementModal .measurement-group .measurement-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 4px;
     display: block;
-    font-size: 0.85rem;
-    color: #495057;
+    text-align: left;
+}
+
+#measurementModal .measurement-group .measurement-input {
+    width: 100%;
+    max-width: none;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    height: auto;
 }
 
 #measurementModal .form-control-sm {
-    height: calc(1.5em + 0.5rem + 2px);
-    padding: 0.35rem 0.5rem;
-    font-size: 0.875rem;
-    text-align: center;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+    max-width: none;
+}
+
+/* Style modal — categories side-by-side, compact grid like dress-measurements */
+#styleModal .oe-style-modal-dialog {
+    max-width: min(1100px, 98vw);
+    margin: 0.75rem auto;
+}
+
+#styleModal .modal-body {
+    max-height: none;
+    overflow: visible;
+    padding: 0.75rem 1rem 1rem;
+    background: #f8f9fa;
+}
+
+.oe-styles-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    align-items: start;
     width: 100%;
-    max-width: 150px;
 }
 
-#measurementModal .measurement-item {
-    display: inline-block;
-    margin: 0.5rem 1rem;
-    vertical-align: top;
+.oe-style-category {
+    background: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-#measurementModal .measurement-group-row {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #dee2e6;
+.oe-style-category-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
-    #measurementModal .measurement-group-row:last-child {
-        border-bottom: none;
-    }
+.oe-style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    gap: 8px;
+    padding: 10px;
+}
+
+.oe-style-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 8px 6px;
+    min-width: 0;
+}
+
+.oe-style-card.selected {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.08);
+}
+
+.oe-style-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.oe-style-check .form-check-input {
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.oe-style-check .form-check-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.25;
+    word-break: break-word;
+    color: #333;
+}
+
+.oe-style-meas {
+    margin-top: 6px;
+    width: 100%;
+    font-size: 13px;
+    padding: 4px 6px;
+    text-align: center;
+}
 
 .style-category {
     background: white;
@@ -350,18 +449,9 @@
     font-size: 1rem;
 }
 
-/* Measurement modal - Old project style (horizontal float layout) */
-#measurementModal .modal-dialog {
-    max-width: 500px;
-    margin: 1.75rem auto;
-}
-
-#measurementModal .modal-body {
-    max-height: 70vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 1.5rem 2rem;
-    background: #fafafa;
+/* Measurement modal - grid layout */
+#measurementModal .oe-measurement-modal-dialog {
+    max-width: min(980px, 96vw);
 }
 
 /* Mobile Responsive Styles */
@@ -480,55 +570,41 @@
         font-size: 0.9rem;
     }
 
-    /* Measurement Modal - Mobile specific */
-    #measurementModal .modal-dialog {
-        max-width: 95%;
+    /* Measurement Modal - Mobile */
+    #measurementModal .oe-measurement-modal-dialog {
+        max-width: calc(100% - 1rem);
         margin: 0.5rem auto;
     }
 
     #measurementModal .modal-body {
-        padding: 1rem;
-        max-height: 65vh;
-    }
-
-    /* Measurement items - Stack on mobile */
-    .measurement-item-old {
-        float: none;
-        width: 100%;
-        padding: 0.5rem 0;
-        text-align: left;
-    }
-
-    .measurement-label-old {
-        text-align: left;
-        font-size: 0.85rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .measurement-input-old {
-        width: 100%;
-        max-width: 100%;
-        font-size: 0.9rem;
-        padding: 0.5rem;
-    }
-
-    .measurement-group-row-old {
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
-    }
-
-    /* Style Modal - Mobile specific */
-    #styleModal .modal-body {
-        padding: 1rem;
-        max-height: calc(100vh - 200px); /* Reserve space for header and footer */
+        padding: 0.75rem;
+        max-height: calc(100vh - 120px);
         overflow-y: auto;
     }
 
-    #styleModal .modal-dialog {
-        margin: 0.5rem;
+    .oe-measurements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+    }
+
+    #measurementModal .measurement-group .measurement-input {
+        font-size: 15px;
+        padding: 7px 8px;
+    }
+
+    /* Style Modal - Mobile */
+    #styleModal .oe-style-modal-dialog {
+        max-width: calc(100% - 1rem);
+        margin: 0.5rem auto;
         display: flex;
         flex-direction: column;
         max-height: calc(100vh - 1rem);
+    }
+
+    #styleModal .modal-body {
+        padding: 0.75rem;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
     }
 
     #styleModal .modal-content {
@@ -538,12 +614,23 @@
     }
 
     #styleModal .modal-footer {
-        flex-shrink: 0; /* Prevent footer from shrinking */
+        flex-shrink: 0;
         position: sticky;
         bottom: 0;
         background: white;
         z-index: 1;
         border-top: 1px solid #dee2e6;
+    }
+
+    .oe-styles-layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .oe-style-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 6px;
+        padding: 8px;
     }
 
     /* Payment Modal - FIXED: Same fix */
@@ -575,44 +662,8 @@
         border-top: 1px solid #dee2e6;
     }
 
-    /* Style Modal - Mobile specific */
-    #styleModal .modal-body {
-        padding: 1rem;
-        max-height: calc(100vh - 200px); /* Reserve space for header and footer */
-        overflow-y: auto;
-    }
-
-    #styleModal .modal-dialog {
-        margin: 0.5rem;
-        display: flex;
-        flex-direction: column;
-        max-height: calc(100vh - 1rem);
-    }
-
-    #styleModal .modal-content {
-        display: flex;
-        flex-direction: column;
-        max-height: 100%;
-    }
-
-    #styleModal .modal-footer {
-        flex-shrink: 0; /* Prevent footer from shrinking */
-        position: sticky;
-        bottom: 0;
-        background: white;
-        z-index: 1;
-        border-top: 1px solid #dee2e6;
-    }
-
-    /* Measurement Modal - FIXED: Same fix */
-    #measurementModal .modal-body {
-        padding: 1rem;
-        max-height: calc(100vh - 200px);
-        overflow-y: auto;
-    }
-
-    #measurementModal .modal-dialog {
-        margin: 0.5rem auto;
+    /* Measurement Modal - sticky footer on small screens */
+    #measurementModal .oe-measurement-modal-dialog {
         display: flex;
         flex-direction: column;
         max-height: calc(100vh - 1rem);

@@ -1,4 +1,13 @@
 ﻿// Delete Order Item
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 function deleteOrderItem(index) {
     const item = orderItems[index];
     
@@ -104,24 +113,25 @@ function renderMeasurements() {
 
     const measurementsHTML = item.measurements.map((group, groupIndex) => {
         const groupItems = group.measurements.map(m => `
-            <div class="measurement-item-old">
-                <label class="measurement-label-old">${m.measurementTypeName}</label>
-                <input type="text" 
-                       class="form-control measurement-input-old" 
-                       value="${m.measurement || ''}"
-                       placeholder=""
-                       onchange="updateMeasurement(${groupIndex}, ${m.measurementTypeID}, this.value)">
+            <div class="measurement-item">
+                <label class="measurement-label">${escapeHtml(m.measurementTypeName)}</label>
+                <input type="text"
+                       class="form-control measurement-input meas-input"
+                       value="${escapeHtml(m.measurement || '')}"
+                       placeholder="মাপ দিন..."
+                       data-group-index="${groupIndex}"
+                       data-type-id="${m.measurementTypeID}">
             </div>
         `).join('');
 
-        return `
-            <div class="measurement-group-row-old">
-                ${groupItems}
-            </div>
-        `;
+        return `<div class="measurement-group oe-measurement-group">${groupItems}</div>`;
     }).join('');
 
-    container.innerHTML = `<div class="measurements-container-old">${measurementsHTML}</div>`;
+    container.innerHTML = `<div class="oe-measurements-grid">${measurementsHTML}</div>`;
+
+    if (window.MeasurementFractionBar && MeasurementFractionBar.enhanceInputs) {
+        MeasurementFractionBar.enhanceInputs(container);
+    }
     
     console.log('✅ Rendered measurements for', item.dress.dressName);
 }
@@ -147,17 +157,12 @@ function saveMeasurements() {
     const container = document.getElementById('measurementsContainer');
     if (!container) return;
 
-    const inputs = container.querySelectorAll('.measurement-input-old');
+    const inputs = container.querySelectorAll('.measurement-input.meas-input');
     inputs.forEach(input => {
-        const onchangeAttr = input.getAttribute('onchange');
-        if (onchangeAttr) {
-            // Extract groupIndex and measurementTypeId from onchange attribute
-            const match = onchangeAttr.match(/updateMeasurement\((\d+),\s*(\d+),/);
-            if (match) {
-                const groupIndex = parseInt(match[1]);
-                const measurementTypeId = parseInt(match[2]);
-                updateMeasurement(groupIndex, measurementTypeId, input.value);
-            }
+        const groupIndex = parseInt(input.dataset.groupIndex, 10);
+        const measurementTypeId = parseInt(input.dataset.typeId, 10);
+        if (!isNaN(groupIndex) && !isNaN(measurementTypeId)) {
+            updateMeasurement(groupIndex, measurementTypeId, input.value);
         }
     });
 
@@ -248,46 +253,39 @@ function renderStyles() {
         return;
     }
     
-    const stylesHTML = item.styles.map((group, groupIndex) => `
-        <div class="style-category mb-3">
-            <div class="style-category-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-chevron-right me-2"></i>
-                    ${group.groupName}
-                </h6>
+    const stylesHTML = item.styles.map((group, groupIndex) => {
+        const styleCards = group.styles.map(style => `
+            <div class="oe-style-card ${style.isCheck ? 'selected' : ''}">
+                <div class="oe-style-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="style_${style.dressStyleId}"
+                           ${style.isCheck ? 'checked' : ''}
+                           onchange="updateStyleCheck(${groupIndex}, ${style.dressStyleId}, this.checked)">
+                    <label class="form-check-label" for="style_${style.dressStyleId}">
+                        ${escapeHtml(style.dressStyleName)}
+                    </label>
+                </div>
+                <input type="text"
+                       class="form-control form-control-sm oe-style-meas style-meas-input"
+                       placeholder="মাপ..."
+                       value="${escapeHtml(style.dressStyleMeasurement || '')}"
+                       ${!style.isCheck ? 'disabled' : ''}
+                       data-group-index="${groupIndex}"
+                       data-style-id="${style.dressStyleId}"
+                       onchange="updateStyleMeasurement(${groupIndex}, ${style.dressStyleId}, this.value)">
             </div>
-            <div class="style-items">
-                ${group.styles.map(style => `
-                    <div class="style-item">
-                        <div class="row align-items-center">
-                            <div class="col-md-5">
-                                <div class="form-check">
-                                    <input class="form-check-input custom-checkbox" 
-                                           type="checkbox" 
-                                           id="style_${style.dressStyleId}"
-                                           ${style.isCheck ? 'checked' : ''}
-                                           onchange="updateStyleCheck(${groupIndex}, ${style.dressStyleId}, this.checked)">
-                                    <label class="form-check-label" for="style_${style.dressStyleId}">
-                                        ${style.dressStyleName}
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <input type="text" 
-                                       class="form-control form-control-sm" 
-                                       placeholder="বিস্তারিত লিখুন..."
-                                       value="${style.dressStyleMeasurement || ''}"
-                                       ${!style.isCheck ? 'disabled' : ''}
-                                       onchange="updateStyleMeasurement(${groupIndex}, ${style.dressStyleId}, this.value)">
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
+        `).join('');
+
+        return `
+            <div class="oe-style-category">
+                <div class="oe-style-category-header">${escapeHtml(group.groupName)}</div>
+                <div class="oe-style-grid">${styleCards}</div>
             </div>
-        </div>
-    `).join('');
-    
-    container.innerHTML = stylesHTML;
+        `;
+    }).join('');
+
+    container.innerHTML = `<div class="oe-styles-layout">${stylesHTML}</div>`;
     
     console.log('✅ Rendered styles for', item.dress.dressName);
 }

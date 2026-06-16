@@ -14,9 +14,26 @@
 
     // URL Parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const customerId = urlParams.get('customerId');
-    const clothForId = urlParams.get('clothForId');
-    const orderId = urlParams.get('orderId'); // For adding to existing order
+    function getUrlParam(name) {
+        let val = urlParams.get(name);
+        if (val != null) return val;
+        for (const [k, v] of urlParams.entries()) {
+            if (k.toLowerCase() === name.toLowerCase()) return v;
+        }
+        return null;
+    }
+    const customerId = getUrlParam('customerId');
+    const clothForId = getUrlParam('clothForId') || getUrlParam('clothid') || '1';
+    const orderId = getUrlParam('orderId'); // For adding to existing order
+
+    function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
 
     $(document).ready(function() {
         // Debug: Check session data
@@ -407,7 +424,7 @@
                     const dressesWithMeasurements = response.data;
                     console.log('Dresses with measurements:', dressesWithMeasurements);
                     
-                    // Mark those options with orange background
+                    // Mark dresses that already have saved measurements
                     dressesWithMeasurements.forEach(dressId => {
                         $(`#dressSelect option[value="${dressId}"]`).addClass('has-measurement');
                     });
@@ -436,35 +453,77 @@
         $('#measurementSection').show();
     };
 
-    function loadDressMeasurementsAndStyles(dressId) {
+    function loadDressStylesFromCustomerPage(dressId) {
         const institutionId = sessionStorage.getItem('institutionId');
 
+        $.get(`/api/customer-page/dress-styles?institutionId=${institutionId}&dressId=${dressId}&customerId=${customerId}`, function (r) {
+            if (r.success && r.data && r.data.length > 0) {
+                styles = r.data.map(function (cat) {
+                    return {
+                        dressStyleCategoryId: cat.categoryId,
+                        dressStyleCategoryName: cat.categoryName,
+                        styles: (cat.styles || []).map(function (s) {
+                            return {
+                                dressStyleId: s.styleId,
+                                dressStyleName: s.styleName,
+                                dressStyleMesurement: s.styleMeasurement || '',
+                                styleMeasurement: s.styleMeasurement || '',
+                                isCheck: !!s.isChecked
+                            };
+                        })
+                    };
+                });
+            } else {
+                styles = [];
+            }
+            displayStyles();
+        }).fail(function (xhr) {
+            console.error('Error loading dress styles:', xhr);
+            styles = [];
+            displayStyles();
+        });
+    }
+
+    function loadDressMeasurementsFromCustomerPage(dressId) {
+        const institutionId = sessionStorage.getItem('institutionId');
+
+        $.get(`/api/customer-page/measurement-types?institutionId=${institutionId}&dressId=${dressId}&customerId=${customerId}`, function (r) {
+            if (r.success && r.data && r.data.groups) {
+                measurements = r.data.groups.map(function (g) {
+                    return {
+                        measurements: (g.types || []).map(function (mt) {
+                            return {
+                                measurementTypeID: mt.measurementTypeId,
+                                measurementType: mt.measurementType,
+                                measurement: mt.measurement || ''
+                            };
+                        })
+                    };
+                });
+                dressDetails = r.data.cdDetails || '';
+            } else {
+                measurements = [];
+                dressDetails = '';
+            }
+            displayMeasurements();
+            $('#dressDetails').val(dressDetails);
+        }).fail(function (xhr) {
+            console.error('Error loading dress measurements:', xhr);
+            measurements = [];
+            dressDetails = '';
+            displayMeasurements();
+            $('#measurementGrid').html('<p class="text-center text-muted">Failed to load measurements</p>');
+        });
+    }
+
+    function loadDressMeasurementsAndStyles(dressId) {
         // Show loading
         $('#measurementGrid').html('<div class="loading-spinner"><div class="spinner-border text-primary"></div><p>Loading...</p></div>');
         $('#stylesContainer').html('');
 
-        $.ajax({
-            url: `/api/measurement/dress-measurements-styles?dressId=${dressId}&customerId=${customerId}&institutionId=${institutionId}`,
-            method: 'GET',
-            success: function(response) {
-                if (response.success && response.data) {
-                    measurements = response.data.measurementGroups || [];
-                    styles = response.data.styleGroups || [];
-                    dressDetails = response.data.orderDetails || '';
-                    
-                    displayMeasurements();
-                    displayStyles();
-                    $('#dressDetails').val(dressDetails);
-                } else {
-                    showAlert('error', 'Failed to load measurements and styles');
-                }
-            },
-            error: function(xhr) {
-                console.error('Error loading measurements and styles:', xhr);
-                showAlert('error', 'Failed to load measurements and styles');
-                $('#measurementGrid').html('<p class="text-center text-muted">Failed to load measurements</p>');
-            }
-        });
+        // Same APIs as customer-details (Customer_Measurement + Customer_Dress_Style)
+        loadDressMeasurementsFromCustomerPage(dressId);
+        loadDressStylesFromCustomerPage(dressId);
     }
 
     function displayMeasurements() {
@@ -490,11 +549,11 @@
 
                 $groupDiv.append(`
                     <div class="measurement-item">
-                        <label class="measurement-label">${measurementType}</label>
+                        <label class="measurement-label">${escapeHtml(measurementType)}</label>
                         <input type="text" 
                                class="measurement-input" 
                                data-measurement-id="${measurementId}"
-                               value="${measurement}"
+                               value="${escapeHtml(measurement)}"
                                placeholder="মাপ দিন...">
                     </div>
                 `);
@@ -502,6 +561,10 @@
 
             $grid.append($groupDiv);
         });
+
+        if (window.MeasurementFractionBar && MeasurementFractionBar.enhanceInputs) {
+            MeasurementFractionBar.enhanceInputs($grid[0]);
+        }
     }
 
     function displayStyles() {
@@ -516,8 +579,8 @@
         $('#stylesCardWrapper').show();
 
         styles.forEach(category => {
-            const categoryId = category.dressStyleCategoryId || category.DressStyleCategoryId;
-            const categoryName = category.dressStyleCategoryName || category.DressStyleCategoryName;
+            const categoryId = category.dressStyleCategoryId || category.DressStyleCategoryId || category.categoryId;
+            const categoryName = category.dressStyleCategoryName || category.DressStyleCategoryName || category.categoryName;
             const categoryStyles = category.styles || category.Styles || [];
 
             if (categoryStyles.length === 0) return;
@@ -536,21 +599,21 @@
             categoryStyles.forEach(style => {
                 const styleId = style.dressStyleId || style.DressStyleId;
                 const styleName = style.dressStyleName || style.DressStyleName;
-                const styleMeasurement = style.dressStyleMesurement || style.dressStyleMeasurement || '';
-                const isCheck = style.isCheck || style.IsCheck || false;
+                const styleMeasurement = style.dressStyleMesurement || style.dressStyleMeasurement || style.styleMeasurement || style.StyleMeasurement || '';
+                const isCheck = style.isCheck || style.IsCheck || style.isChecked || false;
 
                 const $styleItem = $(`
                     <div class="style-item ${isCheck ? 'selected' : ''}" data-style-id="${styleId}">
                         <img class="style-image" src="/Handler/Style_Name.ashx?Img=${styleId}" 
-                             alt="${styleName}" onerror="this.style.display='none'">
+                             alt="${escapeHtml(styleName)}" onerror="this.style.display='none'">
                         <div class="style-checkbox">
                             <input type="checkbox" id="style${styleId}" ${isCheck ? 'checked' : ''}>
-                            <label for="style${styleId}">${styleName}</label>
+                            <label for="style${styleId}">${escapeHtml(styleName)}</label>
                         </div>
                         <input type="text" 
                                class="style-measurement" 
                                placeholder="মাপ..."
-                               value="${styleMeasurement}">
+                               value="${escapeHtml(styleMeasurement)}">
                     </div>
                 `);
 
@@ -755,7 +818,7 @@
             const measurement = $item.find('.style-measurement').val().trim();
             
             collectedStyles.push({
-                id: $(this).attr('id').replace('style', ''),
+                id: parseInt($(this).attr('id').replace('style', ''), 10),
                 value: measurement
             });
         });

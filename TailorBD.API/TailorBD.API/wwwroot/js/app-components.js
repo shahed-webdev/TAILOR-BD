@@ -4,6 +4,72 @@
 (function() {
     'use strict';
 
+    const MOBILE_SIDEBAR_BREAKPOINT = 992;
+    let lastMobileSidebar = null;
+
+    function isMobileSidebar() {
+        return window.innerWidth <= MOBILE_SIDEBAR_BREAKPOINT;
+    }
+
+    function closeMobileSidebar() {
+        $('#sidebar').removeClass('show');
+        $('#sidebarOverlay').removeClass('show');
+    }
+
+    function setSidebarCollapsed(collapsed) {
+        const $sidebar = $('#sidebar');
+        if (!$sidebar.length) return;
+
+        if (collapsed) {
+            $sidebar.addClass('collapsed');
+            $('body').addClass('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', 'true');
+        } else {
+            $sidebar.removeClass('collapsed');
+            $('body').removeClass('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', 'false');
+        }
+        $('.sidebar-flyout').remove();
+    }
+
+    function syncSidebarCollapsedFromStorage() {
+        if (isMobileSidebar()) {
+            $('body').removeClass('sidebar-collapsed');
+            $('#sidebar').removeClass('collapsed');
+            return;
+        }
+        setSidebarCollapsed(localStorage.getItem('sidebarCollapsed') === 'true');
+    }
+
+    function isSidebarLiPermitted(li) {
+        return !!(li && li.style.display !== 'none');
+    }
+
+    function getPermittedSidebarItems($container) {
+        return $container.children('li').filter(function() {
+            return isSidebarLiPermitted(this);
+        });
+    }
+
+    function handleSidebarResize() {
+        const nowMobile = isMobileSidebar();
+        if (lastMobileSidebar === null) {
+            lastMobileSidebar = nowMobile;
+            return;
+        }
+        if (nowMobile === lastMobileSidebar) return;
+
+        if (nowMobile) {
+            $('body').removeClass('sidebar-collapsed');
+            $('#sidebar').removeClass('collapsed');
+            closeMobileSidebar();
+        } else {
+            closeMobileSidebar();
+            syncSidebarCollapsedFromStorage();
+        }
+        lastMobileSidebar = nowMobile;
+    }
+
     // ─── JWT Token Helper ─────────────────────────────────────────────────
     var TokenHelper = {
         KEY: 'tailorbd_jwt',
@@ -404,6 +470,7 @@
 
         // Initialize after all components loaded
         initializeEventHandlers();
+        lastMobileSidebar = isMobileSidebar();
         restoreSidebarState();
         loadUserProfile();
         initializeLanguage();
@@ -414,11 +481,7 @@
 
     // ── Restore Sidebar State from localStorage ────────────────────────────
     function restoreSidebarState() {
-        if (window.innerWidth <= 768) return;
-        if (localStorage.getItem('sidebarCollapsed') === 'true') {
-            $('#sidebar').addClass('collapsed');
-            $('#mainContent').css('margin-left', '70px');
-        }
+        syncSidebarCollapsedFromStorage();
     }
 
     // ── Dashboard Back Button setup ───────────────────────────────────────
@@ -485,23 +548,28 @@
 
         // Menu Toggle
         $(document).on('click', '#menuToggle', function() {
-            if (window.innerWidth <= 768) {
+            if (isMobileSidebar()) {
+                $('#sidebar').removeClass('collapsed');
+                $('body').removeClass('sidebar-collapsed');
                 $('#sidebar').toggleClass('show');
                 $('#sidebarOverlay').toggleClass('show');
             } else {
-                const $sidebar = $('#sidebar');
-                const $main    = $('#mainContent');
-                $sidebar.toggleClass('collapsed');
-                if ($sidebar.hasClass('collapsed')) {
-                    $main.css('margin-left', '70px');
-                    localStorage.setItem('sidebarCollapsed', 'true');
-                    $('.sidebar-flyout').remove();
-                } else {
-                    $main.css('margin-left', '');
-                    localStorage.setItem('sidebarCollapsed', 'false');
-                    $('.sidebar-flyout').remove();
-                }
+                const isCollapsed = !$('#sidebar').hasClass('collapsed');
+                setSidebarCollapsed(isCollapsed);
             }
+        });
+
+        // Close off-canvas sidebar after navigation
+        $(document).on('click', '.sidebar-menu a[href]:not([href="#"])', function() {
+            if (!isMobileSidebar()) return;
+            if ($(this).hasClass('menu-toggle')) return;
+            closeMobileSidebar();
+        });
+
+        let sidebarResizeTimer;
+        $(window).on('resize', function() {
+            clearTimeout(sidebarResizeTimer);
+            sidebarResizeTimer = setTimeout(handleSidebarResize, 150);
         });
 
         // Close sidebar when clicking overlay
@@ -535,9 +603,9 @@
                 $flyout.append('<div class="sidebar-flyout-title">' + tooltip + '</div>');
             }
 
-            // Build items recursively
+            // Build items recursively (use permission check, not :visible — collapsed submenu is CSS-hidden)
             function buildFlyoutItems($src, $target, depth) {
-                $src.children('li').each(function() {
+                getPermittedSidebarItems($src).each(function() {
                     const $item      = $(this);
                     const $childLink = $item.children('a').first();
                     const $childSub  = $item.children('.submenu');
@@ -570,6 +638,10 @@
             }
 
             buildFlyoutItems($submenu, $flyout, 0);
+
+            if (!$flyout.find('a').length) {
+                return;
+            }
 
             // Toggle nested on click
             $flyout.on('click', '.flyout-toggle', function(e) {
@@ -942,13 +1014,18 @@
 
                 $('.sidebar-menu .submenu').get().reverse().forEach(function(submenu) {
                     const $submenu = $(submenu);
-                    const $visibleItems = $submenu.find('> li:visible');
-                    if ($visibleItems.length === 0) {
-                        $submenu.closest('li.menu-item-has-children').hide();
+                    const $allowedItems = getPermittedSidebarItems($submenu);
+                    const $parent = $submenu.closest('li.menu-item-has-children');
+                    if ($allowedItems.length === 0) {
+                        $parent.hide();
+                    } else {
+                        $parent.show();
                     }
                 });
 
                 console.log(`Sidebar: ${matchedCount} links matched, ${hiddenCount} links hidden`);
+
+                syncSidebarCollapsedFromStorage();
 
                 window._subAdminAllowedPages = allowedHrefs;
 
@@ -1253,7 +1330,7 @@
 
     window.TailorBD = window.TailorBD || {};
     window.TailorBD.printSizePref = {
-        validSizes: ['3', '3.5', '4', '4.5', '5'],
+        validSizes: ['3', '3.5', '4', '4.5', '5', '6', '6.5'],
         defaultSize: '4',
 
         storageKey: function() {

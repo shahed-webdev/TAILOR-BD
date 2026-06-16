@@ -30,6 +30,7 @@
                 ? window.TailorBD.printSizePref.save($(this).val())
                 : $(this).val();
             applyPrintSizeToScreen(size);
+            scheduleMeasurementLayoutFit();
         });
 
         // Dress filter dropdown
@@ -149,7 +150,9 @@
         }
         const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
         const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+        const labelFont = getMeasurementLabelFontSize(mFont);
         document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+        document.documentElement.style.setProperty('--measurement-label-font-size', labelFont + 'px');
         document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
         if (printSettings.moneyReceipt && printSettings.moneyReceipt.fontSize) {
             document.documentElement.style.setProperty('--print-font-size', printSettings.moneyReceipt.fontSize + 'px');
@@ -247,48 +250,38 @@
                 });
 
                 const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
-                const MAX_COLS = getMaxMeasurementColsPerRow(mFont);
-                const $outerTable = $('<table class="measurement-groups-table"></table>');
-                const $outerTbody = $('<tbody></tbody>');
+                const $flex = $('<div class="measurement-groups-flex"></div>');
 
-                for (let rowStart = 0; rowStart < validGroups.length; rowStart += MAX_COLS) {
-                    const rowGroups = validGroups.slice(rowStart, rowStart + MAX_COLS);
-                    const $outerTr = $('<tr></tr>');
+                validGroups.forEach(function ({ valid }) {
+                    const $box = $('<div class="measurement-group-box"></div>');
+                    const $innerTable = $('<table class="measurement-group-inner"></table>');
+                    const $innerTbody = $('<tbody></tbody>');
 
-                    rowGroups.forEach(function ({ valid }) {
-                        const $td = $('<td></td>');
-                        const $innerTable = $('<table class="measurement-group-inner"></table>');
-                        const $innerTbody = $('<tbody></tbody>');
+                    valid.forEach(function (m, idx) {
+                        if (mSettings.printMeasurementName) {
+                            const $typeRow = $('<tr></tr>');
+                            $typeRow.append(`<td class="measurement-type-cell">${escapeHtml(m.type)}</td>`);
+                            $innerTbody.append($typeRow);
+                        }
 
-                        valid.forEach(function (m, idx) {
-                            if (mSettings.printMeasurementName) {
-                                const $typeRow = $('<tr></tr>');
-                                $typeRow.append(`<td class="measurement-type-cell">${escapeHtml(m.type)}</td>`);
-                                $innerTbody.append($typeRow);
-                            }
+                        const $valRow = $('<tr></tr>');
+                        $valRow.append(`<td class="measurement-value-cell">${formatMeasurementValueHtml(m.value)}</td>`);
+                        $innerTbody.append($valRow);
 
-                            const $valRow = $('<tr></tr>');
-                            $valRow.append(`<td class="measurement-value-cell">${escapeHtml(m.value)}</td>`);
-                            $innerTbody.append($valRow);
-
-                            if (idx < valid.length - 1) {
-                                const $sepRow = $('<tr></tr>');
-                                $sepRow.append('<td class="measurement-separator"></td>');
-                                $innerTbody.append($sepRow);
-                            }
-                        });
-
-                        $innerTable.append($innerTbody);
-                        $td.append($innerTable);
-                        $outerTr.append($td);
+                        if (idx < valid.length - 1) {
+                            const $sepRow = $('<tr></tr>');
+                            $sepRow.append('<td class="measurement-separator"></td>');
+                            $innerTbody.append($sepRow);
+                        }
                     });
 
-                    $outerTbody.append($outerTr);
-                }
+                    $innerTable.append($innerTbody);
+                    $box.append($innerTable);
+                    $flex.append($box);
+                });
 
-                $outerTable.append($outerTbody);
                 const $fitWrap = $('<div class="measurement-table-fit"></div>');
-                $fitWrap.append($outerTable);
+                $fitWrap.append($flex);
                 $detailsSection.append($fitWrap);
             }
 
@@ -328,9 +321,10 @@
 
         const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
         const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+        const labelFont = getMeasurementLabelFontSize(mFont);
         document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+        document.documentElement.style.setProperty('--measurement-label-font-size', labelFont + 'px');
         document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
-        $('.measurement-type-cell, .measurement-value-cell').css({ fontSize: mFont + 'px', color: '#000' });
         $('.styles-section, .details-section').css('font-size', sFont + 'px');
 
         // Apply border hide state after render
@@ -339,24 +333,207 @@
         }
 
         applyPrintSizeToScreen($('#printSizeSelect').val());
+        scheduleMeasurementLayoutFit();
+    }
+
+    function getMeasurementTargetWidth() {
+        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480, '6': 576, '6.5': 624 };
+        const size = $('#printSizeSelect').val() || '4';
+        const borderReserve = 4;
+        const containerPadding = 8;
+        return (map[size] || 384) - containerPadding - borderReserve;
+    }
+
+    function scheduleMeasurementLayoutFit() {
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                fitMeasurementTablesToPaper();
+            });
+        });
+    }
+
+    function getMeasurementLabelFontSize(valueFontPx) {
+        const vf = valueFontPx > 0 ? valueFontPx : 12;
+        return Math.max(9, Math.round(vf * 0.85));
+    }
+
+    function getMeasurementSettingFontSize() {
+        const mSettings = getMeasurementSettings();
+        if (mSettings.fontSize && mSettings.fontSize > 0) return mSettings.fontSize;
+        const cssVar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--measurement-font-size'));
+        return cssVar > 0 ? cssVar : 12;
+    }
+
+    function applyMeasurementCellStyles($container, valueFontPx) {
+        const labelFontPx = getMeasurementLabelFontSize(valueFontPx);
+        const vPad = Math.max(2, Math.round(valueFontPx * 0.18));
+        const hPad = Math.max(2, Math.round(valueFontPx * 0.12));
+
+        document.documentElement.style.setProperty('--measurement-font-size', valueFontPx + 'px');
+        document.documentElement.style.setProperty('--measurement-label-font-size', labelFontPx + 'px');
+
+        $container.find('.measurement-type-cell').css({
+            fontSize: labelFontPx + 'px',
+            color: '#000',
+            padding: vPad + 'px ' + hPad + 'px',
+            whiteSpace: 'nowrap',
+            wordBreak: 'normal',
+            overflowWrap: 'normal',
+            overflow: 'visible'
+        });
+        $container.find('.measurement-value-cell').css({
+            fontSize: valueFontPx + 'px',
+            color: '#000',
+            padding: (vPad + 1) + 'px ' + hPad + 'px',
+            whiteSpace: 'nowrap',
+            wordBreak: 'normal',
+            overflowWrap: 'normal',
+            overflow: 'visible'
+        });
+    }
+
+    function applyFirstRowStretch($row) {
+        const $boxes = $row.find('.measurement-group-box');
+        if (!$boxes.length) return;
+
+        $row.css({ justifyContent: 'flex-start', columnGap: '0', width: '100%' });
+
+        $boxes.each(function () {
+            const naturalW = Math.ceil(this.getBoundingClientRect().width);
+            this.style.setProperty('flex', '1 0 ' + naturalW + 'px', 'important');
+            this.style.setProperty('min-width', naturalW + 'px', 'important');
+            this.style.setProperty('max-width', 'none', 'important');
+            this.style.setProperty('box-sizing', 'border-box', 'important');
+        });
+
+        $boxes.find('.measurement-group-inner').each(function () {
+            this.style.setProperty('width', '100%', 'important');
+            this.style.setProperty('table-layout', 'auto', 'important');
+        });
+    }
+
+    function layoutMeasurementFlexRows($wrap, targetWidth, valueFontPx) {
+        const $flex = $wrap.find('.measurement-groups-flex').first();
+        if (!$flex.length) return;
+
+        const boxEls = [];
+        $flex.find('.measurement-group-box').each(function () {
+            boxEls.push(this);
+        });
+        if (!boxEls.length) return;
+
+        const $measureRow = $('<div class="measurement-groups-row measurement-measure-row"></div>').css({
+            display: 'flex',
+            flexWrap: 'nowrap',
+            position: 'absolute',
+            visibility: 'hidden',
+            left: '-9999px',
+            top: 0,
+            pointerEvents: 'none'
+        });
+        boxEls.forEach(function (el) { $measureRow.append(el); });
+        $flex.append($measureRow);
+
+        const rows = [];
+        let currentRow = [];
+        let currentWidth = 0;
+
+        boxEls.forEach(function (el) {
+            const w = Math.ceil(el.getBoundingClientRect().width);
+            if (currentRow.length > 0 && currentWidth + w > targetWidth) {
+                rows.push(currentRow);
+                currentRow = [];
+                currentWidth = 0;
+            }
+            currentRow.push(el);
+            currentWidth += w;
+        });
+        if (currentRow.length) rows.push(currentRow);
+
+        $measureRow.remove();
+        $flex.empty().css({
+            display: 'block',
+            width: '100%',
+            maxWidth: '100%'
+        });
+
+        rows.forEach(function (rowEls, rowIndex) {
+            const isFirstRow = rowIndex === 0;
+            const $row = $('<div class="measurement-groups-row"></div>').css({
+                display: 'flex',
+                width: '100%',
+                maxWidth: '100%',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+                boxSizing: 'border-box',
+                marginBottom: '2px',
+                columnGap: isFirstRow ? '0' : '2px'
+            });
+            rowEls.forEach(function (el) { $row.append(el); });
+            $flex.append($row);
+
+            if (!isFirstRow) {
+                $row.find('.measurement-group-box').css({ flex: '0 0 auto' });
+            }
+        });
+    }
+
+    function fitMeasurementTablesToPaper() {
+        const settingFont = getMeasurementSettingFontSize();
+        const targetWidth = getMeasurementTargetWidth();
+
+        $('#cmpPrintContainer .measurement-table-fit').each(function () {
+            const $wrap = $(this);
+            $wrap.css({
+                height: 'auto',
+                width: '100%',
+                maxWidth: targetWidth + 'px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                padding: 0,
+                overflow: 'visible',
+                boxSizing: 'border-box'
+            });
+
+            $wrap.find('.measurement-group-box').css({
+                flex: '0 0 auto',
+                maxWidth: '100%',
+                padding: '0 0 2px',
+                boxSizing: 'border-box'
+            });
+
+            $wrap.find('.measurement-group-inner').css({
+                width: 'auto',
+                tableLayout: 'auto',
+                borderCollapse: 'collapse'
+            });
+
+            applyMeasurementCellStyles($wrap, settingFont);
+            layoutMeasurementFlexRows($wrap, targetWidth, settingFont);
+            applyMeasurementCellStyles($wrap, settingFont);
+            const $firstRow = $wrap.find('.measurement-groups-row').first();
+            if ($firstRow.length) {
+                applyFirstRowStretch($firstRow);
+            }
+        });
     }
 
     // ── Border ────────────────────────────────────────────────────
 
     function applyBorderState(hide) {
         if (hide) {
-            $('.measurement-groups-table td table').css('border', 'none');
-            $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', 'none');
+            $('.measurement-group-inner').css('border', 'none');
+            $('.measurement-group-inner td:not(.measurement-separator)').css('border', 'none');
         } else {
-            $('.measurement-groups-table td table').css('border', '1px solid #666');
-            $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', '');
+            $('.measurement-group-inner').css('border', '1px solid #666');
+            $('.measurement-group-inner td:not(.measurement-separator)').css('border', '');
         }
     }
 
     // ── Print size ────────────────────────────────────────────────
 
     function applyPrintSizeToScreen(size) {
-        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480 };
+        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480, '6': 576, '6.5': 624 };
         const px = map[size] || 384;
         const widthInInches = parseFloat(size) || 4;
         document.documentElement.style.setProperty('--print-width', widthInInches + 'in');
@@ -536,14 +713,6 @@
         };
     }
 
-    function getMaxMeasurementColsPerRow(fontPx) {
-        const fs = fontPx > 0 ? fontPx : 12;
-        if (fs <= 12) return 8;
-        if (fs <= 14) return 7;
-        if (fs <= 18) return 6;
-        return 5;
-    }
-
     function showAlert(type, message) {
         const cls = type === 'error' ? 'alert-danger' : type === 'success' ? 'alert-success' : 'alert-info';
         $('#alertContainer').html(`
@@ -556,6 +725,16 @@
 
     function escapeHtml(str) {
         return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatMeasurementValueHtml(val) {
+        if (val == null || val === '') return '';
+        if (window.MeasurementFractionBar && MeasurementFractionBar.formatFractionHtml) {
+            return MeasurementFractionBar.formatFractionHtml(val);
+        }
+        return escapeHtml(String(val)).replace(/[½¼¾⅛]/g, function (ch) {
+            return '<span class="meas-fraction-char">' + ch + '</span>';
+        });
     }
 
 })();

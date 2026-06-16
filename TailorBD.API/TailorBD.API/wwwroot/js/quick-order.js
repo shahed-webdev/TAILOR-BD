@@ -53,6 +53,13 @@ $(function () {
 
     waitForSession(function () { initPage(); });
 
+    if (window.MeasurementFractionBar) {
+        MeasurementFractionBar.init({
+            barSelector: '#measurementFractionBar',
+            inputSelector: '#measurementModal .meas-input'
+        });
+    }
+
     // Fabric code — press Enter to search
     $('#fabricCodeModal').on('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); searchFabricModal(); }
@@ -64,6 +71,8 @@ $(function () {
 
     if (qo.orderNumber) showOrderNumber(qo.orderNumber);
     if (qo.customer.id) showCustomerBar();
+
+    setupAutoClearZeroInputs('#discountAmount, #paidAmount');
 
     // customer modal open হলে বর্তমান customer তথ্য prefill করুন
     document.getElementById('customerModal').addEventListener('show.bs.modal', function () {
@@ -85,6 +94,21 @@ $(function () {
         }
     });
 });
+
+function setupAutoClearZeroInputs(selectors) {
+    $(selectors).on('focus', function () {
+        const raw = $.trim($(this).val());
+        if (raw === '' || parseFloat(raw) === 0) {
+            $(this).val('');
+        }
+    }).on('blur', function () {
+        const raw = $.trim($(this).val());
+        if (raw === '' || isNaN(parseFloat(raw))) {
+            $(this).val(0);
+        }
+        updateDueAmount();
+    });
+}
 
 /* ───────────────────────────────────────────────
    API helpers
@@ -435,7 +459,7 @@ function renderDressList() {
 
     qo.dresses.forEach((d, i) => {
         $body.append(`
-            <tr>
+            <tr class="dress-list-row">
                 <td class="align-middle">
                     <div class="dress-number-badge">${i + 1}</div>
                 </td>
@@ -577,7 +601,7 @@ window.openMeasurement = function (idx) {
             const value = m.Measurement || m.measurement || '';
             return `
             <div class="mb-2">
-                <input type="text" class="form-control form-control-sm" value="${value}" placeholder="${typeName}"
+                <input type="text" class="form-control form-control-sm meas-input" value="${value}" placeholder="${typeName}"
                        data-id="${typeId}"
                        onchange="updateMeasurement(${idx}, '${typeId}', this.value)">
             </div>`;

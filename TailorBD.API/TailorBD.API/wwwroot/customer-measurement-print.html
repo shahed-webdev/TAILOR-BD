@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link href="/css/money-receipt.css?v=2.2.11" rel="stylesheet">
+    <link href="/css/money-receipt.css?v=2.2.50" rel="stylesheet">
+    <link href="/css/measurement-fraction-bar.css?v=1.9.0" rel="stylesheet">
     <style>
         .cmp-action-bar {
             background: white;
@@ -130,39 +131,66 @@
         .no-data-msg { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
 
         /* স্ট্যাটিক ফন্ট — স্ক্রল ছাড়াই কাগজের প্রস্থে ফিট */
+        /* flex-wrap: প্রস্থ অনুযায়ী যতগুলো মাপ যায় এক লাইনে, বাকি নিচে */
         #cmpPrintContainer .measurement-table-fit {
             width: 100%;
-            overflow: hidden;
+            margin-left: auto;
+            margin-right: auto;
+            overflow: visible;
         }
-        #cmpPrintContainer .measurement-groups-table {
+        #cmpPrintContainer .measurement-groups-flex {
+            display: block;
             width: 100%;
-            table-layout: fixed;
         }
-        #cmpPrintContainer .measurement-groups-table > tbody > tr > td {
-            width: 1%;
-            padding: 0 1px;
-        }
-        #cmpPrintContainer .measurement-groups-table .measurement-group-inner {
+        #cmpPrintContainer .measurement-groups-row {
+            display: flex;
             width: 100%;
-            table-layout: fixed;
+            align-items: flex-start;
+            margin-bottom: 2px;
         }
-        #cmpPrintContainer .measurement-groups-table .measurement-type-cell {
-            font-size: var(--measurement-font-size, 12px);
+        #cmpPrintContainer .measurement-groups-row:first-child {
+            justify-content: flex-start;
+            column-gap: 0;
+        }
+        #cmpPrintContainer .measurement-groups-row:first-child .measurement-group-box {
+            flex: 1 0 auto;
+            min-width: max-content;
+            max-width: none;
+        }
+        #cmpPrintContainer .measurement-groups-row:first-child .measurement-group-inner {
+            width: 100%;
+            table-layout: auto;
+        }
+        #cmpPrintContainer .measurement-type-cell {
+            font-size: var(--measurement-label-font-size, 12px);
             font-weight: 600;
-            padding: 4px 3px;
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: anywhere;
-            line-height: 1.2;
         }
-        #cmpPrintContainer .measurement-groups-table .measurement-value-cell {
+        #cmpPrintContainer .measurement-value-cell {
             font-size: var(--measurement-font-size, 16px);
             font-weight: 700;
-            padding: 4px 3px;
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: anywhere;
-            line-height: 1.2;
+        }
+        #cmpPrintContainer .measurement-value-cell .meas-fraction-stack,
+        #cmpPrintContainer .measurement-value-cell .meas-fraction-char {
+            font-size: calc(1em * var(--measurement-fraction-scale, 0.72));
+            font-weight: 800;
+            color: #000;
+        }
+
+        #cmpPrintContainer .measurement-value-cell .meas-f-stack-top,
+        #cmpPrintContainer .measurement-value-cell .meas-f-stack-bot {
+            font-weight: 800;
+            color: #000;
+        }
+
+        #cmpPrintContainer .measurement-value-cell .meas-f-stack-line {
+            width: var(--measurement-fraction-line-width, 1.25em);
+            min-width: 0.75em;
+            height: 0;
+            border: none;
+            border-top: 3px solid #000;
+            background: transparent;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
         #cmpPrintContainer .styles-section {
             font-size: var(--style-font-size, 14px);
@@ -193,8 +221,13 @@
                 padding: 0;
             }
             #cmpPrintContainer .cmp-cust-highlight { font-size: 20px; }
-            #cmpPrintContainer .measurement-groups-table .measurement-value-cell { font-size: var(--measurement-font-size, 16px); padding: 4px 3px; }
-            #cmpPrintContainer .measurement-groups-table .measurement-type-cell { font-size: var(--measurement-font-size, 12px); padding: 4px 3px; }
+            #cmpPrintContainer .measurement-type-cell {
+                font-size: var(--measurement-label-font-size, 12px) !important;
+            }
+            #cmpPrintContainer .measurement-value-cell {
+                font-size: var(--measurement-font-size, 16px) !important;
+                white-space: nowrap;
+            }
             #cmpPrintContainer .styles-section { font-size: var(--style-font-size, 14px); font-weight: 400; font-style: normal; }
         }
 
@@ -259,6 +292,8 @@
                             <option value="4" selected>4 inch</option>
                             <option value="4.5">4.5 inch</option>
                             <option value="5">5 inch</option>
+                            <option value="6">6 inch</option>
+                            <option value="6.5">6.5 inch</option>
                         </select>
                     </div>
                 </div>
@@ -300,6 +335,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/app-components.js?v=2.2.8"></script>
-    <script src="/js/customer-measurement-print.js?v=1.0.29"></script>
+    <script src="/js/measurement-fraction-bar.js?v=1.9.0"></script>
+    <script src="/js/customer-measurement-print.js?v=1.0.31"></script>
 </body>
 </html>

@@ -285,30 +285,30 @@
             <table class="dg-table">
                 <colgroup>
                     <col class="col-chk">
-                    <col style="width:4%">
-                    <col style="width:9%">
-                    <col style="width:7%">
+                    <col class="col-order-no">
                     <col style="width:8%">
-                    <col style="width:14%">
-                    <col style="width:5%">
-                    <col style="width:5%">
+                    <col class="col-phone">
                     <col style="width:7%">
-                    <col style="width:6%">
+                    <col style="width:11%">
+                    <col class="col-date">
+                    <col class="col-date">
                     <col style="width:7%">
+                    <col style="width:5%">
                     <col style="width:6%">
-                    <col class="col-chk">
+                    <col style="width:5%">
+                    <col class="col-sms">
                     <col class="col-act">
                 </colgroup>
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="selectAllOrders" title="Select All"></th>
-                        <th><span class="lang-content" data-en="No." data-bn="নং">নং</span></th>
+                        <th class="col-order-no-head"><span class="lang-content" data-en="No." data-bn="নং">নং</span></th>
                         <th><span class="lang-content" data-en="Name" data-bn="নাম">নাম</span></th>
-                        <th><span class="lang-content" data-en="Phone" data-bn="মোবা.">মোবা.</span></th>
+                        <th class="col-phone-head"><span class="lang-content" data-en="Phone" data-bn="মোবা.">মোবা.</span></th>
                         <th><span class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</span></th>
                         <th><span class="lang-content" data-en="Dress" data-bn="পোশাক">পোশাক</span></th>
-                        <th><span class="lang-content" data-en="Order" data-bn="অর্ডার">অর্ডার</span></th>
-                        <th><span class="lang-content" data-en="Del." data-bn="ডেলি.">ডেলি.</span></th>
+                        <th class="col-date-head"><span class="lang-content" data-en="Order" data-bn="অর্ডার">অর্ডার</span></th>
+                        <th class="col-date-head"><span class="lang-content" data-en="Del." data-bn="ডেলি.">ডেলি.</span></th>
                         <th><span class="lang-content" data-en="Amt/Paid/Due" data-bn="মোট/পেইড/বাকি">মোট/পেইড/বাকি</span></th>
                         <th><span class="lang-content" data-en="Store" data-bn="রাখা">রাখা</span></th>
                         <th><span class="lang-content" data-en="Note" data-bn="নোট">নোট</span></th>
@@ -337,13 +337,13 @@
             html += `
                 <tr class="${rowClass}">
                     <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
-                    <td><strong>${order.orderSerialNumber}</strong></td>
+                    <td class="col-order-no-cell"><strong>${order.orderSerialNumber}</strong></td>
                     <td><span class="cell-clip" title="${escapeHtml(order.customerName)}">${escapeHtml(clipCell(order.customerName, 18))}</span></td>
-                    <td><span class="cell-clip" title="${escapeHtml(order.phone || '')}">${escapeHtml(order.phone || '-')}</span></td>
+                    <td class="col-phone-cell">${escapeHtml(order.phone || '-')}</td>
                     <td><span class="cell-clip" title="${escapeHtml(addrFull)}">${escapeHtml(clipCell(addrFull, 14))}</span></td>
                     <td><span class="cell-wrap" title="${escapeHtml(dressFull)}">${escapeHtml(dressFull)}</span></td>
-                    <td>${orderDate}</td>
-                    <td>${deliveryDate}</td>
+                    <td class="col-date-cell">${orderDate}</td>
+                    <td class="col-date-cell">${deliveryDate}</td>
                     <td class="money-stack">
                         <div class="total">${order.orderAmount.toFixed(0)}</div>
                         <div class="paid">${order.paidAmount.toFixed(0)}</div>

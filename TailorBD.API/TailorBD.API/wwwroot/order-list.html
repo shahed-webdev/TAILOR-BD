@@ -20,7 +20,7 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/dashboard.css">
-    <link rel="stylesheet" href="/css/order-list.css?v=2.3.0">
+    <link rel="stylesheet" href="/css/order-list.css?v=2.3.1">
 </head>
 <body>
     <!-- Sidebar Container (Auto-loads from component) -->
@@ -169,7 +169,7 @@
                                         <th class="no-print text-center" data-en-title="Update" data-bn-title="আপডেট" title="আপডেট"><i class="fas fa-edit"></i></th>
                                         <th class="no-print text-center" data-en-title="Add Dress" data-bn-title="ড্রেস যোগ করুন" title="ড্রেস যোগ করুন"><i class="fas fa-plus-circle"></i></th>
                                         <th class="no-print text-center" data-en-title="Measurement" data-bn-title="মাপজোখ" title="মাপজোখ"><i class="fas fa-ruler"></i></th>
-                                        <th class="no-print text-center" data-en-title="Money Receipt" data-bn-title="মনি রিসিট" title="মনি রিসিট"><i class="fas fa-receipt"></i></th>
+                                        <th class="no-print text-center" data-en-title="Money Receipt" data-bn-title="মানি রিসিট" title="মানি রিসিট"><i class="fas fa-receipt"></i></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -196,7 +196,7 @@
                                             <td x-text="order.address"></td>
                                             <td x-text="order.details"></td>
                                             <td x-text="formatDate(order.orderDate)"></td>
-                                            <td x-text="formatDate(order.updateDeliveryDate || order.deliveryDate)"></td>
+                                            <td x-text="formatDate(order.deliveryDate)"></td>
                                             <td class="no-print text-center">
                                                 <a :href="'update-order.html?OrderID=' + order.orderId"
                                                    class="btn btn-sm btn-warning"
@@ -223,7 +223,7 @@
                                             <td class="no-print text-center">
                                                 <a :href="'finish-order.html?orderId=' + order.orderId" 
                                                    class="btn btn-sm btn-outline-info"
-                                                   :title="currentLang === 'en' ? 'Money Receipt' : 'মনি রিসিট'">
+                                                   :title="currentLang === 'en' ? 'Money Receipt' : 'মানি রিসিট'">
                                                     <i class="fas fa-receipt"></i>
                                                 </a>
                                             </td>

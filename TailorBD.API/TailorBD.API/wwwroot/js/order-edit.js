@@ -58,6 +58,13 @@ document.addEventListener('DOMContentLoaded', function() {
     currentEditingIndex = null;
     
     loadOrderDetails();
+
+    if (window.MeasurementFractionBar) {
+        MeasurementFractionBar.init({
+            barSelector: '#measurementFractionBar',
+            inputSelector: '#measurementModal .meas-input'
+        });
+    }
 });
 
 // Utility Functions

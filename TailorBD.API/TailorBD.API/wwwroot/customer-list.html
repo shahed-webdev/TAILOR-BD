@@ -20,9 +20,10 @@
             overflow-x: hidden;
             box-sizing: border-box;
         }
-        .container { padding: 10px; }
-        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin-bottom: 16px; }
-        h2 { color: #6c7ae0; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+        .container { padding: 6px; }
+        .card { background: white; border-radius: 8px; padding: 12px 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin-bottom: 12px; }
+        h2 { color: #6c7ae0; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .dashboard-content { padding: 8px 10px; }
 
         /* Search Panel */
         .search-grid { display: grid; grid-template-columns: 120px 1fr 1fr auto; gap: 10px; align-items: end; }
@@ -74,34 +75,70 @@
         .btn-add { padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
         .btn-add:hover { background: #218838; color: white; }
 
-        /* Table — scroll only inside wrapper, not whole page */
+        /* Table — fit viewport, no horizontal page scroll */
         .table-wrapper {
             width: 100%;
             max-width: 100%;
-            overflow-x: auto;
+            overflow-x: hidden;
             overflow-y: visible;
-            -webkit-overflow-scrolling: touch;
         }
         .customer-list-table {
             width: 100%;
-            min-width: 900px;
             border-collapse: collapse;
-            font-size: 13px;
-            table-layout: auto;
+            font-size: 14px;
+            table-layout: fixed;
         }
-        .customer-list-table th { background: #6c7ae0; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
-        .customer-list-table td { padding: 7px 8px; border-bottom: 1px solid #eee; vertical-align: middle; text-align: center; }
+        .customer-list-table th {
+            background: #6c7ae0;
+            color: white;
+            padding: 7px 5px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: normal;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+        .customer-list-table td {
+            padding: 6px 5px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            text-align: center;
+            overflow: hidden;
+        }
+        .customer-list-table th.cl-col-details,
+        .customer-list-table td.cl-col-details { width: 68px; }
+        .customer-list-table th.cl-col-order,
+        .customer-list-table td.cl-col-order { width: 68px; }
+        .customer-list-table th.cl-col-name,
+        .customer-list-table td.cl-col-name { width: 18%; }
+        .customer-list-table th.cl-col-phone,
+        .customer-list-table td.cl-col-phone { width: 104px; white-space: nowrap; }
+        .customer-list-table th.cl-col-address,
+        .customer-list-table td.cl-col-address { width: 12%; }
+        .customer-list-table th.cl-col-desc,
+        .customer-list-table td.cl-col-desc { width: 9%; }
+        .customer-list-table th.cl-col-due,
+        .customer-list-table td.cl-col-due { width: 72px; }
+        .customer-list-table th.cl-col-date,
+        .customer-list-table td.cl-col-date { width: 84px; white-space: nowrap; font-size: 13px; }
+        .customer-list-table th.cl-col-photo,
+        .customer-list-table td.cl-col-photo { width: 44px; }
+        .customer-list-table th.cl-col-edit,
+        .customer-list-table td.cl-col-edit { width: 34px; }
+        .customer-list-table th.cl-col-delete,
+        .customer-list-table td.cl-col-delete { width: 34px; }
         .customer-list-table .col-address,
         .customer-list-table .col-desc {
-            max-width: 140px;
+            max-width: none;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
         tr:hover { background: #f8f9fa; }
-        .customer-name-td { text-align: left; font-weight: 600; }
-        .customer-number { color: #888; font-size: 11px; margin-right: 4px; }
-        .due-badge { background: #f8d7da; color: #721c24; border-radius: 4px; padding: 2px 8px; font-weight: 700; font-size: 12px; }
+        .customer-name-td { text-align: left; font-weight: 600; font-size: 14px; line-height: 1.3; }
+        .customer-number { color: #666; font-size: 13px; margin-right: 3px; }
+        .due-badge { background: #f8d7da; color: #721c24; border-radius: 4px; padding: 2px 7px; font-weight: 700; font-size: 13px; }
         .due-zero { color: #aaa; }
 
         /* Sortable columns */
@@ -112,19 +149,19 @@
         .sort-icon.asc, .sort-icon.desc { opacity: 1; color: #ffd700; }
 
         /* Action buttons */
-        .btn-details { padding: 4px 10px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-details { padding: 4px 7px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; line-height: 1.2; }
         .btn-details:hover { background: #5a68c9; color: white; }
-        .btn-order { padding: 4px 10px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-order { padding: 4px 7px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; line-height: 1.2; }
         .btn-order:hover { background: #138496; color: white; }
-        .btn-edit { padding: 4px 8px; background: #ffc107; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-edit { padding: 4px 7px; background: #ffc107; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; line-height: 1; }
         .btn-edit:hover { background: #e0a800; }
-        .btn-delete { padding: 4px 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-delete { padding: 4px 7px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; line-height: 1; }
         .btn-delete:hover { background: #c82333; }
 
         /* Customer photo */
         .cust-photo-wrap { display: inline-block; position: relative; cursor: pointer; vertical-align: middle; }
-        .cust-photo { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e3f8; display: block; }
-        .cust-photo-placeholder { width: 38px; height: 38px; border-radius: 50%; background: #e8eaf6; display: flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 16px; border: 2px dashed #c5cae9; }
+        .cust-photo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e3f8; display: block; }
+        .cust-photo-placeholder { width: 36px; height: 36px; border-radius: 50%; background: #e8eaf6; display: flex; align-items: center; justify-content: center; color: #9fa8da; font-size: 15px; border: 1px dashed #c5cae9; }
         .cust-photo-wrap:hover::after {
             content: '\f030';
             font-family: 'Font Awesome 6 Free';
@@ -165,7 +202,7 @@
         .photo-modal-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
 
         /* Edit row */
-        .edit-input { width: 100%; padding: 4px 6px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; font-family: inherit; box-sizing: border-box; }
+        .edit-input { width: 100%; padding: 5px 7px; border: 1px solid #ddd; border-radius: 3px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
         .edit-input:focus { outline: none; border-color: #6c7ae0; }
         .btn-save-row { padding: 4px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .btn-cancel-row { padding: 4px 8px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
@@ -193,23 +230,17 @@
         .btn-no { padding: 8px 24px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
 
         @media (max-width: 1400px) {
-            .customer-list-table { font-size: 12px; }
-            .customer-list-table th,
-            .customer-list-table td { padding: 6px 5px; }
-        }
-        @media (max-width: 1200px) {
             .customer-list-table .col-desc { display: none; }
-            .customer-list-table { min-width: 780px; }
         }
         @media (max-width: 992px) {
             .customer-list-table .col-address { display: none; }
-            .customer-list-table { min-width: 640px; }
+            .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         }
         @media (max-width: 768px) {
             #app-navbar { margin-left: 0; }
             .main-content { margin-left: 0; }
             .search-grid { grid-template-columns: 1fr; }
-            .card { padding: 14px; }
+            .card { padding: 10px 8px; }
         }
     </style>
 </head>
@@ -318,6 +349,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/app-components.js?v=2.2.8"></script>
-    <script src="/js/customer-list.js?v=2.1.8"></script>
+    <script src="/js/customer-list.js?v=2.2.0"></script>
 </body>
 </html>

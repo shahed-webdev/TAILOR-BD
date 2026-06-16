@@ -43,7 +43,7 @@
     // ── Shop List ─────────────────────────────────────────────────────────────
     window.loadShops = function () {
         $('#refreshIcon').addClass('fa-spin');
-        $('#shopTableBody').html('<tr><td colspan="10" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</td></tr>');
+        $('#shopTableBody').html('<tr><td colspan="11" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>লোড হচ্ছে...</td></tr>');
 
         $.get('/api/institution/authority/list', function (res) {
             $('#refreshIcon').removeClass('fa-spin');
@@ -58,7 +58,7 @@
         }).fail(function (xhr) {
             $('#refreshIcon').removeClass('fa-spin');
             toast('শপ লোড ব্যর্থ: ' + (xhr.status || 'সংযোগ ব্যর্থ'), 'error');
-            $('#shopTableBody').html('<tr><td colspan="10" class="text-center text-danger py-3">লোড ব্যর্থ হয়েছে</td></tr>');
+            $('#shopTableBody').html('<tr><td colspan="11" class="text-center text-danger py-3">লোড ব্যর্থ হয়েছে</td></tr>');
         });
     };
 
@@ -78,7 +78,8 @@
             const matchSearch = !search ||
                 (s.institutionName || '').toLowerCase().includes(search) ||
                 (s.phone || '').toLowerCase().includes(search) ||
-                (s.userName || '').toLowerCase().includes(search);
+                (s.userName || '').toLowerCase().includes(search) ||
+                String(s.institutionId || '').includes(search);
             const matchPayment = !payment || s.latestInvoiceStatus === payment;
             const matchStatus  = !status  || s.validation === status;
             return matchSearch && matchPayment && matchStatus;
@@ -93,7 +94,7 @@
         const $body = $('#shopTableBody').empty();
 
         if (!shops.length) {
-            $body.html('<tr><td colspan="10" class="text-center py-4 text-muted"><i class="fas fa-store-slash me-2"></i>কোনো শপ পাওয়া যায়নি</td></tr>');
+            $body.html('<tr><td colspan="11" class="text-center py-4 text-muted"><i class="fas fa-store-slash me-2"></i>কোনো শপ পাওয়া যায়নি</td></tr>');
             return;
         }
 
@@ -124,6 +125,7 @@
             $body.append(
                 '<tr>' +
                 '<td style="color:#94a3b8;">' + (i + 1) + '</td>' +
+                '<td><code style="font-size:.8rem;color:#6366f1;font-weight:600;">' + esc(s.institutionId) + '</code></td>' +
                 '<td>' +
                     '<div style="font-weight:600;color:#1e293b;">' + esc(s.institutionName) + '</div>' +
                     '<div style="font-size:.75rem;color:#94a3b8;">' + esc(s.address || '') + '</div>' +

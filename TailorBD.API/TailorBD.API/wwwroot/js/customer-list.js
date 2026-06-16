@@ -193,47 +193,45 @@
             </div>`;
 
             rows += `<tr id="row_${c.customerId}" data-customer-id="${c.customerId}" data-cloth-for="${c.clothForId}">
-                <td>
+                <td class="cl-col-details">
                     <a class="btn-details" href="/customer-details.html?customerId=${c.customerId}&clothForId=${c.clothForId}">
                         <i class="fas fa-eye"></i> বিস্তারিত
                     </a>
                 </td>
-                <td>
+                <td class="cl-col-order">
                     <a class="btn-order" href="/dress-measurements.html?customerId=${c.customerId}&clothForId=${c.clothForId}">
                         <i class="fas fa-plus"></i> অর্ডার
                     </a>
                 </td>
-                <td class="view-cell">${c.customerNumber}</td>
-                <td class="customer-name-td view-cell">
+                <td class="customer-name-td view-cell cl-col-name">
                     <span class="customer-number">(${c.customerNumber})</span>${escapeHtml(c.customerName)}
                 </td>
-                <td class="view-cell">${escapeHtml(c.phone || '-')}</td>
-                <td class="view-cell col-address">${escapeHtml(c.address || '-')}</td>
-                <td class="view-cell col-desc">${escapeHtml(c.description || '-')}</td>
-                <td>${dueHtml}</td>
-                <td>${c.date ? formatDate(c.date) : '-'}</td>
-                <td class="view-cell">${photoHtml}</td>
-                <td>
+                <td class="view-cell cl-col-phone">${escapeHtml(c.phone || '-')}</td>
+                <td class="view-cell col-address cl-col-address">${escapeHtml(c.address || '-')}</td>
+                <td class="view-cell col-desc cl-col-desc">${escapeHtml(c.description || '-')}</td>
+                <td class="cl-col-due">${dueHtml}</td>
+                <td class="cl-col-date">${c.date ? formatDate(c.date) : '-'}</td>
+                <td class="view-cell cl-col-photo">${photoHtml}</td>
+                <td class="cl-col-edit">
                     <button class="btn-edit" onclick="startEdit(${c.customerId})" title="ইডিট করুন"><i class="fas fa-edit"></i></button>
                 </td>
-                <td>
+                <td class="cl-col-delete">
                     <button class="btn-delete" onclick="openDeleteModal(${c.customerId})" title="ডিলেট করুন"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
             <tr id="editrow_${c.customerId}" style="display:none; background:#f0f7ff;">
-                <td colspan="2"></td>
-                <td></td>
-                <td><input class="edit-input" id="edit_name_${c.customerId}" value="${escapeAttr(c.customerName)}" placeholder="নাম"></td>
-                <td><input class="edit-input" id="edit_phone_${c.customerId}" value="${escapeAttr(c.phone)}" placeholder="মোবাইল"></td>
-                <td class="col-address"><input class="edit-input" id="edit_address_${c.customerId}" value="${escapeAttr(c.address)}" placeholder="ঠিকানা"></td>
-                <td class="col-desc"><input class="edit-input" id="edit_desc_${c.customerId}" value="${escapeAttr(c.description)}" placeholder="বিবরণ"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
+                <td class="cl-col-details" colspan="2"></td>
+                <td class="cl-col-name"><input class="edit-input" id="edit_name_${c.customerId}" value="${escapeAttr(c.customerName)}" placeholder="নাম"></td>
+                <td class="cl-col-phone"><input class="edit-input" id="edit_phone_${c.customerId}" value="${escapeAttr(c.phone)}" placeholder="মোবাইল"></td>
+                <td class="col-address cl-col-address"><input class="edit-input" id="edit_address_${c.customerId}" value="${escapeAttr(c.address)}" placeholder="ঠিকানা"></td>
+                <td class="col-desc cl-col-desc"><input class="edit-input" id="edit_desc_${c.customerId}" value="${escapeAttr(c.description)}" placeholder="বিবরণ"></td>
+                <td class="cl-col-due"></td>
+                <td class="cl-col-date"></td>
+                <td class="cl-col-photo"></td>
+                <td class="cl-col-edit">
                     <button class="btn-save-row" onclick="saveEdit(${c.customerId})"><i class="fas fa-check"></i></button>
                 </td>
-                <td>
+                <td class="cl-col-delete">
                     <button class="btn-cancel-row" onclick="cancelEdit(${c.customerId})"><i class="fas fa-times"></i></button>
                 </td>
             </tr>`;
@@ -248,18 +246,17 @@
             <table class="customer-list-table">
                 <thead>
                     <tr>
-                        <th style="width:80px;" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
-                        <th style="width:80px;" data-en="Order" data-bn="অর্ডার দিন">অর্ডার দিন</th>
-                        <th class="sortable" data-sort="customerNumber" data-en="No." data-bn="কাস্টমার নং">কাস্টমার নং${sortIcon('customerNumber')}</th>
-                        <th class="sortable" data-sort="customerName" data-en="Name" data-bn="নাম">নাম${sortIcon('customerName')}</th>
-                        <th class="sortable" data-sort="phone" data-en="Mobile" data-bn="মোবাইল">মোবাইল${sortIcon('phone')}</th>
-                        <th class="col-address" data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
-                        <th class="col-desc" data-en="Description" data-bn="বিবরণ">বিবরণ</th>
-                        <th class="sortable" data-sort="customerDue" data-en="Due" data-bn="বাকি টাকা">বাকি টাকা${sortIcon('customerDue')}</th>
-                        <th class="sortable" data-sort="date" data-en="Reg. Date" data-bn="নিবন্ধনের তারিখ">নিবন্ধনের তারিখ${sortIcon('date')}</th>
-                        <th style="width:70px;" data-en="Photo" data-bn="ছবি">ছবি</th>
-                        <th style="width:50px;"></th>
-                        <th style="width:50px;"></th>
+                        <th class="cl-col-details" data-en="Details" data-bn="বিস্তারিত">বিস্তারিত</th>
+                        <th class="cl-col-order" data-en="Order" data-bn="অর্ডার দিন">অর্ডার দিন</th>
+                        <th class="sortable cl-col-name" data-sort="customerName" data-en="Name" data-bn="নাম">নাম${sortIcon('customerName')}</th>
+                        <th class="sortable cl-col-phone" data-sort="phone" data-en="Mobile" data-bn="মোবাইল">মোবাইল${sortIcon('phone')}</th>
+                        <th class="col-address cl-col-address" data-en="Address" data-bn="ঠিকানা">ঠিকানা</th>
+                        <th class="col-desc cl-col-desc" data-en="Description" data-bn="বিবরণ">বিবরণ</th>
+                        <th class="sortable cl-col-due" data-sort="customerDue" data-en="Due" data-bn="বাকি টাকা">বাকি টাকা${sortIcon('customerDue')}</th>
+                        <th class="sortable cl-col-date" data-sort="date" data-en="Reg. Date" data-bn="নিবন্ধনের তারিখ">নিবন্ধনের তারিখ${sortIcon('date')}</th>
+                        <th class="cl-col-photo" data-en="Photo" data-bn="ছবি">ছবি</th>
+                        <th class="cl-col-edit"></th>
+                        <th class="cl-col-delete"></th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>

@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using TailorBD.API.Helpers;
 using TailorBD.API.Models;
 using TailorBD.API.Services;
 
@@ -11,6 +14,11 @@ namespace TailorBD.API.Controllers
         private readonly IOrderService _orderService;
         private readonly ILogger<OrdersController> _logger;
         private readonly IConfiguration _configuration;
+
+        private static readonly JsonSerializerOptions StyleJsonOptions = new()
+        {
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
+        };
 
         public OrdersController(IOrderService orderService, ILogger<OrdersController> logger, IConfiguration configuration)
         {
@@ -601,9 +609,9 @@ namespace TailorBD.API.Controllers
                         paidAmount = reader.IsDBNull(reader.GetOrdinal("PaidAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("PaidAmount"))),
                         discount = reader.IsDBNull(reader.GetOrdinal("Discount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("Discount"))),
                         dueAmount = reader.IsDBNull(reader.GetOrdinal("DueAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("DueAmount"))),
-                        deliveryDate = reader.IsDBNull(reader.GetOrdinal("Update_DeliveryDate"))
-                            ? (reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")).ToString("yyyy-MM-dd"))
-                            : reader.GetDateTime(reader.GetOrdinal("Update_DeliveryDate")).ToString("yyyy-MM-dd"),
+                        deliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate"))
+                            ? null
+                            : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")).ToString("yyyy-MM-dd"),
                         customerId = reader.GetInt32(reader.GetOrdinal("CustomerID")),
                         customerNumber = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerNumber")),
                         customerName = reader.IsDBNull(reader.GetOrdinal("CustomerName")) ? "" : reader.GetString(reader.GetOrdinal("CustomerName")),
@@ -1213,6 +1221,24 @@ namespace TailorBD.API.Controllers
                     cmd.Parameters.AddWithValue("@DressQuantity",    item.DressQuantity);
                     cmd.Parameters.AddWithValue("@Details",          item.Details ?? "");
                     await cmd.ExecuteNonQueryAsync();
+
+                    try
+                    {
+                        var measurements = JsonSerializer.Deserialize<List<MeasurementItem>>(item.ListMeasurement ?? "[]");
+                        await CustomerDataSync.SyncCustomerMeasurementsForDressAsync(
+                            connection, transaction, model.CustomerId, model.InstitutionId, model.RegistrationId,
+                            item.DressId, measurements);
+                    }
+                    catch (Exception ex) { _logger.LogWarning(ex, "Error syncing customer measurements for quick order"); }
+
+                    try
+                    {
+                        var styles = JsonSerializer.Deserialize<List<StyleItem>>(item.ListStyle ?? "[]", StyleJsonOptions);
+                        await CustomerDataSync.SyncCustomerDressStylesForDressAsync(
+                            connection, transaction, model.CustomerId, model.InstitutionId, model.RegistrationId,
+                            item.DressId, styles);
+                    }
+                    catch (Exception ex) { _logger.LogWarning(ex, "Error syncing customer dress styles for quick order"); }
                 }
 
                 // ── 3. Insert Payment record ───────────────────────────────

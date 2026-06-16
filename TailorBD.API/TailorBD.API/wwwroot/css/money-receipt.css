@@ -616,10 +616,11 @@ body {
 
 .copy-title {
     text-align: center;
-    font-weight: bold;
+    font-weight: 800;
     font-size: 14px;
     margin-bottom: 1px;
     padding-bottom: 1px;
+    color: #000;
 }
 
 /* Measurement Info Table */
@@ -631,10 +632,14 @@ body {
 
 .measurement-info-table td {
     border: 1px solid #000;
-    padding: 0px 0 0px;
+    padding: 2px 3px;
     text-align: center;
-    font-size: 15px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.25;
+    -webkit-font-smoothing: auto;
+    text-rendering: geometricPrecision;
 }
 
 .measurement-info-table td:first-child {
@@ -645,13 +650,43 @@ body {
     width: 34%;
 }
 
+.measurement-dress-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #000;
+}
+
+.measurement-info-label {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.2;
+}
+
+.measurement-order-no {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 900;
+    color: #000;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    margin-top: 1px;
+}
+
 .measurement-info-table td:nth-child(2) strong {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 900;
 }
 
 .measurement-info-table td:last-child {
     width: 33%;
+}
+
+.dress-quantity-input {
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+    font-weight: 800 !important;
 }
 
 /* Measurement Details Section - shown ONCE after all copies */
@@ -1182,6 +1217,67 @@ body {
         box-sizing: border-box;
     }
 
+    .measurement-header h3,
+    .copy-title,
+    .measurement-info-table,
+    .measurement-info-table td,
+    .measurement-info-table strong,
+    .measurement-info-table span,
+    .measurement-dress-name,
+    .measurement-order-no,
+    .measurement-info-label,
+    .measurement-order-cell,
+    .measurement-date-cell,
+    .dress-quantity-input {
+        color: #000 !important;
+        -webkit-text-fill-color: #000 !important;
+        opacity: 1 !important;
+        -webkit-font-smoothing: none !important;
+        -moz-osx-font-smoothing: auto !important;
+        text-rendering: geometricPrecision !important;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+
+    .measurement-header h3,
+    .copy-title {
+        font-weight: 800 !important;
+    }
+
+    .measurement-info-table td {
+        border-color: #000 !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+        padding: 2px 3px !important;
+    }
+
+    .measurement-dress-name {
+        font-weight: 800 !important;
+        font-size: 15px !important;
+    }
+
+    .measurement-info-label {
+        font-weight: 700 !important;
+        font-size: 13px !important;
+    }
+
+    .measurement-order-no {
+        font-weight: 900 !important;
+        font-size: 21px !important;
+        letter-spacing: 0.03em !important;
+        text-shadow: 0.35px 0 0 #000, -0.35px 0 0 #000 !important;
+    }
+
+    .measurement-order-cell,
+    .measurement-date-cell {
+        font-weight: 700 !important;
+    }
+
+    .dress-quantity-input {
+        font-weight: 800 !important;
+        border-color: #000 !important;
+    }
+
     .measurement-container {
         padding: 5px 4px !important;
     }
@@ -1189,41 +1285,120 @@ body {
     .measurement-table-fit {
         width: 100% !important;
         max-width: 100% !important;
-        overflow: hidden !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        overflow: visible !important;
         padding: 0;
         box-sizing: border-box;
     }
 
-    .measurement-groups-table > tbody > tr > td,
-    .measurement-groups-table .measurement-type-cell,
-    .measurement-groups-table .measurement-value-cell {
-        overflow: hidden !important;
-        white-space: normal !important;
-        word-break: break-word !important;
-        overflow-wrap: anywhere !important;
-    }
-
-    .measurement-groups-table {
-        table-layout: fixed !important;
+    .measurement-groups-flex {
+        display: block !important;
         width: 100% !important;
         max-width: 100% !important;
+        box-sizing: border-box;
     }
 
-    .measurement-table-scale-box {
-        margin: 0 auto !important;
-        overflow: hidden !important;
+    .measurement-groups-row {
+        display: flex !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        align-items: flex-start !important;
+        box-sizing: border-box;
+        margin-bottom: 2px;
     }
 
-    .measurement-groups-table .measurement-type-cell,
-    .measurement-groups-table .measurement-value-cell {
+    .measurement-groups-row:first-child {
+        justify-content: flex-start !important;
+        column-gap: 0 !important;
+    }
+
+    .measurement-groups-row:first-child .measurement-group-box {
+        flex: 1 0 auto !important;
+        min-width: max-content !important;
+        max-width: none !important;
+    }
+
+    .measurement-groups-row:first-child .measurement-group-inner {
+        width: 100% !important;
+        table-layout: auto !important;
+    }
+
+    .measurement-groups-row:not(:first-child) {
+        justify-content: flex-start !important;
+        column-gap: 2px;
+    }
+
+    .measurement-group-box {
+        flex: 0 0 auto !important;
+        max-width: 100% !important;
+        padding: 0 0 2px !important;
+        box-sizing: border-box;
+        overflow: visible !important;
+    }
+
+    .measurement-group-inner {
+        border: 1px solid #666;
+        border-collapse: collapse;
+        width: auto !important;
+        table-layout: auto !important;
+    }
+
+    .measurement-type-cell,
+    .measurement-value-cell {
         color: #000 !important;
         -webkit-text-fill-color: #000 !important;
-        font-weight: 700 !important;
         -webkit-font-smoothing: auto !important;
-        white-space: normal !important;
-        word-break: break-word !important;
-        overflow-wrap: anywhere !important;
-        overflow: hidden !important;
+        overflow: visible !important;
+        white-space: nowrap !important;
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+    }
+
+    .measurement-type-cell {
+        font-size: var(--measurement-label-font-size, 11px) !important;
+        font-weight: 600 !important;
+    }
+
+    .measurement-value-cell {
+        font-size: var(--measurement-font-size, 14px) !important;
+        font-weight: 700 !important;
+    }
+
+    .measurement-value-cell .meas-fraction-stack,
+    .measurement-value-cell .meas-fraction-char {
+        font-size: calc(1em * var(--measurement-fraction-scale, 0.72)) !important;
+        font-weight: 800 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .measurement-value-cell .meas-f-stack-top,
+    .measurement-value-cell .meas-f-stack-bot {
+        font-weight: 800 !important;
+        color: #000 !important;
+        text-shadow: 0.35px 0 0 #000, -0.35px 0 0 #000 !important;
+    }
+
+    .measurement-value-cell .meas-f-stack-line {
+        width: var(--measurement-fraction-line-width, 1.25em) !important;
+        min-width: 0.75em !important;
+        height: 0 !important;
+        border: none !important;
+        border-top: 3px solid #000 !important;
+        background: transparent !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .measurement-separator {
+        padding: 0;
+        border: none;
+        border-top: 1px solid #000;
+        line-height: 0;
+        font-size: 0;
+        height: 1px;
     }
 
     /* Apply top margin from settings - directly to receipt header */
@@ -1503,6 +1678,70 @@ body {
     
     [data-print-size="5"] .receipt-table th:nth-child(5),
     [data-print-size="5"] .receipt-table td:nth-child(5) { width: 23%; }
+
+    /* 6 inch print adjustments */
+    [data-print-size="6"] .receipt-container {
+        padding: 0 20px 20px 20px !important;
+        font-size: 14px !important;
+    }
+
+    [data-print-size="6"] .receipt-table {
+        font-size: 13px !important;
+        table-layout: fixed !important;
+    }
+
+    [data-print-size="6"] .receipt-table th,
+    [data-print-size="6"] .receipt-table td {
+        padding: 7px 5px !important;
+        font-size: 13px !important;
+    }
+
+    [data-print-size="6"] .receipt-table th:nth-child(1),
+    [data-print-size="6"] .receipt-table td:nth-child(1) { width: 18%; }
+
+    [data-print-size="6"] .receipt-table th:nth-child(2),
+    [data-print-size="6"] .receipt-table td:nth-child(2) { width: 26%; }
+
+    [data-print-size="6"] .receipt-table th:nth-child(3),
+    [data-print-size="6"] .receipt-table td:nth-child(3) { width: 10%; }
+
+    [data-print-size="6"] .receipt-table th:nth-child(4),
+    [data-print-size="6"] .receipt-table td:nth-child(4) { width: 23%; }
+
+    [data-print-size="6"] .receipt-table th:nth-child(5),
+    [data-print-size="6"] .receipt-table td:nth-child(5) { width: 23%; }
+
+    /* 6.5 inch print adjustments */
+    [data-print-size="6.5"] .receipt-container {
+        padding: 0 20px 20px 20px !important;
+        font-size: 14px !important;
+    }
+
+    [data-print-size="6.5"] .receipt-table {
+        font-size: 13px !important;
+        table-layout: fixed !important;
+    }
+
+    [data-print-size="6.5"] .receipt-table th,
+    [data-print-size="6.5"] .receipt-table td {
+        padding: 7px 5px !important;
+        font-size: 13px !important;
+    }
+
+    [data-print-size="6.5"] .receipt-table th:nth-child(1),
+    [data-print-size="6.5"] .receipt-table td:nth-child(1) { width: 18%; }
+
+    [data-print-size="6.5"] .receipt-table th:nth-child(2),
+    [data-print-size="6.5"] .receipt-table td:nth-child(2) { width: 26%; }
+
+    [data-print-size="6.5"] .receipt-table th:nth-child(3),
+    [data-print-size="6.5"] .receipt-table td:nth-child(3) { width: 10%; }
+
+    [data-print-size="6.5"] .receipt-table th:nth-child(4),
+    [data-print-size="6.5"] .receipt-table td:nth-child(4) { width: 23%; }
+
+    [data-print-size="6.5"] .receipt-table th:nth-child(5),
+    [data-print-size="6.5"] .receipt-table td:nth-child(5) { width: 23%; }
 }
 
 /* Print Size Specific Adjustments */
@@ -1561,6 +1800,28 @@ body.print-size-5 .receipt-table tbody td {
     font-size: 11px;
 }
 
+/* 6 inch */
+body.print-size-6 .receipt-table {
+    font-size: 12px;
+}
+
+body.print-size-6 .receipt-table thead th,
+body.print-size-6 .receipt-table tbody td {
+    padding: 8px 6px;
+    font-size: 11px;
+}
+
+/* 6.5 inch */
+body.print-size-6-5 .receipt-table {
+    font-size: 12px;
+}
+
+body.print-size-6-5 .receipt-table thead th,
+body.print-size-6-5 .receipt-table tbody td {
+    padding: 8px 6px;
+    font-size: 11px;
+}
+
 /* Ensure table remains aligned in all sizes */
 .receipt-table thead th,
 .receipt-table tbody td {
@@ -1578,66 +1839,126 @@ body.print-size-5 .receipt-table tbody td {
 .measurement-table-fit {
     width: 100%;
     max-width: 100%;
-    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: visible;
     padding: 0;
     box-sizing: border-box;
 }
 
 .measurement-table-scale-box {
     margin: 0 auto;
-    overflow: hidden;
+    overflow: visible;
 }
 
-.measurement-groups-table { border-collapse: collapse; table-layout: fixed; width: 100%; max-width: 100%; }
-.measurement-groups-table > tbody > tr > td {
-    padding: 0 1px;
-    vertical-align: top;
-    box-sizing: border-box;
-    overflow: hidden;
-    background: #fff;
-}
-.measurement-groups-table > tbody > tr > td table.measurement-group-inner {
-    border: 1px solid #666;
-    border-collapse: collapse;
+.measurement-groups-flex {
+    display: block;
     width: 100%;
     max-width: 100%;
-    table-layout: fixed;
-}
-.measurement-groups-table .measurement-group-inner td {
-    max-width: 0;
-    width: 100%;
     box-sizing: border-box;
 }
-.measurement-groups-table .measurement-type-cell {
+
+.measurement-groups-row {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    align-items: flex-start;
+    box-sizing: border-box;
+    margin-bottom: 2px;
+}
+
+.measurement-groups-row:first-child {
+    justify-content: flex-start;
+    column-gap: 0;
+}
+
+.measurement-groups-row:first-child .measurement-group-box {
+    flex: 1 0 auto;
+    min-width: max-content;
+    max-width: none;
+}
+
+.measurement-groups-row:first-child .measurement-group-inner {
+    width: 100%;
+    table-layout: auto;
+}
+
+.measurement-groups-row:not(:first-child) {
+    justify-content: flex-start;
+    column-gap: 2px;
+}
+
+.measurement-group-box {
+    flex: 0 0 auto;
+    max-width: 100%;
+    padding: 0 1px 2px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.measurement-group-inner {
+    border: 1px solid #666;
+    border-collapse: collapse;
+    width: auto;
+    table-layout: auto;
+}
+
+.measurement-group-inner td {
+    box-sizing: border-box;
+}
+
+.measurement-type-cell {
     padding: 2px 1px;
     text-align: center;
     border: none;
     font-weight: 600;
     color: #000;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    overflow: hidden;
+    font-size: var(--measurement-label-font-size, 11px);
+    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
+    overflow: visible;
     box-sizing: border-box;
     line-height: 1.25;
 }
-.measurement-groups-table .measurement-value-cell {
+
+.measurement-value-cell {
     padding: 3px 1px;
     text-align: center;
     border: none;
     font-weight: 700;
     color: #000;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    overflow: hidden;
+    font-size: var(--measurement-font-size, 14px);
+    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
+    overflow: visible;
     box-sizing: border-box;
     line-height: 1.25;
     -webkit-font-smoothing: auto;
     -moz-osx-font-smoothing: auto;
     text-rendering: optimizeLegibility;
 }
-.measurement-groups-table .measurement-separator {
+
+.measurement-value-cell .meas-fraction-stack,
+.measurement-value-cell .meas-fraction-char {
+    font-size: calc(1em * var(--measurement-fraction-scale, 0.72));
+    font-weight: var(--measurement-fraction-weight, 700);
+    color: #000;
+}
+
+.measurement-value-cell .meas-f-stack-top,
+.measurement-value-cell .meas-f-stack-bot {
+    font-weight: 800;
+    color: #000;
+}
+
+.measurement-value-cell .meas-f-stack-line {
+    border-top-width: var(--measurement-fraction-line-thickness, 2.5px);
+    border-top-color: #000;
+}
+
+.measurement-separator {
     padding: 0;
     border: none;
     border-top: 1px solid #000;
@@ -1685,4 +2006,47 @@ body.pdf-export-mode #receiptInstitutionName {
     background-clip: border-box !important;
     -webkit-text-fill-color: #000 !important;
     color: #000 !important;
+}
+
+body.pdf-export-mode .measurement-value-cell .meas-fraction-stack,
+body.pdf-export-mode .measurement-value-cell .meas-fraction-char {
+    font-weight: 800 !important;
+    color: #000 !important;
+}
+
+body.pdf-export-mode .measurement-value-cell .meas-f-stack-top,
+body.pdf-export-mode .measurement-value-cell .meas-f-stack-bot {
+    font-weight: 800 !important;
+    color: #000 !important;
+    text-shadow: 0.35px 0 0 #000, -0.35px 0 0 #000 !important;
+}
+
+body.pdf-export-mode .measurement-value-cell .meas-f-stack-line {
+    height: 0 !important;
+    border: none !important;
+    border-top: 3px solid #000 !important;
+    background: transparent !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+body.pdf-export-mode .measurement-header h3,
+body.pdf-export-mode .copy-title,
+body.pdf-export-mode .measurement-info-table td,
+body.pdf-export-mode .measurement-dress-name,
+body.pdf-export-mode .measurement-order-no,
+body.pdf-export-mode .measurement-info-label,
+body.pdf-export-mode .measurement-order-cell,
+body.pdf-export-mode .measurement-date-cell,
+body.pdf-export-mode .dress-quantity-input {
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+    -webkit-font-smoothing: none !important;
+    text-rendering: geometricPrecision !important;
+}
+
+body.pdf-export-mode .measurement-order-no {
+    font-weight: 900 !important;
+    font-size: 21px !important;
+    text-shadow: 0.35px 0 0 #000, -0.35px 0 0 #000 !important;
 }

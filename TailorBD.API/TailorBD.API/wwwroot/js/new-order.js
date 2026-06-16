@@ -146,13 +146,21 @@
             const lastOrderDate    = customer.lastOrderDate  || customer.LastOrderDate  || customer.last_Order_Date;
             const registrationDate = customer.date           || customer.Date;
             const clothForId       = customer.cloth_For_ID   || customer.Cloth_For_ID   || 1;
-            const initials         = customerName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            const initials         = customerName.split(' ').filter(Boolean).map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            const institutionId    = sessionStorage.getItem('institutionId') || '';
+            const photoUrl         = `/api/Customers/${customerId}/photo?institutionId=${institutionId}`;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><button class="btn btn-order" onclick="goToOrder(${customerId},${clothForId})"><i class="fas fa-plus-circle"></i> অর্ডার দিন</button></td>
-                <td><span class="customer-number">${customerNumber}</span></td>
-                <td><div class="customer-info"><div class="customer-avatar">${initials}</div><strong>${customerName}</strong></div></td>
+                <td class="customer-name-cell"><div class="customer-info">
+                    <div class="customer-avatar">
+                        <img class="cust-table-photo" src="${photoUrl}" alt=""
+                            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                        <span class="cust-table-photo-fallback" style="display:none;">${initials || '?'}</span>
+                    </div>
+                    <span class="customer-name-with-no"><strong>${customerName}</strong> <span class="cust-no-bracket">(${customerNumber})</span></span>
+                </div></td>
                 <td>${phone}</td>
                 <td>${address || '-'}</td>
                 <td><span class="badge-orders">${totalOrders}</span></td>

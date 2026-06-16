@@ -17,7 +17,8 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/dashboard.css">
-    <link rel="stylesheet" href="/css/Editorder.css">
+    <link rel="stylesheet" href="/css/Editorder.css?v=2.2.2">
+    <link href="/css/measurement-fraction-bar.css?v=1.9.0" rel="stylesheet">
 
     
     
@@ -207,7 +208,7 @@
 
     <!-- Measurement Modal -->
     <div class="modal fade" id="measurementModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable oe-measurement-modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-ruler me-2"></i><span class="lang-content" data-en="Edit Measurements" data-bn="মাপ সম্পাদনা">মাপ সম্পাদনা</span> — <span id="modalMeasurementDressName"></span>
@@ -215,6 +216,30 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="measurement-fraction-bar" id="measurementFractionBar">
+                        <span class="fraction-bar-label">
+                            <i class="fas fa-divide me-1"></i>
+                            <span class="lang-content" data-en="Fractions — focus a box, then F1=½ F2=¼ F3=¾ F4=⅛" data-bn="ভগ্নাংশ — মাপ ঘরে ক্লিক করে F1=½ F2=¼ F3=¾ F4=⅛">ভগ্নাংশ — মাপ ঘরে ক্লিক করে F1=½ F2=¼ F3=¾ F4=⅛</span>
+                        </span>
+                        <div class="fraction-btn-group">
+                            <button type="button" class="fraction-btn" data-char="½" title="F1 — ½">
+                                <span class="fraction-char">½</span>
+                                <span class="fraction-name">F1</span>
+                            </button>
+                            <button type="button" class="fraction-btn" data-char="¼" title="F2 — ¼">
+                                <span class="fraction-char">¼</span>
+                                <span class="fraction-name">F2</span>
+                            </button>
+                            <button type="button" class="fraction-btn" data-char="¾" title="F3 — ¾">
+                                <span class="fraction-char">¾</span>
+                                <span class="fraction-name">F3</span>
+                            </button>
+                            <button type="button" class="fraction-btn" data-char="⅛" title="F4 — ⅛">
+                                <span class="fraction-char">⅛</span>
+                                <span class="fraction-name">F4</span>
+                            </button>
+                        </div>
+                    </div>
                     <div id="measurementsContainer">
                         <div class="text-center py-5">
                             <div class="spinner-border" role="status">
@@ -238,7 +263,7 @@
 
     <!-- Style Modal -->
     <div class="modal fade" id="styleModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl oe-style-modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-paint-brush me-2"></i><span class="lang-content" data-en="Edit Styles" data-bn="স্টাইল সম্পাদনা">স্টাইল সম্পাদনা</span> — <span id="modalStyleDressName"></span>
@@ -279,7 +304,8 @@
     <script src="/js/app-components.js?v=2.2.7"></script>
 
     <!-- Page Specific JS -->
-    <script src="/js/order-edit.js?v=2.1.6"></script>
-    <script src="/js/order-edit-functions.js?v=2.1.6"></script>
+    <script src="/js/measurement-fraction-bar.js?v=1.9.0"></script>
+    <script src="/js/order-edit.js?v=2.2.0"></script>
+    <script src="/js/order-edit-functions.js?v=2.2.2"></script>
 </body>
 </html>

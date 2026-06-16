@@ -162,6 +162,7 @@ namespace TailorBD.API.Controllers
         [HttpGet("list")]
         public async Task<ActionResult> GetInvoices(
             [FromQuery] int? institutionId = null,
+            [FromQuery] string? search = null,
             [FromQuery] string? status = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20)
@@ -193,21 +194,36 @@ namespace TailorBD.API.Controllers
                     WHERE 1=1";
 
                 if (institutionId.HasValue) sql += " AND inv.InstitutionID = @institutionId";
+                if (!string.IsNullOrWhiteSpace(search))
+                    sql += " AND (CAST(i.InstitutionID AS VARCHAR(20)) LIKE @search OR i.InstitutionName LIKE @search OR l.UserName LIKE @search OR i.Phone LIKE @search)";
                 if (!string.IsNullOrWhiteSpace(status)) sql += " AND inv.PaymentStatus = @status";
                 sql += " ORDER BY inv.CreateDate DESC OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
 
                 var rows = await con.QueryAsync(sql, new
                 {
                     institutionId,
+                    search = string.IsNullOrWhiteSpace(search) ? null : "%" + search.Trim() + "%",
                     status,
                     offset   = (page - 1) * pageSize,
                     pageSize
                 });
 
-                var countSql = "SELECT COUNT(*) FROM Invoice inv WHERE 1=1" +
+                var countSql = @"SELECT COUNT(*)
+                    FROM Invoice inv
+                    JOIN Institution i ON inv.InstitutionID = i.InstitutionID
+                    LEFT JOIN LIU l ON inv.InstitutionID = l.InstitutionID AND l.Category='Admin'
+                    WHERE 1=1" +
                     (institutionId.HasValue ? " AND inv.InstitutionID=@institutionId" : "") +
+                    (!string.IsNullOrWhiteSpace(search)
+                        ? " AND (CAST(i.InstitutionID AS VARCHAR(20)) LIKE @search OR i.InstitutionName LIKE @search OR l.UserName LIKE @search OR i.Phone LIKE @search)"
+                        : "") +
                     (!string.IsNullOrWhiteSpace(status) ? " AND inv.PaymentStatus=@status" : "");
-                var total = await con.ExecuteScalarAsync<int>(countSql, new { institutionId, status });
+                var total = await con.ExecuteScalarAsync<int>(countSql, new
+                {
+                    institutionId,
+                    search = string.IsNullOrWhiteSpace(search) ? null : "%" + search.Trim() + "%",
+                    status
+                });
 
                 var data = rows.Select(r => new
                 {

@@ -7,7 +7,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link href="/css/quick-order.css" rel="stylesheet">
+    <link href="/css/quick-order.css?v=2.2.0" rel="stylesheet">
+    <link href="/css/measurement-fraction-bar.css?v=1.8.1" rel="stylesheet">
 </head>
 <body>
     <!-- Sidebar -->
@@ -262,6 +263,30 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="measurement-fraction-bar" id="measurementFractionBar">
+                        <span class="fraction-bar-label">
+                            <i class="fas fa-divide me-1"></i>
+                            <span data-en="Fractions — focus a box, then F1=½ F2=¼ F3=¾ F4=⅛" data-bn="ভগ্নাংশ — মাপ ঘরে ক্লিক করে F1=½ F2=¼ F3=¾ F4=⅛">ভগ্নাংশ — মাপ ঘরে ক্লিক করে F1=½ F2=¼ F3=¾ F4=⅛</span>
+                        </span>
+                        <div class="fraction-btn-group">
+                            <button type="button" class="fraction-btn" data-char="½" title="F1 — ½">
+                                <span class="fraction-char">½</span>
+                                <span class="fraction-name">F1</span>
+                            </button>
+                            <button type="button" class="fraction-btn" data-char="¼" title="F2 — ¼">
+                                <span class="fraction-char">¼</span>
+                                <span class="fraction-name">F2</span>
+                            </button>
+                            <button type="button" class="fraction-btn" data-char="¾" title="F3 — ¾">
+                                <span class="fraction-char">¾</span>
+                                <span class="fraction-name">F3</span>
+                            </button>
+                            <button type="button" class="fraction-btn" data-char="⅛" title="F4 — ⅛">
+                                <span class="fraction-char">⅛</span>
+                                <span class="fraction-name">F4</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="row" id="measurementModalBody"></div>
                 </div>
                 <div class="modal-footer">
@@ -355,7 +380,8 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/app-components.js?v=2.1.9"></script>
-    <script src="/js/quick-order.js?v=2.1.6"></script>
+    <script src="/js/measurement-fraction-bar.js?v=1.8.1"></script>
+    <script src="/js/quick-order.js?v=2.1.8"></script>
 
     <!-- Shared Modals -->
     <div id="app-modals"></div>

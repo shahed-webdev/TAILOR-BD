@@ -383,29 +383,27 @@ async function renderOrdersTable(orders) {
         <table class="iw-table">
             <colgroup>
                 <col class="col-chk">
-                <col style="width:4%">
-                <col style="width:9%">
-                <col style="width:7%">
-                <col style="width:8%">
+                <col class="col-order-no">
+                <col class="col-name">
+                <col class="col-phone">
                 <col style="width:22%">
+                <col class="col-date">
+                <col class="col-date">
                 <col style="width:5%">
-                <col style="width:5%">
-                <col style="width:5%">
-                <col style="width:8%">
-                <col style="width:8%">
-                <col class="col-chk">
-                <col class="col-act">
+                <col style="width:7%">
+                <col style="width:7%">
+                <col class="col-sms">
+                <col class="col-print">
             </colgroup>
             <thead>
                 <tr>
                     <th><input type="checkbox" id="selectAll" class="order-list-checkbox"></th>
-                    <th>${lang === 'en' ? 'No.' : 'নং'}</th>
+                    <th class="col-order-no-head">${lang === 'en' ? 'No.' : 'নং'}</th>
                     <th>${lang === 'en' ? 'Name' : 'নাম'}</th>
-                    <th>${lang === 'en' ? 'Phone' : 'মোবা.'}</th>
-                    <th>${lang === 'en' ? 'Addr.' : 'ঠিকানা'}</th>
+                    <th class="col-phone-head">${lang === 'en' ? 'Phone' : 'মোবা.'}</th>
                     <th>${lang === 'en' ? 'Order List' : 'অর্ডার লিস্ট'}</th>
-                    <th>${lang === 'en' ? 'Order' : 'অর্ডার'}</th>
-                    <th>${lang === 'en' ? 'Del.' : 'ডেলি.'}</th>
+                    <th class="col-date-head">${lang === 'en' ? 'Order' : 'অর্ডার'}</th>
+                    <th class="col-date-head">${lang === 'en' ? 'Del.' : 'ডেলি.'}</th>
                     <th>${lang === 'en' ? 'Total' : 'মোট'}</th>
                     <th>${lang === 'en' ? 'Store' : 'রাখা'}</th>
                     <th>${lang === 'en' ? 'Note' : 'নোট'}</th>
@@ -427,22 +425,20 @@ async function renderOrdersTable(orders) {
         else if (order.isPartlyCompleted) rowClass = 'partly-completed';
 
         const customerLabel = `(${order.customerNumber}) ${order.customerName}`;
-        const addrFull = order.address || '-';
 
         tableHTML += `
             <tr class="${rowClass}" data-order-id="${order.orderId}">
                 <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
-                <td>
+                <td class="col-order-no-cell">
                     <a href="order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}" class="view-measurement-link" target="_blank" title="${lang === 'en' ? 'View measurement' : 'মাপ দেখুন'}">
                         ${order.orderSerialNumber}
                     </a>
                 </td>
-                <td><span class="cell-clip" title="${escapeHtml(customerLabel)}">${escapeHtml(clipCell(customerLabel, 16))}</span></td>
-                <td><span class="cell-clip" title="${escapeHtml(order.phone || '')}">${escapeHtml(order.phone || '-')}</span></td>
-                <td><span class="cell-clip" title="${escapeHtml(addrFull)}">${escapeHtml(clipCell(addrFull, 12))}</span></td>
+                <td class="col-name-cell"><span class="cell-name" title="${escapeHtml(customerLabel)}">${escapeHtml(customerLabel)}</span></td>
+                <td class="col-phone-cell">${escapeHtml(order.phone || '-')}</td>
                 <td>${renderOrderListTable(orderListItems, order.orderId)}</td>
-                <td>${formatDate(order.orderDate)}</td>
-                <td>${order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</td>
+                <td class="col-date-cell">${formatDate(order.orderDate)}</td>
+                <td class="col-date-cell">${order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</td>
                 <td><strong>${Math.round(order.orderAmount)}</strong></td>
                 <td>
                     <input type="text" class="store-input" data-order-id="${order.orderId}" 

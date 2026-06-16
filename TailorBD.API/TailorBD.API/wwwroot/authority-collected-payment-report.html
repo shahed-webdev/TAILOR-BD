@@ -187,6 +187,16 @@
 
         <!-- -- Collected Payments Tab -- -->
         <div id="panelPayments">
+            <div class="d-flex gap-2 mb-3 align-items-center">
+                <div class="input-group" style="max-width:280px;">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted" style="font-size:.8rem;"></i>
+                    </span>
+                    <input type="text" id="paySearch" class="form-control border-start-0 ps-0"
+                           placeholder="প্রতিষ্ঠান ID / নাম..." oninput="filterPayTable()">
+                </div>
+                <div class="ms-auto" style="font-size:.82rem;color:#64748b;" id="payResultInfo"></div>
+            </div>
             <div class="section-card" style="padding:0;overflow:hidden;" id="payTableWrap">
                 <div class="table-responsive">
                     <table class="rpt-table">
@@ -274,6 +284,34 @@
         var d = new Date();
         return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
     }
+    function formatInstitutionLabel(id, name) {
+        var n = name || '';
+        if (id) return '(' + id + ') ' + n;
+        return n || '—';
+    }
+    function escHtml(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+    function normalizeInstitutionSearch(raw) {
+        var s = String(raw || '').trim().toLowerCase();
+        var wrapped = s.match(/^\((\d+)\)/);
+        if (wrapped) return wrapped[1];
+        return s;
+    }
+    function matchesInstitutionSearch(row, q) {
+        if (!q) return true;
+        var qNorm = normalizeInstitutionSearch(q);
+        var id = String(row.institutionID || '');
+        var name = (row.institutionName || '').toLowerCase();
+        var label = formatInstitutionLabel(row.institutionID, row.institutionName).toLowerCase();
+        return id.indexOf(qNorm) >= 0 ||
+            name.indexOf(qNorm) >= 0 ||
+            label.indexOf(q) >= 0;
+    }
 
     // -- Quick range ---------------------------------------------------------
     function setRange(range, btn) {
@@ -306,6 +344,8 @@
         $('.qr-btn').removeClass('active').first().addClass('active');
         $('#fromDate').val(monthStartStr());
         $('#toDate').val(todayStr());
+        $('#paySearch').val('');
+        $('#dueSearch').val('');
         loadReport();
     }
 
@@ -354,8 +394,9 @@
                 $('#payBadge').text(_allPayments.length);
                 $('#dueBadge').text(_allDues.length);
 
-                renderPayments(_allPayments);
+                filterPayTable();
                 renderDues(_allDues);
+                if ($('#dueSearch').val().trim()) filterDueTable();
             },
             error: function() {
                 showToast('সার্ভার থেকে তথ্য আনা সম্ভব হয়নি', 'danger');
@@ -424,7 +465,7 @@
                     '<tr>' +
                     '<td style="color:#94a3b8;">' + sl + '</td>' +
                     '<td style="white-space:nowrap;">' + fmtDate(r.paidDate) + '</td>' +
-                    '<td><strong>' + (r.institutionName || '�') + '</strong></td>' +
+                    '<td><strong>' + escHtml(formatInstitutionLabel(r.institutionID, r.institutionName)) + '</strong></td>' +
                     '<td style="color:#64748b;font-size:.8rem;">' + (r.invoice_For || '�') + '</td>' +
                     '<td>' + (r.payment_Method || '<span style="color:#cbd5e1;">�</span>') + '</td>' +
                     '<td>' + (r.collected_By   || '<span style="color:#cbd5e1;">�</span>') + '</td>' +
@@ -445,6 +486,19 @@
         );
     }
 
+    function filterPayTable() {
+        var q = $('#paySearch').val().toLowerCase().trim();
+        var filtered = !q ? _allPayments : _allPayments.filter(function(r) {
+            return matchesInstitutionSearch(r, q);
+        });
+        renderPayments(filtered);
+        if (!q) {
+            $('#payResultInfo').text(filtered.length + ' টি পেমেন্ট');
+        } else {
+            $('#payResultInfo').text(filtered.length + ' / ' + _allPayments.length + ' টি পেমেন্ট');
+        }
+    }
+
     // -- Render due list ------------------------------------------------------
     function renderDues(rows) {
         var $tbody = $('#dueTbody');
@@ -463,9 +517,9 @@
                 ? '<span class="ins-status-valid">Active</span>'
                 : '<span class="ins-status-invalid">Inactive</span>';
             $tbody.append(
-                '<tr data-name="' + (r.institutionName || '').toLowerCase() + '" data-user="' + (r.userName || '').toLowerCase() + '" data-phone="' + (r.phone || '') + '">' +
+                '<tr data-name="' + (r.institutionName || '').toLowerCase() + '" data-user="' + (r.userName || '').toLowerCase() + '" data-phone="' + (r.phone || '') + '" data-id="' + (r.institutionID || '') + '">' +
                 '<td style="color:#94a3b8;">' + (idx + 1) + '</td>' +
-                '<td><strong>' + (r.institutionName || '�') + '</strong></td>' +
+                '<td><strong>' + escHtml(formatInstitutionLabel(r.institutionID, r.institutionName)) + '</strong></td>' +
                 '<td style="color:#64748b;">' + (r.userName || '�') + '</td>' +
                 '<td>' + (r.phone || '�') + '</td>' +
                 '<td>' + statusBadge + '</td>' +
@@ -497,7 +551,8 @@
             var name  = $(this).data('name')  || '';
             var user  = $(this).data('user')  || '';
             var phone = $(this).data('phone') || '';
-            if (!q || name.indexOf(q) >= 0 || user.indexOf(q) >= 0 || phone.indexOf(q) >= 0) {
+            var insId = String($(this).data('id') || '');
+            if (!q || name.indexOf(q) >= 0 || user.indexOf(q) >= 0 || phone.indexOf(q) >= 0 || insId.indexOf(q) >= 0) {
                 $(this).show(); visible++;
             } else {
                 $(this).hide();

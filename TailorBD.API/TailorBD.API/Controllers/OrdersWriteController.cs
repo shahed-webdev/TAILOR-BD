@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
+using TailorBD.API.Helpers;
 using TailorBD.API.Models;
 
 namespace TailorBD.API.Controllers
@@ -99,6 +100,10 @@ namespace TailorBD.API.Controllers
                                             await mCmd.ExecuteNonQueryAsync();
                                         }
                                     }
+
+                                    await CustomerDataSync.SyncCustomerMeasurementsForDressAsync(
+                                        connection, transaction, model.CustomerId, model.InstitutionId, model.RegistrationId,
+                                        orderListItem.DressId, measurements);
                                 }
                             }
                             catch (Exception ex) { _logger.LogWarning(ex, "Error parsing measurements"); }
@@ -133,6 +138,10 @@ namespace TailorBD.API.Controllers
                                             await sCmd.ExecuteNonQueryAsync();
                                         }
                                     }
+
+                                    await CustomerDataSync.SyncCustomerDressStylesForDressAsync(
+                                        connection, transaction, model.CustomerId, model.InstitutionId, model.RegistrationId,
+                                        orderListItem.DressId, styles);
                                 }
                             }
                             catch (Exception ex) { _logger.LogWarning(ex, "Error parsing styles"); }
@@ -197,6 +206,26 @@ namespace TailorBD.API.Controllers
                             spCmd.Parameters.AddWithValue("@DressQuantity", orderListItem.DressQuantity);
                             spCmd.Parameters.AddWithValue("@Details", orderListItem.Details ?? "");
                             await spCmd.ExecuteNonQueryAsync();
+
+                            try
+                            {
+                                var spMeasurements = System.Text.Json.JsonSerializer.Deserialize<List<MeasurementItem>>(
+                                    orderListItem.ListMeasurement ?? "[]");
+                                await CustomerDataSync.SyncCustomerMeasurementsForDressAsync(
+                                    connection, transaction, model.CustomerId, model.InstitutionId, model.RegistrationId,
+                                    orderListItem.DressId, spMeasurements);
+                            }
+                            catch (Exception ex) { _logger.LogWarning(ex, "Error syncing customer measurements after SP_Order_Place"); }
+
+                            try
+                            {
+                                var spStyles = System.Text.Json.JsonSerializer.Deserialize<List<StyleItem>>(
+                                    orderListItem.ListStyle ?? "[]", StyleJsonOptions);
+                                await CustomerDataSync.SyncCustomerDressStylesForDressAsync(
+                                    connection, transaction, model.CustomerId, model.InstitutionId, model.RegistrationId,
+                                    orderListItem.DressId, spStyles);
+                            }
+                            catch (Exception ex) { _logger.LogWarning(ex, "Error syncing customer dress styles after SP_Order_Place"); }
                         }
                     }
 
@@ -336,6 +365,10 @@ namespace TailorBD.API.Controllers
                                 await mCmd.ExecuteNonQueryAsync();
                             }
                         }
+
+                        await CustomerDataSync.SyncCustomerMeasurementsForDressAsync(
+                            connection, null, model.CustomerID, model.InstitutionID, model.RegistrationID,
+                            model.DressID, measurements);
                     }
                 }
                 catch (Exception ex) { _logger.LogWarning(ex, "Error parsing measurements"); }
@@ -363,6 +396,10 @@ namespace TailorBD.API.Controllers
                                 await sCmd.ExecuteNonQueryAsync();
                             }
                         }
+
+                        await CustomerDataSync.SyncCustomerDressStylesForDressAsync(
+                            connection, null, model.CustomerID, model.InstitutionID, model.RegistrationID,
+                            model.DressID, styles);
                     }
                 }
                 catch (Exception ex) { _logger.LogWarning(ex, "Error parsing styles"); }
@@ -569,5 +606,6 @@ namespace TailorBD.API.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
+
     }
 }

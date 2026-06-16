@@ -113,6 +113,7 @@
         $('#showShopName').prop('checked', rs.showShopName);
         $('#showServedBy').prop('checked', rs.showServedBy);
         $('#showReceiptBarcode').prop('checked', rs.showReceiptBarcode !== false);
+        $('#showPreviousDue').prop('checked', rs.showPreviousDue !== false);
         $('#receiptTopSpace').val(rs.topSpace);
         $('#receiptFontSize').val(rs.fontSize);
         $('#poweredByInfo').val(rs.poweredByInfo || '');
@@ -192,6 +193,7 @@
             showShopName: $('#showShopName').is(':checked'),
             showServedBy: $('#showServedBy').is(':checked'),
             showReceiptBarcode: $('#showReceiptBarcode').is(':checked'),
+            showPreviousDue: $('#showPreviousDue').is(':checked'),
             topSpace: parseInt($('#receiptTopSpace').val()) || 0,
             fontSize: parseInt($('#receiptFontSize').val()) || 14,
             poweredByInfo: $('#poweredByInfo').val() || ''

@@ -177,66 +177,89 @@ namespace TailorBD.API.Controllers
         {
             try
             {
+                if (model == null || model.AccountID <= 0 || model.InstitutionID <= 0 || model.RegistrationID <= 0)
+                    return BadRequest(new { success = false, message = "Invalid transaction data" });
+
+                if (model.Amount <= 0)
+                    return BadRequest(new { success = false, message = "Amount must be greater than zero" });
+
+                var isDeposit = string.Equals(model.Type, "deposit", StringComparison.OrdinalIgnoreCase);
+                var isWithdraw = string.Equals(model.Type, "withdraw", StringComparison.OrdinalIgnoreCase);
+
+                if (!isDeposit && !isWithdraw)
+                    return BadRequest(new { success = false, message = "Invalid transaction type" });
+
                 using var connection = _context.CreateConnection();
                 connection.Open();
-                using var transaction = connection.BeginTransaction();
 
-                try
+                if (isWithdraw)
                 {
-                    // Insert transaction log
-                    var insertQuery = @"
-                        INSERT INTO Account_Log (
-                            AccountID, 
-                            InstitutionID, 
-                            RegistrationID, 
-                            Amount, 
-                            Type, 
-                            Note, 
-                            Date,
-                            EntryDate
+                    var balance = connection.ExecuteScalar<decimal?>(
+                        "SELECT AccountBalance FROM Account WHERE InstitutionID = @InstitutionID AND AccountID = @AccountID",
+                        new { model.InstitutionID, model.AccountID });
+
+                    if (balance == null)
+                        return BadRequest(new { success = false, message = "Account not found" });
+
+                    if (model.Amount > balance.Value)
+                    {
+                        return Ok(new
+                        {
+                            success = false,
+                            message = "উত্তোলনের পরিমাণ বর্তমান ব্যালেন্সের বেশি"
+                        });
+                    }
+                }
+
+                var txDate = model.Date == default ? DateTime.Today : model.Date.Date;
+                var details = model.Note ?? string.Empty;
+
+                if (isDeposit)
+                {
+                    connection.Execute(@"
+                        INSERT INTO AccountIN_Record (
+                            AccountID, InstitutionID, RegistrationID,
+                            AccountIN_Amount, IN_Details, AccountIN_Date
                         ) VALUES (
-                            @AccountID, 
-                            @InstitutionID, 
-                            @RegistrationID, 
-                            @Amount, 
-                            @Type, 
-                            @Note, 
-                            @Date,
-                            GETDATE()
-                        )";
-
-                    connection.Execute(insertQuery, new {
-                        AccountID = model.AccountID,
-                        InstitutionID = model.InstitutionID,
-                        RegistrationID = model.RegistrationID,
-                        Amount = model.Amount,
-                        Type = model.Type, // 'IN' for deposit, 'OUT' for withdraw
-                        Note = model.Note,
-                        Date = model.Date
-                    }, transaction);
-
-                    // Update account balance
-                    var balanceQuery = model.Type == "deposit" ? 
-                        "UPDATE Account SET AccountBalance = AccountBalance + @Amount, Total_IN = Total_IN + @Amount WHERE AccountID = @AccountID" :
-                        "UPDATE Account SET AccountBalance = AccountBalance - @Amount, Total_OUT = Total_OUT + @Amount WHERE AccountID = @AccountID";
-
-                    connection.Execute(balanceQuery, new {
-                        Amount = model.Amount,
-                        AccountID = model.AccountID
-                    }, transaction);
-
-                    transaction.Commit();
-
-                    return Ok(new { 
-                        success = true, 
-                        message = "Transaction completed successfully" 
-                    });
+                            @AccountID, @InstitutionID, @RegistrationID,
+                            @Amount, @Details, @TxDate
+                        )",
+                        new
+                        {
+                            model.AccountID,
+                            model.InstitutionID,
+                            model.RegistrationID,
+                            Amount = (double)model.Amount,
+                            Details = details,
+                            TxDate = txDate
+                        });
                 }
-                catch (Exception)
+                else
                 {
-                    transaction.Rollback();
-                    throw;
+                    connection.Execute(@"
+                        INSERT INTO AccountOUT_Record (
+                            AccountID, InstitutionID, RegistrationID,
+                            AccountOUT_Amount, Out_Details, AccountOUT_Date
+                        ) VALUES (
+                            @AccountID, @InstitutionID, @RegistrationID,
+                            @Amount, @Details, @TxDate
+                        )",
+                        new
+                        {
+                            model.AccountID,
+                            model.InstitutionID,
+                            model.RegistrationID,
+                            Amount = (double)model.Amount,
+                            Details = details,
+                            TxDate = txDate
+                        });
                 }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = isDeposit ? "জমা সফল হয়েছে" : "উত্তোলন সফল হয়েছে"
+                });
             }
             catch (Exception ex)
             {
@@ -253,9 +276,12 @@ namespace TailorBD.API.Controllers
                 using var connection = _context.CreateConnection();
                 
                 var query = @"
-                    SELECT * FROM Account_Log 
+                    SELECT Log_SN, AccountID, Amount, Add_Subtraction, Category, Situation,
+                           Details, Insert_Date, Activity_Date, Balance_Before, Balance_After
+                    FROM Account_Log 
                     WHERE AccountID = @AccountID 
-                    ORDER BY Date DESC, EntryDate DESC";
+                      AND Category IN ('Deposit', 'Withdraw')
+                    ORDER BY Insert_Date DESC, Insert_Time DESC";
 
                 var transactions = connection.Query(query, new { AccountID = accountId });
 

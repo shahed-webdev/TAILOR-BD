@@ -132,7 +132,7 @@ function populateTable(dresses) {
                </div>`;
 
         const row = `
-            <tr data-dress-id="${dress.DressID}">
+            <tr class="dress-table-row" data-dress-id="${dress.DressID}">
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="editDress(${dress.DressID})" title="এডিট করুন">
                         <i class="fas fa-edit"></i>

@@ -11,6 +11,28 @@ namespace TailorBD.API.Controllers
     {
         private readonly TailorBdContext _context;
 
+        private const string LatestOrderedMeasurementJoin = @"
+            LEFT OUTER JOIN (
+                SELECT MeasurementTypeID, Measurement
+                FROM (
+                    SELECT om.MeasurementTypeID, om.Measurement,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY om.MeasurementTypeID
+                               ORDER BY
+                                   CASE WHEN ISNULL(LTRIM(RTRIM(om.Measurement)), '') <> '' THEN 0 ELSE 1 END,
+                                   o.OrderDate DESC,
+                                   ol.OrderListID DESC
+                           ) AS rn
+                    FROM Ordered_Measurement om
+                    INNER JOIN OrderList ol ON om.OrderListID = ol.OrderListID
+                    INNER JOIN [Order] o ON ol.OrderID = o.OrderID
+                    WHERE om.CustomerID = @CustomerId
+                      AND ol.InstitutionID = @InstitutionId
+                      AND ol.DressID = @DressId
+                ) ranked
+                WHERE rn = 1
+            ) AS latest_om ON mt.MeasurementTypeID = latest_om.MeasurementTypeID";
+
         public MeasurementController(TailorBdContext context)
         {
             _context = context;
@@ -374,9 +396,10 @@ namespace TailorBD.API.Controllers
                         SELECT 
                             mt.MeasurementTypeID, 
                             mt.MeasurementType, 
-                            ISNULL(cm.Measurement, '') as Measurement, 
+                            COALESCE(NULLIF(LTRIM(RTRIM(latest_om.Measurement)), ''), NULLIF(LTRIM(RTRIM(cm.Measurement)), ''), '') as Measurement, 
                             mt.Measurement_Group_SerialNo 
                         FROM Measurement_Type mt
+                        " + LatestOrderedMeasurementJoin + @"
                         LEFT OUTER JOIN (
                             SELECT Measurement, MeasurementTypeID 
                             FROM Customer_Measurement 
@@ -392,7 +415,7 @@ namespace TailorBD.API.Controllers
                     if (group.MeasurementGroupId == null) continue;
 
                     var measurements = connection.Query<dynamic>(measurementsQuery, 
-                        new { GroupId = (int)group.MeasurementGroupId, CustomerId = customerId, InstitutionId = institutionId }).ToList();
+                        new { GroupId = (int)group.MeasurementGroupId, CustomerId = customerId, InstitutionId = institutionId, DressId = dressId }).ToList();
                     
                     measurementGroups.Add(new
                     {
@@ -406,9 +429,10 @@ namespace TailorBD.API.Controllers
                         SELECT 
                             mt.MeasurementTypeID, 
                             mt.MeasurementType, 
-                            ISNULL(cm.Measurement, '') as Measurement, 
+                            COALESCE(NULLIF(LTRIM(RTRIM(latest_om.Measurement)), ''), NULLIF(LTRIM(RTRIM(cm.Measurement)), ''), '') as Measurement, 
                             mt.Measurement_Group_SerialNo 
                         FROM Measurement_Type mt
+                        " + LatestOrderedMeasurementJoin + @"
                         LEFT OUTER JOIN (
                             SELECT Measurement, MeasurementTypeID 
                             FROM Customer_Measurement 
@@ -446,7 +470,7 @@ namespace TailorBD.API.Controllers
                 var categories = connection.Query<dynamic>(styleCategoriesQuery, 
                     new { DressId = dressId }).ToList();
 
-                // Get styles for each category
+                // Get styles — same source as customer-details (/api/customer-page/dress-styles)
                 var styleGroups = new List<object>();
                 foreach (var category in categories)
                 {
@@ -457,11 +481,8 @@ namespace TailorBD.API.Controllers
                             ISNULL(cds.DressStyleMesurement, '') as DressStyleMesurement, 
                             CAST(CASE WHEN cds.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck 
                         FROM Dress_Style ds
-                        LEFT OUTER JOIN (
-                            SELECT DressStyleMesurement, Dress_StyleID 
-                            FROM Customer_Dress_Style 
-                            WHERE CustomerID = @CustomerId
-                        ) AS cds ON ds.Dress_StyleID = cds.Dress_StyleID 
+                        LEFT JOIN Customer_Dress_Style cds 
+                            ON ds.Dress_StyleID = cds.Dress_StyleID AND cds.CustomerID = @CustomerId
                         WHERE ds.Dress_Style_CategoryID = @CategoryId 
                         ORDER BY ISNULL(ds.StyleSerial, 99999)";
                     

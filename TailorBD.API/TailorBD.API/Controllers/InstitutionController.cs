@@ -258,6 +258,7 @@ namespace TailorBD.API.Controllers
                         M_Receipt_ShopName,
                         M_Receipt_ServedBy,
                         M_Receipt_Barcode,
+                        M_Receipt_PreviousDue,
                         M_Receipt_TopSpace,
                         M_Receipt_FontSize,
                         PoweredByInfo
@@ -337,6 +338,7 @@ namespace TailorBD.API.Controllers
                             showShopName = receiptShopName ?? measurementShopName ?? false,
                             showServedBy = SafeGetBoolean("M_Receipt_ServedBy"),
                             showReceiptBarcode = SafeGetBoolean("M_Receipt_Barcode"),
+                            showPreviousDue = SafeGetNullableBoolean("M_Receipt_PreviousDue") ?? true,
                             topSpace = SafeGetInt32("M_Receipt_TopSpace"),
                             fontSize = SafeGetInt32("M_Receipt_FontSize"),
                             poweredByInfo = reader.IsDBNull(reader.GetOrdinal("PoweredByInfo")) 
@@ -456,6 +458,7 @@ namespace TailorBD.API.Controllers
                         M_Receipt_ShopName = @M_Receipt_ShopName,
                         M_Receipt_ServedBy = @M_Receipt_ServedBy,
                         M_Receipt_Barcode = @M_Receipt_Barcode,
+                        M_Receipt_PreviousDue = @M_Receipt_PreviousDue,
                         M_Receipt_TopSpace = @M_Receipt_TopSpace,
                         M_Receipt_FontSize = @M_Receipt_FontSize,
                         PoweredByInfo = @PoweredByInfo
@@ -466,6 +469,7 @@ namespace TailorBD.API.Controllers
                 command.Parameters.AddWithValue("@M_Receipt_ShopName", settings.ShowShopName);
                 command.Parameters.AddWithValue("@M_Receipt_ServedBy", settings.ShowServedBy);
                 command.Parameters.AddWithValue("@M_Receipt_Barcode", settings.ShowReceiptBarcode);
+                command.Parameters.AddWithValue("@M_Receipt_PreviousDue", settings.ShowPreviousDue);
                 command.Parameters.AddWithValue("@M_Receipt_TopSpace", settings.TopSpace);
                 command.Parameters.AddWithValue("@M_Receipt_FontSize", settings.FontSize);
                 command.Parameters.AddWithValue("@PoweredByInfo", settings.PoweredByInfo ?? "");
@@ -1617,6 +1621,7 @@ namespace TailorBD.API.Controllers
         public bool ShowShopName { get; set; }
         public bool ShowServedBy { get; set; }
         public bool ShowReceiptBarcode { get; set; }
+        public bool ShowPreviousDue { get; set; } = true;
         public int TopSpace { get; set; }
         public int FontSize { get; set; }
         public string? PoweredByInfo { get; set; }

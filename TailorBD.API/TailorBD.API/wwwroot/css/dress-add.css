@@ -361,33 +361,159 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-.table-responsive {
-    overflow-x: auto;
-}
-    
-.dress-thumbnail,
-.dress-thumbnail-placeholder {
-    width: 36px;
-    height: 36px;
-}
-    
-.dress-thumbnail-placeholder {
-    font-size: 1rem;
-}
-    
+    .main-content,
+    .dashboard-content {
+        overflow-x: hidden;
+        max-width: 100%;
+        padding: 10px 12px !important;
+        box-sizing: border-box;
+    }
+
+    .page-header {
+        margin-bottom: 10px !important;
+    }
+
+    .page-header h1 {
+        font-size: 1.05rem !important;
+    }
+
+    .page-header p {
+        display: none;
+    }
+
     .action-buttons {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px !important;
     }
-    
-    .action-buttons button {
+
+    .action-buttons .btn {
+        flex: 1 1 calc(50% - 4px);
+        padding: 8px 10px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .table-card {
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .table-card .table-responsive {
+        overflow-x: visible;
+    }
+
+    #dressTable {
+        display: block;
+        font-size: 0.82rem;
+    }
+
+    #dressTable thead {
+        display: none;
+    }
+
+    #dressTable tbody {
+        display: block;
+    }
+
+    #dressTable tbody tr.dress-table-row {
+        display: grid;
+        grid-template-columns: 44px 1fr auto auto;
+        grid-template-rows: auto auto;
+        gap: 8px 6px;
+        padding: 10px;
+        margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    #dressTable tbody tr.dress-table-row:hover {
+        background: #fff;
+    }
+
+    #dressTable tbody td {
+        display: block;
+        padding: 0;
+        border: none;
+        vertical-align: middle;
+    }
+
+    #dressTable tbody td:nth-child(3) {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #dressTable tbody td:nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
+        align-self: center;
+    }
+
+    #dressTable tbody td:nth-child(1) {
+        grid-column: 3;
+        grid-row: 1;
+        align-self: start;
+    }
+
+    #dressTable tbody td:nth-child(7) {
+        grid-column: 4;
+        grid-row: 1;
+        align-self: start;
+    }
+
+    #dressTable tbody td:nth-child(4) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    #dressTable tbody td:nth-child(5) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    #dressTable tbody td:nth-child(6) {
+        grid-column: 3 / 5;
+        grid-row: 2;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .dress-name-link {
+        font-size: 0.88rem;
+        word-break: break-word;
+        display: block;
+        line-height: 1.25;
+    }
+
+    .dress-thumbnail,
+    .dress-thumbnail-placeholder {
+        width: 40px;
+        height: 40px;
+    }
+
+    .dress-thumbnail-placeholder {
+        font-size: 0.95rem;
+    }
+
+    #dressTable .btn-sm {
+        padding: 6px 8px;
+        min-width: 34px;
+    }
+
+    .dress-serial {
+        width: 100% !important;
+        max-width: 88px;
+        font-size: 0.82rem !important;
+    }
+
+    #measurementModal .col-md-6,
+    #measurementModal .col-md-4,
+    #measurementModal .col-sm-6,
+    #measurementModal .col-sm-3 {
         width: 100%;
-    }
-    
-    #measurementModal .col-md-6 {
-        width: 100%;
-    }
-    
-    #measurementModal .col-md-4 {
-        width: 50%;
     }
 }

@@ -23,17 +23,17 @@
 
         .container { max-width: 100%; margin: 0 auto; padding: 6px; background: #f5f7fa; min-height: 100vh; }
         .content { background: white; border-radius: 8px; padding: 12px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; margin-bottom: 12px; font-size: 18px; font-weight: 600; }
+        h2 { color: #2c3e50; margin-bottom: 12px; font-size: 22px; font-weight: 600; }
 
         .search-section { margin-bottom: 12px; }
         .search-tabs { display: flex; gap: 12px; margin-bottom: 10px; }
-        .search-tabs label { display: flex; align-items: center; cursor: pointer; font-size: 12px; }
-        .search-tabs input[type="radio"] { margin-right: 6px; }
+        .search-tabs label { display: flex; align-items: center; cursor: pointer; font-size: 16px; }
+        .search-tabs input[type="radio"] { margin-right: 6px; width: 16px; height: 16px; }
         .search-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
         .form-group { flex: 1; min-width: 150px; }
-        .form-group label { display: block; margin-bottom: 3px; color: #555; font-weight: 500; font-size: 11px; }
-        .form-group input { width: 100%; padding: 5px 7px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
-        .btn-search { padding: 5px 14px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 12px; }
+        .form-group label { display: block; margin-bottom: 3px; color: #555; font-weight: 500; font-size: 15px; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 15px; }
+        .btn-search { padding: 9px 18px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 16px; }
         .btn-search:hover { background: #5a68c9; }
         .search-by-date { display: none; }
         .search-by-date.active { display: block; }
@@ -41,28 +41,28 @@
         .search-by-number.active { display: block; }
 
         .table-wrapper { overflow-x: auto; margin-top: 10px; }
-        .dashboard-content { padding: 12px 14px; }
+        .dashboard-content { padding: 12px 14px; font-size: 1rem; }
         .dg-table {
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            font-size: 12px;
-            line-height: 1.3;
+            font-size: 15px;
+            line-height: 1.35;
         }
         .dg-table th {
             background: #6c7ae0;
             color: white;
-            padding: 2px 0;
+            padding: 4px 3px;
             text-align: center;
             font-weight: 600;
-            font-size: 11px;
-            line-height: 1.2;
+            font-size: 13px;
+            line-height: 1.25;
             white-space: normal;
             word-break: break-word;
             vertical-align: middle;
         }
         .dg-table td {
-            padding: 0;
+            padding: 2px 3px;
             border-bottom: 1px solid #e8e8e8;
             vertical-align: middle;
             text-align: center;
@@ -83,18 +83,18 @@
             align-items: center;
         }
         .delivery-filter-bar .filter-label {
-            font-size: 12px;
+            font-size: 15px;
             font-weight: 600;
             color: #555;
             margin-right: 4px;
         }
         .df-btn {
-            padding: 5px 12px;
+            padding: 6px 14px;
             border: 1px solid #ddd;
             border-radius: 4px;
             background: white;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 15px;
             font-weight: 500;
             color: #444;
             transition: all 0.15s;
@@ -111,7 +111,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            font-size: 12px;
+            font-size: 14px;
         }
         .dg-table .cell-wrap {
             display: block;
@@ -119,28 +119,47 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: normal;
-            max-height: 2.4em;
-            line-height: 1.25;
-            font-size: 11px;
+            max-height: 2.6em;
+            line-height: 1.3;
+            font-size: 14px;
         }
-        .dg-table .money-stack { line-height: 1.2; font-size: 11px; padding: 1px 0; }
-        .dg-table .money-stack .total { color: #1a1a1a; font-weight: 600; font-size: 12px; }
-        .dg-table .money-stack .paid { color: #28a745; font-weight: 600; font-size: 11px; }
-        .dg-table .money-stack .due { font-weight: 700; color: #c0392b; font-size: 12px; }
-        .dg-table .col-chk { width: 22px; }
-        .dg-table .col-act { width: 58px; max-width: 58px; }
+        .dg-table .money-stack { line-height: 1.25; font-size: 14px; padding: 2px 0; }
+        .dg-table .money-stack .total { color: #1a1a1a; font-weight: 600; font-size: 15px; }
+        .dg-table .money-stack .paid { color: #28a745; font-weight: 600; font-size: 14px; }
+        .dg-table .money-stack .due { font-weight: 700; color: #c0392b; font-size: 15px; }
+        .dg-table .col-chk { width: 28px; max-width: 28px; }
+        .dg-table .col-order-no { width: 58px; min-width: 58px; }
+        .dg-table .col-phone { width: 100px; min-width: 100px; }
+        .dg-table .col-sms { width: 30px; max-width: 30px; }
+        .dg-table .col-act { width: 50px; max-width: 50px; }
+        .dg-table .col-date { width: 62px; min-width: 62px; }
+        .dg-table td.col-date-cell,
+        .dg-table th.col-date-head,
+        .dg-table td.col-order-no-cell,
+        .dg-table th.col-order-no-head,
+        .dg-table td.col-phone-cell,
+        .dg-table th.col-phone-head {
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            padding: 2px 3px;
+        }
+        .dg-table td.col-date-cell,
+        .dg-table th.col-date-head {
+            font-size: 13px;
+        }
         .dg-table td.col-act-cell {
             padding: 0;
             overflow: visible;
             text-align: center;
             vertical-align: middle;
         }
-        .dg-table input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: pointer; }
+        .dg-table input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; }
         .dg-table .act-btns {
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            gap: 5px;
+            gap: 3px;
             width: 100%;
             min-height: 100%;
             padding: 2px 0;
@@ -151,17 +170,17 @@
             display: inline-flex; align-items: center; justify-content: center;
             width: 22px; height: 22px; flex-shrink: 0;
         }
-        .dg-table .btn-icon-sm i { font-size: 16px; line-height: 1; }
+        .dg-table .btn-icon-sm i { font-size: 17px; line-height: 1; }
         .dg-table .btn-icon-sm.deliver i { color: #28a745; }
         .dg-table .btn-icon-sm.details i { color: #007bff; }
 
-        .status-badge { padding: 1px 3px; border-radius: 2px; font-size: 10px; font-weight: 600; display: inline-block; white-space: nowrap; }
+        .status-badge { padding: 2px 5px; border-radius: 2px; font-size: 13px; font-weight: 600; display: inline-block; white-space: nowrap; }
         .status-ready { background: #d4edda; color: #155724; }
         .status-partial { background: #fff3cd; color: #856404; }
 
-        .loading { text-align: center; padding: 24px; color: #666; font-size: 12px; }
-        .empty-message { text-align: center; padding: 24px; color: #666; font-size: 12px; }
-        .error-message { text-align: center; padding: 16px; color: #dc3545; font-size: 12px; }
+        .loading { text-align: center; padding: 24px; color: #666; font-size: 15px; }
+        .empty-message { text-align: center; padding: 24px; color: #666; font-size: 15px; }
+        .error-message { text-align: center; padding: 16px; color: #dc3545; font-size: 15px; }
 
         /* SMS Send Panel */
         #smsSendPanel { transition: all 0.3s; }
@@ -189,13 +208,18 @@
         .order-details-bottom .alert { background: #e7f3ff; border: 1px solid #b3d9ff; color: #004085; font-size: 14px; }
 
         /* Pagination */
-        .pagination .page-link { color: #6c7ae0; font-size: 11px; padding: 2px 7px; }
+        .pagination .page-link { color: #6c7ae0; font-size: 14px; padding: 5px 12px; }
         .pagination .page-item.active .page-link { background-color: #6c7ae0; border-color: #6c7ae0; color: white; }
         .pagination .page-item.disabled .page-link { color: #aaa; }
         .pagination .page-link:hover { background-color: #ebebff; color: #5a68c9; }
 
+        .dashboard-content .text-muted,
+        .dashboard-content small {
+            font-size: 14px;
+        }
+
         /* jQuery UI Autocomplete */
-        .ui-autocomplete { max-height: 200px; overflow-y: auto; overflow-x: hidden; z-index: 9999 !important; font-size: 13px; border: 1px solid #6c7ae0; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .ui-autocomplete { max-height: 200px; overflow-y: auto; overflow-x: hidden; z-index: 9999 !important; font-size: 15px; border: 1px solid #6c7ae0; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .ui-menu-item { padding: 8px 12px; cursor: pointer; }
         .ui-menu-item:hover, .ui-menu-item.ui-state-active { background: #6c7ae0; color: white; border: none; }
         .ui-helper-hidden-accessible { display: none; }
@@ -333,19 +357,19 @@
                     <!-- SMS Send Panel (shows when SMS checkboxes are checked) -->
                     <div id="smsSendPanel" style="display:none; margin-bottom:12px; padding:12px 18px; background:#e8f4ff; border:1px solid #b3d9ff; border-radius:8px;">
                         <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-                            <span style="font-size:14px; color:#004085;">
+                            <span style="font-size:16px; color:#004085;">
                                 <i class="fas fa-sms me-1" style="color:#6c7ae0;"></i>
                                 <strong><span id="smsSendCount">0</span></strong>
                                 <span class="lang-content" data-en=" order(s) selected for SMS" data-bn=" টি অর্ডার নির্বাচিত (SMS পাঠানো হবে)"> টি অর্ডার নির্বাচিত (SMS পাঠানো হবে)</span>
                             </span>
                             <button id="smsSendBtn"
-                                    style="padding:7px 18px; background:#6c7ae0; color:white; border:none; border-radius:5px; cursor:pointer; font-size:13px; font-weight:500;"
+                                    style="padding:9px 18px; background:#6c7ae0; color:white; border:none; border-radius:5px; cursor:pointer; font-size:16px; font-weight:500;"
                                     onclick="sendReadySms()">
                                 <i class="fas fa-paper-plane me-1"></i>
                                 <span class="lang-content" data-en="Send SMS" data-bn="SMS পাঠান">SMS পাঠান</span>
                             </button>
                         </div>
-                        <div id="smsStatusMsg" style="display:none; margin-top:8px; font-size:13px;"></div>
+                        <div id="smsStatusMsg" style="display:none; margin-top:8px; font-size:15px;"></div>
                     </div>
 
                     <!-- Delivery Date Filter -->
@@ -436,6 +460,6 @@
     <!-- App Components (sidebar, navbar, modals, session) -->
     <script src="/js/app-components.js?v=2.1.5"></script>
     <!-- Delivery Give Page Logic -->
-    <script src="/js/delivery-give.js?v=2.2.8"></script>
+    <script src="/js/delivery-give.js?v=2.2.10"></script>
 </body>
 </html>

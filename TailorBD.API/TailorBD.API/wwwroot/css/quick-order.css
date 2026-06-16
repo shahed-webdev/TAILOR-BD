@@ -578,9 +578,333 @@
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
-    .add-dress-card { padding: 14px 16px; }
-    .dress-list-card .table th,
-    .dress-list-card .table td { padding: 10px 12px; }
-    .summary-card .card-body { padding: 16px; }
-    .summary-total-row .value { font-size: 1.15rem; }
+    .main-content,
+    .content-area {
+        overflow-x: hidden;
+        max-width: 100%;
+        padding: 10px 12px;
+        box-sizing: border-box;
+    }
+
+    .page-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px;
+        margin-bottom: 12px !important;
+    }
+
+    .page-header h4 {
+        font-size: 1.15rem;
+    }
+
+    .page-header p {
+        display: none;
+    }
+
+    .page-header > .d-flex.gap-2 {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px !important;
+    }
+
+    .page-header > .d-flex.gap-2 .btn,
+    .page-header > .d-flex.gap-2 .btn-customer {
+        flex: 1 1 calc(50% - 4px);
+        padding: 8px 10px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .customer-info-bar {
+        padding: 10px 12px;
+        margin-bottom: 12px !important;
+    }
+
+    .add-dress-card {
+        padding: 12px;
+        margin-bottom: 12px !important;
+    }
+
+    .add-dress-card .row.g-2 {
+        flex-direction: column;
+    }
+
+    .add-dress-card .col-auto {
+        width: 100%;
+    }
+
+    .btn-add-dress {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Dress list — card layout, no horizontal scroll */
+    .dress-list-card {
+        margin-bottom: 12px !important;
+    }
+
+    .dress-list-card .card-header {
+        padding: 10px 14px;
+        font-size: 0.88rem;
+    }
+
+    .dress-list-card .card-body {
+        padding: 8px !important;
+    }
+
+    .dress-list-card .table-responsive {
+        overflow-x: visible;
+    }
+
+    .dress-list-card .table {
+        display: block;
+        margin-bottom: 0;
+    }
+
+    .dress-list-card .table thead {
+        display: none;
+    }
+
+    .dress-list-card .table tbody {
+        display: block;
+    }
+
+    .dress-list-card .table tbody tr.dress-list-row {
+        display: grid;
+        grid-template-columns: 32px 1fr 32px;
+        grid-template-rows: auto auto;
+        gap: 8px 8px;
+        padding: 10px;
+        margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .dress-list-card .table tbody tr.dress-list-row:hover {
+        background: #fff;
+    }
+
+    .dress-list-card .table tbody td {
+        display: block;
+        padding: 0;
+        border: none;
+    }
+
+    .dress-list-card .table tbody td:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .dress-list-card .table tbody td:nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
+    }
+
+    .dress-list-card .table tbody td:nth-child(5) {
+        grid-column: 3;
+        grid-row: 1;
+        align-self: start;
+    }
+
+    .dress-list-card .table tbody td:nth-child(3) {
+        grid-column: 1 / 2;
+        grid-row: 2;
+        display: flex;
+        align-items: center;
+    }
+
+    .dress-list-card .table tbody td:nth-child(4) {
+        grid-column: 2 / 4;
+        grid-row: 2;
+        display: flex;
+        align-items: center;
+        min-width: 0;
+    }
+
+    .dress-number-badge {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+    }
+
+    .dress-name-text {
+        font-size: 0.86rem;
+        margin-bottom: 4px;
+        word-break: break-word;
+    }
+
+    .dress-list-card .d-flex.flex-wrap.gap-1 {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px !important;
+        width: 100%;
+    }
+
+    .btn-measurement,
+    .btn-style,
+    .btn-payment-open {
+        width: 100%;
+        padding: 5px 2px;
+        font-size: 0.62rem;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .btn-measurement i,
+    .btn-style i,
+    .btn-payment-open i {
+        display: none;
+    }
+
+    .qty-input {
+        width: 100% !important;
+        max-width: 72px;
+        padding: 5px 4px;
+        font-size: 0.85rem;
+    }
+
+    .details-input {
+        width: 100%;
+        min-width: 0;
+        padding: 5px 8px;
+        font-size: 0.82rem;
+    }
+
+    .btn-remove-dress {
+        width: 28px;
+        height: 28px;
+        margin-left: auto;
+    }
+
+    /* Payment cards — compact mobile */
+    .payment-card {
+        margin-bottom: 10px;
+    }
+
+    .payment-card .card-header {
+        padding: 10px 12px;
+        flex-wrap: wrap;
+    }
+
+    .payment-card .card-header .dress-label {
+        font-size: 0.82rem;
+    }
+
+    .payment-card .table-responsive {
+        overflow-x: visible;
+    }
+
+    .payment-card .table {
+        display: block;
+    }
+
+    .payment-card .table thead {
+        display: none;
+    }
+
+    .payment-card .table tbody {
+        display: block;
+    }
+
+    .payment-card .table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr auto auto 32px;
+        grid-template-rows: auto auto;
+        gap: 4px 6px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        align-items: center;
+    }
+
+    .payment-card .table tbody td {
+        display: block;
+        padding: 0;
+        border: none;
+        width: auto !important;
+    }
+
+    .payment-card .table tbody td:nth-child(1) {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    .payment-card .table tbody td:nth-child(2) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .payment-card .table tbody td:nth-child(3) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .payment-card .table tbody td:nth-child(4) {
+        grid-column: 3;
+        grid-row: 2;
+        text-align: right !important;
+    }
+
+    .payment-card .table tbody td:nth-child(5) {
+        grid-column: 4;
+        grid-row: 2;
+    }
+
+    .payment-unit-input,
+    .payment-price-input {
+        width: 100% !important;
+        max-width: 72px;
+        padding: 4px 6px;
+        font-size: 0.8rem;
+    }
+
+    .payment-price-input {
+        max-width: 88px;
+    }
+
+    .line-total {
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* Order summary full width */
+    #orderSummarySection .col-md-5 {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .summary-card .card-header {
+        padding: 12px 16px;
+        font-size: 0.88rem;
+    }
+
+    .summary-card .card-body {
+        padding: 14px;
+    }
+
+    .summary-total-row {
+        padding: 10px 14px;
+        margin-bottom: 12px;
+    }
+
+    .summary-total-row .value {
+        font-size: 1.1rem;
+    }
+
+    .summary-input-row label {
+        font-size: 0.75rem;
+    }
+
+    .summary-input-row .form-control,
+    .summary-input-row .form-select {
+        padding: 8px 12px;
+        font-size: 0.88rem;
+    }
+
+    .btn-submit-order {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
 }

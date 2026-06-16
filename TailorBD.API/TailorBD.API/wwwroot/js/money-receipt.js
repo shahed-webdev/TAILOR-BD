@@ -96,23 +96,7 @@
 
         // Hide Border checkbox functionality
         $('#hideBorderCheckbox').on('change', function() {
-            if ($(this).is(':checked')) {
-                // Hide borders on measurement-groups-table inner tables (but keep separator lines)
-                $('.measurement-groups-table td table').css('border', 'none');
-                $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', 'none');
-                // Backward compatibility
-                $('.measurement-grid-container').addClass('hide-borders');
-                $('.measurement-grid-container table').css('border', 'none');
-                $('.measurement-grid-container table td').css('border', 'none');
-            } else {
-                // Show borders on measurement-groups-table inner tables
-                $('.measurement-groups-table td table').css('border', '1px solid #666');
-                $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', '');
-                // Backward compatibility
-                $('.measurement-grid-container').removeClass('hide-borders');
-                $('.measurement-grid-container table').css('border', '1px solid #666');
-                $('.measurement-grid-container table td').css('border', '1px solid #666');
-            }
+            applyMeasurementBorderState($(this).is(':checked'));
         });
 
         // Restore user's saved print size (default 4 inch)
@@ -432,7 +416,9 @@
             '3.5': 336,  // 3.5 inch = 336px
             '4': 384,    // 4 inch = 384px
             '4.5': 432,  // 4.5 inch = 432px
-            '5': 480     // 5 inch = 480px
+            '5': 480,    // 5 inch = 480px
+            '6': 576,    // 6 inch = 576px
+            '6.5': 624   // 6.5 inch = 624px
         };
         
         const widthInPixels = inchToPixel[size] || 384; // Default to 4 inch
@@ -590,104 +576,204 @@
         return Math.max(9, Math.round(vf * 0.85));
     }
 
-    function getMaxMeasurementColsPerRow(fontPx) {
-        const fs = fontPx > 0 ? fontPx : 12;
-        if (fs <= 12) return 8;
-        if (fs <= 14) return 7;
-        if (fs <= 18) return 6;
-        return 5;
+    function applyMeasurementBorderState(hide) {
+        if (hide) {
+            $('.measurement-group-inner').css('border', 'none');
+            $('.measurement-group-inner td:not(.measurement-separator)').css('border', 'none');
+            $('.measurement-grid-container').addClass('hide-borders');
+            $('.measurement-grid-container table').css('border', 'none');
+            $('.measurement-grid-container table td').css('border', 'none');
+        } else {
+            $('.measurement-group-inner').css('border', '1px solid #666');
+            $('.measurement-group-inner td:not(.measurement-separator)').css('border', '');
+            $('.measurement-grid-container').removeClass('hide-borders');
+            $('.measurement-grid-container table').css('border', '1px solid #666');
+            $('.measurement-grid-container table td').css('border', '1px solid #666');
+        }
     }
 
-    function measureTableSize($table) {
-        const el = $table[0];
-        return {
-            w: Math.ceil(Math.max(el.getBoundingClientRect().width, el.scrollWidth, el.offsetWidth, 1)),
-            h: Math.ceil(Math.max(el.getBoundingClientRect().height, el.scrollHeight, el.offsetHeight, 1))
-        };
+    function buildMeasurementGroupBox(validMeasurements, mSettings, fontSize, labelFont) {
+        const $box = $('<div class="measurement-group-box"></div>');
+        const $innerTable = $('<table class="measurement-group-inner"></table>');
+        const $innerTbody = $('<tbody></tbody>');
+
+        validMeasurements.forEach(function (m, idx) {
+            if (mSettings.printMeasurementName) {
+                const $typeRow = $('<tr></tr>');
+                $typeRow.append(`<td class="measurement-type-cell">${m.type}</td>`);
+                $innerTbody.append($typeRow);
+            }
+
+            const $valRow = $('<tr></tr>');
+            $valRow.append(`<td class="measurement-value-cell">${formatMeasurementValueHtml(m.value)}</td>`);
+            $innerTbody.append($valRow);
+
+            if (idx < validMeasurements.length - 1) {
+                const $sepRow = $('<tr></tr>');
+                $sepRow.append('<td class="measurement-separator"></td>');
+                $innerTbody.append($sepRow);
+            }
+        });
+
+        $innerTable.append($innerTbody);
+        $box.append($innerTable);
+        return $box;
     }
 
-    function applyMeasurementCellStyles($table, valueFontPx) {
+    function applyMeasurementCellStyles($container, valueFontPx) {
         const labelFontPx = getMeasurementLabelFontSize(valueFontPx);
-        $table.find('.measurement-type-cell').css({
+        const vPad = Math.max(2, Math.round(valueFontPx * 0.18));
+        const hPad = Math.max(2, Math.round(valueFontPx * 0.12));
+
+        document.documentElement.style.setProperty('--measurement-font-size', valueFontPx + 'px');
+        document.documentElement.style.setProperty('--measurement-label-font-size', labelFontPx + 'px');
+
+        $container.find('.measurement-type-cell').css({
             fontSize: labelFontPx + 'px',
             color: '#000',
-            padding: '2px 1px',
+            padding: vPad + 'px ' + hPad + 'px',
             lineHeight: '1.25',
-            overflow: 'hidden',
-            whiteSpace: 'normal',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
-            maxWidth: '100%'
+            overflow: 'visible',
+            whiteSpace: 'nowrap',
+            wordBreak: 'normal',
+            overflowWrap: 'normal'
         });
-        $table.find('.measurement-value-cell').css({
+        $container.find('.measurement-value-cell').css({
             fontSize: valueFontPx + 'px',
             color: '#000',
-            padding: '3px 1px',
+            padding: (vPad + 1) + 'px ' + hPad + 'px',
             lineHeight: '1.25',
-            overflow: 'hidden',
-            whiteSpace: 'normal',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
+            overflow: 'visible',
+            whiteSpace: 'nowrap',
+            wordBreak: 'normal',
+            overflowWrap: 'normal'
+        });
+    }
+
+    function applyFirstRowStretch($row) {
+        const $boxes = $row.find('.measurement-group-box');
+        if (!$boxes.length) return;
+
+        $row.css({ justifyContent: 'flex-start', columnGap: '0', width: '100%' });
+
+        $boxes.each(function () {
+            const naturalW = Math.ceil(this.getBoundingClientRect().width);
+            this.style.setProperty('flex', '1 0 ' + naturalW + 'px', 'important');
+            this.style.setProperty('min-width', naturalW + 'px', 'important');
+            this.style.setProperty('max-width', 'none', 'important');
+            this.style.setProperty('box-sizing', 'border-box', 'important');
+        });
+
+        $boxes.find('.measurement-group-inner').each(function () {
+            this.style.setProperty('width', '100%', 'important');
+            this.style.setProperty('table-layout', 'auto', 'important');
+        });
+    }
+
+    function layoutMeasurementFlexRows($wrap, targetWidth, valueFontPx) {
+        const $flex = $wrap.find('.measurement-groups-flex').first();
+        if (!$flex.length) return;
+
+        const boxEls = [];
+        $flex.find('.measurement-group-box').each(function () {
+            boxEls.push(this);
+        });
+        if (!boxEls.length) return;
+
+        // Measure natural widths
+        const $measureRow = $('<div class="measurement-groups-row measurement-measure-row"></div>').css({
+            display: 'flex',
+            flexWrap: 'nowrap',
+            position: 'absolute',
+            visibility: 'hidden',
+            left: '-9999px',
+            top: 0,
+            pointerEvents: 'none'
+        });
+        boxEls.forEach(function (el) { $measureRow.append(el); });
+        $flex.append($measureRow);
+
+        const rows = [];
+        let currentRow = [];
+        let currentWidth = 0;
+
+        boxEls.forEach(function (el) {
+            const w = Math.ceil(el.getBoundingClientRect().width);
+            if (currentRow.length > 0 && currentWidth + w > targetWidth) {
+                rows.push(currentRow);
+                currentRow = [];
+                currentWidth = 0;
+            }
+            currentRow.push(el);
+            currentWidth += w;
+        });
+        if (currentRow.length) rows.push(currentRow);
+
+        $measureRow.remove();
+        $flex.empty().css({
+            display: 'block',
+            width: '100%',
             maxWidth: '100%'
+        });
+
+        rows.forEach(function (rowEls, rowIndex) {
+            const isFirstRow = rowIndex === 0;
+            const $row = $('<div class="measurement-groups-row"></div>').css({
+                display: 'flex',
+                width: '100%',
+                maxWidth: '100%',
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start',
+                boxSizing: 'border-box',
+                marginBottom: '2px',
+                columnGap: isFirstRow ? '0' : '2px'
+            });
+            rowEls.forEach(function (el) { $row.append(el); });
+            $flex.append($row);
+
+            if (!isFirstRow) {
+                $row.find('.measurement-group-box').css({ flex: '0 0 auto' });
+            }
         });
     }
 
     function fitMeasurementTablesToPaper() {
+        const targetWidth = getMeasurementTargetWidth();
+        const settingFont = getMeasurementSettingFontSize();
+
         $('.measurement-table-fit').each(function () {
             const $wrap = $(this);
-            let $table = $wrap.find('.measurement-groups-table').first();
-            if (!$table.length) return;
-
-            const $existingBox = $table.parent('.measurement-table-scale-box');
-            if ($existingBox.length) {
-                $existingBox.replaceWith($table);
-            }
-
-            const targetWidth = getMeasurementTargetWidth();
-            const settingFont = getMeasurementSettingFontSize();
-
             $wrap.css({
                 height: 'auto',
                 width: '100%',
                 maxWidth: targetWidth + 'px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
                 padding: 0,
-                overflow: 'hidden',
+                overflow: 'visible',
                 boxSizing: 'border-box'
             });
 
-            const $colCells = $table.find('> tbody > tr > td');
-            const colCount = Math.max($colCells.length, 1);
-            const colWidth = (100 / colCount) + '%';
-
-            $table.css({
-                transform: 'none',
-                width: '100%',
+            $wrap.find('.measurement-group-box').css({
+                flex: '0 0 auto',
                 maxWidth: '100%',
-                display: 'table',
-                tableLayout: 'fixed'
-            });
-            $colCells.css({
-                width: colWidth,
-                maxWidth: colWidth,
-                padding: '0 1px',
-                verticalAlign: 'top',
-                boxSizing: 'border-box',
-                overflow: 'hidden',
-                background: '#fff'
-            });
-            $table.find('.measurement-group-inner').css({
-                width: '100%',
-                maxWidth: '100%',
-                tableLayout: 'fixed'
-            });
-            $table.find('.measurement-group-inner td').css({
-                maxWidth: 0,
-                width: '100%',
+                padding: '0 1px 2px',
                 boxSizing: 'border-box'
             });
 
-            applyMeasurementCellStyles($table, settingFont);
-            $wrap.css('height', 'auto');
+            $wrap.find('.measurement-group-inner').css({
+                width: 'auto',
+                tableLayout: 'auto',
+                borderCollapse: 'collapse'
+            });
+
+            applyMeasurementCellStyles($wrap, settingFont);
+            layoutMeasurementFlexRows($wrap, targetWidth, settingFont);
+            applyMeasurementCellStyles($wrap, settingFont);
+            const $firstRow = $wrap.find('.measurement-groups-row').first();
+            if ($firstRow.length) {
+                applyFirstRowStretch($firstRow);
+            }
         });
     }
 
@@ -697,7 +783,9 @@
             '3.5': 336,
             '4': 384,
             '4.5': 432,
-            '5': 480
+            '5': 480,
+            '6': 576,
+            '6.5': 624
         };
         const size = getSelectedPrintSize();
         return inchToPixel[size] || 384;
@@ -841,7 +929,9 @@
             }
             const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
             const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+            const labelFont = getMeasurementLabelFontSize(mFont);
             document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+            document.documentElement.style.setProperty('--measurement-label-font-size', labelFont + 'px');
             document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
         }
 
@@ -1082,6 +1172,16 @@
             .replace(/"/g, '&quot;');
     }
 
+    function formatMeasurementValueHtml(val) {
+        if (val == null || val === '') return '';
+        if (window.MeasurementFractionBar && MeasurementFractionBar.formatFractionHtml) {
+            return MeasurementFractionBar.formatFractionHtml(val);
+        }
+        return escapeHtml(String(val)).replace(/[½¼¾⅛]/g, function (ch) {
+            return '<span class="meas-fraction-char">' + ch + '</span>';
+        });
+    }
+
     function displayPaymentSummary() {
         const header = orderData.header;
         const total = header.orderAmount || 0;
@@ -1167,7 +1267,7 @@
         const labels = {
             orderNo: currentLang === 'en' ? 'Order No:' : 'অর্ডার নং:',
             order: currentLang === 'en' ? 'Order:' : 'তাং:',
-            delivery: currentLang === 'en' ? 'Delivery:' : 'ডেলি:'
+            delivery: currentLang === 'en' ? 'Del:' : 'ডেলি:'
         };
 
         // Create measurement copies based on settings
@@ -1218,12 +1318,17 @@
                     <table class="measurement-info-table">
                         <tr>
                             <td>
-                                <strong>${item.dressName}</strong><br>
-                                <input type="text" class="dress-quantity-input" value="${item.dressQuantity} P." style="text-align: center; border: 1px solid #666; font-weight: bold; width: 95%; font-size: 14px;" />
+                                <strong class="measurement-dress-name">${item.dressName}</strong><br>
+                                <input type="text" class="dress-quantity-input" value="${item.dressQuantity} P." style="text-align: center; border: 1px solid #000; color: #000; font-weight: 800; width: 95%; font-size: 14px;" />
                             </td>
-                            <td>${labels.orderNo}<br><strong>${header.orderSerialNumber} (${item.orderListSerialNumber || item.orderListSN || item.orderList_SN || ''})</strong></td>
-                            <td>${labels.order} ${formatShortDate(header.orderDate)}<br>
-                                ${labels.delivery} ${formatShortDate(header.deliveryDate)}</td>
+                            <td class="measurement-order-cell">
+                                <span class="measurement-info-label">${labels.orderNo}</span><br>
+                                <strong class="measurement-order-no">${header.orderSerialNumber} (${item.orderListSerialNumber || item.orderListSN || item.orderList_SN || ''})</strong>
+                            </td>
+                            <td class="measurement-date-cell">
+                                <span class="measurement-info-label">${labels.order} ${formatShortDate(header.orderDate)}</span><br>
+                                <span class="measurement-info-label">${labels.delivery} ${formatShortDate(header.deliveryDate)}</span>
+                            </td>
                         </tr>
                     </table>
                 `);
@@ -1295,9 +1400,7 @@
 
                 const fontSize = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
                 const labelFont = getMeasurementLabelFontSize(fontSize);
-                const MAX_COLS_PER_ROW = getMaxMeasurementColsPerRow(fontSize);
-                const $outerTable = $('<table class="measurement-groups-table"></table>');
-                const $outerTbody = $('<tbody></tbody>');
+                const $flex = $('<div class="measurement-groups-flex"></div>');
 
                 const validGroups = [];
                 groupOrder.forEach(groupId => {
@@ -1310,48 +1413,12 @@
                     }
                 });
 
-                for (let rowStart = 0; rowStart < validGroups.length; rowStart += MAX_COLS_PER_ROW) {
-                    const rowGroups = validGroups.slice(rowStart, rowStart + MAX_COLS_PER_ROW);
-                    const $outerTr = $('<tr></tr>');
+                validGroups.forEach(function ({ validMeasurements }) {
+                    $flex.append(buildMeasurementGroupBox(validMeasurements, mSettings, fontSize, labelFont));
+                });
 
-                    rowGroups.forEach(({ validMeasurements }) => {
-                        const $td = $('<td></td>');
-
-                        const $innerTable = $('<table class="measurement-group-inner"></table>');
-                        const $innerTbody = $('<tbody></tbody>');
-
-                        validMeasurements.forEach((m, idx) => {
-                            if (mSettings.printMeasurementName) {
-                                const $typeRow = $('<tr></tr>');
-                                const $typeCell = $(`<td class="measurement-type-cell" style="font-size:${labelFont}px;color:#000;">${m.type}</td>`);
-                                $typeRow.append($typeCell);
-                                $innerTbody.append($typeRow);
-                            }
-
-                            const $valRow = $('<tr></tr>');
-                            const $valCell = $(`<td class="measurement-value-cell" style="font-size:${fontSize}px;color:#000;">${m.value}</td>`);
-                            $valRow.append($valCell);
-                            $innerTbody.append($valRow);
-
-                            if (idx < validMeasurements.length - 1) {
-                                const $sepRow = $('<tr></tr>');
-                                const $sepCell = $('<td class="measurement-separator"></td>');
-                                $sepRow.append($sepCell);
-                                $innerTbody.append($sepRow);
-                            }
-                        });
-
-                        $innerTable.append($innerTbody);
-                        $td.append($innerTable);
-                        $outerTr.append($td);
-                    });
-
-                    $outerTbody.append($outerTr);
-                }
-
-                $outerTable.append($outerTbody);
                 const $fitWrap = $('<div class="measurement-table-fit"></div>');
-                $fitWrap.append($outerTable);
+                $fitWrap.append($flex);
                 $detailsSection.append($fitWrap);
             }
 
@@ -1418,9 +1485,11 @@
 
         const mFont = (mSettings.fontSize && mSettings.fontSize > 0) ? mSettings.fontSize : 12;
         const sFont = (mSettings.styleFontSize && mSettings.styleFontSize > 0) ? mSettings.styleFontSize : mFont;
+        const labelFont = getMeasurementLabelFontSize(mFont);
         document.documentElement.style.setProperty('--measurement-font-size', mFont + 'px');
+        document.documentElement.style.setProperty('--measurement-label-font-size', labelFont + 'px');
         document.documentElement.style.setProperty('--style-font-size', sFont + 'px');
-        $('.measurement-groups-table').each(function () {
+        $('.measurement-table-fit').each(function () {
             applyMeasurementCellStyles($(this), mFont);
         });
         $('.measurement-details-section').css('font-size', mFont + 'px');
@@ -1429,8 +1498,7 @@
 
         // Re-apply border hide state after render
         if ($('#hideBorderCheckbox').is(':checked')) {
-            $('.measurement-groups-table td table').css('border', 'none');
-            $('.measurement-groups-table td table td:not(.measurement-separator)').css('border', 'none');
+            applyMeasurementBorderState(true);
         }
 
         scheduleMeasurementLayoutFit();

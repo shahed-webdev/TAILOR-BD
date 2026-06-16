@@ -20,7 +20,7 @@
     
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link href="/css/finish-order.css" rel="stylesheet">
+    <link href="/css/finish-order.css?v=2.1.0" rel="stylesheet">
 </head>
 <body>
     <!-- Sidebar Container -->
@@ -96,10 +96,22 @@
                             <thead>
                                 <tr>
                                     <th class="lang-content" data-en="Dress" data-bn="পোশাক">পোশাক</th>
-                                    <th class="lang-content" data-en="Details" data-bn="বিবরণ">বিবরণ</th>
-                                    <th class="lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</th>
-                                    <th class="lang-content" data-en="Unit Price" data-bn="একক মূল্য">একক মূল্য</th>
-                                    <th class="text-end lang-content" data-en="Total" data-bn="মোট">মোট</th>
+                                    <th>
+                                        <span class="fo-th-long lang-content" data-en="Details" data-bn="বিবরণ">বিবরণ</span>
+                                        <span class="fo-th-short">বি.</span>
+                                    </th>
+                                    <th>
+                                        <span class="fo-th-long lang-content" data-en="Quantity" data-bn="পরিমাণ">পরিমাণ</span>
+                                        <span class="fo-th-short">পরি.</span>
+                                    </th>
+                                    <th>
+                                        <span class="fo-th-long lang-content" data-en="Unit Price" data-bn="একক মূল্য">একক মূল্য</span>
+                                        <span class="fo-th-short">দর</span>
+                                    </th>
+                                    <th class="text-end">
+                                        <span class="fo-th-long lang-content" data-en="Total" data-bn="মোট">মোট</span>
+                                        <span class="fo-th-short">মোট</span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="orderDetailsBody">
@@ -113,7 +125,12 @@
                             </tbody>
                             <tfoot>
                                 <tr class="table-primary">
-                                    <td colspan="4" class="text-end"><strong class="lang-content" data-en="Total Amount:" data-bn="মোট পরিমাণ:">মোট পরিমাণ:</strong></td>
+                                    <td colspan="4" class="text-end">
+                                        <strong>
+                                            <span class="fo-th-long lang-content" data-en="Total Amount:" data-bn="মোট পরিমাণ:">মোট পরিমাণ:</span>
+                                            <span class="fo-th-short">মোট:</span>
+                                        </strong>
+                                    </td>
                                     <td class="text-end"><strong id="orderTotalAmount">৳ 0.00</strong></td>
                                 </tr>
                             </tfoot>
@@ -129,9 +146,9 @@
                     <span class="lang-content" data-en="Payment & Delivery" data-bn="পেমেন্ট ও ডেলিভারি">পেমেন্ট ও ডেলিভারি</span>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
+                    <div class="row mb-3 g-2">
                         <!-- Account Selection -->
-                        <div class="col-md-3 mb-3" id="accountSection" style="display: none;">
+                        <div class="col-12 col-md-3 mb-2 mb-md-3" id="accountSection" style="display: none;">
                             <label class="form-label">
                                 <i class="fas fa-university me-1"></i>
                                 <span class="lang-content" data-en="Account" data-bn="অ্যাকাউন্ট">অ্যাকাউন্ট</span>
@@ -142,7 +159,7 @@
                         </div>
 
                         <!-- New Discount Input -->
-                        <div class="col-md-3 mb-3">
+                        <div class="col-6 col-md-3 mb-2 mb-md-3">
                             <label class="form-label d-flex justify-content-between align-items-center">
                                 <span>
                                     <i class="fas fa-percentage me-1"></i>
@@ -159,7 +176,7 @@
                         </div>
 
                         <!-- New Paid Amount Input -->
-                        <div class="col-md-3 mb-3">
+                        <div class="col-6 col-md-3 mb-2 mb-md-3">
                             <label class="form-label d-flex justify-content-between align-items-center">
                                 <span>
                                     <i class="fas fa-money-bill me-1"></i>
@@ -175,7 +192,7 @@
                         </div>
 
                         <!-- Delivery Date -->
-                        <div class="col-md-3 mb-3">
+                        <div class="col-12 col-md-3 mb-2 mb-md-3">
                             <label class="form-label">
                                 <i class="fas fa-calendar me-1"></i>
                                 <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
@@ -216,6 +233,6 @@
     <script src="/js/app-components.js?v=2.2.0"></script>
     
     <!-- Finish Order JS -->
-    <script src="/js/finish-order.js?v=2.1.6"></script>
+    <script src="/js/finish-order.js?v=2.1.8"></script>
 </body>
 </html>

@@ -42,7 +42,7 @@
             <!-- Page Header -->
             <div class="page-header">
                 <h1 data-en="Print Settings" data-bn="প্রিন্ট সেটিংস">প্রিন্ট সেটিংস</h1>
-                <p class="text-muted" data-en="Change money receipt and measurement print settings" data-bn="মনি রিসিট ও মাপজোখ প্রিন্ট সেটিংস পরিবর্তন করুন">মনি রিসিট ও মাপজোখ প্রিন্ট সেটিংস পরিবর্তন করুন</p>
+                <p class="text-muted" data-en="Change money receipt and measurement print settings" data-bn="মানি রিসিট ও মাপজোখ প্রিন্ট সেটিংস পরিবর্তন করুন">মানি রিসিট ও মাপজোখ প্রিন্ট সেটিংস পরিবর্তন করুন</p>
             </div>
 
             <!-- Settings Tabs -->
@@ -56,7 +56,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="receipt-settings-tab" data-bs-toggle="tab" 
                             data-bs-target="#receiptSettings" type="button" role="tab">
-                        <i class="fas fa-receipt me-2"></i><span data-en="Money Receipt Settings" data-bn="মনি রিসিট সেটিংস">মনি রিসিট সেটিংস</span>
+                        <i class="fas fa-receipt me-2"></i><span data-en="Money Receipt Settings" data-bn="মানি রিসিট সেটিংস">মানি রিসিট সেটিংস</span>
                     </button>
                 </li>
             </ul>
@@ -219,7 +219,7 @@
                 <div class="tab-pane fade" id="receiptSettings" role="tabpanel">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0" data-en="Money Receipt Print Settings" data-bn="মনি রিসিট প্রিন্ট সেটিংস">মনি রিসিট প্রিন্ট সেটিংস</h5>
+                            <h5 class="mb-0" data-en="Money Receipt Print Settings" data-bn="মানি রিসিট প্রিন্ট সেটিংস">মানি রিসিট প্রিন্ট সেটিংস</h5>
                         </div>
                         <div class="card-body">
                             <form id="receiptSettingsForm">
@@ -243,6 +243,13 @@
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="showReceiptBarcode">
                                                 <label class="form-check-label" for="showReceiptBarcode" data-en="Order Number Barcode" data-bn="অর্ডার নম্বর বারকোড">অর্ডার নম্বর বারকোড</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="showPreviousDue" checked>
+                                                <label class="form-check-label" for="showPreviousDue" data-en="Previous Due (from other orders)" data-bn="আগের বাকি (অন্যান্য অর্ডার থেকে)">আগের বাকি (অন্যান্য অর্ডার থেকে)</label>
                                             </div>
                                         </div>
 
@@ -303,6 +310,6 @@
     <script src="/js/app-components.js?v=2.1.9"></script>
     
     <!-- Print Settings JS -->
-    <script src="/js/print-settings.js?v=2.1.7"></script>
+    <script src="/js/print-settings.js?v=2.1.8"></script>
 </body>
 </html>
