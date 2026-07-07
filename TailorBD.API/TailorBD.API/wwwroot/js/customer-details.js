@@ -232,12 +232,13 @@
     function renderDueTable(orders) {
         let totalAmt = 0, totalPaid = 0, totalDue = 0;
         let rows = '';
-        orders.forEach(function (o) {
+        let cards = '';
+        orders.forEach(function (o, idx) {
             totalAmt += o.orderAmount;
             totalPaid += o.paidAmount;
             totalDue += o.dueAmount;
             rows += `<tr data-order-id="${o.orderId}" data-delivery-status="${o.deliveryStatus}" data-due="${o.dueAmount}">
-                <td><input type="checkbox" class="order-row-chk" style="width:16px;height:16px;cursor:pointer;accent-color:#6c7ae0;"></td>
+                <td><input type="checkbox" class="order-row-chk" data-idx="${idx}" style="width:16px;height:16px;cursor:pointer;accent-color:#6c7ae0;"></td>
                 <td><strong>${o.orderSerialNumber}</strong></td>
                 <td>${formatDate(o.orderDate)}</td>
                 <td>${o.deliveryDate ? formatDate(o.deliveryDate) : '-'}</td>
@@ -246,9 +247,33 @@
                 <td>${o.paidAmount.toFixed(2)}</td>
                 <td class="due-paid-col">${o.dueAmount.toFixed(2)} /-</td>
                 <td>${o.discount.toFixed(2)} /-</td>
-                <td><input type="number" class="row-collect-input due-input" min="0" max="${o.dueAmount.toFixed(2)}" step="0.01" placeholder="0" value="" style="display:none;"></td>
+                <td><input type="number" class="row-collect-input due-input" data-idx="${idx}" min="0" max="${o.dueAmount.toFixed(2)}" step="0.01" placeholder="0" value="" style="display:none;"></td>
                 <td><span class="badge ${o.deliveryStatus === 'Delivered' ? 'bg-success' : 'bg-warning text-dark'}">${o.deliveryStatus}</span></td>
             </tr>`;
+
+            const statusBadge = `<span class="badge ${o.deliveryStatus === 'Delivered' ? 'bg-success' : 'bg-warning text-dark'}">${o.deliveryStatus}</span>`;
+            cards += `<div class="due-card" data-order-id="${o.orderId}" data-delivery-status="${o.deliveryStatus}" data-due="${o.dueAmount}">
+                <div class="dc-top">
+                    <span class="dc-serial">#${o.orderSerialNumber}</span>
+                    ${statusBadge}
+                    <input type="checkbox" class="order-row-chk-m" data-idx="${idx}" style="width:18px;height:18px;cursor:pointer;accent-color:#6c7ae0;">
+                </div>
+                <div class="dc-info">
+                    <span><span class="lbl">অর্ডার: </span>${formatDate(o.orderDate)}</span>
+                    <span><span class="lbl">ডেলিভারি: </span>${o.deliveryDate ? formatDate(o.deliveryDate) : '-'}</span>
+                </div>
+                <div class="dc-dress"><span class="lbl">পোষাক: </span>${escapeHtml(o.details || '-')}</div>
+                <div class="dc-amounts">
+                    <span><span class="lbl">মোট: </span>${o.orderAmount.toFixed(2)}</span>
+                    <span><span class="lbl">পেইড: </span>${o.paidAmount.toFixed(2)}</span>
+                    <span style="color:#dc3545;font-weight:700;"><span class="lbl">বাকি: </span>${o.dueAmount.toFixed(2)} /-</span>
+                    <span><span class="lbl">ছাড়: </span>${o.discount.toFixed(2)}</span>
+                </div>
+                <div class="dc-collect" style="display:none;">
+                    <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">কত টাকা নিচ্ছেন?</label>
+                    <input type="number" class="row-collect-input-m" data-idx="${idx}" min="0" max="${o.dueAmount.toFixed(2)}" step="0.01" placeholder="0" value="">
+                </div>
+            </div>`;
         });
 
         const html = `<table>
@@ -274,10 +299,21 @@
                 <td class="due-paid-col">${totalDue.toFixed(2)} /-</td>
                 <td></td><td></td><td></td>
             </tr></tfoot>
-        </table>`;
+        </table>
+        <div class="due-cards-mobile">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <input type="checkbox" id="checkAllOrdersM" style="width:18px;height:18px;cursor:pointer;accent-color:#6c7ae0;">
+                <span style="font-size:13px;font-weight:600;">সব সিলেক্ট করুন</span>
+            </div>
+            ${cards}
+            <div class="due-footer-card">
+                মোট: ${totalAmt.toFixed(2)} &nbsp;|&nbsp; পেইড: ${totalPaid.toFixed(2)} &nbsp;|&nbsp;
+                <span style="color:#dc3545;">বাকি: ${totalDue.toFixed(2)} /-</span>
+            </div>
+        </div>`;
         $('#dueTableContainer').html(html);
 
-        // Check-all toggle
+        // Check-all toggle — desktop
         $(document).off('change.checkall').on('change.checkall', '#checkAllOrders', function () {
             const checked = $(this).is(':checked');
             $('#dueTableContainer tbody .order-row-chk').each(function () {
@@ -285,12 +321,61 @@
             });
         });
 
+        // Check-all toggle — mobile
+        $(document).off('change.checkallm').on('change.checkallm', '#checkAllOrdersM', function () {
+            const checked = $(this).is(':checked');
+            $(this).closest('.due-cards-mobile').find('.order-row-chk-m').each(function () {
+                $(this).prop('checked', checked).trigger('change.mcard');
+            });
+        });
+
         // Per-row checkbox: show/hide collect input and auto-fill due amount
         $(document).off('change.rowchk').on('change.rowchk', '.order-row-chk', function () {
             const $tr = $(this).closest('tr');
             const $input = $tr.find('.row-collect-input');
-            if ($(this).is(':checked')) {
+            const idx = $(this).data('idx');
+            const checked = $(this).is(':checked');
+            if (checked) {
                 const due = parseFloat($tr.data('due')) || 0;
+                $input.val(due.toFixed(2)).show();
+            } else {
+                $input.val('').hide();
+            }
+            // Sync mobile card checkbox
+            $(`.order-row-chk-m[data-idx="${idx}"]`).prop('checked', checked);
+            const $card = $(`.due-card .order-row-chk-m[data-idx="${idx}"]`).closest('.due-card');
+            const $dc = $card.find('.dc-collect');
+            if (checked) {
+                const due = parseFloat($card.closest('.due-card').data('due')) || 0;
+                $card.find('.row-collect-input-m').val(due.toFixed(2));
+                $dc.show();
+            } else {
+                $card.find('.row-collect-input-m').val('');
+                $dc.hide();
+            }
+            updateCollectPanelFromRows();
+        });
+
+        // Mobile card checkbox
+        $(document).off('change.mcard').on('change.mcard', '.order-row-chk-m', function () {
+            const idx = $(this).data('idx');
+            const checked = $(this).is(':checked');
+            const $card = $(this).closest('.due-card');
+            const $dc = $card.find('.dc-collect');
+            const due = parseFloat($card.data('due')) || 0;
+            if (checked) {
+                $card.find('.row-collect-input-m').val(due.toFixed(2));
+                $dc.show();
+            } else {
+                $card.find('.row-collect-input-m').val('');
+                $dc.hide();
+            }
+            // Sync desktop row checkbox
+            const $chk = $(`.order-row-chk[data-idx="${idx}"]`);
+            $chk.prop('checked', checked);
+            const $tr = $chk.closest('tr');
+            const $input = $tr.find('.row-collect-input');
+            if (checked) {
                 $input.val(due.toFixed(2)).show();
             } else {
                 $input.val('').hide();
@@ -298,13 +383,27 @@
             updateCollectPanelFromRows();
         });
 
-        // Per-row collect input change → update panel total
+        // Per-row collect input change → update panel total (desktop)
         $(document).off('input.rowcollect').on('input.rowcollect', '.row-collect-input', function () {
             const $tr = $(this).closest('tr');
             const due = parseFloat($tr.data('due')) || 0;
             let val = parseFloat($(this).val()) || 0;
             if (val > due) { $(this).val(due.toFixed(2)); val = due; }
             if (val < 0) { $(this).val(0); }
+            const idx = $(this).data('idx');
+            $(`.row-collect-input-m[data-idx="${idx}"]`).val($(this).val());
+            updateCollectPanelFromRows();
+        });
+
+        // Mobile collect input change
+        $(document).off('input.rowcollectm').on('input.rowcollectm', '.row-collect-input-m', function () {
+            const $card = $(this).closest('.due-card');
+            const due = parseFloat($card.data('due')) || 0;
+            let val = parseFloat($(this).val()) || 0;
+            if (val > due) { $(this).val(due.toFixed(2)); val = due; }
+            if (val < 0) { $(this).val(0); }
+            const idx = $(this).data('idx');
+            $(`.row-collect-input[data-idx="${idx}"]`).val($(this).val());
             updateCollectPanelFromRows();
         });
 
@@ -409,6 +508,7 @@
                 return;
             }
             let rows = '';
+            let cards = '';
             r.data.forEach(function (p) {
                 rows += `<tr>
                     <td><strong>${p.orderSerialNumber}</strong></td>
@@ -417,6 +517,15 @@
                     <td>${escapeHtml(p.paymentStatus)}</td>
                     <td>${p.paidDate ? formatDate(p.paidDate) : '-'}</td>
                 </tr>`;
+                cards += `<div class="pr-card">
+                    <div class="prc-top">
+                        <span class="prc-serial">#${p.orderSerialNumber}</span>
+                        <span class="prc-amount">${p.amount.toFixed(2)} /-</span>
+                    </div>
+                    <div class="prc-row"><span class="lbl">অ্যাকাউন্ট:</span> <span>${escapeHtml(p.account)}</span></div>
+                    <div class="prc-row"><span class="lbl">স্ট্যাটাস:</span> <span>${escapeHtml(p.paymentStatus)}</span></div>
+                    <div class="prc-row"><span class="lbl">তারিখ:</span> <span>${p.paidDate ? formatDate(p.paidDate) : '-'}</span></div>
+                </div>`;
             });
             $('#payRecordsContainer').html(`<table>
                 <thead><tr>
@@ -427,7 +536,8 @@
                     <th data-en="Date" data-bn="তারিখ">তারিখ</th>
                 </tr></thead>
                 <tbody>${rows}</tbody>
-            </table>`);
+            </table>
+            <div class="pr-cards-mobile">${cards}</div>`);
             if (typeof window.updateLanguage === 'function') window.updateLanguage();
         });
     }
@@ -458,7 +568,9 @@
                 return;
             }
             let rows = '';
+            let cards = '';
             r.data.forEach(function (o) {
+                const statusBadge = `<span class="badge ${o.deliveryStatus === 'Delivered' ? 'bg-success' : 'bg-warning text-dark'}">${o.deliveryStatus}</span>`;
                 rows += `<tr>
                     <td><strong>${o.orderSerialNumber}</strong></td>
                     <td>${formatDate(o.orderDate)}</td>
@@ -468,8 +580,25 @@
                     <td>${o.discount.toFixed(2)}</td>
                     <td>${o.paidAmount.toFixed(2)}</td>
                     <td>${o.dueAmount.toFixed(2)}</td>
-                    <td><span class="badge ${o.deliveryStatus === 'Delivered' ? 'bg-success' : 'bg-warning text-dark'}">${o.deliveryStatus}</span></td>
+                    <td>${statusBadge}</td>
                 </tr>`;
+                cards += `<div class="oc-card">
+                    <div class="occ-top">
+                        <span class="occ-serial">#${o.orderSerialNumber}</span>
+                        ${statusBadge}
+                    </div>
+                    <div class="occ-info">
+                        <span><span class="lbl">অর্ডার: </span>${formatDate(o.orderDate)}</span>
+                        <span><span class="lbl">ডেলিভারি: </span>${o.deliveryDate ? formatDate(o.deliveryDate) : '-'}</span>
+                    </div>
+                    <div class="occ-dress"><span class="lbl">পোষাক: </span>${escapeHtml(o.details || '-')}</div>
+                    <div class="occ-amounts">
+                        <span><span class="lbl">মোট: </span>${o.orderAmount.toFixed(2)}</span>
+                        <span><span class="lbl">ছাড়: </span>${o.discount.toFixed(2)}</span>
+                        <span><span class="lbl">পেইড: </span>${o.paidAmount.toFixed(2)}</span>
+                        <span style="color:#dc3545;font-weight:700;"><span class="lbl">বাকি: </span>${o.dueAmount.toFixed(2)}</span>
+                    </div>
+                </div>`;
             });
             $(container).html(`<table>
                 <thead><tr>
@@ -484,7 +613,8 @@
                     <th data-en="Status" data-bn="অবস্থা">অবস্থা</th>
                 </tr></thead>
                 <tbody>${rows}</tbody>
-            </table>`);
+            </table>
+            <div class="orders-cards-mobile">${cards}</div>`);
             if (typeof window.updateLanguage === 'function') window.updateLanguage();
         });
     }

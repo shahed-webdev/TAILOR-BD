@@ -490,11 +490,290 @@
             .order-list-nested { font-size: 12px; }
         }
 
-        @media (max-width: 768px) {
-            .search-form { flex-direction: column; }
-            .form-group { width: 100%; }
-            .orders-table-container { overflow-x: auto; }
+        /* ===== SEARCH SECTION REDESIGN ===== */
+        .search-section {
+            background: linear-gradient(135deg, #f0f2ff 0%, #f8f9ff 100%);
+            border: 1px solid #dde3ff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
         }
+        .search-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid #e0e4ff;
+            width: fit-content;
+        }
+        .search-tabs label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .search-tabs label:has(input:checked) {
+            background: #6c7ae0;
+            color: white;
+            font-weight: 600;
+        }
+        .search-tabs input[type="radio"] { display: none; }
+        .search-form {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 130px;
+        }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 4px;
+            color: #444;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .form-group label i { color: #6c7ae0; font-size: 12px; }
+        .form-group input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid #dde3ff;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #6c7ae0;
+            box-shadow: 0 0 0 3px rgba(108,122,224,0.12);
+        }
+        .btn-search {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 20px;
+            background: linear-gradient(135deg, #6c7ae0 0%, #5a68c9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(108,122,224,0.3);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-search:hover {
+            background: linear-gradient(135deg, #5a68c9 0%, #4a58b9 100%);
+            box-shadow: 0 4px 12px rgba(108,122,224,0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Search rows — 2 fields per row */
+        .search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .search-row .form-group { flex: 1; min-width: 0; margin-bottom: 0; }
+        .search-btn-row { display: flex; justify-content: flex-start; margin-top: 4px; }
+
+        /* Result summary bar */
+        .result-summary-bar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            background: #f8f9ff;
+            border: 1px solid #e4e8ff;
+            border-radius: 10px;
+            padding: 8px 14px;
+            margin-bottom: 10px;
+        }
+        .result-summary-bar .rs-count { font-size: 14px; font-weight: 700; color: #2c3e50; }
+        .result-summary-bar .rs-count strong { color: #6c7ae0; }
+        .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 13px; }
+        .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
+        .legend-box.today   { background: #d4edda; }
+        .legend-box.overdue { background: #ffe6e6; }
+        .legend-box.partly  { background: #e6f7ff; }
+
+        /* ===== MOBILE CARD LAYOUT ===== */
+        @media (max-width: 767px) {
+            .search-tabs { width: 100%; }
+            .search-tabs label { flex: 1; justify-content: center; font-size: 12px; padding: 6px 8px; }
+            .orders-table-container { overflow-x: hidden; }
+            /* Hide entire desktop table section (both paginations hidden automatically) */
+            #ordersTableContainer { display: none !important; }
+            .iw-cards-list { display: block !important; }
+        }
+        @media (min-width: 768px) {
+            .iw-cards-list { display: none !important; }
+        }
+
+        .iw-cards-list { display: none; margin-top: 8px; }
+
+        .iw-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 11px 13px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+        .iw-card.today   { border-left: 4px solid #28a745; background: #f0fff4; }
+        .iw-card.overdue { border-left: 4px solid #dc3545; background: #fff5f5; }
+        .iw-card.partly-completed { border-left: 4px solid #17a2b8; background: #f0faff; }
+        .iw-card.selected { background: #e8eeff !important; border-left-color: #6c7ae0 !important; }
+
+        .iw-card .ic-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 7px;
+        }
+        .iw-card .ic-chk { flex-shrink: 0; width: 18px; height: 18px; cursor: pointer; }
+        .iw-card .ic-serial {
+            font-size: 14px;
+            font-weight: 700;
+            color: #6c7ae0;
+            flex-shrink: 0;
+        }
+        .iw-card .ic-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .iw-card .ic-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px 14px;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 7px;
+        }
+        .iw-card .ic-info span { white-space: nowrap; }
+        .iw-card .ic-info .lbl { color: #999; font-size: 12px; }
+
+        .iw-card .ic-items {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 7px;
+            padding: 7px 9px;
+            margin-bottom: 8px;
+        }
+        .iw-card .ic-items-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6c7ae0;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .iw-card .ic-item-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        .iw-card .ic-item-row:last-child { border-bottom: none; }
+        .iw-card .ic-item-row input[type="checkbox"] { width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+        .iw-card .ic-item-row .ic-dress { flex: 1; color: #333; }
+        .iw-card .ic-item-row .ic-qty { color: #555; font-size: 12px; white-space: nowrap; }
+        .iw-card .ic-item-row .pending-input {
+            width: 46px;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .iw-card .ic-inputs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .iw-card .ic-inputs input {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1.5px solid #e0e4ff;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .iw-card .ic-inputs input:focus {
+            border-color: #6c7ae0;
+            outline: none;
+        }
+
+        .iw-card .ic-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 7px;
+            gap: 8px;
+        }
+        .iw-card .ic-footer-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .iw-card .ic-footer-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .iw-card .ic-total { font-weight: 700; color: #2c3e50; }
+        .iw-card .ic-sms-wrap { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #777; }
+        .iw-card .ic-sms-wrap input { width: 15px; height: 15px; cursor: pointer; }
+        .iw-card .ic-print-btn {
+            color: #6c7ae0;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        .iw-card .ic-print-btn:hover { background: #eef0ff; }
+
+        /* mobile select-all bar */
+        .iw-mobile-select-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            background: #6c7ae0;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .iw-mobile-select-bar input[type="checkbox"] { width: 16px; height: 16px; }
     </style>
 </head>
 <body>
@@ -515,40 +794,47 @@
                     <div class="search-tabs">
                         <label>
                             <input type="radio" name="searchType" value="number" checked>
+                            <i class="fas fa-search"></i>
                             <span class="lang-content" data-en="Order No. and Mobile No." data-bn="অর্ডার নং ও মোবাইল নং">অর্ডার নং ও মোবাইল নং</span>
                         </label>
                         <label>
                             <input type="radio" name="searchType" value="date">
+                            <i class="fas fa-calendar-alt"></i>
                             <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
                         </label>
                     </div>
 
                     <!-- Search by Number -->
                     <div class="search-by-number active">
-                        <div class="search-form">
+                        <div class="search-row">
                             <div class="form-group">
-                                <label for="mobileNo" class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                <label for="mobileNo"><i class="fas fa-mobile-alt"></i> <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</span></label>
                                 <input type="text" id="mobileNo" list="mobileNoList" class="lang-content" data-en-placeholder="Mobile Number" data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নম্বর">
                                 <datalist id="mobileNoList"></datalist>
                             </div>
                             <div class="form-group">
-                                <label for="customerName" class="lang-content" data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</label>
+                                <label for="orderNo"><i class="fas fa-hashtag"></i> <span class="lang-content" data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</span></label>
+                                <input type="text" id="orderNo" list="orderNoList" class="lang-content" data-en-placeholder="Example: 10,20,30" data-bn-placeholder="যেমন: 10,20,30" placeholder="যেমন: 10,20,30">
+                                <datalist id="orderNoList"></datalist>
+                            </div>
+                        </div>
+                        <div class="search-row">
+                            <div class="form-group">
+                                <label for="customerName"><i class="fas fa-user"></i> <span class="lang-content" data-en="Customer Name" data-bn="কাস্টমারের নাম">কাস্টমারের নাম</span></label>
                                 <input type="text" id="customerName" list="customerNameList" class="lang-content" data-en-placeholder="Customer Name" data-bn-placeholder="কাস্টমারের নাম" placeholder="কাস্টমারের নাম">
                                 <datalist id="customerNameList"></datalist>
                             </div>
                             <div class="form-group">
-                                <label for="orderNo" class="lang-content" data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</label>
-                                <input type="text" id="orderNo" list="orderNoList" class="lang-content" data-en-placeholder="Example: 10,20,30" data-bn-placeholder="যেমন: 10,20,30" placeholder="যেমন: 10,20,30">
-                                <datalist id="orderNoList"></datalist>
-                            </div>
-                            <div class="form-group">
-                                <label for="address" class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                                <label for="address"><i class="fas fa-map-marker-alt"></i> <span class="lang-content" data-en="Address" data-bn="ঠিকানা">ঠিকানা</span></label>
                                 <input type="text" id="address" list="addressList" class="lang-content" data-en-placeholder="Address" data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা">
                                 <datalist id="addressList"></datalist>
                             </div>
-                            <div class="form-group">
-                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span></button>
-                            </div>
+                        </div>
+                        <div class="search-btn-row">
+                            <button type="button" class="btn-search" onclick="searchOrders()">
+                                <i class="fas fa-search"></i>
+                                <span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                            </button>
                         </div>
                     </div>
 
@@ -556,15 +842,19 @@
                     <div class="search-by-date">
                         <div class="search-form">
                             <div class="form-group">
-                                <label for="startDate" class="lang-content" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                                <label for="startDate"><i class="fas fa-calendar"></i> <span class="lang-content" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</span></label>
                                 <input type="date" id="startDate">
                             </div>
                             <div class="form-group">
-                                <label for="endDate" class="lang-content" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
+                                <label for="endDate"><i class="fas fa-calendar-check"></i> <span class="lang-content" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</span></label>
                                 <input type="date" id="endDate">
                             </div>
-                            <div class="form-group">
-                                <button type="button" class="btn-search" onclick="searchOrders()"><span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span></button>
+                            <div class="form-group" style="flex:0;">
+                                <label>&nbsp;</label>
+                                <button type="button" class="btn-search" onclick="searchOrders()">
+                                    <i class="fas fa-search"></i>
+                                    <span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -572,22 +862,23 @@
 
                 <!-- Orders Table -->
                 <div class="orders-table-container">
-                    <div class="total-count" id="totalCount">
-                        <span class="lang-content" data-en="Total: 0 incomplete orders" data-bn="মোট: 0 টি অসম্পূর্ণ অর্ডার">মোট: 0 টি অসম্পূর্ণ অর্ডার</span>
-                    </div>
-
-                    <div class="legend">
-                        <div class="legend-item">
-                            <div class="legend-box today"></div>
-                            <span class="lang-content" data-en="Today's Delivery Date" data-bn="আজকের ডেলিভারি তারিখ">আজকের ডেলিভারি তারিখ</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-box overdue"></div>
-                            <span class="lang-content" data-en="Delivery Date Passed" data-bn="ডেলিভারি তারিখ অতিক্রান্ত">ডেলিভারি তারিখ অতিক্রান্ত</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-box partly"></div>
-                            <span class="lang-content" data-en="Partly Completed" data-bn="আংশিক সম্পন্ন">আংশিক সম্পন্ন</span>
+                    <div class="result-summary-bar">
+                        <span class="rs-count" id="totalCount">
+                            <span class="lang-content" data-en="Total: 0 incomplete orders" data-bn="মোট: ০ টি অসম্পূর্ণ অর্ডার">মোট: ০ টি অসম্পূর্ণ অর্ডার</span>
+                        </span>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-box today"></div>
+                                <span class="lang-content" data-en="Today's delivery" data-bn="আজকের ডেলিভারি">আজকের ডেলিভারি</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box overdue"></div>
+                                <span class="lang-content" data-en="Overdue" data-bn="তারিখ অতিক্রান্ত">তারিখ অতিক্রান্ত</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box partly"></div>
+                                <span class="lang-content" data-en="Partly done" data-bn="আংশিক সম্পন্ন">আংশিক সম্পন্ন</span>
+                            </div>
                         </div>
                     </div>
 
@@ -595,6 +886,7 @@
                         <div id="ordersTableContainer">
                             <div class="loading"><span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span></div>
                         </div>
+                        <div id="iwCardsContainer" class="iw-cards-list"></div>
                     </div>
 
                     <button type="button" class="btn-complete" id="btnComplete" onclick="completeWork()" disabled>

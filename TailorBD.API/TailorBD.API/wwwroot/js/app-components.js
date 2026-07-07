@@ -431,44 +431,18 @@
             }
         }
 
-        // ── Due Access Block চেক — সব পেজে, component load এর আগে ──
-        await new Promise(function (resolve) {
-            var page = ('/' + window.location.pathname.replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
-            if (SKIP_DUE_CHECK_PAGES.indexOf(page) !== -1) { resolve(); return; }
-            var institutionId = sessionStorage.getItem('institutionId');
-            if (!institutionId) { resolve(); return; }
-            $.ajax({
-                url: '/api/invoice/due-status/' + institutionId,
-                method: 'GET',
-                success: function (r) {
-                    if (r.success && r.data) {
-                        if (r.data.accessBlocked) {
-                            showDueBlockOverlay(r.data);
-                        }
-                        window._dueStatusCache = r.data;
-                    }
-                    resolve();
-                },
-                error: function () { resolve(); }
-            });
-        });
-
-        // Load sidebar
+        // Load sidebar, navbar, modals IMMEDIATELY so UI shows up fast
         if ($('#app-sidebar').length) {
             await loadComponent(config.sidebarPath, '#app-sidebar');
         }
-
-        // Load navbar
         if ($('#app-navbar').length) {
             await loadComponent(config.navbarPath, '#app-navbar');
         }
-
-        // Load modals
         if ($('#app-modals').length) {
             await loadComponent(config.modalsPath, '#app-modals');
         }
 
-        // Initialize after all components loaded
+        // Initialize UI right away
         initializeEventHandlers();
         lastMobileSidebar = isMobileSidebar();
         restoreSidebarState();
@@ -477,9 +451,36 @@
         setActiveMenu();
         applyAccessControl();
         setupDashboardBackBtn();
+
+        // Due access block check runs AFTER sidebar is visible (does not block UI)
+        setTimeout(checkDueAccessBlocking, 50);
     }
 
-    // ── Restore Sidebar State from localStorage ────────────────────────────
+    // ── Due Access Block চেক — sidebar render হওয়ার পর async এ চলবে ──
+    function checkDueAccessBlocking() {
+        var page = ('/' + window.location.pathname.replace(/^\//, '')).toLowerCase().replace(/\/+$/, '');
+        if (SKIP_DUE_CHECK_PAGES.indexOf(page) !== -1) return;
+        var institutionId = sessionStorage.getItem('institutionId');
+        if (!institutionId) return;
+
+        $.ajax({
+            url: '/api/invoice/due-status/' + institutionId,
+            method: 'GET',
+            success: function (r) {
+                if (r.success && r.data) {
+                    if (r.data.accessBlocked) {
+                        showDueBlockOverlay(r.data);
+                    }
+                    window._dueStatusCache = r.data;
+                }
+            },
+            error: function () { /* silent */ }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+
+    // ─── Restore Sidebar State from localStorage ────────────────────────────
     function restoreSidebarState() {
         syncSidebarCollapsedFromStorage();
     }

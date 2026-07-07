@@ -152,20 +152,19 @@
             $('#discountLimitText').text(`সর্বোচ্চ ডিসকাউন্ট: ${discountLimitPercent}% (৳${formatNumber(discountLimit)})`);
         }
 
-        // Store previous payments in global variables
+        // Pre-fill discount with current order discount (editable — replaces on submit)
         previousDiscount = orderData.customer && orderData.customer.discount ? parseFloat(orderData.customer.discount) : 0;
         previousPaid = orderData.customer && orderData.customer.paidAmount ? parseFloat(orderData.customer.paidAmount) : 0;
-        
-        // Display previous payment info in labels if exists
-        if (previousDiscount > 0) {
-            $('#previousDiscountAmount').text('৳' + formatNumber(previousDiscount));
-            $('#previousDiscountLabel').show();
-        }
         
         if (previousPaid > 0) {
             $('#previousPaidAmount').text('৳' + formatNumber(previousPaid));
             $('#previousPaidLabel').show();
+        } else {
+            $('#previousPaidLabel').hide();
         }
+
+        // Hide separate "previous discount" label — value is shown in the input
+        $('#previousDiscountLabel').hide();
 
         // Set existing delivery date if available
         console.log('Checking delivery date...');
@@ -193,8 +192,8 @@
             console.log('Tried properties: deliveryDate, DeliveryDate, delivery_date, Delivery_Date');
         }
 
-        // Reset new payment fields to 0
-        $('#discountAmount').val(0);
+        // Current total discount (replaces previous on submit)
+        $('#discountAmount').val(previousDiscount);
         $('#paidAmount').val(0);
 
         // Calculate initial due amount
@@ -294,28 +293,24 @@
     function calculateDueAmount() {
         const total = orderData.totalAmount || 0;
         
-        // Get new payments from input fields
-        const newDiscount = parseFloat($('#discountAmount').val()) || 0;
+        const totalDiscount = parseFloat($('#discountAmount').val()) || 0;
         const newPaid = parseFloat($('#paidAmount').val()) || 0;
         
-        // Calculate current due (after previous payments)
-        const currentDue = total - (previousDiscount + previousPaid);
+        const maxDiscount = Math.max(0, total - previousPaid);
         
         const currentLang = window.currentLang || 'bn';
         
-        // Validate new discount - should not exceed current due
-        if (newDiscount > currentDue) {
+        if (totalDiscount > maxDiscount) {
             $('#discountAmount').addClass('is-invalid');
             const errorMsg = currentLang === 'en' 
-                ? `Current due ৳${formatNumber(currentDue)}. Maximum discount allowed ৳${formatNumber(currentDue)}`
-                : `বর্তমান বাকি ৳${formatNumber(currentDue)} টাকা। আপনি ডিসকাউন্ট দিতে পারবেন সর্বোচ্চ ৳${formatNumber(currentDue)} টাকা`;
+                ? `Maximum discount allowed ৳${formatNumber(maxDiscount)}`
+                : `সর্বোচ্চ ৳${formatNumber(maxDiscount)} টাকা ছাড় দিতে পারবেন`;
             $('#errorMessage').text(errorMsg);
             $('#submitButton').prop('disabled', true);
             return;
         }
         
-        // Validate new discount against limit (if set)
-        if (discountLimit > 0 && newDiscount > discountLimit) {
+        if (discountLimit > 0 && totalDiscount > discountLimit) {
             $('#discountAmount').addClass('is-invalid');
             const errorMsg = currentLang === 'en'
                 ? `Maximum discount limit: ${discountLimitPercent}% (৳${formatNumber(discountLimit)})`
@@ -327,10 +322,8 @@
             $('#discountAmount').removeClass('is-invalid').addClass('is-valid');
         }
         
-        // Calculate remaining due after new discount
-        const remainingAfterDiscount = currentDue - newDiscount;
+        const remainingAfterDiscount = total - totalDiscount - previousPaid;
         
-        // Validate new paid amount - should not exceed remaining due
         if (newPaid > remainingAfterDiscount) {
             $('#paidAmount').addClass('is-invalid');
             const errorMsg = currentLang === 'en'
@@ -345,8 +338,7 @@
             $('#submitButton').prop('disabled', false);
         }
 
-        // Calculate final due
-        const finalDue = total - (previousDiscount + previousPaid + newDiscount + newPaid);
+        const finalDue = total - totalDiscount - previousPaid - newPaid;
         const dueMsg = currentLang === 'en'
             ? `Remaining due ৳${formatNumber(finalDue)}`
             : `বাকি থাকছে ৳${formatNumber(finalDue)} টাকা`;
@@ -365,8 +357,7 @@
             }
         }
         
-        // Get new payments from input fields (only send new amounts, not total)
-        const newDiscount = parseFloat($('#discountAmount').val()) || 0;
+        const totalDiscount = parseFloat($('#discountAmount').val()) || 0;
         const newPaid = parseFloat($('#paidAmount').val()) || 0;
         
         const accountId = parseInt($('#accountSelect').val()) || null;
@@ -396,16 +387,15 @@
             institutionId: parseInt(sessionStorage.getItem('institutionId')),
             registrationId: parseInt(sessionStorage.getItem('registrationId')),
             deliveryDate: deliveryDate,
-            discount: newDiscount,  // Only new discount
-            paidAmount: newPaid,    // Only new paid amount
+            discount: totalDiscount,
+            paidAmount: newPaid,
             accountId: accountId,
             isDelivery: isDelivery
         };
 
-        console.log('Submitting order with NEW payments only:', data);
-        console.log('Previous discount:', previousDiscount);
+        console.log('Submitting order:', data);
         console.log('Previous paid:', previousPaid);
-        console.log('New discount:', newDiscount);
+        console.log('Total discount:', totalDiscount);
         console.log('New paid:', newPaid);
 
         // Show loading

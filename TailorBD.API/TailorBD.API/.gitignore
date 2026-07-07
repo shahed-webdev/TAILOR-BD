@@ -170,5 +170,9 @@ ScaffoldingReadMe.txt
 # Visual Studio Code
 .vscode/
 
+# Local secrets (never commit)
+appsettings.Development.json
+appsettings.Secrets.json
+
 # Mac files
 .DS_Store

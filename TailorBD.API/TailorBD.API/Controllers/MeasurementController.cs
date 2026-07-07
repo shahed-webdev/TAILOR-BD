@@ -133,10 +133,10 @@ namespace TailorBD.API.Controllers
                     (Cloth_For_ID, InstitutionID, MeasurementType, Date, DressID, Ascending, RegistrationID)
                     VALUES 
                     (@ClothForId, @InstitutionId, @MeasurementType, GETDATE(), @DressId, @Ascending, @RegistrationId);
-                    
-                    DECLARE @Id INT = SCOPE_IDENTITY();
-                    UPDATE Measurement_Type SET Measurement_GroupID = @Id WHERE MeasurementTypeID = @Id;
-                    SELECT @Id;";
+
+                    DECLARE @InsertedId INT = SCOPE_IDENTITY();
+                    UPDATE Measurement_Type SET Measurement_GroupID = @InsertedId WHERE MeasurementTypeID = @InsertedId;
+                    SELECT @InsertedId;";
 
                 var id = connection.QuerySingle<int>(insertQuery, model);
 
@@ -294,20 +294,28 @@ namespace TailorBD.API.Controllers
         }
 
         // DELETE: api/Measurement/type/{id}
+        // Unlinks the type from its group (sets Measurement_GroupID = NULL)
+        // This matches the old project behaviour: the type is removed from the group
+        // but stays in the database so it can be re-assigned to any group later.
         [HttpDelete("type/{id}")]
         public IActionResult DeleteMeasurementType(int id)
         {
             try
             {
                 using var connection = _context.CreateConnection();
-                
-                var deleteQuery = "DELETE FROM Measurement_Type WHERE MeasurementTypeID = @Id";
-                connection.Execute(deleteQuery, new { Id = id });
+
+                var unlinkQuery = @"
+                    UPDATE Measurement_Type
+                    SET Measurement_GroupID = NULL,
+                        Measurement_Group_SerialNo = NULL
+                    WHERE MeasurementTypeID = @Id";
+
+                connection.Execute(unlinkQuery, new { Id = id });
 
                 return Ok(new
                 {
                     success = true,
-                    message = "মাপ সফলভাবে ডিলিট হয়েছে"
+                    message = "মাপ গ্রুপ থেকে বাদ দেওয়া হয়েছে"
                 });
             }
             catch (Exception ex)
@@ -317,6 +325,57 @@ namespace TailorBD.API.Controllers
                     success = false,
                     message = ex.Message
                 });
+            }
+        }
+
+        // GET: api/Measurement/unlinked?dressId=&institutionId=
+        [HttpGet("unlinked")]
+        public IActionResult GetUnlinkedTypes([FromQuery] int dressId, [FromQuery] int institutionId)
+        {
+            try
+            {
+                using var connection = _context.CreateConnection();
+
+                var query = @"
+                    SELECT MeasurementTypeID, MeasurementType
+                    FROM Measurement_Type
+                    WHERE DressID = @DressId
+                      AND InstitutionID = @InstitutionId
+                      AND Measurement_GroupID IS NULL
+                    ORDER BY MeasurementType";
+
+                var types = connection.Query<dynamic>(query, new { DressId = dressId, InstitutionId = institutionId });
+
+                return Ok(new { success = true, data = types });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        // PUT: api/Measurement/type/{id}/assign-group
+        [HttpPut("type/{id}/assign-group")]
+        public IActionResult AssignTypeToGroup(int id, [FromBody] AssignGroupModel model)
+        {
+            try
+            {
+                using var connection = _context.CreateConnection();
+
+                var updateQuery = @"
+                    UPDATE Measurement_Type
+                    SET Measurement_GroupID = @GroupId,
+                        Measurement_Group_SerialNo = NULL
+                    WHERE MeasurementTypeID = @Id
+                      AND InstitutionID = @InstitutionId";
+
+                connection.Execute(updateQuery, new { Id = id, GroupId = model.GroupId, InstitutionId = model.InstitutionId });
+
+                return Ok(new { success = true, message = "মাপ গ্রুপে যুক্ত হয়েছে" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -589,5 +648,11 @@ namespace TailorBD.API.Controllers
         public int Id { get; set; }
         public int InstitutionId { get; set; }
         public int Ascending { get; set; }
+    }
+
+    public class AssignGroupModel
+    {
+        public int GroupId { get; set; }
+        public int InstitutionId { get; set; }
     }
 }

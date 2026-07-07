@@ -673,7 +673,8 @@ window.showMeasurementModal = function(dressId, dressName, clothForId) {
     $('#measurementModalAlert').empty();
     
     loadMeasurementGroups(dressId, clothForId);
-    
+    loadUnlinkedTypes();
+
     const modal = new bootstrap.Modal(document.getElementById('measurementModal'));
     modal.show();
 };
@@ -681,20 +682,21 @@ window.showMeasurementModal = function(dressId, dressName, clothForId) {
 // Load Measurement Groups
 function loadMeasurementGroups(dressId, clothForId) {
     const institutionId = sessionStorage.getItem('institutionId');
-    
+
     $('#measurementGroupsList').html(`
         <div class="text-center py-4">
             <span class="spinner-border text-primary"></span>
             <p class="mt-2 text-muted">লোড হচ্ছে...</p>
         </div>
     `);
-    
+
     $.ajax({
         url: `/api/measurement/dress/${dressId}?institutionId=${institutionId}&clothForId=${clothForId}`,
         method: 'GET',
         success: function(response) {
             if (response.success) {
                 displayMeasurementGroups(response.data);
+                loadUnlinkedTypes();
             }
         },
         error: function(xhr) {
@@ -712,41 +714,35 @@ function loadMeasurementGroups(dressId, clothForId) {
 function displayMeasurementGroups(groups) {
     const $container = $('#measurementGroupsList');
     $container.empty();
+    $('#noGroupsPlaceholder').toggle(groups.length === 0);
     
     if (groups.length === 0) {
-        $container.html(`
-            <div class="text-center py-4 text-muted border rounded">
-                <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                কোনো মাপের গ্রুপ যুক্ত করা হয়নি。
-            </div>
-        `);
         return;
     }
     
     groups.forEach(group => {
         const $groupCard = $(`
-            <div class="card mb-3 shadow-sm" data-group-id="${group.MeasurementTypeID}">
-                <div class="card-header py-2 d-flex justify-content-between align-items-center"
-                     style="background:#f0f4ff; border-left:4px solid #667eea;">
-                    <div class="d-flex align-items-center gap-2">
+            <div class="meas-group-card" data-group-id="${group.MeasurementTypeID}">
+                <div class="group-header">
+                    <div class="group-header-left">
                         <i class="fas fa-layer-group text-primary"></i>
-                        <strong class="group-name-display">${group.MeasurementType}</strong>
-                        <span class="badge bg-secondary" style="font-size:.7rem;">
-                            সিরিয়াল: <span class="group-serial-display">${group.Ascending || '—'}</span>
+                        <strong class="group-name">${group.MeasurementType}</strong>
+                        <span class="serial-badge">
+                            সির: <span class="group-serial-display">${group.Ascending || '—'}</span>
                         </span>
                     </div>
-                    <div class="d-flex gap-1">
-                        <button class="btn btn-sm btn-outline-primary py-0 px-2"
+                    <div class="group-header-right">
+                        <button class="group-btn-edit"
                                 title="এডিট করুন"
                                 onclick="openEditGroupModal(${group.MeasurementTypeID}, '${group.MeasurementType.replace(/'/g,"\\'")}', ${group.Ascending || 0})">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-success py-0 px-2"
+                        <button class="group-btn-add"
                                 title="এই গ্রুপে মাপ যুক্ত করুন"
                                 onclick="toggleAddTypeForm(${group.MeasurementTypeID}, '${group.MeasurementType.replace(/'/g,"\\'")}')">
                             <i class="fas fa-plus"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger py-0 px-2"
+                        <button class="group-btn-delete"
                                 title="গ্রুপ মুছুন"
                                 onclick="deleteMeasurementGroup(${group.MeasurementTypeID}, '${group.MeasurementType.replace(/'/g,"\\'")}')">
                             <i class="fas fa-trash"></i>
@@ -754,28 +750,30 @@ function displayMeasurementGroups(groups) {
                     </div>
                 </div>
 
-                <!-- Inline Add Type Form (hidden by default) -->
-                <div class="add-type-form p-2 bg-light border-bottom" id="add-type-form-${group.MeasurementTypeID}" style="display:none;">
+                <!-- Inline Add Type Form -->
+                <div class="meas-add-type-form" id="add-type-form-${group.MeasurementTypeID}">
                     <form onsubmit="submitMeasurementType(event, ${group.MeasurementTypeID})">
-                        <div class="row g-2 align-items-end">
-                            <div class="col-sm-6">
-                                <label class="form-label form-label-sm mb-1">মাপের নাম</label>
-                                <input type="text" class="form-control form-control-sm"
+                        <div class="meas-input-row">
+                            <div class="meas-field-grow">
+                                <label class="form-label-sm">মাপের নাম</label>
+                                <input type="text" class="form-control"
                                        id="typeName-${group.MeasurementTypeID}"
                                        placeholder="যেমন: গলা, হাতা..." required>
                             </div>
-                            <div class="col-sm-3">
-                                <label class="form-label form-label-sm mb-1">সিরিয়াল</label>
-                                <input type="number" class="form-control form-control-sm"
+                            <div class="meas-field-sm">
+                                <label class="form-label-sm">সিরিয়াল</label>
+                                <input type="number" class="form-control"
                                        id="typeSerial-${group.MeasurementTypeID}"
-                                       placeholder="১, ২..." min="1">
+                                       placeholder="১" min="1">
                             </div>
-                            <div class="col-sm-3 d-flex gap-1">
-                                <button type="submit" class="btn btn-success btn-sm flex-grow-1">
-                                    <i class="fas fa-plus"></i> যুক্ত
+                            <div class="meas-field-btn">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> <span class="d-none d-sm-inline">যুক্ত</span>
                                 </button>
-                                <button type="button" class="btn btn-secondary btn-sm"
-                                        onclick="$('#add-type-form-${group.MeasurementTypeID}').hide()">
+                            </div>
+                            <div class="meas-field-btn">
+                                <button type="button" class="btn btn-secondary"
+                                        onclick="$('#add-type-form-${group.MeasurementTypeID}').slideUp(150)">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -783,8 +781,8 @@ function displayMeasurementGroups(groups) {
                     </form>
                 </div>
 
-                <div class="card-body p-2">
-                    <div class="measurement-types-container" id="types-${group.MeasurementTypeID}">
+                <div class="meas-types-body">
+                    <div class="meas-types-grid" id="types-${group.MeasurementTypeID}">
                         <div class="text-center py-2">
                             <span class="spinner-border spinner-border-sm text-primary"></span>
                         </div>
@@ -801,10 +799,13 @@ function displayMeasurementGroups(groups) {
 // Toggle inline add-type form
 window.toggleAddTypeForm = function(groupId) {
     const $form = $(`#add-type-form-${groupId}`);
-    $form.toggle();
-    if ($form.is(':visible')) {
-        $(`#typeName-${groupId}`).focus();
-    }
+    // Close others
+    $('.meas-add-type-form').not($form).slideUp(150);
+    $form.slideToggle(150, function() {
+        if ($(this).is(':visible')) {
+            $(`#typeName-${groupId}`).focus();
+        }
+    });
 };
 
 // Load Measurement Types for a Group
@@ -830,46 +831,34 @@ function displayMeasurementTypes(groupId, types) {
     
     if (types.length === 0) {
         $container.html(`
-            <p class="text-muted small mb-0 py-1">
+            <p class="meas-empty-msg mb-0">
                 <i class="fas fa-info-circle me-1"></i>
-                এই গ্রুপে কোনো মাপ নেই — উপরের <b>+</b> বাটন দিয়ে যুক্ত করুন।
+                এই গ্রুপে কোনো মাপ নেই — উপরের <b>+</b> বাটন দিয়ে যুক্ত করুন。
             </p>
         `);
         return;
     }
     
-    const $row = $('<div class="row g-2"></div>');
-    
     types.forEach(type => {
-        const $col = $(`
-            <div class="col-md-6 col-lg-4">
-                <div class="d-flex align-items-center justify-content-between px-2 py-1 border rounded bg-white">
-                    <div class="d-flex align-items-center gap-1 text-truncate">
-                        <i class="fas fa-minus text-info" style="font-size:.65rem;flex-shrink:0;"></i>
-                        <span class="small fw-medium text-truncate">${type.MeasurementType}</span>
-                        ${type.SerialNo ? `<span class="badge bg-light text-secondary border" style="font-size:.65rem;">${type.SerialNo}</span>` : ''}
-                    </div>
-                    <div class="d-flex gap-1 flex-shrink-0 ms-1">
-                        <button class="btn btn-outline-primary py-0 px-1"
-                                style="font-size:.7rem;"
-                                title="এডিট"
-                                onclick="openEditTypeModal(${type.MeasurementTypeID}, '${type.MeasurementType.replace(/'/g,"\\'")}', ${groupId}, ${type.SerialNo || 0})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-outline-danger py-0 px-1"
-                                style="font-size:.7rem;"
-                                title="ডিলিট"
-                                onclick="deleteMeasurementType(${type.MeasurementTypeID}, '${type.MeasurementType.replace(/'/g,"\\'")}', ${groupId})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
+        const $chip = $(`
+            <div class="meas-type-chip">
+                <span class="chip-icon"><i class="fas fa-minus"></i></span>
+                <span>${type.MeasurementType}</span>
+                ${type.SerialNo ? `<span class="chip-serial">${type.SerialNo}</span>` : ''}
+                <span class="chip-actions">
+                    <button class="chip-btn chip-btn-edit" title="এডিট"
+                            onclick="openEditTypeModal(${type.MeasurementTypeID}, '${type.MeasurementType.replace(/'/g,"\\'")}', ${groupId}, ${type.SerialNo || 0})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="chip-btn chip-btn-remove" title="ডিলিট"
+                            onclick="deleteMeasurementType(${type.MeasurementTypeID}, '${type.MeasurementType.replace(/'/g,"\\'")}', ${groupId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </span>
             </div>
         `);
-        $row.append($col);
+        $container.append($chip);
     });
-    
-    $container.append($row);
 }
 
 // Submit new measurement type (inline form)
@@ -1064,17 +1053,18 @@ window.deleteMeasurementGroup = function(groupId, groupName) {
     });
 };
 
-// Delete Measurement Type
+// Delete Measurement Type (unlink from group)
 window.deleteMeasurementType = function(typeId, typeName, groupId) {
-    if (!confirm(`"${typeName}" মাপটি মুছে ফেলবেন?`)) return;
-    
+    if (!confirm(`"${typeName}" মাপটি গ্রুপ থেকে বাদ দেবেন?\nএটি ডিলিট হবে না — পরে যেকোনো গ্রুপে যুক্ত করা যাবে।`)) return;
+
     $.ajax({
         url: `/api/measurement/type/${typeId}`,
         method: 'DELETE',
         success: function(response) {
             if (response.success) {
-                showMeasurementModalAlert('মাপ মুছে ফেলা হয়েছে', 'success');
+                showMeasurementModalAlert('মাপ গ্রুপ থেকে বাদ দেওয়া হয়েছে', 'success');
                 loadMeasurementTypes(groupId);
+                loadUnlinkedTypes();
             }
         },
         error: function() {
@@ -1097,6 +1087,96 @@ function showMeasurementModalAlert(message, type) {
     setTimeout(() => $alert.fadeOut(400, function(){ $(this).remove(); }), 3000);
 }
 
-// Removed old showAddMeasurementTypeForm, loadExistingMeasurements,
-// selectExistingMeasurement, editMeasurementGroup, editMeasurementType,
-// showModalAlert — replaced by the functions above.
+// Load & render unlinked measurement types panel
+function loadUnlinkedTypes() {
+    const institutionId = sessionStorage.getItem('institutionId');
+    if (!currentMeasurementDressId) return;
+
+    $.ajax({
+        url: `/api/measurement/unlinked?dressId=${currentMeasurementDressId}&institutionId=${institutionId}`,
+        method: 'GET',
+        success: function(response) {
+            renderUnlinkedPanel(response.success ? response.data : []);
+        },
+        error: function() {
+            renderUnlinkedPanel([]);
+        }
+    });
+}
+
+function renderUnlinkedPanel(types) {
+    let $panel = $('#unlinkedTypesPanel');
+    if (!$panel.length) {
+        // Insert before the groups list
+        $('#measurementGroupsList').before('<div id="unlinkedTypesPanel"></div>');
+        $panel = $('#unlinkedTypesPanel');
+    }
+
+    if (!types || types.length === 0) {
+        $panel.empty();
+        return;
+    }
+
+    // Build group options for the assign dropdown
+    let groupOptions = '<option value="">-- গ্রুপ নির্বাচন করুন --</option>';
+    $('#measurementGroupsList .meas-group-card[data-group-id]').each(function() {
+        const gId = $(this).data('group-id');
+        const gName = $(this).find('.group-name').text() || $(this).find('.group-name-display').text();
+        groupOptions += `<option value="${gId}">${gName}</option>`;
+    });
+
+    let items = '';
+    types.forEach(function(t) {
+        items += `
+            <div class="unlinked-item" id="unlinked-${t.MeasurementTypeID}">
+                <i class="fas fa-unlink text-warning"></i>
+                <span class="item-name">${t.MeasurementType}</span>
+                <select class="form-select form-select-sm" id="assign-select-${t.MeasurementTypeID}">
+                    ${groupOptions}
+                </select>
+                <button class="btn-assign"
+                        onclick="assignTypeToGroup(${t.MeasurementTypeID})" title="গ্রুপে যুক্ত করুন">
+                    <i class="fas fa-plus"></i> <span>যুক্ত</span>
+                </button>
+            </div>`;
+    });
+
+    $panel.html(`
+        <div class="meas-unlinked-panel">
+            <div class="panel-header">
+                <i class="fas fa-unlink"></i>
+                <span>গ্রুপ-বিহীন মাপজোখ</span>
+                <span class="badge bg-warning text-dark">${types.length}</span>
+            </div>
+            <div class="panel-body">${items}</div>
+        </div>`);
+}
+
+// Assign an unlinked type to a group
+window.assignTypeToGroup = function(typeId) {
+    const groupId = parseInt($(`#assign-select-${typeId}`).val());
+    if (!groupId) {
+        showMeasurementModalAlert('একটি গ্রুপ নির্বাচন করুন', 'error');
+        return;
+    }
+    const institutionId = sessionStorage.getItem('institutionId');
+
+    $.ajax({
+        url: `/api/measurement/type/${typeId}/assign-group`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ groupId: groupId, institutionId: parseInt(institutionId) }),
+        success: function(response) {
+            if (response.success) {
+                showMeasurementModalAlert('মাপ গ্রুপে যুক্ত হয়েছে', 'success');
+                loadMeasurementTypes(groupId);
+                loadUnlinkedTypes();
+            } else {
+                showMeasurementModalAlert(response.message || 'সমস্যা হয়েছে', 'error');
+            }
+        },
+        error: function() {
+            showMeasurementModalAlert('সমস্যা হয়েছে', 'error');
+        }
+    });
+};

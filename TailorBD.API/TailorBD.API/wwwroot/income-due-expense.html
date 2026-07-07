@@ -91,12 +91,21 @@
 
         /* Print */
         @media print {
-            #app-navbar,#app-sidebar,.filter-card,.tab-nav,.no-print { display:none !important; }
-            .main-content { margin-left:0 !important; }
+            @page { margin: 8mm; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #app-navbar,#app-sidebar,.filter-card,.tab-nav,.no-print,.cat-chips { display:none !important; }
+            .main-content { margin-left:0 !important; width:100% !important; }
+            .dashboard-content { padding:0 !important; }
             .page-container { padding:0 !important; }
-            .tbl-card,.s-card { box-shadow:none; border:1px solid #ddd !important; }
+            .tbl-card,.s-card { box-shadow:none !important; border:1px solid #ddd !important; }
             .print-header { display:block !important; }
-            .tab-pane:not(.active) { display:block !important; }
+            .tab-pane { display:none !important; }
+            .tab-pane.active { display:block !important; }
+            .r-table { font-size:10px; table-layout:auto; width:100%; }
+            .r-table thead th, .r-table tbody td { padding:4px 5px !important; word-wrap:break-word; white-space:normal !important; color:#000 !important; font-weight:bold !important; }
+            .r-table thead th { background:#fff !important; }
+            .tbl-title,.s-lbl,.s-val,.s-sub,.text-sm-muted,.amt-green,.amt-red,.amt-orange { color:#000 !important; }
+            * { color:#000 !important; }
         }
         .print-header { display:none; text-align:center; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #333; }
         .print-header .ins-name  { font-size:20px; font-weight:800; }
@@ -171,20 +180,20 @@
             <div class="sum-grid" id="sumGrid">
                 <div class="s-card income" onclick="switchTab('income')">
                     <div class="s-lbl" data-en="Total Income" data-bn="মোট আয়">মোট আয়</div>
-                    <div class="s-val green" id="sTotalIncome">?0.00</div>
+                    <div class="s-val green" id="sTotalIncome">৳0.00</div>
                 </div>
                 <div class="s-card due" onclick="switchTab('due')">
                     <div class="s-lbl" data-en="Total Due" data-bn="মোট বাকি">মোট বাকি</div>
-                    <div class="s-val red" id="sTotalDue">?0.00</div>
+                    <div class="s-val red" id="sTotalDue">৳0.00</div>
                     <div class="s-sub" id="sDueCount"></div>
                 </div>
                 <div class="s-card expense" onclick="switchTab('expense')">
                     <div class="s-lbl" data-en="Total Expense" data-bn="মোট খরচ">মোট খরচ</div>
-                    <div class="s-val orange" id="sTotalExpense">?0.00</div>
+                    <div class="s-val orange" id="sTotalExpense">৳0.00</div>
                 </div>
                 <div class="s-card net">
                     <div class="s-lbl" data-en="Net (Income - Expense)" data-bn="নেট (আয় - খরচ)">নেট (আয় - খরচ)</div>
-                    <div class="s-val teal" id="sNet">?0.00</div>
+                    <div class="s-val teal" id="sNet">৳0.00</div>
                 </div>
             </div>
 
@@ -209,7 +218,7 @@
                 <div class="tbl-card">
                     <div class="tbl-head">
                         <span class="tbl-title income"><i class="fas fa-hand-holding-usd me-1"></i>
-                            <span data-en="Income Records" data-bn="আয়ের বিবরণ">আয়ের বিবরণ</span>
+                            <span data-en="Income Records" data-bn="আয় এর বিবরণ">আয় এর বিবরণ</span>
                         </span>
                         <span id="incomeCount" class="text-sm-muted"></span>
                     </div>
@@ -224,12 +233,10 @@
                                     <th data-en="Order Date" data-bn="অর্ডারের তারিখ">অর্ডারের তারিখ</th>
                                     <th data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</th>
                                     <th data-en="Total" data-bn="মোট">মোট</th>
-                                    <th data-en="Pre Paid" data-bn="পরবর্তী ধাপ">পরবর্তী ধাপ</th>
                                     <th data-en="Paid" data-bn="পরিশোধ">পরিশোধ</th>
                                     <th data-en="Discount" data-bn="ছাড়">ছাড়</th>
                                     <th data-en="Due" data-bn="বাকি">বাকি</th>
                                     <th data-en="Pay Date" data-bn="পরিশোধের তারিখ">পরিশোধের তারিখ</th>
-                                    <th data-en="Type" data-bn="ধরন">ধরন</th>
                                     <th data-en="Account" data-bn="একাউন্ট">একাউন্ট</th>
                                 </tr></thead>
                                 <tbody id="incomeBody"></tbody>
@@ -319,6 +326,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/app-components.js?v=2.1.9"></script>
-<script src="/js/income-due-expense.js?v=2.1.6"></script>
+<script src="/js/income-due-expense.js?v=2.1.7"></script>
 </body>
 </html>

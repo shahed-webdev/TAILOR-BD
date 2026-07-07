@@ -52,6 +52,13 @@ $(function () {
 
     waitForSession(function () { initPage(); });
 
+    if (window.MeasurementFractionBar) {
+        MeasurementFractionBar.init({
+            barSelector: '#measurementFractionBar',
+            inputSelector: '#measurementModal .meas-input'
+        });
+    }
+
     $('#fabricCodeModal').on('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); searchFabricModal(); }
     });
@@ -464,7 +471,7 @@ window.openMeasurement = function (idx) {
             const value = m.Measurement || m.measurement || '';
             return `
             <div class="mb-2">
-                <input type="text" class="form-control form-control-sm" value="${value}" placeholder="${typeName}"
+                <input type="text" class="form-control form-control-sm meas-input" value="${value}" placeholder="${typeName}"
                        data-id="${typeId}"
                        onchange="updateMeasurement(${idx}, '${typeId}', this.value)">
             </div>`;
@@ -472,6 +479,10 @@ window.openMeasurement = function (idx) {
 
         $body.append(`<div class="col-sm-4 col-lg-3 mb-3"><div class="border rounded p-2 h-100" style="background:#f8f9fa">${fields}</div></div>`);
     });
+
+    if (window.MeasurementFractionBar && MeasurementFractionBar.enhanceInputs) {
+        MeasurementFractionBar.enhanceInputs(document.getElementById('measurementModalBody'));
+    }
 
     new bootstrap.Modal(document.getElementById('measurementModal')).show();
 };

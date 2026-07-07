@@ -165,10 +165,61 @@
         /* Collect Panel hidden state */
         .collect-panel-hidden { display: none; }
 
+        /* Mobile card base */
+        .due-cards-mobile,
+        .pr-cards-mobile,
+        .orders-cards-mobile { display: none; margin-top: 4px; }
+
+        .due-card, .pr-card, .oc-card {
+            background: #fff; border: 1px solid #dee2e6; border-radius: 10px;
+            margin-bottom: 9px; padding: 11px 13px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+        .pr-card { display: flex; flex-direction: column; gap: 4px; }
+
+        .dc-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .dc-serial { font-size: 15px; font-weight: 700; color: #6c7ae0; flex: 1; }
+        .dc-info { display: flex; gap: 8px 14px; flex-wrap: wrap; font-size: 13px; color: #555; margin-bottom: 5px; }
+        .dc-dress { font-size: 13px; color: #333; margin-bottom: 7px; }
+        .dc-amounts { display: flex; gap: 8px 14px; flex-wrap: wrap; font-size: 13px; color: #444; margin-bottom: 6px; }
+        .dc-amounts .lbl { color: #999; font-size: 12px; }
+        .dc-collect { margin-top: 6px; }
+        .dc-collect input { width: 100%; padding: 7px 10px; border: 2px solid #6c7ae0; border-radius: 6px; font-size: 15px; font-weight: 700; text-align: center; font-family: inherit; outline: none; }
+        .due-footer-card { background: #f0f2ff; border: 1px solid #dde3ff; border-radius: 8px; padding: 10px 13px; margin-bottom: 9px; font-weight: 700; font-size: 13px; }
+
+        .prc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+        .prc-serial { font-size: 15px; font-weight: 700; color: #6c7ae0; }
+        .prc-amount { font-size: 15px; font-weight: 700; color: #28a745; }
+        .prc-row { display: flex; justify-content: space-between; font-size: 13px; color: #444; padding: 2px 0; }
+        .prc-row .lbl { color: #999; font-size: 12px; }
+
+        .occ-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
+        .occ-serial { font-size: 15px; font-weight: 700; color: #6c7ae0; }
+        .occ-info { display: flex; gap: 8px 14px; flex-wrap: wrap; font-size: 13px; color: #555; margin-bottom: 5px; }
+        .occ-dress { font-size: 13px; color: #333; margin-bottom: 7px; }
+        .occ-amounts { display: flex; gap: 8px 14px; flex-wrap: wrap; font-size: 13px; color: #444; }
+        .occ-amounts .lbl { color: #999; font-size: 12px; }
+
         @media(max-width:768px) {
             #app-navbar { margin-left: 0; }
             .main-content { margin-left: 0; }
             .measurement-section { flex-direction: column; }
+
+            .tabs-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 4px; scrollbar-width: none; }
+            .tabs-nav::-webkit-scrollbar { display: none; }
+            .tab-btn { white-space: nowrap; flex-shrink: 0; }
+
+            .table-wrapper table { display: none; }
+            .due-cards-mobile, .pr-cards-mobile, .orders-cards-mobile { display: block; }
+
+            .collect-summary { flex-direction: column; align-items: stretch; gap: 10px; }
+            .collect-input { width: 100% !important; }
+            .collect-arrow { display: none; }
+            #accountSelect { width: 100%; }
+            .btn-collect { width: 100%; justify-content: center; }
+        }
+
+        @media(min-width:769px) {
+            .due-cards-mobile, .pr-cards-mobile, .orders-cards-mobile { display: none !important; }
         }
     </style>
 </head>
@@ -351,6 +402,6 @@
     <script src="/js/auth.js"></script>
     <script src="/js/app-components.js?v=2.2.8"></script>
     <script src="/js/measurement-fraction-bar.js?v=1.8.1"></script>
-    <script src="/js/customer-details.js?v=2.1.8"></script>
+    <script src="/js/customer-details.js?v=2.2.0"></script>
 </body>
 </html>

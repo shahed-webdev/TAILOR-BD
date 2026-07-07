@@ -97,6 +97,52 @@
         });
     }
 
+    // ── Pager ──────────────────────────────────────────────────────────────────
+    function renderPager(page, totalPages) {
+        ['#custPagerTop', '#custPagerBottom'].forEach(function (sel) {
+            const $w = $(sel).empty();
+            if (!totalPages || totalPages <= 1) return;
+            const btn = (label, pg, dis, active) =>
+                $('<button>').html(label).prop('disabled', !!dis).addClass(active ? 'active' : '')
+                    .on('click', () => loadCustomers(pg, lastPhone, lastCustNo));
+            $w.append(btn('&laquo;', 1, page <= 1));
+            $w.append(btn('&lsaquo;', page - 1, page <= 1));
+            const s = Math.max(1, page - 2), e = Math.min(totalPages, s + 4);
+            for (let i = s; i <= e; i++) $w.append(btn(i, i, false, i === page));
+            $w.append(btn('&rsaquo;', page + 1, page >= totalPages));
+            $w.append(btn('&raquo;', totalPages, page >= totalPages));
+            $w.append('<span class="pager-info">পেইজ ' + page + ' / ' + totalPages + '</span>');
+        });
+    }
+
+    window.selectPage = function () {
+        $('.cust-chk').prop('checked', true);
+        $('.cust-table tbody tr').addClass('row-checked');
+        $('#chkAll').prop('checked', true).prop('indeterminate', false);
+        updateSelBadge();
+        updateCounter();
+        autoOpenCompose();
+    };
+
+    function showErr(msg) {
+        $('#sendErrMsg').text(msg).show();
+    }
+
+    function hideErr() {
+        $('#sendErrMsg').hide().text('');
+    }
+
+    function showToast(msg, type) {
+        const bg = type === 'success' ? '#28a745' : '#dc3545';
+        const $t = $('<div>').text(msg).css({
+            position: 'fixed', bottom: '90px', right: '24px', background: bg,
+            color: '#fff', padding: '10px 20px', borderRadius: '8px',
+            fontWeight: '600', fontSize: '13px', zIndex: 2000, boxShadow: '0 4px 12px rgba(0,0,0,.2)'
+        });
+        $('body').append($t);
+        setTimeout(() => $t.fadeOut(400, () => $t.remove()), 3000);
+    }
+
     window.searchCustomers = function () {
         const phone  = $('#searchPhone').val().trim() || null;
         const custNo = $('#searchCustNo').val().trim() || null;
@@ -267,7 +313,14 @@
             } else {
                 showErr(res.message);
             }
-        })
+        }).fail(function (xhr) {
+            const msg = (xhr.responseJSON && xhr.responseJSON.message)
+                || 'সার্ভার এরর। আবার চেষ্টা করুন।';
+            showErr(msg);
+        }).always(function () {
+            $('#sendBtn').prop('disabled', false)
+                .html('<i class="fas fa-paper-plane me-2"></i><span data-en="Send" data-bn="পাঠান">পাঠান</span>');
+        });
     };
 
     // ────────────────────────────────────────────────────────────────────────────

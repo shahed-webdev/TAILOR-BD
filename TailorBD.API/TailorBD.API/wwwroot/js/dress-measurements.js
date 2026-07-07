@@ -129,11 +129,6 @@
     });
 
     function setupEventListeners() {
-        // Quantity change updates price list
-        $('#dressQuantity').on('input', function() {
-            updatePriceQuantities();
-        });
-
         // ── Fabric code input ─────────────────────────────────────────────────
         let fabricDebounce = null;
 
@@ -768,15 +763,47 @@
         displayPriceList();
     };
 
-    function updatePriceQuantities() {
-        const newQuantity = parseInt($('#dressQuantity').val()) || 1;
-        
-        priceList.forEach(item => {
-            item.quantity = newQuantity;
+    // Save last edited measurements/styles to customer profile (Customer_Measurement / Customer_Dress_Style)
+    function saveCustomerMeasurementsFromForm(dressId) {
+        const parsedInstitutionId = parseInt(sessionStorage.getItem('institutionId'), 10);
+        const parsedRegistrationId = parseInt(sessionStorage.getItem('registrationId'), 10);
+        const parsedCustomerId = parseInt(customerId, 10);
+        const parsedDressId = parseInt(dressId, 10);
+
+        if (!parsedInstitutionId || !parsedRegistrationId || !parsedCustomerId || !parsedDressId) return;
+
+        const measurements = [];
+        $('.measurement-input').each(function () {
+            measurements.push({
+                measurementTypeId: parseInt($(this).attr('data-measurement-id'), 10) || 0,
+                measurement: $(this).val().trim()
+            });
         });
 
-        displayPriceList();
-    };
+        const styles = [];
+        $('.style-item').each(function () {
+            styles.push({
+                styleId: parseInt($(this).attr('data-style-id'), 10) || 0,
+                isChecked: $(this).find('input[type="checkbox"]').is(':checked'),
+                styleMeasurement: $(this).find('.style-measurement').val().trim()
+            });
+        });
+
+        $.ajax({
+            url: '/api/customer-page/save-measurements',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                institutionId: parsedInstitutionId,
+                registrationId: parsedRegistrationId,
+                customerId: parsedCustomerId,
+                dressId: parsedDressId,
+                cdDetails: $('#dressDetails').val().trim(),
+                measurements,
+                styles
+            })
+        });
+    }
 
     // Add dress to order
     window.addDressToOrder = function() {
@@ -803,9 +830,10 @@
         const collectedMeasurements = [];
         $('.measurement-input').each(function() {
             const value = $(this).val().trim();
-            if (value) {
+            const measurementId = parseInt($(this).attr('data-measurement-id'), 10);
+            if (value && measurementId > 0) {
                 collectedMeasurements.push({
-                    id: $(this).data('measurement-id'),
+                    id: measurementId,
                     value: value
                 });
             }
@@ -816,11 +844,14 @@
         $('.style-item input[type="checkbox"]:checked').each(function() {
             const $item = $(this).closest('.style-item');
             const measurement = $item.find('.style-measurement').val().trim();
+            const styleId = parseInt($item.attr('data-style-id'), 10);
             
-            collectedStyles.push({
-                id: parseInt($(this).attr('id').replace('style', ''), 10),
-                value: measurement
-            });
+            if (styleId > 0) {
+                collectedStyles.push({
+                    id: styleId,
+                    value: measurement
+                });
+            }
         });
 
         // Get details
@@ -964,6 +995,9 @@
                 
                 if (response.success) {
                     showAlert('success', 'পোশাক সফলভাবে যুক্ত হয়েছে!');
+                    
+                    // Keep customer's latest measurements/styles for next order
+                    saveCustomerMeasurementsFromForm(orderData.dressId);
                     
                     // Add to local cart
                     const cartItem = {

@@ -25,16 +25,87 @@
         .content { background: white; border-radius: 8px; padding: 12px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h2 { color: #2c3e50; margin-bottom: 12px; font-size: 22px; font-weight: 600; }
 
-        .search-section { margin-bottom: 12px; }
-        .search-tabs { display: flex; gap: 12px; margin-bottom: 10px; }
-        .search-tabs label { display: flex; align-items: center; cursor: pointer; font-size: 16px; }
-        .search-tabs input[type="radio"] { margin-right: 6px; width: 16px; height: 16px; }
+        /* ===== SEARCH SECTION ===== */
+        .search-section {
+            background: linear-gradient(135deg, #f0f2ff 0%, #f8f9ff 100%);
+            border: 1px solid #dde3ff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+        }
+        .search-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid #e0e4ff;
+            width: fit-content;
+        }
+        .search-tabs label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            user-select: none;
+            gap: 6px;
+        }
+        .search-tabs label:has(input:checked) {
+            background: #6c7ae0;
+            color: white;
+            font-weight: 600;
+        }
+        .search-tabs input[type="radio"] { display: none; }
         .search-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-        .form-group { flex: 1; min-width: 150px; }
-        .form-group label { display: block; margin-bottom: 3px; color: #555; font-weight: 500; font-size: 15px; }
-        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 15px; }
-        .btn-search { padding: 9px 18px; background: #6c7ae0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 16px; }
-        .btn-search:hover { background: #5a68c9; }
+        .form-group { flex: 1; min-width: 140px; }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 4px;
+            color: #444;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .form-group label i { color: #6c7ae0; font-size: 13px; }
+        .form-group input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #dde3ff;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #6c7ae0;
+            box-shadow: 0 0 0 3px rgba(108,122,224,0.12);
+        }
+        .btn-search {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 20px;
+            background: linear-gradient(135deg, #6c7ae0 0%, #5a68c9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(108,122,224,0.3);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-search:hover { background: linear-gradient(135deg, #5a68c9 0%, #4a58b9 100%); box-shadow: 0 4px 12px rgba(108,122,224,0.4); transform: translateY(-1px); }
+        .btn-search:active { transform: translateY(0); }
         .search-by-date { display: none; }
         .search-by-date.active { display: block; }
         .search-by-number { display: none; }
@@ -75,36 +146,64 @@
         .dg-table tbody tr.row-today:hover { background-color: #c3e6cb; }
         .dg-table tbody tr.row-overdue:hover { background-color: #f5c6cb; }
 
+        /* ===== FILTER BAR ===== */
         .delivery-filter-bar {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             align-items: center;
+            background: #f8f9ff;
+            border: 1px solid #e4e8ff;
+            border-radius: 10px;
+            padding: 8px 12px;
         }
         .delivery-filter-bar .filter-label {
-            font-size: 15px;
-            font-weight: 600;
-            color: #555;
-            margin-right: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #6c7ae0;
+            margin-right: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .df-btn {
-            padding: 6px 14px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 13px;
+            border: 1.5px solid #e0e4ff;
+            border-radius: 20px;
             background: white;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 500;
-            color: #444;
-            transition: all 0.15s;
+            color: #555;
+            transition: all 0.18s;
+            white-space: nowrap;
         }
-        .df-btn:hover { border-color: #6c7ae0; color: #6c7ae0; }
+        .df-btn .df-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #eef0ff;
+            color: #6c7ae0;
+        }
+        .df-btn:hover { border-color: #6c7ae0; color: #6c7ae0; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(108,122,224,0.15); }
         .df-btn.active { font-weight: 600; }
-        .df-btn.df-all.active { background: #6c7ae0; color: white; border-color: #6c7ae0; }
-        .df-btn.df-today.active { background: #d4edda; color: #155724; border-color: #28a745; }
-        .df-btn.df-overdue.active { background: #f8d7da; color: #721c24; border-color: #dc3545; }
-        .df-btn.df-normal.active { background: #f8f9fa; color: #333; border-color: #adb5bd; }
+        .df-btn.df-all.active  { background: linear-gradient(135deg,#6c7ae0,#5a68c9); color: white; border-color: #6c7ae0; box-shadow: 0 2px 8px rgba(108,122,224,0.35); }
+        .df-btn.df-all.active .df-count { background: rgba(255,255,255,0.25); color: white; }
+        .df-btn.df-today.active { background: linear-gradient(135deg,#28a745,#20c997); color: white; border-color: #28a745; box-shadow: 0 2px 8px rgba(40,167,69,0.3); }
+        .df-btn.df-today.active .df-count { background: rgba(255,255,255,0.25); color: white; }
+        .df-btn.df-overdue.active { background: linear-gradient(135deg,#dc3545,#e05260); color: white; border-color: #dc3545; box-shadow: 0 2px 8px rgba(220,53,69,0.3); }
+        .df-btn.df-overdue.active .df-count { background: rgba(255,255,255,0.25); color: white; }
+        .df-btn.df-normal.active { background: linear-gradient(135deg,#6c757d,#868e96); color: white; border-color: #6c757d; box-shadow: 0 2px 8px rgba(108,117,125,0.3); }
+        .df-btn.df-normal.active .df-count { background: rgba(255,255,255,0.25); color: white; }
         .dg-table .cell-clip {
             display: block;
             max-width: 100%;
@@ -127,11 +226,13 @@
         .dg-table .money-stack .total { color: #1a1a1a; font-weight: 600; font-size: 15px; }
         .dg-table .money-stack .paid { color: #28a745; font-weight: 600; font-size: 14px; }
         .dg-table .money-stack .due { font-weight: 700; color: #c0392b; font-size: 15px; }
-        .dg-table .col-chk { width: 28px; max-width: 28px; }
+        .dg-table .col-chk { width: 22px; max-width: 22px; min-width: 22px; }
         .dg-table .col-order-no { width: 58px; min-width: 58px; }
         .dg-table .col-phone { width: 100px; min-width: 100px; }
-        .dg-table .col-sms { width: 30px; max-width: 30px; }
-        .dg-table .col-act { width: 50px; max-width: 50px; }
+        .dg-table .col-sms { width: 46px; min-width: 46px; }
+        .dg-table .col-act { width: 165px; min-width: 155px; }
+        .dg-table th.col-sms-head,
+        .dg-table th.col-act-head { white-space: nowrap; }
         .dg-table .col-date { width: 62px; min-width: 62px; }
         .dg-table td.col-date-cell,
         .dg-table th.col-date-head,
@@ -173,6 +274,8 @@
         .dg-table .btn-icon-sm i { font-size: 17px; line-height: 1; }
         .dg-table .btn-icon-sm.deliver i { color: #28a745; }
         .dg-table .btn-icon-sm.details i { color: #007bff; }
+        .dg-table .btn-icon-sm.receipt i { color: #6f42c1; }
+        .dg-table .btn-icon-sm.receipt:hover i { color: #5a32a3; }
 
         .status-badge { padding: 2px 5px; border-radius: 2px; font-size: 13px; font-weight: 600; display: inline-block; white-space: nowrap; }
         .status-ready { background: #d4edda; color: #155724; }
@@ -284,6 +387,156 @@
             #partialDeliveryModal .form-control,
             #partialDeliveryModal .form-select { font-size: 16px; }
         }
+        .customer-info-simple .btn-light { background: rgba(255,255,255,0.9); color: #764ba2; border: none; font-weight: 600; }
+        .customer-info-simple .btn-light:hover { background: #fff; }
+        .dg-table .btn-icon-sm.btn-deliver-text {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            width: auto;
+            height: auto;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+        .dg-table .btn-icon-sm.btn-deliver-text:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ba87e 100%);
+            color: white;
+        }
+        .dg-table .btn-icon-sm.btn-deliver-text i { color: white; font-size: 14px; }
+        /* ===== MOBILE CARD LAYOUT ===== */
+        @media (max-width: 767px) {
+            .search-section { padding: 12px; }
+            .search-tabs { width: 100%; }
+            .search-tabs label { flex: 1; justify-content: center; font-size: 13px; padding: 7px 8px; }
+            .delivery-filter-bar { gap: 6px; padding: 8px 10px; }
+            .df-btn { font-size: 12px; padding: 5px 10px; }
+            .dg-table { display: none !important; }
+            .dg-cards-list { display: block; }
+
+            .dg-card {
+                background: #fff;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                padding: 10px 12px;
+                position: relative;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+            }
+            .dg-card.row-today  { border-left: 4px solid #28a745; background: #f0fff4; }
+            .dg-card.row-overdue { border-left: 4px solid #dc3545; background: #fff5f5; }
+
+            .dg-card .card-top {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 8px;
+                margin-bottom: 6px;
+            }
+            .dg-card .card-top-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex: 1;
+                min-width: 0;
+            }
+            .dg-card .card-chk { flex-shrink: 0; }
+            .dg-card .card-serial {
+                font-size: 15px;
+                font-weight: 700;
+                color: #6c7ae0;
+                flex-shrink: 0;
+            }
+            .dg-card .card-name {
+                font-size: 15px;
+                font-weight: 600;
+                color: #2c3e50;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .dg-card .card-top-right {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex-shrink: 0;
+            }
+            .dg-card .card-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px 14px;
+                font-size: 13px;
+                color: #555;
+                margin-bottom: 5px;
+            }
+            .dg-card .card-row span { white-space: nowrap; }
+            .dg-card .card-row .lbl { color: #888; font-size: 12px; }
+            .dg-card .card-dress {
+                font-size: 13px;
+                color: #444;
+                margin-bottom: 5px;
+                line-height: 1.4;
+            }
+            .dg-card .card-money {
+                display: flex;
+                gap: 10px;
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+            .dg-card .card-money .m-total { font-weight: 700; color: #1a1a1a; }
+            .dg-card .card-money .m-paid  { font-weight: 600; color: #28a745; }
+            .dg-card .card-money .m-due   { font-weight: 700; color: #c0392b; }
+            .dg-card .card-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                flex-wrap: wrap;
+                padding-top: 6px;
+                border-top: 1px solid #f0f0f0;
+                margin-top: 4px;
+            }
+            .dg-card .card-footer-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .dg-card .card-footer-right {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .dg-card .btn-icon-sm { width: 30px; height: 30px; }
+            .dg-card .btn-icon-sm i { font-size: 16px; }
+            .dg-card .btn-deliver-text {
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 5px 12px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            /* mobile select-all bar */
+            .dg-mobile-select-bar {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 10px;
+                background: #6c7ae0;
+                border-radius: 6px;
+                color: white;
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            .dg-mobile-select-bar input[type="checkbox"] { width: 16px; height: 16px; }
+        }
+        @media (min-width: 768px) {
+            .dg-cards-list { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -305,10 +558,12 @@
                         <div class="search-tabs">
                             <label>
                                 <input type="radio" name="searchType" value="number" checked>
-                                <span class="lang-content" data-en="Mobile No. & Order No." data-bn="মোবাইল নং ও অর্ডার নং">মোবাইল নং ও অর্ডার নং</span>
+                                <i class="fas fa-search"></i>
+                                <span class="lang-content" data-en="Mobile & Order No." data-bn="মোবাইল নং ও অর্ডার নং">মোবাইল নং ও অর্ডার নং</span>
                             </label>
                             <label>
                                 <input type="radio" name="searchType" value="date">
+                                <i class="fas fa-calendar-alt"></i>
                                 <span class="lang-content" data-en="Delivery Date" data-bn="ডেলিভারি তারিখ">ডেলিভারি তারিখ</span>
                             </label>
                         </div>
@@ -317,16 +572,17 @@
                         <div class="search-by-number active">
                             <div class="search-form">
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                    <label><i class="fas fa-mobile-alt"></i> <span class="lang-content" data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</span></label>
                                     <input type="text" id="mobileNo" placeholder="মোবাইল নাম্বার">
                                 </div>
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</label>
+                                    <label><i class="fas fa-hashtag"></i> <span class="lang-content" data-en="Order Number" data-bn="অর্ডার নম্বর">অর্ডার নম্বর</span></label>
                                     <input type="text" id="orderNo" placeholder="অর্ডার নাম্বার">
                                 </div>
                                 <div class="form-group" style="flex:0;">
                                     <label>&nbsp;</label>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <i class="fas fa-search"></i>
                                         <span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
@@ -337,16 +593,17 @@
                         <div class="search-by-date">
                             <div class="search-form">
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                                    <label><i class="fas fa-calendar"></i> <span class="lang-content" data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</span></label>
                                     <input type="date" id="startDate">
                                 </div>
                                 <div class="form-group">
-                                    <label class="lang-content" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
+                                    <label><i class="fas fa-calendar-check"></i> <span class="lang-content" data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</span></label>
                                     <input type="date" id="endDate">
                                 </div>
                                 <div class="form-group" style="flex:0;">
                                     <label>&nbsp;</label>
                                     <button type="button" class="btn-search" onclick="searchOrders()">
+                                        <i class="fas fa-search"></i>
                                         <span class="lang-content" data-en="Search" data-bn="অনুসন্ধান">অনুসন্ধান</span>
                                     </button>
                                 </div>
@@ -374,18 +631,26 @@
 
                     <!-- Delivery Date Filter -->
                     <div id="deliveryFilterBar" class="delivery-filter-bar" style="display:none;">
-                        <span class="filter-label lang-content" data-en="Filter:" data-bn="ফিল্টার:">ফিল্টার:</span>
+                        <span class="filter-label"><i class="fas fa-filter me-1"></i><span class="lang-content" data-en="Filter" data-bn="ফিল্টার">ফিল্টার</span></span>
                         <button type="button" class="df-btn df-all active" data-filter="all" onclick="setDeliveryFilter('all')">
-                            <span class="lang-content" data-en="All" data-bn="সব">সব</span> (<span id="dfCountAll">0</span>)
+                            <i class="fas fa-list"></i>
+                            <span class="lang-content" data-en="All" data-bn="সব">সব</span>
+                            <span class="df-count" id="dfCountAll">0</span>
                         </button>
                         <button type="button" class="df-btn df-today" data-filter="today" onclick="setDeliveryFilter('today')">
-                            <span class="lang-content" data-en="Today" data-bn="আজকে">আজকে</span> (<span id="dfCountToday">0</span>)
+                            <i class="fas fa-clock"></i>
+                            <span class="lang-content" data-en="Today" data-bn="আজকে">আজকে</span>
+                            <span class="df-count" id="dfCountToday">0</span>
                         </button>
                         <button type="button" class="df-btn df-overdue" data-filter="overdue" onclick="setDeliveryFilter('overdue')">
-                            <span class="lang-content" data-en="Overdue" data-bn="অতিক্রান্ত">অতিক্রান্ত</span> (<span id="dfCountOverdue">0</span>)
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span class="lang-content" data-en="Overdue" data-bn="অতিক্রান্ত">অতিক্রান্ত</span>
+                            <span class="df-count" id="dfCountOverdue">0</span>
                         </button>
                         <button type="button" class="df-btn df-normal" data-filter="normal" onclick="setDeliveryFilter('normal')">
-                            <span class="lang-content" data-en="Upcoming" data-bn="সাধারণ">সাধারণ</span> (<span id="dfCountNormal">0</span>)
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="lang-content" data-en="Upcoming" data-bn="সাধারণ">সাধারণ</span>
+                            <span class="df-count" id="dfCountNormal">0</span>
                         </button>
                     </div>
 
@@ -460,6 +725,6 @@
     <!-- App Components (sidebar, navbar, modals, session) -->
     <script src="/js/app-components.js?v=2.1.5"></script>
     <!-- Delivery Give Page Logic -->
-    <script src="/js/delivery-give.js?v=2.2.10"></script>
+    <script src="/js/delivery-give.js?v=2.2.11"></script>
 </body>
 </html>

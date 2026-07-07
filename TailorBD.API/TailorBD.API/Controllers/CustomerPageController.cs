@@ -353,7 +353,8 @@ namespace TailorBD.API.Controllers
                     using var cmd = new SqlCommand(
                         @"SELECT MT.MeasurementTypeID, MT.MeasurementType, ISNULL(CM.Measurement, '') AS Measurement
                           FROM Measurement_Type MT
-                          LEFT JOIN Customer_Measurement CM ON MT.MeasurementTypeID = CM.MeasurementTypeID AND CM.CustomerID = @CustomerID
+                          LEFT JOIN Customer_Measurement CM ON MT.MeasurementTypeID = CM.MeasurementTypeID
+                              AND CM.CustomerID = @CustomerID AND CM.InstitutionID = @InstitutionID
                           WHERE MT.Measurement_GroupID = @GroupID AND MT.InstitutionID = @InstitutionID
                           ORDER BY ISNULL(MT.Measurement_Group_SerialNo, 99999)",
                         connection);
@@ -442,12 +443,14 @@ namespace TailorBD.API.Controllers
                                  ISNULL(CDS.DressStyleMesurement, '') AS DressStyleMesurement,
                                  CASE WHEN CDS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS IsCheck
                           FROM Dress_Style DS
-                          LEFT JOIN Customer_Dress_Style CDS ON DS.Dress_StyleID = CDS.Dress_StyleID AND CDS.CustomerID = @CustomerID
+                          LEFT JOIN Customer_Dress_Style CDS ON DS.Dress_StyleID = CDS.Dress_StyleID
+                              AND CDS.CustomerID = @CustomerID AND CDS.InstitutionID = @InstitutionID
                           WHERE DS.Dress_Style_CategoryID = @CategoryID
                           ORDER BY ISNULL(DS.StyleSerial, 99999)",
                         connection);
                     cmd.Parameters.AddWithValue("@CustomerID", customerId);
                     cmd.Parameters.AddWithValue("@CategoryID", cat.categoryId);
+                    cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                     using var reader = await cmd.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
@@ -496,7 +499,8 @@ namespace TailorBD.API.Controllers
                                 IF NOT EXISTS (SELECT 1 FROM Customer_Measurement WHERE InstitutionID=@InstitutionID AND CustomerID=@CustomerID AND MeasurementTypeID=@MeasurementTypeID)
                                     INSERT INTO Customer_Measurement (RegistrationID, InstitutionID, CustomerID, MeasurementTypeID, Measurement) VALUES (@RegistrationID, @InstitutionID, @CustomerID, @MeasurementTypeID, @Measurement)
                                 ELSE
-                                    UPDATE Customer_Measurement SET Measurement=@Measurement WHERE MeasurementTypeID=@MeasurementTypeID AND CustomerID=@CustomerID",
+                                    UPDATE Customer_Measurement SET Measurement=@Measurement
+                                    WHERE MeasurementTypeID=@MeasurementTypeID AND CustomerID=@CustomerID AND InstitutionID=@InstitutionID",
                                 connection, transaction);
                             cmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
                             cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
@@ -508,10 +512,11 @@ namespace TailorBD.API.Controllers
                         else
                         {
                             using var cmd = new SqlCommand(
-                                "DELETE FROM Customer_Measurement WHERE MeasurementTypeID=@MeasurementTypeID AND CustomerID=@CustomerID",
+                                "DELETE FROM Customer_Measurement WHERE MeasurementTypeID=@MeasurementTypeID AND CustomerID=@CustomerID AND InstitutionID=@InstitutionID",
                                 connection, transaction);
                             cmd.Parameters.AddWithValue("@MeasurementTypeID", m.MeasurementTypeId);
                             cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                            cmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
                             await cmd.ExecuteNonQueryAsync();
                         }
                     }

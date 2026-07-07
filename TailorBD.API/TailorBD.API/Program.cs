@@ -12,6 +12,9 @@ using TailorBD.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Optional local/server secrets (gitignored) — overrides appsettings
+builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true, reloadOnChange: true);
+
 // ── Controllers ──────────────────────────────────────────────────────────
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -155,6 +158,18 @@ builder.Services.AddHttpClient("ShurjoPay", c =>
     c.Timeout = TimeSpan.FromSeconds(30);
 });
 builder.Services.AddScoped<IShurjoPayService, ShurjoPayService>();
+
+// ── Novocom SMS ─────────────────────────────────────────────────────────────
+var novocomOpt = builder.Configuration.GetSection("NovocomSms").Get<NovocomSmsOptions>()
+    ?? new NovocomSmsOptions();
+builder.Services.AddSingleton(novocomOpt);
+builder.Services.AddHttpClient("NovocomSms", c =>
+{
+    c.BaseAddress = new Uri(novocomOpt.ApiUrl.TrimEnd('/'));
+    c.DefaultRequestHeaders.Add("Accept", "application/json");
+    c.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddScoped<INovocomSmsService, NovocomSmsService>();
 
 builder.Services.AddHostedService<InvoiceAutoGenerateService>();
 

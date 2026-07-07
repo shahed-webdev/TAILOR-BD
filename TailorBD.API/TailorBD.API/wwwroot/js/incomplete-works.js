@@ -2,6 +2,7 @@
 let selectedOrders = new Map();
 let currentInstitutionId = null;
 let currentRegistrationId = null;
+let orderListItemsCache = {};
 
 // Constants
 const API_BASE_URL = '/api/delivery';
@@ -374,7 +375,15 @@ async function renderOrdersTable(orders) {
     if (!orders || orders.length === 0) {
         const emptyMsg = lang === 'en' ? 'No orders found' : 'কোন অর্ডার পাওয়া যায়নি';
         ordersTableContainer.innerHTML = renderPaginationHtml() + `<div class="empty-message">${emptyMsg}</div>`;
+        const cardsEl = document.getElementById('iwCardsContainer');
+        if (cardsEl) cardsEl.innerHTML = '';
         return;
+    }
+
+    // Pre-fetch all order list items and cache
+    orderListItemsCache = {};
+    for (const order of orders) {
+        orderListItemsCache[order.orderId] = await getIncompleteOrderList(order.orderId);
     }
 
     const paginationHtml = renderPaginationHtml();
@@ -415,8 +424,8 @@ async function renderOrdersTable(orders) {
     `;
 
     for (const order of orders) {
-        // Get order list items
-        const orderListItems = await getIncompleteOrderList(order.orderId);
+        // Use cached order list items
+        const orderListItems = orderListItemsCache[order.orderId] || [];
 
         // Determine row class
         let rowClass = '';
@@ -465,9 +474,127 @@ async function renderOrdersTable(orders) {
 
     ordersTableContainer.innerHTML = tableHTML;
 
+    // Render mobile cards
+    renderMobileCards(orders);
+
     // Setup event listeners
     setupOrderCheckboxes();
     setupOrderListCheckboxes();
+}
+
+// Render mobile card layout
+function renderMobileCards(orders) {
+    const container = document.getElementById('iwCardsContainer');
+    if (!container) return;
+    const lang = window.currentLang || 'bn';
+
+    if (!orders || orders.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = `<div class="iw-mobile-select-bar">
+        <input type="checkbox" id="selectAllMobile">
+        <span>${lang === 'en' ? 'Select All' : 'সব নির্বাচন করুন'}</span>
+    </div>`;
+
+    orders.forEach(order => {
+        let rowClass = '';
+        if (order.isToday) rowClass = 'today';
+        else if (order.isOverdue) rowClass = 'overdue';
+        else if (order.isPartlyCompleted) rowClass = 'partly-completed';
+
+        const customerLabel = `(${order.customerNumber}) ${order.customerName}`;
+        const orderDate    = order.orderDate    ? formatDate(order.orderDate)    : '-';
+        const deliveryDate = order.deliveryDate ? formatDate(order.deliveryDate) : '-';
+
+        // Items rows (use already-loaded data from orderListItemsCache)
+        const items = orderListItemsCache[order.orderId] || [];
+        let itemsHtml = '';
+        items.forEach(item => {
+            itemsHtml += `
+            <div class="ic-item-row">
+                <input type="checkbox" class="order-list-item-checkbox"
+                    data-order-id="${order.orderId}"
+                    data-order-list-id="${item.orderListId}">
+                <span class="ic-dress">${escapeHtml(item.dressName)}</span>
+                <span class="ic-qty">${lang === 'en' ? 'Tot:' : 'মো:'} ${item.dressQuantity}</span>
+                <input type="number" class="pending-input"
+                    data-order-id="${order.orderId}"
+                    data-order-list-id="${item.orderListId}"
+                    data-max="${item.pendingWork}"
+                    value="${item.pendingWork}" min="0" max="${item.pendingWork}">
+            </div>`;
+        });
+
+        html += `
+        <div class="iw-card ${rowClass}" data-order-id="${order.orderId}">
+            <div class="ic-top">
+                <input type="checkbox" class="order-checkbox ic-chk" data-order-id="${order.orderId}">
+                <a href="order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}"
+                   class="ic-serial" target="_blank">#${order.orderSerialNumber}</a>
+                <span class="ic-name" title="${escapeHtml(customerLabel)}">${escapeHtml(customerLabel)}</span>
+            </div>
+            <div class="ic-info">
+                <span><span class="lbl">${lang === 'en' ? 'Phone: ' : 'মোবা: '}</span>${escapeHtml(order.phone || '-')}</span>
+                <span><span class="lbl">${lang === 'en' ? 'Order: ' : 'অর্ডার: '}</span>${orderDate}</span>
+                <span><span class="lbl">${lang === 'en' ? 'Del: ' : 'ডেলি: '}</span><strong>${deliveryDate}</strong></span>
+            </div>
+            ${items.length > 0 ? `
+            <div class="ic-items">
+                <div class="ic-items-title"><i class="fas fa-tshirt me-1"></i>${lang === 'en' ? 'Order Items' : 'পোশাকের তালিকা'}</div>
+                ${itemsHtml}
+            </div>` : ''}
+            <div class="ic-inputs">
+                <input type="text" class="store-input" data-order-id="${order.orderId}"
+                    placeholder="${lang === 'en' ? 'Store' : 'রাখা'}"
+                    value="${escapeHtml(order.storeDetails || '')}">
+                <input type="text" class="details-input" data-order-id="${order.orderId}"
+                    placeholder="${lang === 'en' ? 'Note' : 'নোট'}"
+                    value="${escapeHtml(order.details || '')}">
+            </div>
+            <div class="ic-footer">
+                <div class="ic-footer-left">
+                    <span class="ic-total">${lang === 'en' ? 'Total: ' : 'মোট: '}${Math.round(order.orderAmount)}</span>
+                    <span class="ic-sms-wrap">
+                        <input type="checkbox" class="sms-checkbox" data-order-id="${order.orderId}">
+                        <span>SMS</span>
+                    </span>
+                </div>
+                <div class="ic-footer-right">
+                    <i class="fas fa-print ic-print-btn"
+                       onclick="window.open('order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}','_blank')"
+                       title="${lang === 'en' ? 'Print' : 'প্রিন্ট'}"></i>
+                </div>
+            </div>
+        </div>`;
+    });
+
+    container.innerHTML = html + renderPaginationHtml();
+
+    // Select all mobile
+    const selectAllMobile = document.getElementById('selectAllMobile');
+    if (selectAllMobile) {
+        selectAllMobile.addEventListener('change', function() {
+            container.querySelectorAll('.order-checkbox').forEach(cb => {
+                cb.checked = this.checked;
+                cb.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
+    }
+
+    // Sync card checkboxes with table checkboxes
+    container.querySelectorAll('.order-checkbox').forEach(cb => {
+        cb.addEventListener('change', function() {
+            const orderId = this.dataset.orderId;
+            const tableCheckbox = document.querySelector(`#ordersTableContainer .order-checkbox[data-order-id="${orderId}"]`);
+            if (tableCheckbox) tableCheckbox.checked = this.checked;
+            // update card selected style
+            const card = this.closest('.iw-card');
+            if (card) card.classList.toggle('selected', this.checked);
+            updateCompleteButton();
+        });
+    });
 }
 
 // Render order list table

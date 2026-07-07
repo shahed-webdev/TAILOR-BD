@@ -483,12 +483,12 @@ namespace TailorBD.API.Controllers
                         @"UPDATE [Order] 
                           SET DeliveryDate        = @DeliveryDate,
                               Update_DeliveryDate = GETDATE(),
-                              Discount            = Discount + @NewDiscount
+                              Discount            = @Discount
                           WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID",
                         connection, transaction))
                     {
                         cmd.Parameters.AddWithValue("@DeliveryDate", model.DeliveryDate);
-                        cmd.Parameters.AddWithValue("@NewDiscount", model.Discount);
+                        cmd.Parameters.AddWithValue("@Discount", model.Discount);
                         cmd.Parameters.AddWithValue("@OrderID", model.OrderId);
                         cmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
                         await cmd.ExecuteNonQueryAsync();

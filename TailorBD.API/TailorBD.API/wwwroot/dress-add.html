@@ -17,7 +17,7 @@
     
     <!-- Custom CSS -->
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link href="/css/dress-add.css?v=2.2.0" rel="stylesheet">
+    <link href="/css/dress-add.css?v=3.0.0" rel="stylesheet">
 </head>
 <body>
     <!-- Sidebar Container (Auto-loads from component) -->
@@ -229,56 +229,61 @@
 
     <!-- Measurement Modal -->
     <div class="modal fade" id="measurementModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-dialog modal-fullscreen-sm-down modal-lg modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg,#667eea,#764ba2); color:#fff;">
-                    <h5 class="modal-title mb-0">
-                        <i class="fas fa-ruler-combined me-2"></i>
-                        "<span id="measurementDressName"></span>" মাপজোখ
-                    </h5>
+                <div class="modal-header measurement-modal-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="header-icon"><i class="fas fa-ruler-combined"></i></span>
+                        <div>
+                            <h5 class="modal-title mb-0">"<span id="measurementDressName"></span>" <span class="fw-normal">মাপজোখ</span></h5>
+                            <small class="header-subtitle">গ্রুপ ও মাপজোখ সহজভাবে যোগ করুন</small>
+                        </div>
+                    </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
-                <div class="modal-body p-3">
+                <div class="modal-body measurement-modal-body">
                     <!-- Modal alert area -->
                     <div id="measurementModalAlert"></div>
 
                     <!-- Add New Group Form -->
-                    <div class="card border-success mb-3">
-                        <div class="card-header bg-success bg-opacity-10 py-2">
-                            <strong class="text-success">
-                                <i class="fas fa-plus-circle me-1"></i> নতুন মাপজোখ গ্রুপ যোগ করুন
-                            </strong>
+                    <div class="measurement-form-card add-group-card">
+                        <div class="form-card-title text-success">
+                            <i class="fas fa-folder-plus"></i> নতুন মাপজোখ গ্রুপ যোগ করুন
                         </div>
-                        <div class="card-body py-2">
-                            <form id="measurementGroupForm">
-                                <div class="row g-2 align-items-end">
-                                    <div class="col-sm-6">
-                                        <label class="form-label form-label-sm mb-1">গ্রুপের নাম</label>
-                                        <input type="text" class="form-control form-control-sm" id="measurementGroupName"
-                                               placeholder="যেমন: হাত, ছাতি, কোমর..." required>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label class="form-label form-label-sm mb-1">সিরিয়াল</label>
-                                        <input type="number" class="form-control form-control-sm" id="measurementGroupSerial"
-                                               placeholder="১, ২, ৩..." min="1">
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <button type="submit" class="btn btn-success btn-sm w-100">
-                                            <i class="fas fa-plus me-1"></i> গ্রুপ যোগ করুন
-                                        </button>
-                                    </div>
+                        <form id="measurementGroupForm">
+                            <div class="meas-input-row">
+                                <div class="meas-field-grow">
+                                    <label class="form-label-sm">গ্রুপের নাম</label>
+                                    <input type="text" class="form-control" id="measurementGroupName"
+                                           placeholder="যেমন: হাত, ছাতি, কোমর..." required>
                                 </div>
-                            </form>
-                        </div>
+                                <div class="meas-field-sm">
+                                    <label class="form-label-sm">সিরিয়াল</label>
+                                    <input type="number" class="form-control" id="measurementGroupSerial"
+                                           placeholder="১" min="1">
+                                </div>
+                                <div class="meas-field-btn">
+                                    <label class="form-label-sm d-none d-sm-block">&nbsp;</label>
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fas fa-plus me-1"></i> <span class="d-none d-sm-inline">গ্রুপ যোগ করুন</span><span class="d-sm-none">যোগ</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
                     <!-- Groups List -->
                     <div id="measurementGroupsList"></div>
+
+                    <div id="noGroupsPlaceholder" class="text-center py-4" style="display:none;">
+                        <i class="fas fa-ruler-combined empty-icon"></i>
+                        <p class="text-muted mb-0">কোনো গ্রুপ এখনো যোগ করা হয়নি।<br>উপরের ফর্ম থেকে প্রথম গ্রুপটি যোগ করুন।</p>
+                    </div>
                 </div>
 
-                <div class="modal-footer py-2">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                <div class="modal-footer measurement-modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i> বন্ধ করুন
                     </button>
                 </div>
@@ -355,6 +360,6 @@
     <script src="/js/app-components.js?v=2.1.9"></script>
     
     <!-- Dress Add JS -->
-    <script src="/js/dress-add.js?v=2.1.7"></script>
+    <script src="/js/dress-add.js?v=3.0.0"></script>
 </body>
 </html>

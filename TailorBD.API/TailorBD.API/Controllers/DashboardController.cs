@@ -230,5 +230,102 @@ namespace TailorBD.API.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Get unified dashboard summary (today + overall) in one request
+        /// GET api/Dashboard/summary?institutionId=1
+        /// </summary>
+        [HttpGet("summary")]
+        public IActionResult GetSummary(int institutionId)
+        {
+            try
+            {
+                using var con = _context.CreateConnection();
+
+                var sql = @"
+                    DECLARE @Today DATE = CAST(GETDATE() AS DATE);
+                    DECLARE @Tomorrow DATE = DATEADD(DAY, 1, @Today);
+                    DECLARE @ThisMonthStart DATE = DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1);
+                    DECLARE @LastMonthStart DATE = DATEADD(MONTH, -1, @ThisMonthStart);
+                    DECLARE @LastMonthEnd DATE = DATEADD(DAY, -1, @ThisMonthStart);
+
+                    SELECT
+                        -- Today's stats (use range so existing indexes can seek)
+                        (SELECT COUNT(*) FROM [Order]
+                         WHERE InstitutionID = @InstitutionID
+                           AND OrderDate >= @Today AND OrderDate < @Tomorrow)          AS todayOrders,
+
+                        (SELECT COUNT(DISTINCT o.OrderID)
+                         FROM [Order] o
+                         LEFT JOIN Order_Delivery_Date odd ON odd.OrderID = o.OrderID
+                            AND odd.DeliveryInsertDate >= @Today AND odd.DeliveryInsertDate < @Tomorrow
+                         WHERE o.InstitutionID = @InstitutionID
+                           AND o.DeliveryStatus = N'Delivered'
+                           AND (
+                               (o.Update_DeliveryDate >= @Today AND o.Update_DeliveryDate < @Tomorrow)
+                               OR odd.OrderID IS NOT NULL
+                           ))                                                              AS todayDeliveries,
+
+                        (SELECT ISNULL(SUM(Amount), 0) FROM Payment_Record
+                         WHERE InstitutionID = @InstitutionID
+                           AND OrderPaid_Date >= @Today AND OrderPaid_Date < @Tomorrow)     AS todayIncome,
+
+                        (SELECT ISNULL(SUM(ExpanseAmount), 0) FROM Expanse
+                         WHERE InstitutionID = @InstitutionID
+                           AND ExpanseDate >= @Today AND ExpanseDate < @Tomorrow)        AS todayExpense,
+
+                        (SELECT ISNULL(SUM(DueAmount), 0) FROM [Order]
+                         WHERE InstitutionID = @InstitutionID
+                           AND PaymentStatus = N'Due'
+                           AND OrderDate >= @Today AND OrderDate < @Tomorrow)          AS todayDue,
+
+                        (SELECT ISNULL(SUM(SellingPaidAmount), 0) FROM Fabrics_Selling
+                         WHERE InstitutionID = @InstitutionID
+                           AND SellingDate >= @Today AND SellingDate < @Tomorrow)        AS todayItemSale,
+
+                        (SELECT ISNULL(SUM(SellingDueAmount), 0) FROM Fabrics_Selling
+                         WHERE InstitutionID = @InstitutionID
+                           AND SellingDate >= @Today AND SellingDate < @Tomorrow)        AS todayItemSaleDue,
+
+                        -- Overall stats
+                        (SELECT COUNT(*) FROM Customer
+                         WHERE InstitutionID = @InstitutionID)                          AS totalCustomers,
+
+                        (SELECT COUNT(*) FROM [Order]
+                         WHERE InstitutionID = @InstitutionID)                          AS totalOrders,
+
+                        (SELECT COUNT(*) FROM [Order]
+                         WHERE InstitutionID = @InstitutionID
+                           AND DeliveryStatus IN (N'Pending', N'PartlyDelivered'))      AS pendingOrders,
+
+                        (SELECT ISNULL(SUM(DueAmount), 0) FROM [Order]
+                         WHERE InstitutionID = @InstitutionID
+                           AND PaymentStatus = N'Due')                                  AS totalDue,
+
+                        (SELECT ISNULL(SUM(Amount), 0) FROM Payment_Record
+                         WHERE InstitutionID = @InstitutionID
+                           AND OrderPaid_Date >= @ThisMonthStart
+                           AND OrderPaid_Date < DATEADD(MONTH, 1, @ThisMonthStart))     AS monthlyRevenue,
+
+                        (SELECT COUNT(*) FROM Customer
+                         WHERE InstitutionID = @InstitutionID
+                           AND [Date] >= @LastMonthStart AND [Date] <= @LastMonthEnd)      AS lastMonthCustomers,
+
+                        (SELECT COUNT(*) FROM [Order]
+                         WHERE InstitutionID = @InstitutionID
+                           AND OrderDate >= @LastMonthStart AND OrderDate <= @LastMonthEnd) AS lastMonthOrders,
+
+                        (SELECT ISNULL(SUM(Amount), 0) FROM Payment_Record
+                         WHERE InstitutionID = @InstitutionID
+                           AND OrderPaid_Date >= @LastMonthStart AND OrderPaid_Date <= @LastMonthEnd) AS lastMonthRevenue";
+
+                var data = con.QueryFirstOrDefault(sql, new { InstitutionID = institutionId });
+                return Ok(new { success = true, data });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
     }
 }

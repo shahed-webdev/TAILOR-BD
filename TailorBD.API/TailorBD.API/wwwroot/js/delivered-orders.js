@@ -151,6 +151,7 @@
         $(document).on('languageChanged', function () {
             if (window._deliveredOrdersData) {
                 renderOrdersTable(window._deliveredOrdersData.orders);
+                renderMobileCards(window._deliveredOrdersData.orders);
                 renderSummary(window._deliveredOrdersData.stats);
                 renderPagination(currentPage);
             }
@@ -179,6 +180,7 @@
                     : (b.dueAmount || 0) - (a.dueAmount || 0);
             });
             renderOrdersTable(sorted);
+            renderMobileCards(sorted);
         }
     };
 
@@ -330,7 +332,58 @@
         html += '</tbody></table>';
         container.html(html);
 
+        renderMobileCards(orders);
+
         if (window.updateLanguage) window.updateLanguage();
+    }
+
+    function renderMobileCards(orders) {
+        const $cards = $('#doCardsContainer');
+        if (!$cards.length) return;
+
+        if (!orders || orders.length === 0) {
+            $cards.html('');
+            return;
+        }
+
+        const l = (window.currentLang === 'en') ? 'en' : 'bn';
+        let html = '';
+
+        orders.forEach(function (order) {
+            const orderDate   = formatDate(order.orderDate);
+            const deliveryDate = order.deliveryDate ? formatDate(order.deliveryDate) : '-';
+            const deliveredOn  = order.deliveryInsertDate ? formatDate(order.deliveryInsertDate) : '-';
+            const due = (order.dueAmount || 0).toFixed(2);
+            const dueClass = (order.dueAmount > 0) ? 'has-due' : 'no-due';
+            const dueLabel = l === 'en' ? 'Due: ' : 'বাকি: ';
+            const customerNo = order.customerNumber ? `(${order.customerNumber}) ` : '';
+            const dress = order.dressDetails || '-';
+            const addr  = order.address || '';
+
+            html += `
+            <div class="do-card">
+                <div class="dc-top">
+                    <span class="dc-serial">#${order.orderSerialNumber}</span>
+                    <span class="dc-name" title="${escapeHtml(customerNo + order.customerName)}">${escapeHtml(customerNo + order.customerName)}</span>
+                    <span class="dc-due ${dueClass}">${dueLabel}${due}</span>
+                </div>
+                <div class="dc-info">
+                    <span><span class="lbl">${l === 'en' ? 'Phone: ' : 'মোবা: '}</span>${escapeHtml(order.phone || '-')}</span>
+                    <span><span class="lbl">${l === 'en' ? 'Order: ' : 'অর্ডার: '}</span>${orderDate}</span>
+                    <span><span class="lbl">${l === 'en' ? 'Del. date: ' : 'ডেলি. তারিখ: '}</span>${deliveryDate}</span>
+                    <span><span class="lbl">${l === 'en' ? 'Delivered: ' : 'ডেলিভারি: '}</span><strong>${deliveredOn}</strong></span>
+                    ${addr ? `<span><span class="lbl">${l === 'en' ? 'Address: ' : 'ঠিকানা: '}</span>${escapeHtml(addr)}</span>` : ''}
+                </div>
+                ${dress !== '-' ? `<div class="dc-dress"><span class="lbl">${l === 'en' ? 'Dress: ' : 'পোশাক: '}</span>${escapeHtml(dress)}</div>` : ''}
+                <div class="dc-footer">
+                    <button class="dc-print-btn" onclick="printOrder(${order.orderId})">
+                        <i class="fas fa-print"></i> ${l === 'en' ? 'Receipt' : 'রিসিট'}
+                    </button>
+                </div>
+            </div>`;
+        });
+
+        $cards.html(html);
     }
 
     function renderPagination(page) {

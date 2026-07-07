@@ -268,7 +268,7 @@
 
         if (!orders || orders.length === 0) {
             const msg = allOrders.length > 0 && deliveryFilter !== 'all'
-                ? (window.currentLang === 'en' ? 'No orders in this filter' : 'এই ফিল্টারে কোনো অর্ডার পাওয়া যায়নি')
+                ? (window.currentLang === 'en' ? 'No orders in this filter' : 'এই ফিল্টারে কোন অর্ডার পাওয়া যায়নি')
                 : '<span class="lang-content" data-en="No ready-to-deliver orders found" data-bn="ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি">ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি</span>';
             container.html('<div class="empty-message">' + msg + '</div>');
             if (window.updateLanguage) window.updateLanguage();
@@ -286,16 +286,16 @@
                 <colgroup>
                     <col class="col-chk">
                     <col class="col-order-no">
-                    <col style="width:8%">
+                    <col>
                     <col class="col-phone">
-                    <col style="width:7%">
-                    <col style="width:11%">
-                    <col class="col-date">
-                    <col class="col-date">
-                    <col style="width:7%">
-                    <col style="width:5%">
                     <col style="width:6%">
+                    <col style="width:12%">
+                    <col class="col-date">
+                    <col class="col-date">
+                    <col style="width:8%">
                     <col style="width:5%">
+                    <col style="width:5%">
+                    <col style="width:55px">
                     <col class="col-sms">
                     <col class="col-act">
                 </colgroup>
@@ -313,8 +313,8 @@
                         <th><span class="lang-content" data-en="Store" data-bn="রাখা">রাখা</span></th>
                         <th><span class="lang-content" data-en="Note" data-bn="নোট">নোট</span></th>
                         <th><span class="lang-content" data-en="St." data-bn="স্ট.">স্ট.</span></th>
-                        <th>SMS</th>
-                        <th><span class="lang-content" data-en="Act." data-bn="কাজ">কাজ</span></th>
+                        <th class="col-sms-head">SMS</th>
+                        <th class="col-act-head"><span class="lang-content" data-en="Act." data-bn="কাজ">কাজ</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -366,8 +366,12 @@
                             <button onclick="viewOrderDetails(${order.orderId})" class="btn-icon-sm details" title="বিস্তারিত">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button onclick="openPartialDeliveryModal(${order.orderId}, '${order.orderSerialNumber}')" class="btn-icon-sm deliver" title="ডেলিভারি দিন">
-                                <i class="fas fa-check-circle"></i>
+                            <a href="/money-receipt.html?orderId=${order.orderId}" target="_blank" class="btn-icon-sm receipt" title="মানি রিসিট">
+                                <i class="fas fa-print"></i>
+                            </a>
+                            <button onclick="openPartialDeliveryModal(${order.orderId}, '${order.orderSerialNumber}')" class="btn-icon-sm deliver btn-deliver-text" title="ডেলিভারি দিন">
+                                <i class="fas fa-check-circle d-md-none"></i>
+                                <span class="d-none d-md-inline">ডেলিভারি দিন</span>
                             </button>
                         </div>
                     </td>
@@ -376,13 +380,91 @@
         });
 
         html += '</tbody></table>';
+
+        // ---- Mobile card list ----
+        html += '<div class="dg-cards-list">';
+        html += `<div class="dg-mobile-select-bar">
+            <input type="checkbox" id="selectAllOrdersMobile" title="সব নির্বাচন">
+            <span>সব নির্বাচন করুন</span>
+        </div>`;
+        pageOrders.forEach(order => {
+            const orderDate    = formatShortDate(order.orderDate);
+            const deliveryDate = formatShortDate(order.deliveryDate);
+            const rowClass     = getDeliveryRowClass(order.deliveryDate);
+            const isFullyCompleted = (order.workStatus || '').toLowerCase() === 'completed';
+            const statusClass = isFullyCompleted ? 'status-ready' : 'status-partial';
+            const statusText  = isFullyCompleted ? 'প্রস্তুত' : 'আংশিক';
+            const dressFull   = order.dressDetails || '-';
+            const addrFull    = order.address || '-';
+            const noteFull    = order.details || '-';
+
+            html += `
+            <div class="dg-card ${rowClass}">
+                <div class="card-top">
+                    <div class="card-top-left">
+                        <input type="checkbox" class="order-checkbox card-chk" data-order-id="${order.orderId}">
+                        <span class="card-serial">#${order.orderSerialNumber}</span>
+                        <span class="card-name" title="${escapeHtml(order.customerName)}">${escapeHtml(clipCell(order.customerName, 22))}</span>
+                    </div>
+                    <div class="card-top-right">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        <input type="checkbox" class="sms-checkbox"
+                            style="width:16px;height:16px;"
+                            title="SMS"
+                            data-order-id="${order.orderId}"
+                            data-order-serial="${order.orderSerialNumber}"
+                            data-phone="${escapeHtml(order.phone || '')}"
+                            data-institution-name="${escapeHtml(order.institutionName || '')}"
+                            data-masking="${escapeHtml(order.masking || '')}"
+                            data-sms-balance="${order.smsBalance || 0}">
+                        <span style="font-size:11px;color:#888;">SMS</span>
+                    </div>
+                </div>
+                <div class="card-row">
+                    <span><span class="lbl">মোবা. </span>${escapeHtml(order.phone || '-')}</span>
+                    <span><span class="lbl">অর্ডার </span>${orderDate}</span>
+                    <span><span class="lbl">ডেলি. </span><strong>${deliveryDate}</strong></span>
+                    ${addrFull !== '-' ? `<span><span class="lbl">ঠিকানা </span>${escapeHtml(clipCell(addrFull, 18))}</span>` : ''}
+                </div>
+                <div class="card-dress">${escapeHtml(dressFull)}</div>
+                <div class="card-money">
+                    <span class="m-total">মোট: ${order.orderAmount.toFixed(0)}</span>
+                    <span class="m-paid">পরিশোধ: ${order.paidAmount.toFixed(0)}</span>
+                    <span class="m-due">বাকি: ${order.dueAmount.toFixed(0)}</span>
+                </div>
+                ${noteFull !== '-' ? `<div class="card-row"><span class="lbl">নোট: </span>${escapeHtml(clipCell(noteFull, 40))}</div>` : ''}
+                <div class="card-footer">
+                    <div class="card-footer-left">
+                        <button onclick="viewOrderDetails(${order.orderId})" class="btn-icon-sm details" title="বিস্তারিত"><i class="fas fa-eye"></i></button>
+                        <a href="/money-receipt.html?orderId=${order.orderId}" target="_blank" class="btn-icon-sm receipt" title="মানি রিসিট"><i class="fas fa-print"></i></a>
+                    </div>
+                    <div class="card-footer-right">
+                        <button onclick="openPartialDeliveryModal(${order.orderId}, '${order.orderSerialNumber}')" class="btn-deliver-text">
+                            <i class="fas fa-check-circle me-1"></i>ডেলিভারি দিন
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+        // ---- end mobile cards ----
+
         html += paginationHtml;
         container.html(html);
 
-        // Select All — sync SMS checkboxes too
+        // Select All desktop
         $('#selectAllOrders').on('change', function() {
             $('.order-checkbox').prop('checked', $(this).prop('checked'));
             $('.sms-checkbox').prop('checked', $(this).prop('checked'));
+            $('#selectAllOrdersMobile').prop('checked', $(this).prop('checked'));
+            updateSmsSendPanel();
+        });
+
+        // Select All mobile
+        $('#selectAllOrdersMobile').on('change', function() {
+            $('.order-checkbox').prop('checked', $(this).prop('checked'));
+            $('.sms-checkbox').prop('checked', $(this).prop('checked'));
+            $('#selectAllOrders').prop('checked', $(this).prop('checked'));
             updateSmsSendPanel();
         });
 
@@ -392,8 +474,10 @@
             $(`.sms-checkbox[data-order-id="${orderId}"]`).prop('checked', $(this).is(':checked'));
             const total   = $('.order-checkbox').length;
             const checked = $('.order-checkbox:checked').length;
-            $('#selectAllOrders').prop('indeterminate', checked > 0 && checked < total);
-            $('#selectAllOrders').prop('checked', checked === total);
+            const isAll   = checked === total;
+            const isIndet = checked > 0 && checked < total;
+            $('#selectAllOrders').prop('indeterminate', isIndet).prop('checked', isAll);
+            $('#selectAllOrdersMobile').prop('indeterminate', isIndet).prop('checked', isAll);
             updateSmsSendPanel();
         });
 
@@ -505,6 +589,7 @@
                     const data = response.data;
                     // money-receipt-details returns header + measurements; adapt to expected shape
                     renderOrderDetailsModal({
+                        orderId:      orderId,
                         customer:     data.header,
                         measurements: data.measurements || []
                     });
@@ -521,10 +606,11 @@
     function renderOrderDetailsModal(data) {
         const customer     = data.customer;
         const measurements = data.measurements || [];
+        const orderId      = data.orderId;
 
         let html = `
             <div class="customer-info-simple mb-4">
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-md-8">
                         <h5><i class="fas fa-user me-2"></i>${customer.customerName}</h5>
                         <p class="mb-1"><i class="fas fa-phone me-2"></i>${customer.phone || 'N/A'}</p>
@@ -533,6 +619,9 @@
                     <div class="col-md-4 text-end">
                         <div class="mb-2"><strong>অর্ডার নং:</strong> <span class="badge bg-primary fs-6">${customer.orderSerialNumber}</span></div>
                         <div><strong>কাস্টমার নং:</strong> ${customer.customerNumber || 'N/A'}</div>
+                        <a href="/money-receipt.html?orderId=${orderId || ''}" target="_blank" class="btn btn-sm btn-light mt-2" title="মানি রিসিট দেখুন">
+                            <i class="fas fa-receipt me-1"></i> মানি রিসিট
+                        </a>
                     </div>
                 </div>
             </div>
@@ -713,7 +802,8 @@
             <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold"><i class="fas fa-university me-1"></i>অ্যাকাউন্ট</label>
                 <select id="pdAccount" class="form-select">${accountOptions}</select>
-            </div>` : '<input type="hidden" id="pdAccount" value="">'}
+            </div>` : '<input type="hidden" id="pdAccount" value="">'
+        }
         </div>
         <div id="pdAlertMsg" class="mt-2" style="display:none;"></div>`;
 

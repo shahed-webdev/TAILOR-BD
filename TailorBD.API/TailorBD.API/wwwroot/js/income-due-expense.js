@@ -122,8 +122,8 @@
         activeTab = tab;
         $('.tab-btn').removeClass('active');
         $('#tab-' + tab).addClass('active');
-        $('.tab-pane').hide();
-        $('#pane-' + tab).show();
+        $('.tab-pane').removeClass('active').css('display', 'none');
+        $('#pane-' + tab).addClass('active').css('display', 'block');
 
         if (tab === 'income'  && !incomeLoaded)  loadIncome(1);
         if (tab === 'due'     && !dueLoaded)     loadDue(1);
@@ -153,13 +153,12 @@
                 incomeLoaded = true;
                 const $body = $('#incomeBody').empty();
                 if (!res.success || !res.data || !res.data.length) {
-                    $body.append('<tr><td colspan="13" class="text-center py-4 text-muted">কোন রেকর্ড নেই</td></tr>');
+                    $body.append('<tr><td colspan="11" class="text-center py-4 text-muted">কোন রেকর্ড নেই</td></tr>');
                     $('#incomeCount').text(''); $('#incomePager').empty(); return;
                 }
                 $('#incomeCount').text('মোট: ' + res.total + ' টি পেমেন্ট');
                 const off = (res.page - 1) * res.pageSize;
                 res.data.forEach(function (r) {
-                    const st = PAY_STATUS[r.PayStatus] || { cls: 'badge-adv', label: r.PayStatus || '—' };
                     const due = parseFloat(r.DueAmount || 0);
                     $body.append('<tr>' +
                         '<td><b>' + r.OrderSerialNumber + '</b></td>' +
@@ -168,12 +167,10 @@
                         '<td>' + (r.OrderDate||'—') + '</td>' +
                         '<td>' + (r.DeliveryDate||'—') + '</td>' +
                         '<td>' + fmt(r.OrderAmount) + '</td>' +
-                        '<td class="text-sm-muted">' + fmt(r.PrePaid) + '</td>' +
                         '<td class="amt-green">' + fmt(r.Amount) + '</td>' +
                         '<td class="text-sm-muted">' + fmt(r.Discount) + '</td>' +
                         '<td class="' + (due > 0 ? 'amt-red' : '') + '">' + fmt(due) + '</td>' +
                         '<td style="white-space:nowrap;">' + (r.PaidDate||'—') + '</td>' +
-                        '<td><span class="' + st.cls + '">' + st.label + '</span></td>' +
                         '<td class="text-sm-muted">' + (r.Account||'—') + '</td>' +
                         '</tr>');
                 });

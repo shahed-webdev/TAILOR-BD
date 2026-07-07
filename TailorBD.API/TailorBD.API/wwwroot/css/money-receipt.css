@@ -1755,6 +1755,38 @@ body {
     [data-print-size="5"] .receipt-table th:nth-child(5),
     [data-print-size="5"] .receipt-table td:nth-child(5) { width: 23%; }
 
+    /* 5.5 inch print adjustments */
+    [data-print-size="5.5"] .receipt-container {
+        padding: 0 20px 20px 20px !important;
+        font-size: 14px !important;
+    }
+
+    [data-print-size="5.5"] .receipt-table {
+        font-size: 13px !important;
+        table-layout: fixed !important;
+    }
+
+    [data-print-size="5.5"] .receipt-table th,
+    [data-print-size="5.5"] .receipt-table td {
+        padding: 7px 5px !important;
+        font-size: 13px !important;
+    }
+
+    [data-print-size="5.5"] .receipt-table th:nth-child(1),
+    [data-print-size="5.5"] .receipt-table td:nth-child(1) { width: 18%; }
+
+    [data-print-size="5.5"] .receipt-table th:nth-child(2),
+    [data-print-size="5.5"] .receipt-table td:nth-child(2) { width: 26%; }
+
+    [data-print-size="5.5"] .receipt-table th:nth-child(3),
+    [data-print-size="5.5"] .receipt-table td:nth-child(3) { width: 10%; }
+
+    [data-print-size="5.5"] .receipt-table th:nth-child(4),
+    [data-print-size="5.5"] .receipt-table td:nth-child(4) { width: 23%; }
+
+    [data-print-size="5.5"] .receipt-table th:nth-child(5),
+    [data-print-size="5.5"] .receipt-table td:nth-child(5) { width: 23%; }
+
     /* 6 inch print adjustments */
     [data-print-size="6"] .receipt-container {
         padding: 0 20px 20px 20px !important;
@@ -1872,6 +1904,17 @@ body.print-size-5 .receipt-table {
 
 body.print-size-5 .receipt-table thead th,
 body.print-size-5 .receipt-table tbody td {
+    padding: 8px 6px;
+    font-size: 11px;
+}
+
+/* 5.5 inch */
+body.print-size-5-5 .receipt-table {
+    font-size: 12px;
+}
+
+body.print-size-5-5 .receipt-table thead th,
+body.print-size-5-5 .receipt-table tbody td {
     padding: 8px 6px;
     font-size: 11px;
 }

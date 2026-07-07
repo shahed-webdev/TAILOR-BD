@@ -16,6 +16,17 @@ customer: { id: 0, clothForId: 1, name: '', phone: '', photo: '' },
     addDressInProgress: false
 };
 
+function normalizePhone(value) {
+    return String(value || '').trim().replace(/\s+/g, ' ');
+}
+
+function isValidPhone(value) {
+    const phone = normalizePhone(value);
+    if (!phone) return false;
+    const digits = phone.replace(/\D/g, '');
+    return digits.length >= 4;
+}
+
 function escapeHtml(str) {
     if (str == null) return '';
     return String(str)
@@ -358,15 +369,21 @@ window.previewCustomerPhoto = function (input) {
 };
 
 window.addNewCustomer = async function () {
-    const phone   = $('#customerPhone').val().trim();
+    const phone   = normalizePhone($('#customerPhone').val());
     const name    = $('#customerName').val().trim();
     const address = $('#customerAddress').val().trim();
     const gender  = $('#customerGender').val();
 
-    if (!phone || !name) {
-        showAlert(window.currentLang === 'en' ? 'Phone and name required' : 'ফোন ও নাম আবশ্যক', 'warning');
+    if (!name) {
+        showAlert(window.currentLang === 'en' ? 'Customer name is required' : 'কাস্টমারের নাম আবশ্যক', 'warning');
         return;
     }
+    if (!isValidPhone(phone)) {
+        showAlert(window.currentLang === 'en' ? 'Enter a valid phone number (any country)' : 'সঠিক ফোন নম্বর দিন (যেকোনো দেশ)', 'warning');
+        return;
+    }
+
+    $('#customerPhone').val(phone);
 
     const $btn = $('#addCustomerBtn').prop('disabled', true)
         .html(`<span class="spinner-border spinner-border-sm me-1"></span>${window.currentLang === 'en' ? 'Adding...' : 'যুক্ত হচ্ছে...'}`);

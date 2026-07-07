@@ -20,45 +20,91 @@
         .content { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h2 { color: #2c3e50; margin-bottom: 15px; font-size: 22px; font-weight: 600; }
 
-        /* Search Mode Radio */
-        .search-mode-group { margin-bottom: 15px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-        .search-mode-group label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; font-size: 14px; }
-        .search-mode-group input[type=radio] { accent-color: #6c7ae0; width: 16px; height: 16px; cursor: pointer; }
-        .radio-order { color: #dc3545; }
-        .radio-date { color: #28a745; }
+        /* Search Mode Radio — pill toggle */
+        .search-mode-group {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid #e0e4ff;
+            width: fit-content;
+            flex-wrap: wrap;
+        }
+        .search-mode-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .search-mode-group label:has(input:checked) { background: #6c7ae0; color: white; font-weight: 600; }
+        .search-mode-group input[type=radio] { display: none; }
 
         /* Search Sections */
-        .search-section { margin-bottom: 20px; }
-        .search-panel { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; }
-        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
-        .search-grid-date { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
-        .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 13px; }
-        .form-group input, .form-group textarea { 
-            width: 100%; padding: 7px 10px; border: 1px solid #ddd; 
-            border-radius: 4px; font-size: 13px; font-family: inherit;
+        .search-section { margin-bottom: 14px; }
+        .search-panel {
+            background: linear-gradient(135deg, #f0f2ff 0%, #f8f9ff 100%);
+            border: 1px solid #dde3ff;
+            border-radius: 10px;
+            padding: 14px 16px;
         }
-        .form-group textarea { resize: vertical; min-height: 72px; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #6c7ae0; box-shadow: 0 0 0 2px rgba(108,122,224,0.15); }
-
-        .btn-search { 
-            padding: 8px 20px; background: #6c7ae0; color: white; border: none; 
-            border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px; 
-            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+        .search-grid-date { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+        .form-group label {
+            display: flex; align-items: center; gap: 5px;
+            margin-bottom: 4px; color: #444; font-weight: 600; font-size: 13px;
         }
-        .btn-search:hover { background: #5a68c9; }
+        .form-group label i { color: #6c7ae0; font-size: 12px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 8px 10px;
+            border: 1.5px solid #dde3ff; border-radius: 8px;
+            font-size: 13px; font-family: inherit; background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #6c7ae0;
+            box-shadow: 0 0 0 3px rgba(108,122,224,0.12);
+        }
+        .btn-search {
+            display: flex; align-items: center; gap: 7px;
+            padding: 9px 20px;
+            background: linear-gradient(135deg, #6c7ae0 0%, #5a68c9 100%);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 14px;
+            box-shadow: 0 2px 8px rgba(108,122,224,0.3);
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-search:hover {
+            background: linear-gradient(135deg, #5a68c9 0%, #4a58b9 100%);
+            box-shadow: 0 4px 12px rgba(108,122,224,0.4); transform: translateY(-1px);
+        }
 
         /* Stats */
-        .stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .stat-card { color: white; padding: 15px 20px; border-radius: 8px; }
+        .stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
+        .stat-card { color: white; padding: 14px 18px; border-radius: 10px; }
         .stat-card.green { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
-        .stat-card.red { background: linear-gradient(135deg, #f5515f 0%, #a1051d 100%); }
-        .stat-value { font-size: 26px; font-weight: 700; margin-bottom: 3px; }
+        .stat-card.red   { background: linear-gradient(135deg, #f5515f 0%, #a1051d 100%); }
+        .stat-value { font-size: 24px; font-weight: 700; margin-bottom: 3px; }
         .stat-label { font-size: 13px; opacity: 0.9; }
 
         /* Summary text */
-        .summary-text { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 10px; }
+        .summary-text {
+            font-size: 13px; font-weight: 600; color: #555;
+            background: #f8f9ff; border: 1px solid #e4e8ff;
+            border-radius: 8px; padding: 7px 12px; margin-bottom: 10px;
+            display: inline-block;
+        }
 
-        /* Table */
+        /* Desktop Table */
         .table-wrapper { overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { background: #6c7ae0; color: white; padding: 9px 8px; text-align: center; font-weight: 600; white-space: nowrap; }
@@ -71,10 +117,9 @@
         .customer-number { color: #888; font-size: 12px; }
         .due-amount { color: #dc3545; font-weight: 600; }
         .due-zero { color: #28a745; }
-
-        .btn-print { 
-            width: 30px; height: 30px; background: #17a2b8; color: white; border: none; 
-            border-radius: 4px; cursor: pointer; font-size: 13px; 
+        .btn-print {
+            width: 30px; height: 30px; background: #17a2b8; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 13px;
             display: inline-flex; align-items: center; justify-content: center;
         }
         .btn-print:hover { background: #138496; }
@@ -84,9 +129,9 @@
         .error-message { color: #dc3545; }
 
         /* Pagination */
-        .pagination-wrapper { display: flex; justify-content: center; gap: 5px; margin-top: 20px; flex-wrap: wrap; }
-        .pagination-wrapper button { 
-            padding: 5px 12px; border: 1px solid #ddd; background: white; 
+        .pagination-wrapper { display: flex; justify-content: center; gap: 5px; margin-top: 16px; flex-wrap: wrap; }
+        .pagination-wrapper button {
+            padding: 5px 12px; border: 1px solid #ddd; background: white;
             cursor: pointer; border-radius: 3px; font-size: 13px;
         }
         .pagination-wrapper button.active { background: #6c7ae0; color: white; border-color: #6c7ae0; }
@@ -98,7 +143,7 @@
         .autocomplete-list {
             position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;
             background: white; border: 1px solid #ddd; border-top: none;
-            border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
+            border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .autocomplete-list div {
@@ -107,11 +152,76 @@
         .autocomplete-list div:hover, .autocomplete-list div.active { background: #f0f4ff; color: #6c7ae0; }
         .autocomplete-list div:last-child { border-bottom: none; }
 
-        @media (max-width: 768px) {
+        /* ===== MOBILE CARD LAYOUT ===== */
+        @media (max-width: 767px) {
             #app-navbar { margin-left: 0; }
             .main-content { margin-left: 0; }
-            .search-grid, .search-grid-date { grid-template-columns: 1fr; }
+            .search-mode-group { width: 100%; }
+            .search-mode-group label { flex: 1; justify-content: center; font-size: 12px; padding: 6px 8px; }
+            .search-grid, .search-grid-date { grid-template-columns: 1fr 1fr; }
+            .search-grid > div:last-child,
+            .search-grid-date > div:last-child { grid-column: 1 / -1; }
+            /* Hide desktop table on mobile */
+            #ordersTableContainer { display: none !important; }
+            .do-cards { display: block !important; }
         }
+        @media (min-width: 768px) {
+            .do-cards { display: none !important; }
+        }
+
+        .do-cards { display: none; margin-top: 8px; }
+
+        .do-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 9px;
+            padding: 11px 13px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+        .do-card .dc-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .do-card .dc-serial {
+            font-size: 15px; font-weight: 700; color: #6c7ae0; flex-shrink: 0;
+        }
+        .do-card .dc-name {
+            font-size: 14px; font-weight: 600; color: #2c3e50;
+            flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .do-card .dc-due {
+            font-size: 14px; font-weight: 700; flex-shrink: 0;
+        }
+        .do-card .dc-due.has-due { color: #dc3545; }
+        .do-card .dc-due.no-due  { color: #28a745; }
+
+        .do-card .dc-info {
+            display: flex; flex-wrap: wrap; gap: 3px 14px;
+            font-size: 13px; color: #555; margin-bottom: 5px;
+        }
+        .do-card .dc-info span { white-space: nowrap; }
+        .do-card .dc-info .lbl { color: #999; font-size: 12px; }
+
+        .do-card .dc-dress {
+            font-size: 13px; color: #444; margin-bottom: 7px; line-height: 1.4;
+        }
+        .do-card .dc-dress .lbl { color: #999; font-size: 12px; }
+
+        .do-card .dc-footer {
+            display: flex; align-items: center; justify-content: flex-end;
+            border-top: 1px solid #f0f0f0; padding-top: 7px; margin-top: 4px;
+        }
+        .do-card .dc-print-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #17a2b8; color: white; border: none;
+            border-radius: 6px; padding: 5px 12px; font-size: 13px;
+            font-weight: 500; cursor: pointer;
+        }
+        .do-card .dc-print-btn:hover { background: #138496; }
     </style>
 </head>
 <body>
@@ -157,7 +267,7 @@
                         <div class="search-panel">
                             <div class="search-grid">
                                 <div class="form-group autocomplete-wrapper">
-                                    <label data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</label>
+                                    <label><i class="fas fa-mobile-alt"></i> <span data-en="Mobile Number" data-bn="মোবাইল নম্বর">মোবাইল নম্বর</span></label>
                                     <input type="text" id="mobileNo"
                                         data-en-placeholder="Mobile Number"
                                         data-bn-placeholder="মোবাইল নম্বর" placeholder="মোবাইল নম্বর"
@@ -165,7 +275,7 @@
                                     <div class="autocomplete-list" id="mobileNoSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group autocomplete-wrapper">
-                                    <label data-en="Customer Name" data-bn="গ্রাহকের নাম">গ্রাহকের নাম</label>
+                                    <label><i class="fas fa-user"></i> <span data-en="Customer Name" data-bn="গ্রাহকের নাম">গ্রাহকের নাম</span></label>
                                     <input type="text" id="customerName"
                                         data-en-placeholder="Customer Name"
                                         data-bn-placeholder="গ্রাহকের নাম" placeholder="গ্রাহকের নাম"
@@ -173,13 +283,13 @@
                                     <div class="autocomplete-list" id="customerNameSuggestions" style="display:none;"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="Order Number (one or multiple)" data-bn="অর্ডার নম্বর (এক বা একাধিক)">অর্ডার নম্বর (এক বা একাধিক)</label>
+                                    <label><i class="fas fa-hashtag"></i> <span data-en="Order Number (one or multiple)" data-bn="অর্ডার নম্বর (এক বা একাধিক)">অর্ডার নম্বর</span></label>
                                     <textarea id="orderNo"
                                         data-en-placeholder="e.g. Order numbers: 10,20,30"
                                         data-bn-placeholder="উদাঃ অর্ডার নম্বর: ১০,২০,৩০" placeholder="উদাঃ অর্ডার নম্বর: ১০,২০,৩০"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="Address" data-bn="ঠিকানা">ঠিকানা</label>
+                                    <label><i class="fas fa-map-marker-alt"></i> <span data-en="Address" data-bn="ঠিকানা">ঠিকানা</span></label>
                                     <textarea id="address"
                                         data-en-placeholder="Address"
                                         data-bn-placeholder="ঠিকানা" placeholder="ঠিকানা"></textarea>
@@ -199,11 +309,11 @@
                         <div class="search-panel">
                             <div class="search-grid-date">
                                 <div class="form-group">
-                                    <label data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</label>
+                                    <label><i class="fas fa-calendar"></i> <span data-en="From Date" data-bn="শুরুর তারিখ">শুরুর তারিখ</span></label>
                                     <input type="date" id="startDate">
                                 </div>
                                 <div class="form-group">
-                                    <label data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</label>
+                                    <label><i class="fas fa-calendar-check"></i> <span data-en="To Date" data-bn="শেষের তারিখ">শেষের তারিখ</span></label>
                                     <input type="date" id="endDate">
                                 </div>
                                 <div>
@@ -219,7 +329,7 @@
                     <!-- Summary -->
                     <div class="summary-text" id="summaryText"></div>
 
-                    <!-- Orders Table -->
+                    <!-- Orders Table (desktop) -->
                     <div class="table-wrapper">
                         <div id="ordersTableContainer">
                             <div class="loading">
@@ -227,6 +337,9 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Orders Cards (mobile) -->
+                    <div class="do-cards" id="doCardsContainer"></div>
 
                     <!-- Pagination -->
                     <div class="pagination-wrapper" id="paginationContainer"></div>

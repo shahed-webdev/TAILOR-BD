@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using TailorBD.API.Services;
 
 namespace TailorBD.API.Controllers
 {
@@ -9,11 +10,16 @@ namespace TailorBD.API.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<DeliveryController> _logger;
+        private readonly INovocomSmsService _smsService;
 
-        public DeliveryController(IConfiguration configuration, ILogger<DeliveryController> logger)
+        public DeliveryController(
+            IConfiguration configuration,
+            ILogger<DeliveryController> logger,
+            INovocomSmsService smsService)
         {
             _configuration = configuration;
             _logger = logger;
+            _smsService = smsService;
         }
 
         /// <summary>
@@ -428,9 +434,7 @@ namespace TailorBD.API.Controllers
             }
 
             // Count SMS
-            bool isUnicode = textSms.Any(c => c > 0xFF);
-            int perSms = isUnicode ? 70 : 160;
-            int smsCount = Math.Max(1, (int)Math.Ceiling((double)textSms.Length / perSms));
+            int smsCount = _smsService.CalculateSmsCount(textSms);
 
             if (smsBalance < smsCount)
             {
@@ -438,25 +442,9 @@ namespace TailorBD.API.Controllers
                 return;
             }
 
-            // Send SMS via GreenWeb
-            using var http = new System.Net.Http.HttpClient();
-            var content = new System.Net.Http.FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                { "token",   "90282141541680536514c64f44771ad21951c8b207c2dcf341b0" },
-                { "to",      phone },
-                { "message", textSms }
-            });
-            var res = await http.PostAsync("https://api.greenweb.com.bd/api.php?json", content);
-            var body = await res.Content.ReadAsStringAsync();
-
-            bool sent = false;
-            try
-            {
-                using var doc = System.Text.Json.JsonDocument.Parse(body);
-                var status = doc.RootElement[0].GetProperty("status").GetString();
-                sent = status == "SENT";
-            }
-            catch { sent = false; }
+            var smsResult = await _smsService.SendAsync(phone, textSms, masking);
+            bool sent = smsResult.Success;
+            var body = smsResult.Response;
 
             if (sent)
             {
@@ -1036,9 +1024,7 @@ namespace TailorBD.API.Controllers
             }
 
             // Count SMS
-            bool isUnicode = textSms.Any(c => c > 0xFF);
-            int perSms = isUnicode ? 70 : 160;
-            int smsCount = Math.Max(1, (int)Math.Ceiling((double)textSms.Length / perSms));
+            int smsCount = _smsService.CalculateSmsCount(textSms);
 
             if (smsBalance < smsCount)
             {
@@ -1046,25 +1032,9 @@ namespace TailorBD.API.Controllers
                 return false;
             }
 
-            // Send SMS via GreenWeb
-            using var http = new System.Net.Http.HttpClient();
-            var content = new System.Net.Http.FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                { "token",   "90282141541680536514c64f44771ad21951c8b207c2dcf341b0" },
-                { "to",      phone },
-                { "message", textSms }
-            });
-            var res = await http.PostAsync("https://api.greenweb.com.bd/api.php?json", content);
-            var body = await res.Content.ReadAsStringAsync();
-
-            bool sent = false;
-            try
-            {
-                using var doc = System.Text.Json.JsonDocument.Parse(body);
-                var status = doc.RootElement[0].GetProperty("status").GetString();
-                sent = status == "SENT";
-            }
-            catch { sent = false; }
+            var smsResult = await _smsService.SendAsync(phone, textSms, masking);
+            bool sent = smsResult.Success;
+            var body = smsResult.Response;
 
             if (sent)
             {
@@ -2045,22 +2015,12 @@ namespace TailorBD.API.Controllers
                 ? templateText.Replace("{items}", orderListSms).Replace("{newDate}", newDateStr).Replace("{orderNo}", orderSerialNumber.ToString()).Replace("{institutionName}", institutionName)
                 : $"সম্মানিত গ্রাহক, আপনার অর্ডার কৃত {orderListSms} এর ডেলিভারির তারিখ পরিবর্তন হয়েছে। নতুন তারিখ: {newDateStr}, অর্ডার নং :{orderSerialNumber}, ধন্যবাদ। {institutionName}";
 
-            bool isUnicode = textSms.Any(c => c > 0xFF);
-            int smsCount = Math.Max(1, (int)Math.Ceiling((double)textSms.Length / (isUnicode ? 70 : 160)));
+            int smsCount = _smsService.CalculateSmsCount(textSms);
             if (smsBalance < smsCount) return;
 
-            using var http = new System.Net.Http.HttpClient();
-            var res = await http.PostAsync("https://api.greenweb.com.bd/api.php?json",
-                new System.Net.Http.FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    { "token", "90282141541680536514c64f44771ad21951c8b207c2dcf341b0" },
-                    { "to", phone }, { "message", textSms }
-                }));
-            var body = await res.Content.ReadAsStringAsync();
-
-            bool sent = false;
-            try { using var doc = System.Text.Json.JsonDocument.Parse(body); sent = doc.RootElement[0].GetProperty("status").GetString() == "SENT"; }
-            catch { sent = false; }
+            var smsResult = await _smsService.SendAsync(phone, textSms, masking);
+            bool sent = smsResult.Success;
+            var body = smsResult.Response;
 
             if (sent)
             {

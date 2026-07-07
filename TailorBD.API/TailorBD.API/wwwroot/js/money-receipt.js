@@ -417,6 +417,7 @@
             '4': 384,    // 4 inch = 384px
             '4.5': 432,  // 4.5 inch = 432px
             '5': 480,    // 5 inch = 480px
+            '5.5': 528,  // 5.5 inch = 528px
             '6': 576,    // 6 inch = 576px
             '6.5': 624   // 6.5 inch = 624px
         };
@@ -784,6 +785,7 @@
             '4': 384,
             '4.5': 432,
             '5': 480,
+            '5.5': 528,
             '6': 576,
             '6.5': 624
         };
@@ -936,6 +938,10 @@
         }
 
         setTimeout(autoFitReceiptTextBlocks, 0);
+
+        if (orderData && orderData.header) {
+            displayPaymentSummary();
+        }
     }
 
     // Load money receipt data
@@ -1200,8 +1206,12 @@
             $('#discountRow').show();
         }
 
-        // Show previous due and total due rows only if previous due > 0
-        if (previousDue > 0) {
+        // Show previous due only when enabled in print settings and amount > 0
+        const showPreviousDueSetting = printSettings
+            && printSettings.moneyReceipt
+            && printSettings.moneyReceipt.showPreviousDue !== false;
+
+        if (previousDue > 0 && showPreviousDueSetting) {
             $('#previousDueAmount').text('৳' + formatNumber(previousDue));
             $('#previousDueRow').show();
             const totalDue = due + previousDue;

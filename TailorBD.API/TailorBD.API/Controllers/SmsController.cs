@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TailorBD.API.Data;
+using TailorBD.API.Services;
 using Dapper;
-using System.Text;
-using System.Text.Json;
 
 namespace TailorBD.API.Controllers
 {
@@ -11,10 +10,12 @@ namespace TailorBD.API.Controllers
     public class SmsController : ControllerBase
     {
         private readonly TailorBdContext _context;
-        private const string GreenWebHost = "https://api.greenweb.com.bd/";
-        private const string GreenWebApiKey = "90282141541680536514c64f44771ad21951c8b207c2dcf341b0";
-
-        public SmsController(TailorBdContext context) => _context = context;
+        private readonly INovocomSmsService _smsService;
+        public SmsController(TailorBdContext context, INovocomSmsService smsService)
+        {
+            _context    = context;
+            _smsService = smsService;
+        }
 
         // ── SMS balance (simple) ──────────────────────────────────────────────
         [HttpGet("balance/{institutionId}")]
@@ -120,21 +121,23 @@ namespace TailorBD.API.Controllers
                     return BadRequest(new { success = false, message = "SMS তথ্য পাওয়া যায়নি" });
 
                 int dbBalance = smsInfo.SMS_Balance;
-                int totalSmsCount = m.PhoneNumbers.Count * TotalSmsCount(m.Message);
+                int totalSmsCount = m.PhoneNumbers.Count * _smsService.CalculateSmsCount(m.Message);
+                string masking = (string?)(smsInfo.Masking) ?? "";
 
                 if (dbBalance < totalSmsCount)
                     return BadRequest(new { success = false, message = $"অপর্যাপ্ত ব্যালেন্স। প্রয়োজন: {totalSmsCount}, আপনার ব্যালেন্স: {dbBalance}" });
 
                 int sentCount = 0;
+                string? lastError = null;
                 for (int i = 0; i < m.PhoneNumbers.Count; i++)
                 {
                     var phone = m.PhoneNumbers[i];
                     var customerId = i < m.CustomerIds.Count ? m.CustomerIds[i] : 0;
 
-                    if (!IsValidBdNumber(phone)) continue;
+                    if (!_smsService.IsValidBdNumber(phone)) continue;
 
-                    var (ok, response) = await SendSmsGreenWeb(phone, m.Message);
-                    if (ok)
+                    var result = await _smsService.SendAsync(phone, m.Message, masking);
+                    if (result.Success)
                     {
                         var smsSendId = Guid.NewGuid();
                         con.Execute(@"
@@ -142,7 +145,7 @@ namespace TailorBD.API.Controllers
                                 (SMS_Send_ID, PhoneNumber, TextSMS, TextCount, SMSCount, PurposeOfSMS, Status, Date, SMS_Response)
                             VALUES (@ID, @Phone, @Text, @TextLen, @SmsCount, 'Send SMS', 'Sent', GETDATE(), @Response)",
                             new { ID = smsSendId, Phone = phone, Text = m.Message,
-                                  TextLen = (float)m.Message.Length, SmsCount = (float)TotalSmsCount(m.Message), Response = response });
+                                  TextLen = (float)m.Message.Length, SmsCount = (float)_smsService.CalculateSmsCount(m.Message), Response = result.Response });
 
                         if (customerId > 0)
                             con.Execute(@"INSERT INTO SMS_OtherInfo (SMS_Send_ID, InstitutionID, CustomerID)
@@ -151,7 +154,14 @@ namespace TailorBD.API.Controllers
 
                         sentCount++;
                     }
+                    else
+                    {
+                        lastError = result.ErrorMessage ?? result.Response;
+                    }
                 }
+
+                if (sentCount == 0)
+                    return BadRequest(new { success = false, sentCount, message = lastError ?? "কোনো SMS পাঠানো যায়নি। Novocom credentials ও Masking সেটিংস যাচাই করুন।" });
 
                 return Ok(new { success = true, sentCount, message = $"{sentCount} টি এসএমএস সফলভাবে পাঠানো হয়েছে।" });
             }
@@ -372,11 +382,12 @@ namespace TailorBD.API.Controllers
             {
                 using var con = _context.CreateConnection();
                 var smsInfo = con.QueryFirstOrDefault(
-                    "SELECT SMS_Balance FROM SMS WHERE InstitutionID=@IID", new { IID = m.InstitutionId });
+                    "SELECT SMS_Balance, Masking FROM SMS WHERE InstitutionID=@IID", new { IID = m.InstitutionId });
                 if (smsInfo == null)
                     return BadRequest(new { success = false, message = "SMS তথ্য পাওয়া যায়নি" });
 
-                int totalNeeded = m.ContactIds.Count * TotalSmsCount(m.Message);
+                string masking = (string?)(smsInfo.Masking) ?? "";
+                int totalNeeded = m.ContactIds.Count * _smsService.CalculateSmsCount(m.Message);
                 if ((int)smsInfo.SMS_Balance < totalNeeded)
                     return BadRequest(new { success = false,
                         message = $"অপর্যাপ্ত ব্যালেন্স। প্রয়োজন: {totalNeeded}, ব্যালেন্স: {smsInfo.SMS_Balance}" });
@@ -389,9 +400,9 @@ namespace TailorBD.API.Controllers
                 foreach (var c in phones)
                 {
                     string phone = c.MobileNo;
-                    if (!IsValidBdNumber(phone)) continue;
-                    var (ok, response) = await SendSmsGreenWeb(phone, m.Message);
-                    if (ok)
+                    if (!_smsService.IsValidBdNumber(phone)) continue;
+                    var result = await _smsService.SendAsync(phone, m.Message, masking);
+                    if (result.Success)
                     {
                         var smsSendId = Guid.NewGuid();
                         con.Execute(@"
@@ -400,7 +411,7 @@ namespace TailorBD.API.Controllers
                             VALUES (@ID,@Phone,@Text,@TextLen,@SmsCount,'Others SMS','Sent',GETDATE(),@Response)",
                             new { ID = smsSendId, Phone = phone, Text = m.Message,
                                   TextLen = (float)m.Message.Length,
-                                  SmsCount = (float)TotalSmsCount(m.Message), Response = response });
+                                  SmsCount = (float)_smsService.CalculateSmsCount(m.Message), Response = result.Response });
                         con.Execute(
                             "INSERT INTO SMS_OtherInfo (SMS_Send_ID,InstitutionID,CustomerID) VALUES (@ID,@IID,NULL)",
                             new { ID = smsSendId, IID = m.InstitutionId });
@@ -475,42 +486,6 @@ namespace TailorBD.API.Controllers
                 return Ok(new { success = true, message = "টেমপ্লেট মুছে গেছে" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
-        }
-
-        // ── GreenWeb helpers ─────────────────────────────────────────────────
-        private static async Task<(bool ok, string response)> SendSmsGreenWeb(string number, string message)
-        {
-            using var http = new HttpClient();
-            var content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                { "token",   GreenWebApiKey },
-                { "to",      number         },
-                { "message", message        }
-            });
-            var res = await http.PostAsync($"{GreenWebHost}api.php?json", content);
-            var body = await res.Content.ReadAsStringAsync();
-            try
-            {
-                using var doc = JsonDocument.Parse(body);
-                var status = doc.RootElement[0].GetProperty("status").GetString();
-                return (status == "SENT", body);
-            }
-            catch { return (false, body); }
-        }
-
-        private static bool IsValidBdNumber(string number)
-        {
-            if (string.IsNullOrWhiteSpace(number)) return false;
-            var digits = new string(number.Where(char.IsDigit).ToArray());
-            return digits.Length >= 10;
-        }
-
-        private static int TotalSmsCount(string text)
-        {
-            if (string.IsNullOrEmpty(text)) return 1;
-            bool isUnicode = text.Any(c => c > 0xFF);
-            int perSms = isUnicode ? 70 : 160;
-            return Math.Max(1, (int)Math.Ceiling((double)text.Length / perSms));
         }
     }
 

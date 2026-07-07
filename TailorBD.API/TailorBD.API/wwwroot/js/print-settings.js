@@ -89,6 +89,12 @@
     }
 
     // Populate form fields with loaded settings
+    function clampFontSize(val, fallback) {
+        const n = parseInt(val, 10);
+        if (isNaN(n)) return fallback;
+        return Math.min(50, Math.max(8, n));
+    }
+
     function populateSettings(settings) {
         console.log('Populating settings:', settings);
 
@@ -105,8 +111,11 @@
         $('#printStyleCategory').prop('checked', ms.printStyleCategory);
         $('#printBarcode').prop('checked', ms.printBarcode || false);
         $('#measurementTopSpace').val(ms.topSpace);
-        $('#measurementFontSize').val(ms.fontSize && ms.fontSize > 0 ? ms.fontSize : 12);
-        $('#styleFontSize').val(ms.styleFontSize && ms.styleFontSize > 0 ? ms.styleFontSize : (ms.fontSize && ms.fontSize > 0 ? ms.fontSize : 14));
+        $('#measurementFontSize').val(clampFontSize(ms.fontSize, 12));
+        $('#styleFontSize').val(clampFontSize(
+            ms.styleFontSize,
+            ms.fontSize && ms.fontSize > 0 ? ms.fontSize : 14
+        ));
 
         // Receipt settings
         const rs = settings.moneyReceipt;
@@ -115,7 +124,7 @@
         $('#showReceiptBarcode').prop('checked', rs.showReceiptBarcode !== false);
         $('#showPreviousDue').prop('checked', rs.showPreviousDue !== false);
         $('#receiptTopSpace').val(rs.topSpace);
-        $('#receiptFontSize').val(rs.fontSize);
+        $('#receiptFontSize').val(clampFontSize(rs.fontSize, 14));
         $('#poweredByInfo').val(rs.poweredByInfo || '');
 
         console.log('Settings populated successfully');
@@ -136,9 +145,9 @@
             printMeasurementName: $('#printMeasurementName').is(':checked'),
             printStyleCategory: $('#printStyleCategory').is(':checked'),
             printBarcode: $('#printBarcode').is(':checked'),
-            topSpace: parseInt($('#measurementTopSpace').val()) || 0,
-            fontSize: parseInt($('#measurementFontSize').val()) || 12,
-            styleFontSize: parseInt($('#styleFontSize').val()) || 14
+            topSpace: parseInt($('#measurementTopSpace').val(), 10) || 0,
+            fontSize: clampFontSize($('#measurementFontSize').val(), 12),
+            styleFontSize: clampFontSize($('#styleFontSize').val(), 14)
         };
 
         console.log('Saving measurement settings:', settings);
@@ -146,6 +155,14 @@
         // Validate
         if (settings.topSpace < 0 || settings.topSpace > 200) {
             showAlert('warning', 'উপরের স্পেস 0 থেকে 200 এর মধ্যে হতে হবে');
+            return;
+        }
+        if (settings.fontSize < 8 || settings.fontSize > 50) {
+            showAlert('warning', 'মাপজোখ ফন্ট সাইজ ৮ থেকে ৫০ এর মধ্যে হতে হবে');
+            return;
+        }
+        if (settings.styleFontSize < 8 || settings.styleFontSize > 50) {
+            showAlert('warning', 'স্টাইল ফন্ট সাইজ ৮ থেকে ৫০ এর মধ্যে হতে হবে');
             return;
         }
 
@@ -194,8 +211,8 @@
             showServedBy: $('#showServedBy').is(':checked'),
             showReceiptBarcode: $('#showReceiptBarcode').is(':checked'),
             showPreviousDue: $('#showPreviousDue').is(':checked'),
-            topSpace: parseInt($('#receiptTopSpace').val()) || 0,
-            fontSize: parseInt($('#receiptFontSize').val()) || 14,
+            topSpace: parseInt($('#receiptTopSpace').val(), 10) || 0,
+            fontSize: clampFontSize($('#receiptFontSize').val(), 14),
             poweredByInfo: $('#poweredByInfo').val() || ''
         };
 
@@ -203,7 +220,11 @@
 
         // Validate
         if (settings.topSpace < 0 || settings.topSpace > 200) {
-            showAlert('warning', 'Top Space must be between 0 and 200');
+            showAlert('warning', 'উপরের স্পেস ০ থেকে ২০০ এর মধ্যে হতে হবে');
+            return;
+        }
+        if (settings.fontSize < 8 || settings.fontSize > 50) {
+            showAlert('warning', 'ফন্ট সাইজ ৮ থেকে ৫০ এর মধ্যে হতে হবে');
             return;
         }
 

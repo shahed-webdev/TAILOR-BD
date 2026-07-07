@@ -109,7 +109,7 @@
                     </div>
                     <div class="stat-details">
                         <h3 id="todayDue">৳0</h3>
-                        <p class="lang-content" data-en="Today's Due" data-bn="আজকের বাকি">আজকের বাকি</p>
+                        <p class="lang-content" data-en="Today's Due" data-bn="আজকের বaki">আজকের বাকি</p>
                         <small class="lang-content" data-en="New due today" data-bn="আজকে নতুন বাকি">আজকে নতুন বাকি</small>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                     </div>
                     <div class="stat-details">
                         <h3 id="todayItemSaleDue">৳0</h3>
-                        <p class="lang-content" data-en="Today's Item Sale Due" data-bn="আজকের বিক্রয় বাকি">আজকের বিক্রয় বাকি</p>
+                        <p class="lang-content" data-en="Today's Item Sale Due" data-bn="আজকের বিক্রয় বaki">আজকের বিক্রয় বাকি</p>
                         <small class="lang-content" data-en="Fabric sale due today" data-bn="আজকের ফেব্রিক বিক্রয় বাকি">আজকের ফেব্রিক বিক্রয় বাকি</small>
                     </div>
                 </div>
@@ -227,9 +227,9 @@
             </div>
 
             <!-- Recent Orders Table -->
-            <div class="table-card">
+            <div class="table-card recent-orders-card">
                 <h3 class="lang-content" data-en="Recent Orders" data-bn="সাম্প্রতিক অর্ডার">সাম্প্রতিক অর্ডার</h3>
-                <div class="table-responsive">
+                <div class="table-responsive recent-orders-table-wrap">
                     <table class="table">
                         <thead>
                             <tr>
@@ -245,6 +245,8 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Mobile card view -->
+                <div class="recent-orders-mobile" id="recentOrdersMobile"></div>
             </div>
         </div>
     </main>
@@ -308,8 +310,20 @@
                 console.log('Sub-Admin user - showing welcome message');
             }
 
-            // Load dashboard data
-            loadDashboardData();
+            // Load dashboard data as soon as components are ready
+            if (window.appSessionReady) {
+                loadDashboardData();
+            } else {
+                $(document).on('app-session-ready', function() {
+                    loadDashboardData();
+                });
+                // Fallback: if event already fired or takes too long, load after short delay
+                setTimeout(function() {
+                    if (!$('#todayOrders').data('loaded')) {
+                        loadDashboardData();
+                    }
+                }, 300);
+            }
 
             // Due notice popup — login করার পরে একবার দেখাবে
             if (window.TailorBD && window.TailorBD.initDueNotice) {
@@ -326,33 +340,42 @@
                 return;
             }
 
-            // Load today's stats
+            // Load all summary cards in ONE request
+            showSummaryLoading(true);
             $.ajax({
-                url: `/api/Dashboard/today-stats?institutionId=${institutionId}`,
+                url: `/api/Dashboard/summary?institutionId=${institutionId}`,
                 method: 'GET',
                 success: function(response) {
+                    showSummaryLoading(false);
                     if (response.success && response.data) {
-                        const t = response.data;
+                        const d = response.data;
                         const fmt = n => (n ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 
-                        $('#todayOrders').text(t.todayOrders ?? 0);
-                        $('#todayDeliveries').text(t.todayDeliveries ?? 0);
-                        $('#todayIncome').text('৳' + fmt(t.todayIncome));
-                        $('#todayExpense').text('৳' + fmt(t.todayExpense));
-                        $('#todayDue').text('৳' + fmt(t.todayDue));
-                        $('#todayItemSale').text('৳' + fmt(t.todayItemSale));
-                        $('#todayItemSaleDue').text('৳' + fmt(t.todayItemSaleDue));
+                        // Today's stats
+                        $('#todayOrders').text(d.todayOrders ?? 0).data('loaded', true);
+                        $('#todayDeliveries').text(d.todayDeliveries ?? 0).data('loaded', true);
+                        $('#todayIncome').text('৳' + fmt(d.todayIncome)).data('loaded', true);
+                        $('#todayExpense').text('৳' + fmt(d.todayExpense)).data('loaded', true);
+                        $('#todayDue').text('৳' + fmt(d.todayDue)).data('loaded', true);
+                        $('#todayItemSale').text('৳' + fmt(d.todayItemSale)).data('loaded', true);
+                        $('#todayItemSaleDue').text('৳' + fmt(d.todayItemSaleDue)).data('loaded', true);
 
-                        // সব 0 হলে informative note দেখাবে
-                        const allZero = !t.todayOrders && !t.todayDeliveries && !t.todayIncome &&
-                                        !t.todayExpense && !t.todayDue && !t.todayItemSale && !t.todayItemSaleDue;
+                        // Overall stats
+                        $('#totalCustomers').text(d.totalCustomers ?? 0).data('loaded', true);
+                        $('#totalOrders').text(d.totalOrders ?? 0).data('loaded', true);
+                        $('#pendingOrders').text(d.pendingOrders ?? 0).data('loaded', true);
+                        $('#totalDue').text('৳' + fmt(d.totalDue)).data('loaded', true);
+                        $('#monthlyRevenue').text('৳' + fmt(d.monthlyRevenue)).data('loaded', true);
+
+                        // All-zero informative note
+                        const allZero = !d.todayOrders && !d.todayDeliveries && !d.todayIncome &&
+                                        !d.todayExpense && !d.todayDue && !d.todayItemSale && !d.todayItemSaleDue;
                         if (allZero) {
                             const now = new Date();
-                            const dateStr = now.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' });
                             const lang = window.currentLang || 'bn';
                             const msg = lang === 'en'
                                 ? `No activity recorded today (${now.toLocaleDateString('en-GB')})`
-                                : `আজ (${dateStr}) কোনো কার্যক্রম রেকর্ড হয়নি`;
+                                : `আজ (${now.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}) কোনো কার্যক্রম রেকর্ড হয়নি`;
                             $('#todayNoDataNote').text(msg).show();
                         } else {
                             $('#todayNoDataNote').hide();
@@ -360,37 +383,8 @@
                     }
                 },
                 error: function(xhr) {
-                    console.error('Error loading today stats:', xhr);
-                }
-            });
-
-            // Load stats cards from API
-            $.ajax({
-                url: `/api/Dashboard/stats?institutionId=${institutionId}`,
-                method: 'GET',
-                success: function(response) {
-                    if (response.success && response.data) {
-                        const d = response.data;
-
-                        $('#totalCustomers').text(d.totalCustomers ?? 0);
-                        $('#totalOrders').text(d.totalOrders ?? 0);
-                        $('#pendingOrders').text(d.pendingOrders ?? 0);
-                        $('#totalDue').text('৳' + (d.totalDue ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }));
-                        $('#monthlyRevenue').text('৳' + (d.monthlyRevenue ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 0 }));
-
-                        // Update percentage labels dynamically
-                        const lastMonthCustomers = d.lastMonthCustomers || 0;
-                        const lastMonthOrders    = d.lastMonthOrders    || 0;
-                        const lastMonthRevenue   = d.lastMonthRevenue   || 0;
-
-                        if (lastMonthCustomers > 0) {
-                            const currentMonthCustomers = d.totalCustomers;
-                            // cannot compute without current month customers separately; keep label as-is
-                        }
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error loading dashboard stats:', xhr);
+                    showSummaryLoading(false);
+                    console.error('Error loading dashboard summary:', xhr);
                 }
             });
 
@@ -430,15 +424,38 @@
             });
         }
 
+        // Show/hide summary card loading placeholders
+        function showSummaryLoading(show) {
+            const ids = [
+                'todayOrders','todayDeliveries','todayIncome','todayExpense','todayDue','todayItemSale','todayItemSaleDue',
+                'totalCustomers','totalOrders','pendingOrders','totalDue','monthlyRevenue'
+            ];
+            ids.forEach(function(id) {
+                const $el = $('#' + id);
+                if (show) {
+                    $el.data('original', $el.html());
+                    $el.html('<span class="spinner-border spinner-border-sm" role="status"></span>');
+                } else {
+                    // value will be overwritten by caller; remove placeholder only if still showing spinner
+                    if ($el.find('.spinner-border').length) {
+                        $el.html($el.data('original') || '0');
+                    }
+                }
+            });
+        }
+
         // Render recent orders table
         function renderRecentOrders(orders) {
             const tbody = $('#recentOrdersTable');
+            const mobile = $('#recentOrdersMobile');
             tbody.empty();
+            mobile.empty();
 
             if (!orders || orders.length === 0) {
-                const lang = sessionStorage.getItem('language') || 'bn';
-                const msg = lang === 'bn' ? 'কোনো অর্ডার নেই' : 'No orders found';
+                const lang = window.currentLang || 'bn';
+                const msg = lang === 'en' ? 'No orders found' : 'কোনো অর্ডার নেই';
                 tbody.append(`<tr><td colspan="5" class="text-center">${msg}</td></tr>`);
+                mobile.append(`<div class="recent-empty">${msg}</div>`);
                 return;
             }
 
@@ -447,10 +464,16 @@
                 const paymentStatus  = order.paymentStatus  || '';
 
                 let statusBadge = '';
+                let statusClass = 'pending';
+                let statusText = window.currentLang === 'en' ? 'Pending' : 'পেন্ডিং';
                 if (deliveryStatus === 'Delivered') {
                     statusBadge = '<span class="badge bg-success">Delivered</span>';
+                    statusClass = 'delivered';
+                    statusText = window.currentLang === 'en' ? 'Delivered' : 'ডেলিভার্ড';
                 } else if (deliveryStatus === 'PartlyDelivered') {
                     statusBadge = '<span class="badge bg-warning text-dark">Partly</span>';
+                    statusClass = 'partly';
+                    statusText = window.currentLang === 'en' ? 'Partly' : 'আংশিক';
                 } else {
                     statusBadge = '<span class="badge bg-secondary">Pending</span>';
                 }
@@ -473,6 +496,21 @@
                         <td>৳${amount}</td>
                         <td>${statusBadge}${payBadge}</td>
                     </tr>
+                `);
+
+                mobile.append(`
+                    <div class="recent-order-item ${statusClass}">
+                        <div class="recent-order-top">
+                            <span class="recent-order-no">#${order.orderSerialNumber}</span>
+                            <span class="recent-order-amount">৳${amount}</span>
+                        </div>
+                        <div class="recent-order-customer">${order.customerName || ''}</div>
+                        <div class="recent-order-bottom">
+                            <span class="recent-order-date"><i class="far fa-calendar-alt"></i> ${date}</span>
+                            <span class="recent-order-status ${statusClass}">${statusText}</span>
+                            ${paymentStatus === 'Due' ? '<span class="recent-order-due">Due</span>' : ''}
+                        </div>
+                    </div>
                 `);
             });
         }

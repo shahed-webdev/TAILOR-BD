@@ -177,30 +177,22 @@
 
                                         <div class="mb-3">
                                             <label for="measurementFontSize" class="form-label" data-en="Measurement Font Size" data-bn="মাপজোখ ফন্ট সাইজ">মাপজোখ ফন্ট সাইজ</label>
-                                            <select class="form-select" id="measurementFontSize">
-                                                <option value="11">11 PX</option>
-                                                <option value="12" selected>12 PX</option>
-                                                <option value="13">13 PX</option>
-                                                <option value="14">14 PX</option>
-                                                <option value="16">16 PX</option>
-                                                <option value="18">18 PX</option>
-                                                <option value="19">19 PX</option>
-                                                <option value="20">20 PX</option>
-                                            </select>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="measurementFontSize"
+                                                       min="8" max="50" value="12">
+                                                <span class="input-group-text">px</span>
+                                            </div>
+                                            <small class="text-muted" data-en="Enter between 8 to 50" data-bn="৮ থেকে ৫০ এর মধ্যে দিন">৮ থেকে ৫০ এর মধ্যে দিন</small>
                                         </div>
 
                                         <div class="mb-3">
                                             <label for="styleFontSize" class="form-label" data-en="Style Font Size" data-bn="স্টাইল ফন্ট সাইজ">স্টাইল ফন্ট সাইজ</label>
-                                            <select class="form-select" id="styleFontSize">
-                                                <option value="11">11 PX</option>
-                                                <option value="12">12 PX</option>
-                                                <option value="13">13 PX</option>
-                                                <option value="14" selected>14 PX</option>
-                                                <option value="16">16 PX</option>
-                                                <option value="18">18 PX</option>
-                                                <option value="19">19 PX</option>
-                                                <option value="20">20 PX</option>
-                                            </select>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="styleFontSize"
+                                                       min="8" max="50" value="14">
+                                                <span class="input-group-text">px</span>
+                                            </div>
+                                            <small class="text-muted" data-en="Enter between 8 to 50" data-bn="৮ থেকে ৫০ এর মধ্যে দিন">৮ থেকে ৫০ এর মধ্যে দিন</small>
                                         </div>
                                     </div>
                                 </div>
@@ -267,16 +259,12 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="receiptFontSize" class="form-label" data-en="Font Size" data-bn="ফন্ট সাইজ">ফন্ট সাইজ</label>
-                                            <select class="form-select" id="receiptFontSize">
-                                                <option value="11">11 PX</option>
-                                                <option value="12">12 PX</option>
-                                                <option value="13">13 PX</option>
-                                                <option value="14" selected>14 PX</option>
-                                                <option value="16">16 PX</option>
-                                                <option value="18">18 PX</option>
-                                                <option value="19">19 PX</option>
-                                                <option value="20">20 PX</option>
-                                            </select>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="receiptFontSize"
+                                                       min="8" max="50" value="14">
+                                                <span class="input-group-text">px</span>
+                                            </div>
+                                            <small class="text-muted" data-en="Enter between 8 to 50" data-bn="৮ থেকে ৫০ এর মধ্যে দিন">৮ থেকে ৫০ এর মধ্যে দিন</small>
                                         </div>
 
                                         <div class="mb-3">
@@ -310,6 +298,6 @@
     <script src="/js/app-components.js?v=2.1.9"></script>
     
     <!-- Print Settings JS -->
-    <script src="/js/print-settings.js?v=2.1.8"></script>
+    <script src="/js/print-settings.js?v=2.2.0"></script>
 </body>
 </html>

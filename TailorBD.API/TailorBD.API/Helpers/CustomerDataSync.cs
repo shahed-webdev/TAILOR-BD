@@ -24,7 +24,6 @@ namespace TailorBD.API.Helpers
             using (var delCmd = new SqlCommand(@"
                 DELETE FROM Customer_Measurement
                 WHERE CustomerID = @CustomerID
-                  AND InstitutionID = @InstitutionID
                   AND MeasurementTypeID IN (
                       SELECT MeasurementTypeID FROM Measurement_Type
                       WHERE DressID = @DressID AND InstitutionID = @InstitutionID
@@ -72,7 +71,6 @@ namespace TailorBD.API.Helpers
             using (var delCmd = new SqlCommand(@"
                 DELETE FROM Customer_Dress_Style
                 WHERE CustomerID = @CustomerID
-                  AND InstitutionID = @InstitutionID
                   AND Dress_StyleID IN (
                       SELECT Dress_StyleID FROM Dress_Style WHERE DressID = @DressID
                   )",
