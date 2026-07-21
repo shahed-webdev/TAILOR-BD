@@ -218,7 +218,10 @@
                 </table>
             `);
 
-            // ৩. কাস্টমার নাম হাইলাইট
+            // ৩. সার্ভ করেছেন (কাস্টমার তথ্যের উপরে)
+            appendMeasurementServedByLine($itemContainer, mSettings);
+
+            // ৪. কাস্টমার নাম হাইলাইট
             $itemContainer.append(`<div class="cmp-cust-highlight">${escapeHtml(cust.customerName || '-')}</div>`);
 
             // ৪. ঠিকানা ছোট ফন্টে
@@ -337,7 +340,7 @@
     }
 
     function getMeasurementTargetWidth() {
-        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480, '6': 576, '6.5': 624 };
+        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480, '5.5': 528, '6': 576, '6.5': 624 };
         const size = $('#printSizeSelect').val() || '4';
         const borderReserve = 4;
         const containerPadding = 8;
@@ -533,7 +536,7 @@
     // ── Print size ────────────────────────────────────────────────
 
     function applyPrintSizeToScreen(size) {
-        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480, '6': 576, '6.5': 624 };
+        const map = { '3': 288, '3.5': 336, '4': 384, '4.5': 432, '5': 480, '5.5': 528, '6': 576, '6.5': 624 };
         const px = map[size] || 384;
         const widthInInches = parseFloat(size) || 4;
         document.documentElement.style.setProperty('--print-width', widthInInches + 'in');
@@ -708,9 +711,27 @@
             printMasterCopy: true,
             printMeasurementName: false,
             printStyleCategory: false,
+            printServedBy: false,
             fontSize: 12,
             styleFontSize: 14
         };
+    }
+
+    function getServedByDisplayHtml() {
+        const name = sessionStorage.getItem('name') || sessionStorage.getItem('username') || '';
+        if (!name) return '';
+        const phone = sessionStorage.getItem('phone') || '';
+        const userPart = phone
+            ? `${escapeHtml(name)}(${escapeHtml(phone)})`
+            : escapeHtml(name);
+        return `Serve by : ${userPart}`;
+    }
+
+    function appendMeasurementServedByLine($container, mSettings) {
+        if (!mSettings || !mSettings.printServedBy) return;
+        const html = getServedByDisplayHtml();
+        if (!html) return;
+        $container.append(`<div class="measurement-served-by-section">${html}</div>`);
     }
 
     function showAlert(type, message) {

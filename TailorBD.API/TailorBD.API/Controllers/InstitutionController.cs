@@ -252,6 +252,7 @@ namespace TailorBD.API.Controllers
                         Print_Measurement_Name, 
                         Print_S_Category,
                         Print_Barcode,
+                        Print_ServedBy,
                         Print_TopSpace, 
                         Print_Font_Size,
                         Print_Style_Font_Size,
@@ -327,6 +328,7 @@ namespace TailorBD.API.Controllers
                             printMeasurementName = SafeGetBoolean("Print_Measurement_Name"),
                             printStyleCategory = SafeGetBoolean("Print_S_Category"),
                             printBarcode = SafeGetBoolean("Print_Barcode"),
+                            printServedBy = SafeGetBoolean("Print_ServedBy"),
                             topSpace = SafeGetInt32("Print_TopSpace"),
                             fontSize = SafeGetInt32("Print_Font_Size") is var mfs && mfs > 0 ? mfs : 12,
                             styleFontSize = SafeGetInt32("Print_Style_Font_Size") is var sfs && sfs > 0
@@ -398,6 +400,7 @@ namespace TailorBD.API.Controllers
                         Print_Measurement_Name = @Print_Measurement_Name,
                         Print_S_Category = @Print_S_Category,
                         Print_Barcode = @Print_Barcode,
+                        Print_ServedBy = @Print_ServedBy,
                         Print_TopSpace = @Print_TopSpace,
                         Print_Font_Size = @Print_Font_Size,
                         Print_Style_Font_Size = @Print_Style_Font_Size
@@ -415,6 +418,7 @@ namespace TailorBD.API.Controllers
                 command.Parameters.AddWithValue("@Print_Measurement_Name", settings.PrintMeasurementName);
                 command.Parameters.AddWithValue("@Print_S_Category", settings.PrintStyleCategory);
                 command.Parameters.AddWithValue("@Print_Barcode", settings.PrintBarcode);
+                command.Parameters.AddWithValue("@Print_ServedBy", settings.PrintServedBy);
                 command.Parameters.AddWithValue("@Print_TopSpace", settings.TopSpace);
                 command.Parameters.AddWithValue("@Print_Font_Size", settings.FontSize);
                 command.Parameters.AddWithValue("@Print_Style_Font_Size", settings.StyleFontSize);
@@ -1611,6 +1615,7 @@ namespace TailorBD.API.Controllers
         public bool PrintMeasurementName { get; set; }
         public bool PrintStyleCategory { get; set; }
         public bool PrintBarcode { get; set; }
+        public bool PrintServedBy { get; set; }
         public int TopSpace { get; set; }
         public int FontSize { get; set; }
         public int StyleFontSize { get; set; }

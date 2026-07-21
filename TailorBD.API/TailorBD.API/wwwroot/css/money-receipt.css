@@ -738,6 +738,15 @@ body {
     padding-bottom: 5px;
 }
 
+.measurement-served-by-section {
+    text-align: center;
+    font-size: var(--measurement-font-size, 13px);
+    font-weight: 600;
+    color: #000;
+    margin: 2px 0 4px;
+    line-height: 1.3;
+}
+
 .customer-address-section {
     text-align: center;
     font-size: 15px;

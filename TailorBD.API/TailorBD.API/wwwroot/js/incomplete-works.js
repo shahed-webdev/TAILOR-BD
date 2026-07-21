@@ -512,6 +512,7 @@ function renderMobileCards(orders) {
         const items = orderListItemsCache[order.orderId] || [];
         let itemsHtml = '';
         items.forEach(item => {
+            const remaining = item.remainingWork ?? item.pendingWork ?? 0;
             itemsHtml += `
             <div class="ic-item-row">
                 <input type="checkbox" class="order-list-item-checkbox"
@@ -522,8 +523,8 @@ function renderMobileCards(orders) {
                 <input type="number" class="pending-input"
                     data-order-id="${order.orderId}"
                     data-order-list-id="${item.orderListId}"
-                    data-max="${item.pendingWork}"
-                    value="${item.pendingWork}" min="0" max="${item.pendingWork}">
+                    data-max="${remaining}"
+                    value="${remaining}" min="0" max="${remaining}">
             </div>`;
         });
 
@@ -625,6 +626,7 @@ function renderOrderListTable(orderListItems, orderId) {
     `;
 
     orderListItems.forEach(item => {
+        const remaining = item.remainingWork ?? item.pendingWork ?? 0;
         html += `
             <tr>
                 <td>
@@ -639,10 +641,10 @@ function renderOrderListTable(orderListItems, orderId) {
                     <input type="number" class="pending-input" 
                            data-order-id="${orderId}"
                            data-order-list-id="${item.orderListId}"
-                           data-max="${item.pendingWork}"
-                           value="${item.pendingWork}" 
+                           data-max="${remaining}"
+                           value="${remaining}" 
                            min="0" 
-                           max="${item.pendingWork}">
+                           max="${remaining}">
                 </td>
             </tr>
         `;
@@ -759,7 +761,7 @@ function setupOrderListCheckboxes() {
 
             if (value > max) {
                 this.value = max;
-                alert('পোষাকের পরিমান বেশী দিয়েছেন');
+                alert(`সর্বোচ্চ ${max} টি সম্পূর্ণ করা যাবে`);
             }
         });
     });
@@ -795,7 +797,8 @@ async function completeWork() {
 
                 if (value > max) {
                     hasError = true;
-                    alert('পোষাকের পরিমান বেশী দিয়েছেন');
+                    input.value = max;
+                    alert(`সর্বোচ্চ ${max} টি সম্পূর্ণ করা যাবে`);
                 }
             }
         });

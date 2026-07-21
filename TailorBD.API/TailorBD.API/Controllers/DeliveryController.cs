@@ -206,11 +206,12 @@ namespace TailorBD.API.Controllers
                         OrderList.OrderList_SN,
                         Dress.Dress_Name,
                         OrderList.DressQuantity,
-                        OrderList.Pending_Work
+                        ISNULL(OrderList.WorkCompleteQuantity, 0) AS WorkCompleteQuantity,
+                        (OrderList.DressQuantity - ISNULL(OrderList.WorkCompleteQuantity, 0)) AS RemainingWork
                     FROM OrderList
                     INNER JOIN Dress ON OrderList.DressID = Dress.DressID
                     WHERE (OrderList.OrderID = @OrderID) 
-                    AND (OrderList.Pending_Work <> 0)
+                    AND (OrderList.DressQuantity - ISNULL(OrderList.WorkCompleteQuantity, 0)) > 0
                     ORDER BY OrderList.OrderList_SN";
 
                 var orderListItems = new List<dynamic>();
@@ -227,7 +228,9 @@ namespace TailorBD.API.Controllers
                             orderListSN = reader.IsDBNull(reader.GetOrdinal("OrderList_SN")) ? 0 : Convert.ToInt32(reader.GetValue(reader.GetOrdinal("OrderList_SN"))),
                             dressName = reader.GetString(reader.GetOrdinal("Dress_Name")),
                             dressQuantity = reader.GetInt32(reader.GetOrdinal("DressQuantity")),
-                            pendingWork = reader.GetInt32(reader.GetOrdinal("Pending_Work"))
+                            workCompleteQuantity = reader.GetInt32(reader.GetOrdinal("WorkCompleteQuantity")),
+                            pendingWork = reader.GetInt32(reader.GetOrdinal("RemainingWork")),
+                            remainingWork = reader.GetInt32(reader.GetOrdinal("RemainingWork"))
                         });
                     }
                 }
@@ -260,6 +263,9 @@ namespace TailorBD.API.Controllers
 
                 try
                 {
+                    var validationErrors = new List<string>();
+                    var insertedCount = 0;
+
                     foreach (var order in model.Orders)
                     {
                         if (order.OrderListItems == null || order.OrderListItems.Count == 0)
@@ -282,6 +288,59 @@ namespace TailorBD.API.Controllers
                             if (orderListItem.CompletedQuantity <= 0)
                                 continue;
 
+                            int dressQuantity;
+                            int workCompleteQuantity;
+                            using (var readCmd = new SqlCommand(
+                                @"SELECT DressQuantity, ISNULL(WorkCompleteQuantity, 0)
+                                  FROM OrderList
+                                  WHERE OrderListID = @OrderListID
+                                    AND OrderID = @OrderID
+                                    AND InstitutionID = @InstitutionID",
+                                connection, transaction))
+                            {
+                                readCmd.Parameters.AddWithValue("@OrderListID", orderListItem.OrderListId);
+                                readCmd.Parameters.AddWithValue("@OrderID", order.OrderId);
+                                readCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                                using var reader = await readCmd.ExecuteReaderAsync();
+                                if (!await reader.ReadAsync())
+                                {
+                                    validationErrors.Add($"অর্ডার {order.OrderId}: OrderList {orderListItem.OrderListId} পাওয়া যায়নি");
+                                    continue;
+                                }
+
+                                dressQuantity = reader.GetInt32(0);
+                                workCompleteQuantity = reader.GetInt32(1);
+                            }
+
+                            var remaining = dressQuantity - workCompleteQuantity;
+                            if (remaining <= 0)
+                            {
+                                validationErrors.Add($"অর্ডার {order.OrderId}: এই পোশাকের কাজ ইতিমধ্যে সম্পূর্ণ");
+                                continue;
+                            }
+
+                            var wcQuantity = Math.Min(orderListItem.CompletedQuantity, remaining);
+                            if (wcQuantity <= 0)
+                                continue;
+
+                            if (orderListItem.CompletedQuantity > remaining)
+                            {
+                                validationErrors.Add(
+                                    $"অর্ডার {order.OrderId}: সর্বোচ্চ {remaining} টি সম্পূর্ণ করা যাবে (আপনি {orderListItem.CompletedQuantity} দিয়েছেন)");
+                            }
+
+                            // Trigger uses += on WorkCompleteQuantity; NULL breaks the update.
+                            using (var nullFixCmd = new SqlCommand(
+                                @"UPDATE OrderList
+                                  SET WorkCompleteQuantity = 0
+                                  WHERE OrderListID = @OrderListID
+                                    AND WorkCompleteQuantity IS NULL",
+                                connection, transaction))
+                            {
+                                nullFixCmd.Parameters.AddWithValue("@OrderListID", orderListItem.OrderListId);
+                                await nullFixCmd.ExecuteNonQueryAsync();
+                            }
+
                             using (var cmd = new SqlCommand(
                                 "INSERT INTO Order_WorkComplete_Date(InstitutionID, RegistrationID, OrderID, OrderListID, WCQuantity) " +
                                 "VALUES (@InstitutionID, @RegistrationID, @OrderID, @OrderListID, @WCQuantity)",
@@ -291,10 +350,23 @@ namespace TailorBD.API.Controllers
                                 cmd.Parameters.AddWithValue("@RegistrationID", model.RegistrationId);
                                 cmd.Parameters.AddWithValue("@OrderID", order.OrderId);
                                 cmd.Parameters.AddWithValue("@OrderListID", orderListItem.OrderListId);
-                                cmd.Parameters.AddWithValue("@WCQuantity", orderListItem.CompletedQuantity);
+                                cmd.Parameters.AddWithValue("@WCQuantity", wcQuantity);
                                 await cmd.ExecuteNonQueryAsync();
+                                insertedCount++;
                             }
+
+                            // Keep request model aligned with what was actually saved (SMS text).
+                            orderListItem.CompletedQuantity = wcQuantity;
                         }
+                    }
+
+                    if (insertedCount == 0)
+                    {
+                        transaction.Rollback();
+                        var failMessage = validationErrors.Count > 0
+                            ? string.Join("; ", validationErrors.Distinct())
+                            : "কোনো পোশাক সম্পূর্ণ করা যায়নি";
+                        return BadRequest(new { success = false, message = failMessage });
                     }
 
                     transaction.Commit();
@@ -318,6 +390,8 @@ namespace TailorBD.API.Controllers
                     }
 
                     var message = "অর্ডারের কাজ সফলভাবে সম্পূর্ণ হয়েছে";
+                    if (validationErrors.Count > 0)
+                        message += ". সতর্কতা: " + string.Join("; ", validationErrors.Distinct());
                     if (smsErrors.Count > 0)
                         message += $". SMS পাঠাতে সমস্যা: {string.Join("; ", smsErrors)}";
 

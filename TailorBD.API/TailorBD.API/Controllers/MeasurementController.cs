@@ -100,6 +100,7 @@ namespace TailorBD.API.Controllers
                         Measurement_Group_SerialNo as SerialNo
                     FROM Measurement_Type
                     WHERE Measurement_GroupID = @GroupId
+                      AND MeasurementTypeID <> @GroupId
                     ORDER BY ISNULL(Measurement_Group_SerialNo, 99999)";
 
                 var types = connection.Query<dynamic>(query, new { GroupId = groupId });
@@ -266,16 +267,30 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
-                
-                var deleteQuery = @"
-                    DELETE FROM Measurement_Type 
-                    WHERE MeasurementTypeID = @Id;
-                    
-                    UPDATE Measurement_Type 
-                    SET Measurement_GroupID = MeasurementTypeID 
-                    WHERE Measurement_GroupID = @Id";
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
 
-                connection.Execute(deleteQuery, new { Id = id });
+                connection.Execute(
+                    "DELETE FROM Customer_Measurement WHERE MeasurementTypeID = @Id AND InstitutionID = @InstitutionId",
+                    new { Id = id, InstitutionId = institutionId },
+                    transaction);
+
+                connection.Execute(
+                    "DELETE FROM Measurement_Type WHERE MeasurementTypeID = @Id AND InstitutionID = @InstitutionId",
+                    new { Id = id, InstitutionId = institutionId },
+                    transaction);
+
+                connection.Execute(
+                    @"UPDATE Measurement_Type
+                      SET Measurement_GroupID = MeasurementTypeID,
+                          Measurement_Group_SerialNo = NULL
+                      WHERE Measurement_GroupID = @Id
+                        AND InstitutionID = @InstitutionId
+                        AND MeasurementTypeID <> @Id",
+                    new { Id = id, InstitutionId = institutionId },
+                    transaction);
+
+                transaction.Commit();
 
                 return Ok(new
                 {
@@ -294,28 +309,36 @@ namespace TailorBD.API.Controllers
         }
 
         // DELETE: api/Measurement/type/{id}
-        // Unlinks the type from its group (sets Measurement_GroupID = NULL)
-        // This matches the old project behaviour: the type is removed from the group
-        // but stays in the database so it can be re-assigned to any group later.
+        // Removes type from its group and promotes it to a main category (old project behaviour).
         [HttpDelete("type/{id}")]
-        public IActionResult DeleteMeasurementType(int id)
+        public IActionResult DeleteMeasurementType(int id, [FromQuery] int institutionId)
         {
             try
             {
                 using var connection = _context.CreateConnection();
 
-                var unlinkQuery = @"
-                    UPDATE Measurement_Type
-                    SET Measurement_GroupID = NULL,
-                        Measurement_Group_SerialNo = NULL
-                    WHERE MeasurementTypeID = @Id";
+                var rows = connection.Execute(
+                    @"UPDATE Measurement_Type
+                      SET Measurement_GroupID = MeasurementTypeID,
+                          Measurement_Group_SerialNo = NULL
+                      WHERE MeasurementTypeID = @Id
+                        AND InstitutionID = @InstitutionId
+                        AND MeasurementTypeID <> Measurement_GroupID",
+                    new { Id = id, InstitutionId = institutionId });
 
-                connection.Execute(unlinkQuery, new { Id = id });
+                if (rows == 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "মাপটি গ্রুপ থেকে বাদ দেওয়া যায়নি"
+                    });
+                }
 
                 return Ok(new
                 {
                     success = true,
-                    message = "মাপ গ্রুপ থেকে বাদ দেওয়া হয়েছে"
+                    message = "মাপ গ্রুপ থেকে বাদ দিয়ে মূল ক্যাটাগরি করা হয়েছে"
                 });
             }
             catch (Exception ex)
@@ -325,6 +348,129 @@ namespace TailorBD.API.Controllers
                     success = false,
                     message = ex.Message
                 });
+            }
+        }
+
+        // DELETE: api/Measurement/type/{id}/permanent?institutionId=
+        [HttpDelete("type/{id}/permanent")]
+        public IActionResult DeleteMeasurementTypePermanent(int id, [FromQuery] int institutionId)
+        {
+            try
+            {
+                using var connection = _context.CreateConnection();
+                connection.Open();
+                using var transaction = connection.BeginTransaction();
+
+                connection.Execute(
+                    "DELETE FROM Customer_Measurement WHERE MeasurementTypeID = @Id AND InstitutionID = @InstitutionId",
+                    new { Id = id, InstitutionId = institutionId },
+                    transaction);
+
+                connection.Execute(
+                    "DELETE FROM Ordered_Measurement WHERE MeasurementTypeID = @Id AND InstitutionID = @InstitutionId",
+                    new { Id = id, InstitutionId = institutionId },
+                    transaction);
+
+                connection.Execute(
+                    @"UPDATE Measurement_Type
+                      SET Measurement_GroupID = MeasurementTypeID,
+                          Measurement_Group_SerialNo = NULL
+                      WHERE Measurement_GroupID = @Id
+                        AND InstitutionID = @InstitutionId
+                        AND MeasurementTypeID <> @Id",
+                    new { Id = id, InstitutionId = institutionId },
+                    transaction);
+
+                var rows = connection.Execute(
+                    "DELETE FROM Measurement_Type WHERE MeasurementTypeID = @Id AND InstitutionID = @InstitutionId",
+                    new { Id = id, InstitutionId = institutionId },
+                    transaction);
+
+                transaction.Commit();
+
+                if (rows == 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "মাপটি ডিলিট করা যায়নি"
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "মাপ স্থায়ীভাবে ডিলিট হয়েছে"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        // GET: api/Measurement/group/{groupId}/assignable?dressId=&institutionId=
+        [HttpGet("group/{groupId}/assignable")]
+        public IActionResult GetAssignableTypes(int groupId, [FromQuery] int dressId, [FromQuery] int institutionId)
+        {
+            try
+            {
+                using var connection = _context.CreateConnection();
+
+                var query = @"
+                    SELECT DISTINCT
+                        ML.MeasurementTypeID,
+                        ML.MeasurementType,
+                        ISNULL(ML.Ascending, 99999) AS Ascending
+                    FROM Measurement_Type ML
+                    WHERE ML.DressID = @DressId
+                      AND ML.InstitutionID = @InstitutionId
+                      AND ML.MeasurementTypeID <> @GroupId
+                      AND (
+                          ML.Measurement_GroupID IS NULL
+                          OR (
+                              ML.MeasurementTypeID <> ML.Measurement_GroupID
+                              AND ML.Measurement_GroupID <> @GroupId
+                          )
+                          OR (
+                              (
+                                  SELECT COUNT(*)
+                                  FROM Measurement_Type MG
+                                  WHERE MG.DressID = @DressId
+                                    AND MG.InstitutionID = @InstitutionId
+                                    AND MG.Measurement_GroupID = ML.Measurement_GroupID
+                              ) = 1
+                          )
+                          OR (
+                              ML.MeasurementTypeID = ML.Measurement_GroupID
+                              AND NOT EXISTS (
+                                  SELECT 1
+                                  FROM Measurement_Type child
+                                  WHERE child.DressID = @DressId
+                                    AND child.InstitutionID = @InstitutionId
+                                    AND child.Measurement_GroupID = ML.MeasurementTypeID
+                                    AND child.MeasurementTypeID <> ML.MeasurementTypeID
+                              )
+                          )
+                      )
+                    ORDER BY Ascending, ML.MeasurementType";
+
+                var types = connection.Query<dynamic>(query, new
+                {
+                    GroupId = groupId,
+                    DressId = dressId,
+                    InstitutionId = institutionId
+                });
+
+                return Ok(new { success = true, data = types });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -365,9 +511,16 @@ namespace TailorBD.API.Controllers
                 var updateQuery = @"
                     UPDATE Measurement_Type
                     SET Measurement_GroupID = @GroupId,
-                        Measurement_Group_SerialNo = NULL
+                        Measurement_Group_SerialNo = NULL,
+                        Ascending = (
+                            SELECT Ascending
+                            FROM Measurement_Type
+                            WHERE MeasurementTypeID = @GroupId
+                              AND InstitutionID = @InstitutionId
+                        )
                     WHERE MeasurementTypeID = @Id
-                      AND InstitutionID = @InstitutionId";
+                      AND InstitutionID = @InstitutionId
+                      AND MeasurementTypeID <> @GroupId";
 
                 connection.Execute(updateQuery, new { Id = id, GroupId = model.GroupId, InstitutionId = model.InstitutionId });
 

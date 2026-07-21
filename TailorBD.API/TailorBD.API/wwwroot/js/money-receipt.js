@@ -1224,6 +1224,23 @@
     }
 
     // Display measurements
+    function getServedByDisplayHtml() {
+        const name = sessionStorage.getItem('name') || sessionStorage.getItem('username') || '';
+        if (!name) return '';
+        const phone = sessionStorage.getItem('phone') || '';
+        const userPart = phone
+            ? `${escapeHtml(name)}(${escapeHtml(phone)})`
+            : escapeHtml(name);
+        return `Serve by : ${userPart}`;
+    }
+
+    function appendMeasurementServedByLine($container, mSettings) {
+        if (!mSettings || !mSettings.printServedBy) return;
+        const html = getServedByDisplayHtml();
+        if (!html) return;
+        $container.append(`<div class="measurement-served-by-section">${html}</div>`);
+    }
+
     function displayMeasurements() {
         if (!printSettings || !printSettings.measurement) {
             console.warn('No print settings found, using defaults');
@@ -1238,6 +1255,7 @@
                     printMeasurementName: false,
                     printStyleCategory: false,
                     printBarcode: false,
+                    printServedBy: false,
                     topSpace: 0,
                     fontSize: 12,
                     styleFontSize: 14
@@ -1377,6 +1395,8 @@
             const $detailsSection = $('<div class="measurement-details-section"></div>');
 
             // Customer name AND phone (if enabled separately)
+            appendMeasurementServedByLine($detailsSection, mSettings);
+
             if (mSettings.printCustomerName) {
                 let customerLine = `<strong>${header.customerName}</strong>`;
                 const showPhone = mSettings.printCustomerPhone !== false;

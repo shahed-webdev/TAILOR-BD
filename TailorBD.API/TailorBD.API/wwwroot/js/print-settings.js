@@ -107,6 +107,7 @@
         $('#printCustomerName').prop('checked', ms.printCustomerName);
         $('#printCustomerPhone').prop('checked', ms.printCustomerPhone !== false);
         $('#printCustomerAddress').prop('checked', ms.printCustomerAddress);
+        $('#printMeasurementServedBy').prop('checked', ms.printServedBy);
         $('#printMeasurementName').prop('checked', ms.printMeasurementName);
         $('#printStyleCategory').prop('checked', ms.printStyleCategory);
         $('#printBarcode').prop('checked', ms.printBarcode || false);
@@ -142,6 +143,7 @@
             printCustomerName: $('#printCustomerName').is(':checked'),
             printCustomerPhone: $('#printCustomerPhone').is(':checked'),
             printCustomerAddress: $('#printCustomerAddress').is(':checked'),
+            printServedBy: $('#printMeasurementServedBy').is(':checked'),
             printMeasurementName: $('#printMeasurementName').is(':checked'),
             printStyleCategory: $('#printStyleCategory').is(':checked'),
             printBarcode: $('#printBarcode').is(':checked'),

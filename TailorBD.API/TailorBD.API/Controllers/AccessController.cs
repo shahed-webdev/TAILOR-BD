@@ -52,6 +52,9 @@ namespace TailorBD.API.Controllers
             ["~/AccessAdmin/Customer/Customer_Detail.aspx"]     = "/customer-details.html",
             // Basic / Dress / Sub-Admin
             ["~/AccessAdmin/Dress/Dress_Add.aspx"]              = "/dress-add.html",
+            ["~/AccessAdmin/Dress/Dress_Style_Add.aspx"]        = "/dress-style-add.html",
+            ["~/AccessAdmin/Dress/DressStyleAdd.aspx"]          = "/dress-style-add.html",
+            ["~/AccessAdmin/Dress/Style_Design_Add.aspx"]       = "/style-design-add.html",
             ["~/AccessAdmin/Dress/Mesurement_Printing_Setting.aspx"] = "/print-settings.html",
             ["~/AccessAdmin/Basic/Tailor_Info.aspx"]            = "/tailor-info.html",
             ["~/AccessAdmin/TailorInfo.aspx"]                     = "/tailor-info.html",
@@ -206,6 +209,8 @@ namespace TailorBD.API.Controllers
             // Basic Setting
             ["/tailor-info.html"]            = ("Tailor Shop Info",        "Basic"),
             ["/dress-add.html"]              = ("Add Dress & Measurement", "Basic"),
+            ["/dress-style-add.html"]        = ("Dress Style Add",         "Basic"),
+            ["/style-design-add.html"]       = ("Style Design Add",        "Basic"),
             ["/print-settings.html"]         = ("Print Settings",          "Basic"),
             ["/sub-admin.html"]              = ("SignUp Sub Admin",        "Basic"),
             ["/access-management.html"]      = ("Sub Admin Page Access",   "Basic"),

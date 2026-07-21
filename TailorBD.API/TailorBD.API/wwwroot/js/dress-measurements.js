@@ -536,9 +536,13 @@
             if (groupMeasurements.length === 0) return;
 
             const $groupDiv = $('<div class="measurement-group"></div>');
+            const seenTypeIds = new Set();
 
             groupMeasurements.forEach(m => {
                 const measurementId = m.measurementTypeID || m.MeasurementTypeID;
+                if (seenTypeIds.has(measurementId)) return;
+                seenTypeIds.add(measurementId);
+
                 const measurementType = m.measurementType || m.MeasurementType;
                 const measurement = m.measurement || m.Measurement || '';
 

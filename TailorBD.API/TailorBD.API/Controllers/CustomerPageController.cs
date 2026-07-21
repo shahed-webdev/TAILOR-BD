@@ -353,8 +353,12 @@ namespace TailorBD.API.Controllers
                     using var cmd = new SqlCommand(
                         @"SELECT MT.MeasurementTypeID, MT.MeasurementType, ISNULL(CM.Measurement, '') AS Measurement
                           FROM Measurement_Type MT
-                          LEFT JOIN Customer_Measurement CM ON MT.MeasurementTypeID = CM.MeasurementTypeID
-                              AND CM.CustomerID = @CustomerID AND CM.InstitutionID = @InstitutionID
+                          LEFT JOIN (
+                              SELECT MeasurementTypeID, MAX(Measurement) AS Measurement
+                              FROM Customer_Measurement
+                              WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID
+                              GROUP BY MeasurementTypeID
+                          ) CM ON MT.MeasurementTypeID = CM.MeasurementTypeID
                           WHERE MT.Measurement_GroupID = @GroupID AND MT.InstitutionID = @InstitutionID
                           ORDER BY ISNULL(MT.Measurement_Group_SerialNo, 99999)",
                         connection);
@@ -495,12 +499,19 @@ namespace TailorBD.API.Controllers
                     {
                         if (!string.IsNullOrWhiteSpace(m.Measurement))
                         {
+                            using (var delCmd = new SqlCommand(
+                                "DELETE FROM Customer_Measurement WHERE InstitutionID=@InstitutionID AND CustomerID=@CustomerID AND MeasurementTypeID=@MeasurementTypeID",
+                                connection, transaction))
+                            {
+                                delCmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
+                                delCmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
+                                delCmd.Parameters.AddWithValue("@MeasurementTypeID", m.MeasurementTypeId);
+                                await delCmd.ExecuteNonQueryAsync();
+                            }
+
                             using var cmd = new SqlCommand(@"
-                                IF NOT EXISTS (SELECT 1 FROM Customer_Measurement WHERE InstitutionID=@InstitutionID AND CustomerID=@CustomerID AND MeasurementTypeID=@MeasurementTypeID)
-                                    INSERT INTO Customer_Measurement (RegistrationID, InstitutionID, CustomerID, MeasurementTypeID, Measurement) VALUES (@RegistrationID, @InstitutionID, @CustomerID, @MeasurementTypeID, @Measurement)
-                                ELSE
-                                    UPDATE Customer_Measurement SET Measurement=@Measurement
-                                    WHERE MeasurementTypeID=@MeasurementTypeID AND CustomerID=@CustomerID AND InstitutionID=@InstitutionID",
+                                INSERT INTO Customer_Measurement (RegistrationID, InstitutionID, CustomerID, MeasurementTypeID, Measurement)
+                                VALUES (@RegistrationID, @InstitutionID, @CustomerID, @MeasurementTypeID, @Measurement)",
                                 connection, transaction);
                             cmd.Parameters.AddWithValue("@InstitutionID", model.InstitutionId);
                             cmd.Parameters.AddWithValue("@CustomerID", model.CustomerId);
@@ -1220,9 +1231,14 @@ namespace TailorBD.API.Controllers
                         @"SELECT MT.Measurement_GroupID, MT.MeasurementTypeID, MT.MeasurementType, CM.Measurement,
                                  ISNULL(MT.Measurement_Group_SerialNo, 99999) AS SN
                           FROM Measurement_Type MT
-                          INNER JOIN Customer_Measurement CM ON MT.MeasurementTypeID = CM.MeasurementTypeID
+                          INNER JOIN (
+                              SELECT MeasurementTypeID, MAX(Measurement) AS Measurement
+                              FROM Customer_Measurement
+                              WHERE CustomerID = @CustomerID
+                              GROUP BY MeasurementTypeID
+                          ) CM ON MT.MeasurementTypeID = CM.MeasurementTypeID
                           LEFT JOIN Measurement_Type MT_GRP ON MT.Measurement_GroupID = MT_GRP.MeasurementTypeID
-                          WHERE CM.CustomerID = @CustomerID AND MT.DressID = @DressID
+                          WHERE MT.DressID = @DressID
                             AND CM.Measurement IS NOT NULL AND CM.Measurement <> ''
                           ORDER BY ISNULL(MT_GRP.Ascending, 99999), ISNULL(MT.Measurement_Group_SerialNo, 99999)",
                         connection))

@@ -958,6 +958,25 @@
                 });
             }
 
+            // Dress-add row actions inherit from dress pages (legacy behaviour)
+            var dressEntryPages = [
+                '/dress-add.html',
+                '/dress-style-add.html'
+            ];
+            var dressWorkflowPages = [
+                '/dress-style-add.html',
+                '/style-design-add.html'
+            ];
+            var hasDressEntry = dressEntryPages.some(function(p) {
+                return expanded.has(p) || expanded.has(p.replace(/\.html$/i, ''));
+            });
+            if (hasDressEntry) {
+                dressWorkflowPages.forEach(function(p) {
+                    expanded.add(p);
+                    expanded.add(p.replace(/\.html$/i, ''));
+                });
+            }
+
             return expanded;
         }
 
@@ -1331,13 +1350,16 @@
 
     window.TailorBD = window.TailorBD || {};
     window.TailorBD.printSizePref = {
-        validSizes: ['3', '3.5', '4', '4.5', '5', '6', '6.5'],
+        validSizes: ['3', '3.5', '4', '4.5', '5', '5.5', '6', '6.5'],
         defaultSize: '4',
 
         storageKey: function() {
             var regId = sessionStorage.getItem('registrationId') ||
                 localStorage.getItem('session_registrationId') || '';
-            return 'tailorbd_printSize_' + regId;
+            if (regId) return 'tailorbd_printSize_' + regId;
+            var instId = sessionStorage.getItem('institutionId') ||
+                localStorage.getItem('session_institutionId') || '';
+            return 'tailorbd_printSize_inst_' + instId;
         },
 
         normalize: function(size) {

@@ -167,23 +167,36 @@ namespace TailorBD.API.Controllers
                         new { C = customerId, D = dressId, I = institutionId }) ?? "";
                 }
 
-                // Measurement groups � include Ascending in SELECT for DISTINCT + ORDER BY
+                // Measurement groups — one row per group (DISTINCT GroupID+Ascending duplicated groups)
                 var groupRows = await conn.QueryAsync(
-                    @"SELECT DISTINCT Measurement_GroupID, ISNULL(Ascending, 99999) AS Ascending
+                    @"SELECT Measurement_GroupID, MIN(ISNULL(Ascending, 99999)) AS Ascending
                       FROM Measurement_Type
                       WHERE InstitutionID=@I AND DressID=@D AND Measurement_GroupID IS NOT NULL
+                      GROUP BY Measurement_GroupID
                       ORDER BY Ascending",
                     new { I = institutionId, D = dressId });
 
                 var measurementGroups = new List<object>();
+                var seenGroupIds = new HashSet<int>();
+                var seenTypeIds = new HashSet<int>();
+
+                const string customerMeasurementJoin = @"
+                          LEFT JOIN (
+                              SELECT MeasurementTypeID, MAX(Measurement) AS Measurement
+                              FROM Customer_Measurement
+                              WHERE CustomerID=@C AND InstitutionID=@I
+                              GROUP BY MeasurementTypeID
+                          ) cm ON mt.MeasurementTypeID = cm.MeasurementTypeID";
+
                 foreach (var grow in groupRows)
                 {
                     var groupDict = (IDictionary<string, object>)grow;
                     if (groupDict["Measurement_GroupID"] == null || groupDict["Measurement_GroupID"] == DBNull.Value) continue;
                     int gid = Convert.ToInt32(groupDict["Measurement_GroupID"]);
+                    if (!seenGroupIds.Add(gid)) continue;
 
                     var measurements = (await conn.QueryAsync(
-                        @"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
+                        $@"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
                                  COALESCE(NULLIF(LTRIM(RTRIM(latest_om.Measurement)), ''), NULLIF(LTRIM(RTRIM(cm.Measurement)), ''), '') AS Measurement
                           FROM Measurement_Type mt
                           LEFT JOIN (
@@ -204,22 +217,30 @@ namespace TailorBD.API.Controllers
                               ) ranked
                               WHERE rn = 1
                           ) latest_om ON mt.MeasurementTypeID = latest_om.MeasurementTypeID
-                          LEFT JOIN (
-                              SELECT MeasurementTypeID, Measurement FROM Customer_Measurement
-                              WHERE CustomerID=@C AND InstitutionID=@I
-                          ) cm ON mt.MeasurementTypeID = cm.MeasurementTypeID
+                          {customerMeasurementJoin}
                           WHERE mt.Measurement_GroupID=@G
+                            AND mt.InstitutionID=@I
+                            AND mt.DressID=@D
                           ORDER BY ISNULL(mt.Measurement_Group_SerialNo,99999)",
                         new { C = customerId, I = institutionId, D = dressId, G = gid }))
                         .Select(row => (IDictionary<string, object>)row)
                         .Select(dict => new Dictionary<string, object>(dict))
+                        .GroupBy(dict => Convert.ToInt32(dict["MeasurementTypeID"]))
+                        .Select(g => g.First())
+                        .Where(dict =>
+                        {
+                            var typeId = Convert.ToInt32(dict["MeasurementTypeID"]);
+                            return seenTypeIds.Add(typeId);
+                        })
                         .ToList();
+
+                    if (measurements.Count == 0) continue;
 
                     measurementGroups.Add(new { MeasurementGroupId = gid, Measurements = measurements });
                 }
 
                 var orphanRows = (await conn.QueryAsync(
-                    @"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
+                    $@"SELECT mt.MeasurementTypeID, mt.MeasurementType, mt.Measurement_Group_SerialNo,
                              COALESCE(NULLIF(LTRIM(RTRIM(latest_om.Measurement)), ''), NULLIF(LTRIM(RTRIM(cm.Measurement)), ''), '') AS Measurement
                       FROM Measurement_Type mt
                       LEFT JOIN (
@@ -240,10 +261,7 @@ namespace TailorBD.API.Controllers
                           ) ranked
                           WHERE rn = 1
                       ) latest_om ON mt.MeasurementTypeID = latest_om.MeasurementTypeID
-                      LEFT JOIN (
-                          SELECT MeasurementTypeID, Measurement FROM Customer_Measurement
-                          WHERE CustomerID=@C AND InstitutionID=@I
-                      ) cm ON mt.MeasurementTypeID = cm.MeasurementTypeID
+                      {customerMeasurementJoin}
                       WHERE mt.InstitutionID=@I AND mt.DressID=@D AND mt.Measurement_GroupID IS NULL
                       ORDER BY ISNULL(mt.Ascending,99999), mt.MeasurementTypeID",
                     new { C = customerId, I = institutionId, D = dressId }))
@@ -254,6 +272,7 @@ namespace TailorBD.API.Controllers
                 foreach (var orphan in orphanRows)
                 {
                     var orphanId = Convert.ToInt32(orphan["MeasurementTypeID"]);
+                    if (!seenTypeIds.Add(orphanId)) continue;
                     measurementGroups.Add(new { MeasurementGroupId = orphanId, Measurements = new List<Dictionary<string, object>> { orphan } });
                 }
 
@@ -277,36 +296,17 @@ namespace TailorBD.API.Controllers
                     var styles = (await conn.QueryAsync(
                         @"SELECT ds.Dress_StyleID AS DressStyleId,
                                  ds.Dress_Style_Name AS DressStyleName,
-                                 COALESCE(NULLIF(LTRIM(RTRIM(latest_ods.DressStyleMesurement)), ''), NULLIF(LTRIM(RTRIM(cds.DressStyleMesurement)), ''), '') AS DressStyleMesurement,
-                                 CAST(CASE WHEN latest_ods.Dress_StyleID IS NOT NULL OR cds.Dress_StyleID IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS IsCheck
+                                 ISNULL(cds.DressStyleMesurement, '') AS DressStyleMesurement,
+                                 CAST(CASE WHEN cds.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck
                           FROM Dress_Style ds
                           LEFT JOIN (
                               SELECT Dress_StyleID, DressStyleMesurement
-                              FROM (
-                                  SELECT ods.Dress_StyleID, ods.DressStyleMesurement,
-                                         ROW_NUMBER() OVER (
-                                             PARTITION BY ods.Dress_StyleID
-                                             ORDER BY
-                                                 CASE WHEN ISNULL(LTRIM(RTRIM(ods.DressStyleMesurement)), '') <> '' THEN 0 ELSE 1 END,
-                                                 o.OrderDate DESC,
-                                                 ol.OrderListID DESC
-                                         ) AS rn
-                                  FROM Ordered_Dress_Style ods
-                                  INNER JOIN OrderList ol ON ods.OrderListID = ol.OrderListID
-                                  INNER JOIN [Order] o ON ol.OrderID = o.OrderID
-                                  WHERE ods.CustomerID = @C
-                                    AND ol.InstitutionID = @I
-                                    AND ol.DressID = @D
-                              ) ranked
-                              WHERE rn = 1
-                          ) latest_ods ON ds.Dress_StyleID = latest_ods.Dress_StyleID
-                          LEFT JOIN (
-                              SELECT Dress_StyleID, DressStyleMesurement FROM Customer_Dress_Style
-                              WHERE CustomerID=@C
+                              FROM Customer_Dress_Style
+                              WHERE CustomerID = @C AND InstitutionID = @I
                           ) cds ON ds.Dress_StyleID = cds.Dress_StyleID
-                          WHERE ds.Dress_Style_CategoryID=@Cat
+                          WHERE ds.Dress_Style_CategoryID = @Cat
                           ORDER BY ISNULL(ds.StyleSerial,99999)",
-                        new { C = customerId, I = institutionId, D = dressId, Cat = catId }))
+                        new { C = customerId, I = institutionId, Cat = catId }))
                         .Select(row => (IDictionary<string, object>)row)
                         .Select(dict => new Dictionary<string, object>(dict))
                         .ToList();

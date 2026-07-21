@@ -71,6 +71,13 @@ namespace TailorBD.API.Middleware
             "dress-measurements.html"
         };
 
+        // Dress-add row actions — inherit access from dress pages (legacy behaviour)
+        private static readonly HashSet<string> _dressWorkflowPages = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "dress-style-add.html",
+            "style-design-add.html"
+        };
+
         public PageAccessMiddleware(RequestDelegate next, TailorBdContext context, IMemoryCache cache)
         {
             _next = next;
@@ -195,6 +202,11 @@ namespace TailorBD.API.Middleware
                     return await HasCustomerEntryAccess(connection, institutionId, registrationId);
                 }
 
+                if (_dressWorkflowPages.Contains(pagePath))
+                {
+                    return await HasDressEntryAccess(connection, institutionId, registrationId);
+                }
+
                 return false;
             }
             catch (Exception ex)
@@ -245,6 +257,31 @@ namespace TailorBD.API.Middleware
                   )";
 
             var count = await connection.ExecuteScalarAsync<int>(customerEntryQuery, new {
+                InstitutionID = institutionId,
+                RegistrationID = registrationId
+            });
+
+            return count > 0;
+        }
+
+        private static async Task<bool> HasDressEntryAccess(System.Data.IDbConnection connection, int institutionId, int registrationId)
+        {
+            const string dressEntryQuery = @"
+                SELECT COUNT(*)
+                FROM Link_Users LU
+                INNER JOIN Link_Pages LP ON LU.LinkID = LP.LinkID
+                WHERE LU.InstitutionID = @InstitutionID
+                  AND LU.RegistrationID = @RegistrationID
+                  AND (
+                      LOWER(LP.PageURL) LIKE '%dress_add%'
+                      OR LOWER(LP.PageURL) LIKE '%dressadd%'
+                      OR LOWER(LP.PageURL) LIKE '%dress_style%'
+                      OR LOWER(LP.PageURL) LIKE '%dressstyle%'
+                      OR LOWER(LP.PageURL) LIKE '%style_design%'
+                      OR LOWER(LP.PageURL) LIKE '%styledesign%'
+                  )";
+
+            var count = await connection.ExecuteScalarAsync<int>(dressEntryQuery, new {
                 InstitutionID = institutionId,
                 RegistrationID = registrationId
             });

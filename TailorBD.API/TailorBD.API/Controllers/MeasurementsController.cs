@@ -241,33 +241,13 @@ namespace TailorBD.API.Controllers
                                         styleQuery = @"
                                             SELECT Dress_Style.Dress_StyleID, 
                                                    Dress_Style.Dress_Style_Name, 
-                                                   COALESCE(NULLIF(LTRIM(RTRIM(latest_ods.DressStyleMesurement)), ''), NULLIF(LTRIM(RTRIM(Customer_DS.DressStyleMesurement)), ''), '') AS DressStyleMesurement, 
-                                                   CAST(CASE WHEN latest_ods.Dress_StyleID IS NOT NULL OR Customer_DS.Dress_StyleID IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS IsCheck 
+                                                   ISNULL(Customer_DS.DressStyleMesurement, '') AS DressStyleMesurement, 
+                                                   CAST(CASE WHEN Customer_DS.Dress_StyleID IS NULL THEN 0 ELSE 1 END AS BIT) AS IsCheck 
                                             FROM Dress_Style 
-                                            LEFT OUTER JOIN (
-                                                SELECT Dress_StyleID, DressStyleMesurement
-                                                FROM (
-                                                    SELECT ods.Dress_StyleID, ods.DressStyleMesurement,
-                                                           ROW_NUMBER() OVER (
-                                                               PARTITION BY ods.Dress_StyleID
-                                                               ORDER BY
-                                                                   CASE WHEN ISNULL(LTRIM(RTRIM(ods.DressStyleMesurement)), '') <> '' THEN 0 ELSE 1 END,
-                                                                   o.OrderDate DESC,
-                                                                   ol.OrderListID DESC
-                                                           ) AS rn
-                                                    FROM Ordered_Dress_Style ods
-                                                    INNER JOIN OrderList ol ON ods.OrderListID = ol.OrderListID
-                                                    INNER JOIN [Order] o ON ol.OrderID = o.OrderID
-                                                    WHERE ods.CustomerID = @CustomerID
-                                                      AND ol.InstitutionID = @InstitutionID
-                                                      AND ol.DressID = @DressID
-                                                ) ranked
-                                                WHERE rn = 1
-                                            ) AS latest_ods ON Dress_Style.Dress_StyleID = latest_ods.Dress_StyleID
                                             LEFT OUTER JOIN (
                                                 SELECT DressStyleMesurement, Dress_StyleID 
                                                 FROM Customer_Dress_Style 
-                                                WHERE CustomerID = @CustomerID
+                                                WHERE CustomerID = @CustomerID AND InstitutionID = @InstitutionID
                                             ) AS Customer_DS 
                                             ON Dress_Style.Dress_StyleID = Customer_DS.Dress_StyleID 
                                             WHERE (Dress_Style.Dress_Style_CategoryID = @Dress_Style_CategoryID) 
@@ -275,7 +255,6 @@ namespace TailorBD.API.Controllers
                                         
                                         styleCmd.Parameters.AddWithValue("@CustomerID", customerId);
                                         styleCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
-                                        styleCmd.Parameters.AddWithValue("@DressID", dressId);
                                     }
                                     
                                     styleCmd.CommandText = styleQuery;

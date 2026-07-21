@@ -752,6 +752,21 @@ function displayMeasurementGroups(groups) {
 
                 <!-- Inline Add Type Form -->
                 <div class="meas-add-type-form" id="add-type-form-${group.MeasurementTypeID}">
+                    <div class="meas-existing-row">
+                        <div class="meas-field-grow">
+                            <label class="form-label-sm">বিদ্যমান মাপ / মূল ক্যাটাগরি</label>
+                            <select class="form-select" id="existingTypeSelect-${group.MeasurementTypeID}">
+                                <option value="">-- লোড হচ্ছে... --</option>
+                            </select>
+                        </div>
+                        <div class="meas-field-btn">
+                            <button type="button" class="btn btn-primary"
+                                    onclick="assignExistingTypeFromDropdown(${group.MeasurementTypeID})">
+                                <i class="fas fa-link"></i> <span class="d-none d-sm-inline">যুক্ত</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="meas-divider-or"><span>অথবা নতুন যুক্ত করুন</span></div>
                     <form onsubmit="submitMeasurementType(event, ${group.MeasurementTypeID})">
                         <div class="meas-input-row">
                             <div class="meas-field-grow">
@@ -803,9 +818,56 @@ window.toggleAddTypeForm = function(groupId) {
     $('.meas-add-type-form').not($form).slideUp(150);
     $form.slideToggle(150, function() {
         if ($(this).is(':visible')) {
+            loadAssignableTypes(groupId);
             $(`#typeName-${groupId}`).focus();
         }
     });
+};
+
+function loadAssignableTypes(groupId) {
+    const institutionId = sessionStorage.getItem('institutionId');
+    const $select = $(`#existingTypeSelect-${groupId}`);
+
+    if (!$select.length || !currentMeasurementDressId) return;
+
+    $select.html('<option value="">-- লোড হচ্ছে... --</option>');
+
+    $.ajax({
+        url: `/api/measurement/group/${groupId}/assignable?dressId=${currentMeasurementDressId}&institutionId=${institutionId}`,
+        method: 'GET',
+        success: function(response) {
+            populateAssignableDropdown(groupId, response.success ? response.data : []);
+        },
+        error: function() {
+            populateAssignableDropdown(groupId, []);
+        }
+    });
+}
+
+function populateAssignableDropdown(groupId, types) {
+    const $select = $(`#existingTypeSelect-${groupId}`);
+    if (!$select.length) return;
+
+    let html = '<option value="">-- বিদ্যমান মাপ নির্বাচন করুন --</option>';
+    if (!types || types.length === 0) {
+        html += '<option value="" disabled>কোনো বিদ্যমান মাপ নেই</option>';
+    } else {
+        types.forEach(function(t) {
+            const id = t.measurementTypeID || t.MeasurementTypeID;
+            const name = t.measurementType || t.MeasurementType;
+            html += `<option value="${id}">${name}</option>`;
+        });
+    }
+    $select.html(html);
+}
+
+window.assignExistingTypeFromDropdown = function(groupId) {
+    const typeId = parseInt($(`#existingTypeSelect-${groupId}`).val(), 10);
+    if (!typeId) {
+        showMeasurementModalAlert('একটি বিদ্যমান মাপ নির্বাচন করুন', 'error');
+        return;
+    }
+    assignTypeToGroup(typeId, groupId);
 };
 
 // Load Measurement Types for a Group
@@ -850,7 +912,7 @@ function displayMeasurementTypes(groupId, types) {
                             onclick="openEditTypeModal(${type.MeasurementTypeID}, '${type.MeasurementType.replace(/'/g,"\\'")}', ${groupId}, ${type.SerialNo || 0})">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="chip-btn chip-btn-remove" title="ডিলিট"
+                    <button class="chip-btn chip-btn-remove" title="গ্রুপ থেকে বাদ (মূল ক্যাটাগরি)"
                             onclick="deleteMeasurementType(${type.MeasurementTypeID}, '${type.MeasurementType.replace(/'/g,"\\'")}', ${groupId})">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -1053,22 +1115,46 @@ window.deleteMeasurementGroup = function(groupId, groupName) {
     });
 };
 
-// Delete Measurement Type (unlink from group)
+// Delete Measurement Type (unlink from group → main category)
 window.deleteMeasurementType = function(typeId, typeName, groupId) {
-    if (!confirm(`"${typeName}" মাপটি গ্রুপ থেকে বাদ দেবেন?\nএটি ডিলিট হবে না — পরে যেকোনো গ্রুপে যুক্ত করা যাবে।`)) return;
+    if (!confirm(`"${typeName}" মাপটি গ্রুপ থেকে বাদ দেবেন?\n\nএটি মুছে যাবে না — মূল ক্যাটাগরি হিসেবে দেখাবে। পরে চাইলে আবার অন্য গ্রুপে যুক্ত করতে পারবেন।`)) return;
+
+    const institutionId = sessionStorage.getItem('institutionId');
 
     $.ajax({
-        url: `/api/measurement/type/${typeId}`,
+        url: `/api/measurement/type/${typeId}?institutionId=${institutionId}`,
         method: 'DELETE',
         success: function(response) {
             if (response.success) {
-                showMeasurementModalAlert('মাপ গ্রুপ থেকে বাদ দেওয়া হয়েছে', 'success');
-                loadMeasurementTypes(groupId);
-                loadUnlinkedTypes();
+                showMeasurementModalAlert('মাপ মূল ক্যাটাগরি করা হয়েছে', 'success');
+                loadMeasurementGroups(currentMeasurementDressId, currentMeasurementClothForId);
             }
         },
-        error: function() {
-            showMeasurementModalAlert('মুছতে ব্যর্থ হয়েছে', 'error');
+        error: function(xhr) {
+            const msg = xhr.responseJSON?.message || 'মুছতে ব্যর্থ হয়েছে';
+            showMeasurementModalAlert(msg, 'error');
+        }
+    });
+};
+
+// Permanently delete an unlinked/orphan measurement type
+window.permanentDeleteUnlinkedType = function(typeId, typeName) {
+    if (!confirm(`"${typeName}" মাপটি স্থায়ীভাবে ডিলিট করবেন?\n\nকাস্টমার ও অর্ডারের সংশ্লিষ্ট মাপও মুছে যাবে।`)) return;
+
+    const institutionId = sessionStorage.getItem('institutionId');
+
+    $.ajax({
+        url: `/api/measurement/type/${typeId}/permanent?institutionId=${institutionId}`,
+        method: 'DELETE',
+        success: function(response) {
+            if (response.success) {
+                showMeasurementModalAlert('মাপ স্থায়ীভাবে ডিলিট হয়েছে', 'success');
+                loadMeasurementGroups(currentMeasurementDressId, currentMeasurementClothForId);
+            }
+        },
+        error: function(xhr) {
+            const msg = xhr.responseJSON?.message || 'ডিলিট ব্যর্থ হয়েছে';
+            showMeasurementModalAlert(msg, 'error');
         }
     });
 };
@@ -1127,16 +1213,23 @@ function renderUnlinkedPanel(types) {
 
     let items = '';
     types.forEach(function(t) {
+        const typeId = t.measurementTypeID || t.MeasurementTypeID;
+        const typeName = (t.measurementType || t.MeasurementType || '').replace(/'/g, "\\'");
+        const displayName = t.measurementType || t.MeasurementType || '';
         items += `
-            <div class="unlinked-item" id="unlinked-${t.MeasurementTypeID}">
+            <div class="unlinked-item" id="unlinked-${typeId}">
                 <i class="fas fa-unlink text-warning"></i>
-                <span class="item-name">${t.MeasurementType}</span>
-                <select class="form-select form-select-sm" id="assign-select-${t.MeasurementTypeID}">
+                <span class="item-name">${displayName}</span>
+                <select class="form-select form-select-sm" id="assign-select-${typeId}">
                     ${groupOptions}
                 </select>
                 <button class="btn-assign"
-                        onclick="assignTypeToGroup(${t.MeasurementTypeID})" title="গ্রুপে যুক্ত করুন">
+                        onclick="assignTypeToGroup(${typeId})" title="গ্রুপে যুক্ত করুন">
                     <i class="fas fa-plus"></i> <span>যুক্ত</span>
+                </button>
+                <button class="btn-unlinked-delete"
+                        onclick="permanentDeleteUnlinkedType(${typeId}, '${typeName}')" title="স্থায়ীভাবে ডিলিট">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>`;
     });
@@ -1148,13 +1241,14 @@ function renderUnlinkedPanel(types) {
                 <span>গ্রুপ-বিহীন মাপজোখ</span>
                 <span class="badge bg-warning text-dark">${types.length}</span>
             </div>
+            <p class="panel-hint">গ্রুপে যুক্ত করুন অথবা স্থায়ীভাবে ডিলিট করুন</p>
             <div class="panel-body">${items}</div>
         </div>`);
 }
 
-// Assign an unlinked type to a group
-window.assignTypeToGroup = function(typeId) {
-    const groupId = parseInt($(`#assign-select-${typeId}`).val());
+// Assign an existing measurement type to a group
+window.assignTypeToGroup = function(typeId, groupIdOptional) {
+    const groupId = groupIdOptional || parseInt($(`#assign-select-${typeId}`).val(), 10);
     if (!groupId) {
         showMeasurementModalAlert('একটি গ্রুপ নির্বাচন করুন', 'error');
         return;
@@ -1169,14 +1263,15 @@ window.assignTypeToGroup = function(typeId) {
         success: function(response) {
             if (response.success) {
                 showMeasurementModalAlert('মাপ গ্রুপে যুক্ত হয়েছে', 'success');
-                loadMeasurementTypes(groupId);
-                loadUnlinkedTypes();
+                loadMeasurementGroups(currentMeasurementDressId, currentMeasurementClothForId);
+                $(`#add-type-form-${groupId}`).slideUp(150);
             } else {
                 showMeasurementModalAlert(response.message || 'সমস্যা হয়েছে', 'error');
             }
         },
-        error: function() {
-            showMeasurementModalAlert('সমস্যা হয়েছে', 'error');
+        error: function(xhr) {
+            const msg = xhr.responseJSON?.message || 'সমস্যা হয়েছে';
+            showMeasurementModalAlert(msg, 'error');
         }
     });
 };

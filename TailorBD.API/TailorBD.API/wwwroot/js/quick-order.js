@@ -650,9 +650,20 @@ window.openMeasurement = function (idx) {
     $('#measurementModalTitle').text(d.dressName);
     const $body = $('#measurementModalBody').empty();
 
+    const seenGroups = new Set();
     (d.measurements || []).forEach(group => {
+        const groupId = group.MeasurementGroupId || group.measurementGroupId || group.groupId;
+        if (groupId != null && seenGroups.has(groupId)) return;
+        if (groupId != null) seenGroups.add(groupId);
+
         const measurements = group.Measurements || group.measurements || [];
-        let fields = measurements.map(m => {
+        const seenTypes = new Set();
+        let fields = measurements.filter(m => {
+            const typeId = m.MeasurementTypeID || m.measurementTypeID;
+            if (seenTypes.has(typeId)) return false;
+            seenTypes.add(typeId);
+            return true;
+        }).map(m => {
             const typeId = m.MeasurementTypeID || m.measurementTypeID;
             const typeName = m.MeasurementType || m.measurementType;
             const value = m.Measurement || m.measurement || '';
@@ -664,6 +675,8 @@ window.openMeasurement = function (idx) {
                        onchange="updateMeasurement(${idx}, '${typeId}', this.value)">
             </div>`;
         }).join('');
+
+        if (!fields) return;
 
         $body.append(`<div class="col-sm-4 col-lg-3 mb-3"><div class="border rounded p-2 h-100 qo-measurement-group">${fields}</div></div>`);
     });

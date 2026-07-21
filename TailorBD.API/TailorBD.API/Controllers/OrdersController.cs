@@ -117,11 +117,12 @@ namespace TailorBD.API.Controllers
 
                 var whereClause = string.Join(" AND ", conditions);
                 var offset = (page - 1) * pageSize;
+                const int commandTimeoutSeconds = 120;
 
                 var countQuery = $@"
                     SELECT COUNT(*) 
-                    FROM [Order] 
-                    INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID 
+                    FROM [Order] WITH (NOLOCK)
+                    INNER JOIN Customer WITH (NOLOCK) ON [Order].CustomerID = Customer.CustomerID 
                     WHERE {whereClause}";
 
                 var dataQuery = $@"
@@ -143,16 +144,9 @@ namespace TailorBD.API.Controllers
                         Customer.Phone,
                         Customer.Address,
                         Customer.CustomerID,
-                        Customer.Cloth_For_ID,
-                        STUFF((
-                            SELECT '; ' + Dress.Dress_Name + ' ' + CAST(OrderList.DressQuantity AS NVARCHAR(50)) + ' Piece '
-                            FROM OrderList 
-                            INNER JOIN Dress ON OrderList.DressID = Dress.DressID 
-                            WHERE OrderList.OrderID = [Order].OrderID 
-                            FOR XML PATH('')
-                        ), 1, 1, '') AS Details
-                    FROM [Order] 
-                    INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID 
+                        Customer.Cloth_For_ID
+                    FROM [Order] WITH (NOLOCK)
+                    INNER JOIN Customer WITH (NOLOCK) ON [Order].CustomerID = Customer.CustomerID 
                     WHERE {whereClause}
                     ORDER BY [Order].OrderSerialNumber DESC
                     OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
@@ -160,13 +154,17 @@ namespace TailorBD.API.Controllers
                 int totalCount;
                 using (var countCmd = new Microsoft.Data.SqlClient.SqlCommand(countQuery, connection))
                 {
+                    countCmd.CommandTimeout = commandTimeoutSeconds;
                     countCmd.Parameters.AddRange(parameters.ToArray());
                     totalCount = Convert.ToInt32(await countCmd.ExecuteScalarAsync());
                 }
 
-                var orders = new List<object>();
+                var orders = new List<Dictionary<string, object?>>();
+                var orderIds = new List<int>();
+
                 using (var dataCmd = new Microsoft.Data.SqlClient.SqlCommand(dataQuery, connection))
                 {
+                    dataCmd.CommandTimeout = commandTimeoutSeconds;
                     dataCmd.Parameters.AddRange(parameters.Select(p =>
                         new Microsoft.Data.SqlClient.SqlParameter(p.ParameterName, p.Value)).ToArray());
                     dataCmd.Parameters.Add(new("@Offset", offset));
@@ -175,30 +173,65 @@ namespace TailorBD.API.Controllers
                     using var reader = await dataCmd.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
-                        orders.Add(new
+                        var orderId = reader.GetInt32(reader.GetOrdinal("OrderID"));
+                        orderIds.Add(orderId);
+                        orders.Add(new Dictionary<string, object?>
                         {
-                            orderId = reader.GetInt32(reader.GetOrdinal("OrderID")),
-                            orderSerialNumber = reader.GetInt32(reader.GetOrdinal("OrderSerialNumber")),
-                            orderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
-                            deliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")),
-                            updateDeliveryDate = reader.IsDBNull(reader.GetOrdinal("Update_DeliveryDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("Update_DeliveryDate")),
-                            orderAmount = reader.IsDBNull(reader.GetOrdinal("OrderAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("OrderAmount"))),
-                            paidAmount = reader.IsDBNull(reader.GetOrdinal("PaidAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("PaidAmount"))),
-                            dueAmount = reader.IsDBNull(reader.GetOrdinal("DueAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("DueAmount"))),
-                            paymentStatus = reader.IsDBNull(reader.GetOrdinal("PaymentStatus")) ? "" : reader.GetString(reader.GetOrdinal("PaymentStatus")),
-                            deliveryStatus = reader.IsDBNull(reader.GetOrdinal("DeliveryStatus")) ? "" : reader.GetString(reader.GetOrdinal("DeliveryStatus")),
-                            workStatus = reader.IsDBNull(reader.GetOrdinal("WorkStatus")) ? "" : reader.GetString(reader.GetOrdinal("WorkStatus")),
-                            measurementPrintCount = reader.GetInt32(reader.GetOrdinal("Is_Print")),
-                            customerNumber = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerNumber")),
-                            customerName = reader.IsDBNull(reader.GetOrdinal("CustomerName")) ? "" : reader.GetString(reader.GetOrdinal("CustomerName")),
-                            phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? "" : reader.GetString(reader.GetOrdinal("Phone")),
-                            address = reader.IsDBNull(reader.GetOrdinal("Address")) ? "" : reader.GetString(reader.GetOrdinal("Address")),
-                            customerId = reader.IsDBNull(reader.GetOrdinal("CustomerID")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerID")),
-                            clothForId = reader.IsDBNull(reader.GetOrdinal("Cloth_For_ID")) ? 0 : reader.GetInt32(reader.GetOrdinal("Cloth_For_ID")),
-                            details = reader.IsDBNull(reader.GetOrdinal("Details")) ? "" : reader.GetString(reader.GetOrdinal("Details"))
+                            ["orderId"] = orderId,
+                            ["orderSerialNumber"] = reader.GetInt32(reader.GetOrdinal("OrderSerialNumber")),
+                            ["orderDate"] = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
+                            ["deliveryDate"] = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate")),
+                            ["updateDeliveryDate"] = reader.IsDBNull(reader.GetOrdinal("Update_DeliveryDate")) ? null : reader.GetDateTime(reader.GetOrdinal("Update_DeliveryDate")),
+                            ["orderAmount"] = reader.IsDBNull(reader.GetOrdinal("OrderAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("OrderAmount"))),
+                            ["paidAmount"] = reader.IsDBNull(reader.GetOrdinal("PaidAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("PaidAmount"))),
+                            ["dueAmount"] = reader.IsDBNull(reader.GetOrdinal("DueAmount")) ? 0.0 : Convert.ToDouble(reader.GetValue(reader.GetOrdinal("DueAmount"))),
+                            ["paymentStatus"] = reader.IsDBNull(reader.GetOrdinal("PaymentStatus")) ? "" : reader.GetString(reader.GetOrdinal("PaymentStatus")),
+                            ["deliveryStatus"] = reader.IsDBNull(reader.GetOrdinal("DeliveryStatus")) ? "" : reader.GetString(reader.GetOrdinal("DeliveryStatus")),
+                            ["workStatus"] = reader.IsDBNull(reader.GetOrdinal("WorkStatus")) ? "" : reader.GetString(reader.GetOrdinal("WorkStatus")),
+                            ["measurementPrintCount"] = reader.GetInt32(reader.GetOrdinal("Is_Print")),
+                            ["customerNumber"] = reader.IsDBNull(reader.GetOrdinal("CustomerNumber")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerNumber")),
+                            ["customerName"] = reader.IsDBNull(reader.GetOrdinal("CustomerName")) ? "" : reader.GetString(reader.GetOrdinal("CustomerName")),
+                            ["phone"] = reader.IsDBNull(reader.GetOrdinal("Phone")) ? "" : reader.GetString(reader.GetOrdinal("Phone")),
+                            ["address"] = reader.IsDBNull(reader.GetOrdinal("Address")) ? "" : reader.GetString(reader.GetOrdinal("Address")),
+                            ["customerId"] = reader.IsDBNull(reader.GetOrdinal("CustomerID")) ? 0 : reader.GetInt32(reader.GetOrdinal("CustomerID")),
+                            ["clothForId"] = reader.IsDBNull(reader.GetOrdinal("Cloth_For_ID")) ? 0 : reader.GetInt32(reader.GetOrdinal("Cloth_For_ID")),
+                            ["details"] = ""
                         });
                     }
                 }
+
+                if (orderIds.Count > 0)
+                {
+                    var detailsMap = await LoadOrderListDetailsAsync(connection, orderIds, commandTimeoutSeconds);
+                    foreach (var order in orders)
+                    {
+                        var id = (int)order["orderId"]!;
+                        order["details"] = detailsMap.GetValueOrDefault(id, "");
+                    }
+                }
+
+                var responseOrders = orders.Select(o => new
+                {
+                    orderId = o["orderId"],
+                    orderSerialNumber = o["orderSerialNumber"],
+                    orderDate = o["orderDate"],
+                    deliveryDate = o["deliveryDate"],
+                    updateDeliveryDate = o["updateDeliveryDate"],
+                    orderAmount = o["orderAmount"],
+                    paidAmount = o["paidAmount"],
+                    dueAmount = o["dueAmount"],
+                    paymentStatus = o["paymentStatus"],
+                    deliveryStatus = o["deliveryStatus"],
+                    workStatus = o["workStatus"],
+                    measurementPrintCount = o["measurementPrintCount"],
+                    customerNumber = o["customerNumber"],
+                    customerName = o["customerName"],
+                    phone = o["phone"],
+                    address = o["address"],
+                    customerId = o["customerId"],
+                    clothForId = o["clothForId"],
+                    details = o["details"]
+                }).ToList();
 
                 var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
@@ -207,7 +240,7 @@ namespace TailorBD.API.Controllers
                     success = true,
                     data = new
                     {
-                        orders,
+                        orders = responseOrders,
                         totalCount,
                         totalPages,
                         currentPage = page
@@ -1278,6 +1311,41 @@ namespace TailorBD.API.Controllers
                 _logger.LogError(ex, "Error creating quick order for institution {InstitutionId}", model.InstitutionId);
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
+        }
+
+        private static async Task<Dictionary<int, string>> LoadOrderListDetailsAsync(
+            Microsoft.Data.SqlClient.SqlConnection connection,
+            List<int> orderIds,
+            int commandTimeoutSeconds)
+        {
+            var map = new Dictionary<int, string>();
+            if (orderIds.Count == 0) return map;
+
+            var idList = string.Join(",", orderIds.Distinct());
+            var query = $@"
+                SELECT ol.OrderID, d.Dress_Name, ol.DressQuantity
+                FROM OrderList ol WITH (NOLOCK)
+                INNER JOIN Dress d WITH (NOLOCK) ON ol.DressID = d.DressID
+                WHERE ol.OrderID IN ({idList})
+                ORDER BY ol.OrderID, ISNULL(ol.OrderList_SN, 99999)";
+
+            using var cmd = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
+            cmd.CommandTimeout = commandTimeoutSeconds;
+
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var orderId = reader.GetInt32(0);
+                var dressName = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                var qty = reader.IsDBNull(2) ? 0 : reader.GetInt32(2);
+                var part = $"{dressName} {qty} Piece ";
+                if (map.TryGetValue(orderId, out var existing))
+                    map[orderId] = existing + "; " + part;
+                else
+                    map[orderId] = part;
+            }
+
+            return map;
         }
 
     }

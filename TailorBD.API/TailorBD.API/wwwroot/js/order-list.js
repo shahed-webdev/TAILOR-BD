@@ -6,7 +6,7 @@ function orderListData() {
         orders: [],
         totalCount: 0,
         currentPage: 1,
-        pageSize: 100,
+        pageSize: 25,
         totalPages: 0,
         currentLang: window.currentLang || 'bn',
         filters: {
