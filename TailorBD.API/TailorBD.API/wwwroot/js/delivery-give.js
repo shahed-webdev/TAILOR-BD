@@ -5,6 +5,8 @@
     let institutionId = null;
     let registrationId = null;
     let allOrders = [];
+    let cachedReadyOrders = [];
+    let loadSeq = 0;
     let currentPage = 1;
     let deliveryFilter = 'all';
     const PAGE_SIZE = 100;
@@ -51,19 +53,41 @@
     function setupAutocomplete() {
         $('#mobileNo').autocomplete({
             source: function(request, response) {
+                const local = suggestFromCache('phone', request.term);
+                if (local) { response(local); return; }
                 fetchSuggestions('phone', request.term, function(suggestions) { response(suggestions); });
             },
             minLength: 3,
+            delay: 250,
             select: function(event, ui) { $(this).val(ui.item.value); return false; }
         });
 
         $('#orderNo').autocomplete({
             source: function(request, response) {
+                const local = suggestFromCache('order', request.term);
+                if (local) { response(local); return; }
                 fetchSuggestions('orderno', request.term, function(suggestions) { response(suggestions); });
             },
             minLength: 1,
+            delay: 250,
             select: function(event, ui) { $(this).val(ui.item.value); return false; }
         });
+    }
+
+    function suggestFromCache(type, term) {
+        if (!cachedReadyOrders.length || !term) return null;
+        const t = String(term).trim().toLowerCase();
+        const seen = {};
+        const matches = [];
+        for (let i = 0; i < cachedReadyOrders.length && matches.length < 10; i++) {
+            const o = cachedReadyOrders[i];
+            const value = type === 'phone' ? String(o.phone || '') : String(o.orderSerialNumber || '');
+            if (!value || seen[value]) continue;
+            if (value.toLowerCase().indexOf(t) === -1) continue;
+            seen[value] = true;
+            matches.push(value);
+        }
+        return matches;
     }
 
     function fetchSuggestions(field, term, callback) {
@@ -92,7 +116,52 @@
         }
     };
 
+    function showOrdersList(orders) {
+        const container = $('#ordersTableContainer');
+        if (orders && orders.length > 0) {
+            allOrders = sortOrdersByDeliveryPriority(orders);
+            deliveryFilter = 'all';
+            currentPage = 1;
+            updateDeliveryFilterBar();
+            renderOrdersTable(getFilteredOrders(), currentPage);
+        } else {
+            allOrders = [];
+            $('#deliveryFilterBar').hide();
+            $('#smsSendPanel').hide();
+            container.html('<div class="empty-message"><span class="lang-content" data-en="No ready-to-deliver orders found" data-bn="ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি">ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি</span></div>');
+        }
+    }
+
+    function filterCachedOrders(phone, orderNo) {
+        let list = cachedReadyOrders.slice();
+        if (phone) {
+            const p = phone.toLowerCase();
+            list = list.filter(function(o) { return String(o.phone || '').toLowerCase().indexOf(p) !== -1; });
+        }
+        if (orderNo) {
+            const nums = orderNo.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
+            list = list.filter(function(o) {
+                const serial = String(o.orderSerialNumber);
+                return nums.some(function(n) { return serial === n; });
+            });
+        }
+        return list;
+    }
+
+    function reloadReadyOrders() {
+        cachedReadyOrders = [];
+        loadReadyOrders();
+    }
+
     function loadReadyOrders(phone = '', orderNo = '', startDate = null, endDate = null) {
+        const hasDateFilter = !!(startDate || endDate);
+        const seq = ++loadSeq;
+
+        if (!hasDateFilter && cachedReadyOrders.length) {
+            showOrdersList(filterCachedOrders(phone, orderNo));
+            return;
+        }
+
         const container = $('#ordersTableContainer');
         container.html('<div class="loading"><span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span></div>');
         $('#smsSendPanel').hide();
@@ -108,19 +177,15 @@
             method: 'GET',
             timeout: 60000,
             success: function(response) {
-                if (response.success && response.data && response.data.orders.length > 0) {
-                    allOrders = sortOrdersByDeliveryPriority(response.data.orders);
-                    deliveryFilter = 'all';
-                    currentPage = 1;
-                    updateDeliveryFilterBar();
-                    renderOrdersTable(getFilteredOrders(), currentPage);
-                } else {
-                    allOrders = [];
-                    $('#deliveryFilterBar').hide();
-                    container.html('<div class="empty-message"><span class="lang-content" data-en="No ready-to-deliver orders found" data-bn="ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি">ডেলিভেরির জন্য প্রস্তুত কোন অর্ডার পাওয়া যায়নি</span></div>');
+                const orders = (response.success && response.data && response.data.orders) ? response.data.orders : [];
+                if (!hasDateFilter && !phone && !orderNo) {
+                    cachedReadyOrders = orders.slice();
                 }
+                if (seq !== loadSeq) return;
+                showOrdersList(orders);
             },
             error: function(xhr, status) {
+                if (seq !== loadSeq) return;
                 console.error('Error loading orders:', xhr);
                 const msg = status === 'timeout'
                     ? 'অর্ডার লোড হতে অনেক সময় লাগছে। API সার্ভার রিস্টার্ট করে আবার চেষ্টা করুন।'
@@ -567,7 +632,7 @@
                 success: function(response) {
                     if (response.success) {
                         alert(window.currentLang === 'en' ? 'Order delivered successfully!' : 'অর্ডার সফলভাবে ডেলিভার করা হয়েছে!');
-                        loadReadyOrders();
+                        reloadReadyOrders();
                     } else {
                         alert(response.message || 'Failed to deliver order');
                     }
@@ -878,7 +943,7 @@
                         if (canOpenReceipt) {
                             window.location.href = '/money-receipt.html?orderId=' + pdCurrentOrderId;
                         } else {
-                            loadReadyOrders();
+                            reloadReadyOrders();
                         }
                     }, 1000);
                 } else {

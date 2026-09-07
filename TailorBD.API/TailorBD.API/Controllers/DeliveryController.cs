@@ -65,10 +65,15 @@ namespace TailorBD.API.Controllers
                         SMS.SMS_Balance,
                         Institution.InstitutionName,
                         STUFF((
-                            SELECT '|' + D.Dress_Name + '~' + CAST(OL2.DressQuantity AS NVARCHAR(10)) + '~' + CAST(OL2.Pending_Work AS NVARCHAR(10))
+                            SELECT '|' + CAST(OL2.OrderListID AS NVARCHAR(20))
+                                 + '~' + CAST(ISNULL(OL2.OrderList_SN, 0) AS NVARCHAR(10))
+                                 + '~' + D.Dress_Name
+                                 + '~' + CAST(OL2.DressQuantity AS NVARCHAR(10))
+                                 + '~' + CAST(OL2.DressQuantity - ISNULL(OL2.WorkCompleteQuantity, 0) AS NVARCHAR(10))
                             FROM OrderList OL2
                             INNER JOIN Dress D ON OL2.DressID = D.DressID
                             WHERE OL2.OrderID = [Order].OrderID
+                              AND (OL2.DressQuantity - ISNULL(OL2.WorkCompleteQuantity, 0)) > 0
                             ORDER BY OL2.OrderList_SN
                             FOR XML PATH('')
                         ), 1, 1, '') AS DressItems
@@ -79,11 +84,11 @@ namespace TailorBD.API.Controllers
                     WHERE ([Order].InstitutionID = @InstitutionID) 
                     AND ([Order].DeliveryStatus IN (N'Pending', N'PartlyDelivered'))
                     AND ([Order].WorkStatus IN (N'incomplete', N'PartlyCompleted'))
-                    AND (Customer.Phone LIKE '%' + @Phone + '%')
-                    AND (CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
+                    AND (@Phone = '' OR Customer.Phone LIKE '%' + @Phone + '%')
+                    AND (@OrderSerialNumber = '0' OR CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)))
                     AND ([Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
-                    AND (ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
-                    AND (ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')
+                    AND (@CustomerName = '' OR ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
+                    AND (@Address = '' OR ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')
                     ORDER BY 
                         (CASE WHEN [Order].DeliveryDate = CAST(GETDATE() AS DATE) THEN 0 ELSE 1 END),
                         ISNULL([Order].DeliveryDate, '1-1-3000')
@@ -97,11 +102,11 @@ namespace TailorBD.API.Controllers
                     WHERE ([Order].InstitutionID = @InstitutionID) 
                     AND ([Order].DeliveryStatus IN (N'Pending', N'PartlyDelivered'))
                     AND ([Order].WorkStatus IN (N'incomplete', N'PartlyCompleted'))
-                    AND (Customer.Phone LIKE '%' + @Phone + '%')
-                    AND (CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
+                    AND (@Phone = '' OR Customer.Phone LIKE '%' + @Phone + '%')
+                    AND (@OrderSerialNumber = '0' OR CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)))
                     AND ([Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
-                    AND (ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
-                    AND (ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')";
+                    AND (@CustomerName = '' OR ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
+                    AND (@Address = '' OR ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')";
 
                 // Get total count
                 int totalCount = 0;
@@ -592,10 +597,15 @@ namespace TailorBD.API.Controllers
 
                     case "orderno":
                     case "orderserialnumber":
-                        query = @"SELECT DISTINCT TOP 10 CAST(OrderSerialNumber AS NVARCHAR(50)) AS OrderSerialNumber
-                                 FROM [Order]
-                                 WHERE InstitutionID = @InstitutionID
-                                 AND CAST(OrderSerialNumber AS NVARCHAR(50)) LIKE '%' + @Term + '%'
+                        query = @"SELECT DISTINCT TOP 10 CAST(o.OrderSerialNumber AS NVARCHAR(50)) AS OrderSerialNumber
+                                 FROM [Order] o WITH (NOLOCK)
+                                 WHERE o.InstitutionID = @InstitutionID
+                                 AND o.DeliveryStatus IN (N'Pending', N'PartlyDelivered')
+                                 AND o.WorkStatus IN (N'completed', N'PartlyCompleted')
+                                 AND (
+                                    o.OrderSerialNumber = TRY_CONVERT(INT, @Term)
+                                    OR CAST(o.OrderSerialNumber AS NVARCHAR(50)) LIKE @Term + '%'
+                                 )
                                  ORDER BY OrderSerialNumber";
                         break;
 
@@ -652,7 +662,32 @@ namespace TailorBD.API.Controllers
                 using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
 
-                var query = @"
+                var where = new List<string>
+                {
+                    "o.InstitutionID = @InstitutionID",
+                    "o.DeliveryStatus IN (N'Pending', N'PartlyDelivered')",
+                    @"(o.WorkStatus IN (N'completed', N'PartlyCompleted')
+                       OR pw.OrderID IS NULL)"
+                };
+
+                if (!string.IsNullOrWhiteSpace(phone))
+                    where.Add("c.Phone LIKE @Phone + '%'");
+
+                var serialNumbers = (orderSerialNumbers ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Where(s => int.TryParse(s, out _))
+                    .Select(int.Parse)
+                    .Distinct()
+                    .ToList();
+                if (serialNumbers.Count > 0)
+                    where.Add($"o.OrderSerialNumber IN ({string.Join(",", serialNumbers)})");
+
+                if (startDate.HasValue)
+                    where.Add("o.DeliveryDate >= @StartDate");
+                if (endDate.HasValue)
+                    where.Add("o.DeliveryDate <= @EndDate");
+
+                var query = $@"
                     SELECT 
                         o.OrderID, 
                         o.OrderSerialNumber,
@@ -671,23 +706,21 @@ namespace TailorBD.API.Controllers
                         ISNULL(s.SMS_Balance, 0) AS SMS_Balance,
                         i.InstitutionName,
                         CASE 
-                            WHEN EXISTS (SELECT 1 FROM OrderList ol WITH (NOLOCK) WHERE ol.OrderID = o.OrderID AND ol.Pending_Work <> 0) 
-                            THEN N'PartlyCompleted'
+                            WHEN pw.OrderID IS NOT NULL THEN N'PartlyCompleted'
                             ELSE N'completed'
                         END AS WorkStatus
                     FROM [Order] o WITH (NOLOCK)
                     INNER JOIN Customer c WITH (NOLOCK) ON o.CustomerID = c.CustomerID
                     LEFT JOIN SMS s WITH (NOLOCK) ON o.InstitutionID = s.InstitutionID
                     INNER JOIN Institution i WITH (NOLOCK) ON o.InstitutionID = i.InstitutionID
-                    WHERE o.InstitutionID = @InstitutionID
-                    AND o.DeliveryStatus IN (N'Pending', N'PartlyDelivered')
-                    AND (
-                        o.WorkStatus IN (N'completed', N'PartlyCompleted')
-                        OR NOT EXISTS (SELECT 1 FROM OrderList ol WITH (NOLOCK) WHERE ol.OrderID = o.OrderID AND ol.Pending_Work <> 0)
-                    )
-                    AND (@Phone = '' OR c.Phone LIKE @Phone + '%')
-                    AND (CAST(o.OrderSerialNumber AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)) OR @OrderSerialNumber = '0')
-                    AND (o.DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
+                    LEFT JOIN (
+                        SELECT ol.OrderID
+                        FROM OrderList ol WITH (NOLOCK)
+                        INNER JOIN [Order] o2 WITH (NOLOCK) ON o2.OrderID = ol.OrderID
+                        WHERE o2.InstitutionID = @InstitutionID AND ol.Pending_Work <> 0
+                        GROUP BY ol.OrderID
+                    ) pw ON pw.OrderID = o.OrderID
+                    WHERE {string.Join(" AND ", where)}
                     ORDER BY o.DeliveryDate";
 
                 var orders = new List<ReadyOrderModel>();
@@ -695,10 +728,12 @@ namespace TailorBD.API.Controllers
                 {
                     cmd.CommandTimeout = 60;
                     cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
-                    cmd.Parameters.AddWithValue("@Phone", phone ?? "");
-                    cmd.Parameters.AddWithValue("@OrderSerialNumber", orderSerialNumbers ?? "0");
-                    cmd.Parameters.AddWithValue("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@EndDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value);
+                    if (!string.IsNullOrWhiteSpace(phone))
+                        cmd.Parameters.AddWithValue("@Phone", phone);
+                    if (startDate.HasValue)
+                        cmd.Parameters.AddWithValue("@StartDate", startDate.Value);
+                    if (endDate.HasValue)
+                        cmd.Parameters.AddWithValue("@EndDate", endDate.Value);
 
                     using var reader = await cmd.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
@@ -1357,7 +1392,24 @@ namespace TailorBD.API.Controllers
             foreach (var part in raw.Split('|', StringSplitOptions.RemoveEmptyEntries))
             {
                 var fields = part.Split('~');
-                if (fields.Length >= 3)
+                if (fields.Length >= 5)
+                {
+                    int.TryParse(fields[0], out int orderListId);
+                    int.TryParse(fields[1], out int orderListSn);
+                    int.TryParse(fields[3], out int qty);
+                    int.TryParse(fields[4], out int pending);
+                    result.Add(new
+                    {
+                        orderListId,
+                        orderListSN = orderListSn,
+                        dressName = fields[2],
+                        dressQuantity = qty,
+                        total = qty,
+                        pendingWork = pending,
+                        remainingWork = pending
+                    });
+                }
+                else if (fields.Length >= 3)
                 {
                     result.Add(new
                     {

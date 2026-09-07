@@ -14,6 +14,9 @@ let totalCount = 0;
 let totalPages = 0;
 let currentFilters = {};
 let currentLanguage = localStorage.getItem('language') || 'bn';
+let allLoadedOrders = [];
+let cachedIncompleteOrders = [];
+let institutionInfoCache = null;
 
 // Autocomplete Search History
 const SEARCH_HISTORY_KEY = 'incompleteWorkSearchHistory';
@@ -203,6 +206,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Setup search tabs
         setupSearchTabs();
+        setupLegendFilters();
 
         // Load initial data
         await searchOrders();
@@ -218,8 +222,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Listen for language change event
         $(document).on('languageChanged', async function(event, lang) {
             console.log('Language changed to:', lang);
-            // Reload the table with new language
-            await searchOrders();
+            await renderFromCache();
         });
 
         // Initialize autocomplete after jQuery UI is loaded
@@ -257,49 +260,115 @@ function setupSearchTabs() {
     });
 }
 
+function getSearchCriteria() {
+    const searchType = document.querySelector('input[name="searchType"]:checked')?.value || 'number';
+    if (searchType === 'date') {
+        return {
+            phone: '',
+            customerName: '',
+            orderNo: '',
+            address: '',
+            startDate: document.getElementById('startDate')?.value || '',
+            endDate: document.getElementById('endDate')?.value || ''
+        };
+    }
+    return {
+        phone: document.getElementById('mobileNo')?.value.trim() || '',
+        customerName: document.getElementById('customerName')?.value.trim() || '',
+        orderNo: document.getElementById('orderNo')?.value.trim() || '',
+        address: document.getElementById('address')?.value.trim() || '',
+        startDate: '',
+        endDate: ''
+    };
+}
+
+function orderDeliveryDateKey(order) {
+    if (!order.deliveryDate) return '';
+    return String(order.deliveryDate).split('T')[0];
+}
+
+function orderMatchesSearch(order, criteria) {
+    if (criteria.phone && String(order.phone || '').indexOf(criteria.phone) === -1) return false;
+    if (criteria.customerName && String(order.customerName || '').toLowerCase().indexOf(criteria.customerName.toLowerCase()) === -1) return false;
+    if (criteria.address && String(order.address || '').toLowerCase().indexOf(criteria.address.toLowerCase()) === -1) return false;
+    if (criteria.orderNo) {
+        const nums = criteria.orderNo.split(',').map(n => n.trim()).filter(Boolean);
+        if (!nums.some(n => String(order.orderSerialNumber) === n)) return false;
+    }
+    const day = orderDeliveryDateKey(order);
+    if (criteria.startDate && (!day || day < criteria.startDate)) return false;
+    if (criteria.endDate && (!day || day > criteria.endDate)) return false;
+    return true;
+}
+
+function rememberSearchTerms(criteria) {
+    if (criteria.phone) addToSearchHistory('mobileNo', criteria.phone);
+    if (criteria.customerName) addToSearchHistory('customerName', criteria.customerName);
+    if (criteria.address) addToSearchHistory('address', criteria.address);
+    if (criteria.orderNo) {
+        criteria.orderNo.split(',').map(n => n.trim()).filter(Boolean).forEach(num => addToSearchHistory('orderNo', num));
+    }
+}
+
+function itemsFromDressItems(order) {
+    return (order.dressItems || []).map((item, index) => ({
+        orderListId: item.orderListId || 0,
+        orderListSN: item.orderListSN || (index + 1),
+        dressName: item.dressName,
+        dressQuantity: item.dressQuantity ?? item.total ?? 0,
+        pendingWork: item.pendingWork ?? item.remainingWork ?? 0,
+        remainingWork: item.remainingWork ?? item.pendingWork ?? 0
+    })).filter(item => (item.remainingWork ?? item.pendingWork ?? 0) > 0);
+}
+
+async function ensureOrderListCache(orders) {
+    const missing = orders.filter(order => !orderListItemsCache[order.orderId]);
+    missing.forEach(order => {
+        const fromApi = itemsFromDressItems(order);
+        if (fromApi.length && fromApi.every(item => item.orderListId)) {
+            orderListItemsCache[order.orderId] = fromApi;
+        }
+    });
+    const stillMissing = orders.filter(order => !orderListItemsCache[order.orderId]);
+    if (!stillMissing.length) return;
+    await Promise.all(stillMissing.map(async order => {
+        orderListItemsCache[order.orderId] = await getIncompleteOrderList(order.orderId);
+    }));
+}
+
+async function renderFromCache() {
+    const criteria = getSearchCriteria();
+    const searched = cachedIncompleteOrders.filter(order => orderMatchesSearch(order, criteria));
+    allLoadedOrders = searched;
+    totalCount = searched.length;
+    totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 0;
+    if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageOrders = searched.slice(start, start + PAGE_SIZE);
+    await renderOrdersTable(pageOrders);
+    applyLegendFilters();
+}
+
 // Search orders
-async function searchOrders(page) {
+async function searchOrders(page, forceReload) {
     if (typeof page === 'number') {
         currentPage = page;
     } else {
         currentPage = 1;
     }
 
-    const searchType = document.querySelector('input[name="searchType"]:checked').value;
+    rememberSearchTerms(getSearchCriteria());
+
+    if (cachedIncompleteOrders.length && !forceReload) {
+        await renderFromCache();
+        return;
+    }
+
     const ordersTableContainer = document.getElementById('ordersTableContainer');
     ordersTableContainer.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
 
     try {
-        let queryParams = `institutionId=${currentInstitutionId}&page=${currentPage}&pageSize=${PAGE_SIZE}`;
-
-        if (searchType === 'number') {
-            const phone = document.getElementById('mobileNo').value.trim();
-            const customerName = document.getElementById('customerName').value.trim();
-            const orderNo = document.getElementById('orderNo').value.trim();
-            const address = document.getElementById('address').value.trim();
-
-            // Add to search history only if values are not empty
-            if (phone) addToSearchHistory('mobileNo', phone);
-            if (customerName) addToSearchHistory('customerName', customerName);
-            if (orderNo) {
-                // Split comma-separated order numbers and add each to history
-                const orderNumbers = orderNo.split(',').map(n => n.trim()).filter(n => n);
-                orderNumbers.forEach(num => addToSearchHistory('orderNo', num));
-            }
-            if (address) addToSearchHistory('address', address);
-
-            if (phone) queryParams += `&phone=${encodeURIComponent(phone)}`;
-            if (customerName) queryParams += `&customerName=${encodeURIComponent(customerName)}`;
-            if (orderNo) queryParams += `&orderSerialNumbers=${encodeURIComponent(orderNo)}`;
-            if (address) queryParams += `&address=${encodeURIComponent(address)}`;
-        } else {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (startDate) queryParams += `&startDate=${startDate}`;
-            if (endDate) queryParams += `&endDate=${endDate}`;
-        }
-
+        const queryParams = `institutionId=${currentInstitutionId}&page=1&pageSize=2000`;
         const response = await fetch(`/api/Delivery/incomplete-works?${queryParams}`);
         const result = await response.json();
 
@@ -307,20 +376,12 @@ async function searchOrders(page) {
             throw new Error(result.message || 'Failed to load orders');
         }
 
-        // Update total count
-        const totalCountEl = document.getElementById('totalCount');
-        totalCount = result.data.totalCount || 0;
-        totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 0;
-        const lang = window.currentLang || 'bn';
-        
-        if (lang === 'en') {
-            totalCountEl.innerHTML = `Total: <strong>${totalCount}</strong> incomplete orders`;
-        } else {
-            totalCountEl.innerHTML = `সর্বমোট: <strong>${totalCount}</strong> টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে`;
+        cachedIncompleteOrders = result.data.orders || [];
+        if (cachedIncompleteOrders.length && cachedIncompleteOrders[0].institutionName && !institutionInfoCache) {
+            institutionInfoCache = { institutionName: cachedIncompleteOrders[0].institutionName };
         }
 
-        // Render orders table
-        await renderOrdersTable(result.data.orders);
+        await renderFromCache();
 
     } catch (error) {
         console.error('Error loading orders:', error);
@@ -363,7 +424,8 @@ function renderPaginationHtml() {
 
 window.goToIncompletePage = function(page) {
     if (page < 1 || page > totalPages) return;
-    searchOrders(page);
+    currentPage = page;
+    renderFromCache();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -380,11 +442,7 @@ async function renderOrdersTable(orders) {
         return;
     }
 
-    // Pre-fetch all order list items and cache
-    orderListItemsCache = {};
-    for (const order of orders) {
-        orderListItemsCache[order.orderId] = await getIncompleteOrderList(order.orderId);
-    }
+    await ensureOrderListCache(orders);
 
     const paginationHtml = renderPaginationHtml();
 
@@ -436,7 +494,10 @@ async function renderOrdersTable(orders) {
         const customerLabel = `(${order.customerNumber}) ${order.customerName}`;
 
         tableHTML += `
-            <tr class="${rowClass}" data-order-id="${order.orderId}">
+            <tr class="${rowClass}" data-order-id="${order.orderId}"
+                data-is-today="${order.isToday ? '1' : '0'}"
+                data-is-overdue="${order.isOverdue ? '1' : '0'}"
+                data-is-partly="${order.isPartlyCompleted ? '1' : '0'}">
                 <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
                 <td class="col-order-no-cell">
                     <a href="order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}" class="view-measurement-link" target="_blank" title="${lang === 'en' ? 'View measurement' : 'মাপ দেখুন'}">
@@ -529,7 +590,10 @@ function renderMobileCards(orders) {
         });
 
         html += `
-        <div class="iw-card ${rowClass}" data-order-id="${order.orderId}">
+        <div class="iw-card ${rowClass}" data-order-id="${order.orderId}"
+            data-is-today="${order.isToday ? '1' : '0'}"
+            data-is-overdue="${order.isOverdue ? '1' : '0'}"
+            data-is-partly="${order.isPartlyCompleted ? '1' : '0'}">
             <div class="ic-top">
                 <input type="checkbox" class="order-checkbox ic-chk" data-order-id="${order.orderId}">
                 <a href="order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}"
@@ -877,7 +941,9 @@ async function completeWork() {
 
         if (result.success) {
             alert(result.message || 'অর্ডারের কাজ সফলভাবে সম্পূর্ণ হয়েছে');
-            await searchOrders(currentPage);
+            cachedIncompleteOrders = [];
+            orderListItemsCache = {};
+            await searchOrders(1, true);
         } else {
             throw new Error(result.message || 'Failed to complete work');
         }
@@ -890,6 +956,260 @@ async function completeWork() {
         document.getElementById('btnComplete').textContent = 'কাজ সম্পূর্ণ করুন';
     }
 }
+
+function getActiveLegendFilters() {
+    return Array.from(document.querySelectorAll('.legend-filter-cb:checked')).map(cb => cb.value);
+}
+
+function orderMatchesLegendFilter(orderOrEl, filters) {
+    if (!filters || filters.length === 0) return true;
+    const isToday = orderOrEl.isToday === true || orderOrEl.dataset?.isToday === '1';
+    const isOverdue = orderOrEl.isOverdue === true || orderOrEl.dataset?.isOverdue === '1';
+    const isPartly = orderOrEl.isPartlyCompleted === true || orderOrEl.dataset?.isPartly === '1';
+    return filters.some(f =>
+        (f === 'today' && isToday) ||
+        (f === 'overdue' && isOverdue) ||
+        (f === 'partly' && isPartly)
+    );
+}
+
+function updateTotalCountText(visibleCount) {
+    const totalCountEl = document.getElementById('totalCount');
+    if (!totalCountEl) return;
+    const lang = window.currentLang || 'bn';
+    const filters = getActiveLegendFilters();
+    if (filters.length === 0) {
+        totalCountEl.innerHTML = lang === 'en'
+            ? `Total: <strong>${totalCount}</strong> incomplete orders`
+            : `সর্বমোট: <strong>${totalCount}</strong> টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে`;
+        return;
+    }
+    totalCountEl.innerHTML = lang === 'en'
+        ? `Showing: <strong>${visibleCount}</strong> of ${totalCount} incomplete orders`
+        : `দেখানো হচ্ছে: <strong>${visibleCount}</strong> টি (মোট ${totalCount} টি অসম্পূর্ণ অর্ডার)`;
+}
+
+function applyLegendFilters() {
+    const filters = getActiveLegendFilters();
+    document.querySelectorAll('.legend-filter').forEach(item => {
+        const cb = item.querySelector('.legend-filter-cb');
+        item.classList.toggle('is-active', !!(cb && cb.checked));
+    });
+
+    const visibleCount = allLoadedOrders.filter(order => orderMatchesLegendFilter(order, filters)).length;
+    document.querySelectorAll('#ordersTableContainer tbody tr[data-order-id]').forEach(row => {
+        row.style.display = orderMatchesLegendFilter(row, filters) ? '' : 'none';
+    });
+    document.querySelectorAll('#iwCardsContainer .iw-card[data-order-id]').forEach(card => {
+        card.style.display = orderMatchesLegendFilter(card, filters) ? '' : 'none';
+    });
+
+    updateTotalCountText(visibleCount);
+
+    const lang = window.currentLang || 'bn';
+    let emptyEl = document.getElementById('iwFilterEmpty');
+    if (!emptyEl) {
+        emptyEl = document.createElement('div');
+        emptyEl.id = 'iwFilterEmpty';
+        emptyEl.className = 'empty-message no-print';
+        const tableWrap = document.querySelector('.table-wrapper');
+        if (tableWrap) tableWrap.appendChild(emptyEl);
+    }
+    const noMatch = filters.length > 0 && visibleCount === 0 && allLoadedOrders.length > 0;
+    emptyEl.style.display = noMatch ? '' : 'none';
+    emptyEl.textContent = lang === 'en'
+        ? 'No orders match the selected filters'
+        : 'নির্বাচিত ফিল্টারে কোন অর্ডার পাওয়া যায়নি';
+}
+
+function setupLegendFilters() {
+    document.querySelectorAll('.legend-filter-cb').forEach(cb => {
+        cb.addEventListener('change', applyLegendFilters);
+    });
+}
+
+function getFilteredOrders(sourceOrders) {
+    const filters = getActiveLegendFilters();
+    const criteria = getSearchCriteria();
+    const list = sourceOrders || cachedIncompleteOrders || allLoadedOrders || [];
+    return list
+        .filter(order => orderMatchesSearch(order, criteria))
+        .filter(order => orderMatchesLegendFilter(order, filters));
+}
+
+function getOrderDressItems(order) {
+    if (orderListItemsCache[order.orderId] && orderListItemsCache[order.orderId].length) {
+        return orderListItemsCache[order.orderId].map(item => ({
+            dressName: item.dressName,
+            total: item.dressQuantity,
+            pendingWork: item.remainingWork ?? item.pendingWork ?? 0
+        }));
+    }
+    return (order.dressItems || []).map(item => ({
+        dressName: item.dressName,
+        total: item.total ?? item.dressQuantity ?? 0,
+        pendingWork: item.pendingWork ?? item.remainingWork ?? 0
+    }));
+}
+
+function buildIncompletePrintQuery() {
+    const searchType = document.querySelector('input[name="searchType"]:checked')?.value;
+    let queryParams = `institutionId=${currentInstitutionId}&page=1&pageSize=${Math.max(totalCount || PAGE_SIZE, PAGE_SIZE)}`;
+
+    if (searchType === 'number') {
+        const phone = document.getElementById('mobileNo').value.trim();
+        const customerName = document.getElementById('customerName').value.trim();
+        const orderNo = document.getElementById('orderNo').value.trim();
+        const address = document.getElementById('address').value.trim();
+        if (phone) queryParams += `&phone=${encodeURIComponent(phone)}`;
+        if (customerName) queryParams += `&customerName=${encodeURIComponent(customerName)}`;
+        if (orderNo) queryParams += `&orderSerialNumbers=${encodeURIComponent(orderNo)}`;
+        if (address) queryParams += `&address=${encodeURIComponent(address)}`;
+    } else if (searchType === 'date') {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        if (startDate) queryParams += `&startDate=${startDate}`;
+        if (endDate) queryParams += `&endDate=${endDate}`;
+    }
+    return queryParams;
+}
+
+async function fetchAllOrdersForPrint() {
+    if (cachedIncompleteOrders.length) return cachedIncompleteOrders;
+    if (allLoadedOrders.length) return allLoadedOrders;
+    const response = await fetch(`/api/Delivery/incomplete-works?${buildIncompletePrintQuery()}`);
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message || 'Failed to load orders');
+    return result.data.orders || [];
+}
+
+function getLegendFilterLabels(lang) {
+    const labels = [];
+    if (document.getElementById('filterToday')?.checked) labels.push(lang === 'en' ? "Today's delivery" : 'আজকের ডেলিভারি');
+    if (document.getElementById('filterOverdue')?.checked) labels.push(lang === 'en' ? 'Overdue' : 'তারিখ অতিক্রান্ত');
+    if (document.getElementById('filterPartly')?.checked) labels.push(lang === 'en' ? 'Partly done' : 'আংশিক সম্পন্ন');
+    return labels;
+}
+
+function renderPrintList(orders) {
+    const lang = window.currentLang || 'bn';
+    const printArea = document.getElementById('iwPrintArea');
+    if (!printArea) return;
+
+    const titleEl = document.getElementById('printRepTitle');
+    const metaEl = document.getElementById('printRepMeta');
+    const filterLabels = getLegendFilterLabels(lang);
+    if (titleEl) {
+        titleEl.textContent = lang === 'en' ? 'Incomplete Orders List' : 'অসম্পূর্ণ অর্ডারের তালিকা';
+    }
+    if (metaEl) {
+        const now = new Date();
+        const printedOn = formatDate(now.toISOString());
+        const filterText = filterLabels.length
+            ? (lang === 'en' ? `Filter: ${filterLabels.join(', ')}` : `ফিল্টার: ${filterLabels.join(', ')}`)
+            : (lang === 'en' ? 'All incomplete orders' : 'সকল অসম্পূর্ণ অর্ডার');
+        metaEl.textContent = lang === 'en'
+            ? `${filterText} | Total: ${orders.length} | Printed: ${printedOn}`
+            : `${filterText} | মোট: ${orders.length} টি | প্রিন্ট: ${printedOn}`;
+    }
+
+    let rows = '';
+    orders.forEach((order, index) => {
+        let rowClass = '';
+        if (order.isToday) rowClass = 'today';
+        else if (order.isOverdue) rowClass = 'overdue';
+        else if (order.isPartlyCompleted) rowClass = 'partly-completed';
+
+        const items = getOrderDressItems(order);
+        const itemsHtml = items.length
+            ? `<ul class="iw-print-items">${items.map(item =>
+                `<li>${escapeHtml(item.dressName)} — ${lang === 'en' ? 'Tot' : 'মো'}: ${item.total}, ${lang === 'en' ? 'Inc' : 'অসম্পূ'}: ${item.pendingWork}</li>`
+              ).join('')}</ul>`
+            : '-';
+
+        rows += `
+            <tr class="${rowClass}">
+                <td class="num">${index + 1}</td>
+                <td class="num">${order.orderSerialNumber}</td>
+                <td>${escapeHtml(`(${order.customerNumber}) ${order.customerName}`)}</td>
+                <td>${escapeHtml(order.phone || '-')}</td>
+                <td>${itemsHtml}</td>
+                <td class="num">${formatDate(order.orderDate)}</td>
+                <td class="num">${order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</td>
+            </tr>`;
+    });
+
+    printArea.innerHTML = `
+        <table class="iw-print-table">
+            <thead>
+                <tr>
+                    <th>${lang === 'en' ? 'SL' : 'ক্রম'}</th>
+                    <th>${lang === 'en' ? 'No.' : 'নং'}</th>
+                    <th>${lang === 'en' ? 'Name' : 'নাম'}</th>
+                    <th>${lang === 'en' ? 'Phone' : 'মোবাইল'}</th>
+                    <th>${lang === 'en' ? 'Order List' : 'অর্ডার লিস্ট'}</th>
+                    <th>${lang === 'en' ? 'Order' : 'অর্ডার'}</th>
+                    <th>${lang === 'en' ? 'Delivery' : 'ডেলিভারি'}</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>`;
+}
+
+async function loadInstitutionInfoForPrint() {
+    if (institutionInfoCache && institutionInfoCache.phone) return institutionInfoCache;
+    try {
+        const response = await fetch(`/api/institution/${currentInstitutionId}`);
+        const result = await response.json();
+        if (result && (result.data || result.institutionName)) {
+            institutionInfoCache = result.data || result;
+        }
+    } catch (error) {
+        console.warn('Could not load institution info for print', error);
+    }
+    return institutionInfoCache;
+}
+
+function fillPrintHeader() {
+    const info = institutionInfoCache || {};
+    const nameEl = document.getElementById('printInsName');
+    const phoneEl = document.getElementById('printInsPhone');
+    const addressEl = document.getElementById('printInsAddress');
+    if (nameEl) nameEl.textContent = info.institutionName || '';
+    if (phoneEl) phoneEl.textContent = info.phone ? info.phone : '';
+    if (addressEl) addressEl.textContent = info.address ? info.address : '';
+}
+
+async function printIncompleteList() {
+    const lang = window.currentLang || 'bn';
+    const btn = document.querySelector('.btn-print-list');
+    const originalHtml = btn ? btn.innerHTML : '';
+    try {
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${lang === 'en' ? 'Preparing...' : 'প্রস্তুত হচ্ছে...'}</span>`;
+        }
+        await loadInstitutionInfoForPrint();
+        fillPrintHeader();
+        const orders = getFilteredOrders(await fetchAllOrdersForPrint());
+        if (!orders.length) {
+            alert(lang === 'en' ? 'No orders to print' : 'প্রিন্ট করার মতো কোন অর্ডার নেই');
+            return;
+        }
+        renderPrintList(orders);
+        window.print();
+    } catch (error) {
+        console.error('Error printing list:', error);
+        alert(lang === 'en' ? 'Could not prepare print list' : 'তালিকা প্রিন্ট করতে সমস্যা হয়েছে');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+}
+
+window.printIncompleteList = printIncompleteList;
 
 // Format date helper - Compact version
 function formatDate(dateString) {

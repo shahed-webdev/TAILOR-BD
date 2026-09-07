@@ -606,15 +606,83 @@
         }
         .result-summary-bar .rs-count { font-size: 14px; font-weight: 700; color: #2c3e50; }
         .result-summary-bar .rs-count strong { color: #6c7ae0; }
-        .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+        .legend { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
         .legend-item { display: flex; align-items: center; gap: 5px; font-size: 13px; }
         .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
         .legend-box.today   { background: #d4edda; }
         .legend-box.overdue { background: #ffe6e6; }
         .legend-box.partly  { background: #e6f7ff; }
 
-        /* ===== MOBILE CARD LAYOUT ===== */
-        @media (max-width: 767px) {
+        .legend-filter {
+            cursor: pointer;
+            user-select: none;
+            margin: 0;
+            padding: 3px 8px 3px 6px;
+            border: 1px solid #d5daf0;
+            border-radius: 16px;
+            background: #fff;
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+        }
+        .legend-filter:hover { border-color: #6c7ae0; }
+        .legend-filter input.legend-filter-cb {
+            width: 14px;
+            height: 14px;
+            margin: 0;
+            cursor: pointer;
+            accent-color: #6c7ae0;
+        }
+        .legend-filter.is-active { font-weight: 600; box-shadow: 0 0 0 2px rgba(108,122,224,0.18); }
+        .legend-filter.is-active[data-filter="today"] { background: #d4edda; border-color: #28a745; }
+        .legend-filter.is-active[data-filter="overdue"] { background: #ffe6e6; border-color: #dc3545; }
+        .legend-filter.is-active[data-filter="partly"] { background: #e6f7ff; border-color: #17a2b8; }
+
+        .btn-print-list {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+            padding: 6px 12px;
+            background: #fff;
+            color: #5a68c9;
+            border: 1px solid #c5cbf0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .btn-print-list:hover { background: #eef0ff; border-color: #6c7ae0; }
+
+        .iw-print-area { display: none; }
+        .iw-print-header { display: none; text-align: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #333; }
+        .iw-print-header .ins-name { font-size: 18px; font-weight: 800; }
+        .iw-print-header .ins-meta { font-size: 12px; color: #444; margin: 2px 0; }
+        .iw-print-header .rep-title { font-size: 15px; font-weight: 700; margin: 8px 0 4px; }
+        .iw-print-header .rep-date { font-size: 16px; font-weight: 700; color: #222; }
+
+        .iw-print-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .iw-print-table th,
+        .iw-print-table td {
+            border: 1px solid #999;
+            padding: 4px 5px;
+            vertical-align: top;
+            text-align: left;
+        }
+        .iw-print-table th {
+            background: #eee;
+            text-align: center;
+            font-weight: 700;
+        }
+        .iw-print-table td.num { text-align: center; white-space: nowrap; }
+        .iw-print-items { margin: 0; padding-left: 16px; }
+        .iw-print-items li { margin: 0; }
+
+        /* ===== MOBILE CARD LAYOUT (screen only — never in print) ===== */
+        @media screen and (max-width: 767px) {
             .search-tabs { width: 100%; }
             .search-tabs label { flex: 1; justify-content: center; font-size: 12px; padding: 6px 8px; }
             .orders-table-container { overflow-x: hidden; }
@@ -774,6 +842,33 @@
             margin-bottom: 8px;
         }
         .iw-mobile-select-bar input[type="checkbox"] { width: 16px; height: 16px; }
+
+        @media print {
+            #app-navbar, #app-sidebar, .search-section, .result-summary-bar,
+            .btn-complete, .iw-pagination-bar, .iw-cards-list, .iw-mobile-select-bar,
+            #ordersTableContainer, .iw-card, .no-print { display: none !important; }
+            .main-content { margin-left: 0 !important; padding: 0 !important; }
+            .dashboard-content, .work-complete-container, .content, .container,
+            .orders-table-container, .table-wrapper {
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                background: #fff !important;
+                overflow: visible !important;
+            }
+            .work-complete-container h2 { display: none !important; }
+            .iw-print-area, .iw-print-header { display: block !important; }
+            .iw-print-table th,
+            .iw-print-table td,
+            .iw-print-table tr.today td,
+            .iw-print-table tr.overdue td,
+            .iw-print-table tr.partly-completed td {
+                background: #fff !important;
+                -webkit-print-color-adjust: economy;
+                print-color-adjust: economy;
+            }
+            .iw-print-table th { background: #fff !important; }
+        }
     </style>
 </head>
 <body>
@@ -787,10 +882,10 @@
     <main class="main-content" id="mainContent">
         <div class="dashboard-content">
             <div class="work-complete-container">
-                <h2><span class="lang-content" data-en="Complete Incomplete Orders" data-bn="অসম্পূর্ণ অর্ডার সম্পন্ন করুন">অসম্পূর্ণ অর্ডার সম্পন্ন করুন</span></h2>
+                <h2 class="no-print"><span class="lang-content" data-en="Complete Incomplete Orders" data-bn="অসম্পূর্ণ অর্ডার সম্পন্ন করুন">অসম্পূর্ণ অর্ডার সম্পন্ন করুন</span></h2>
 
                 <!-- Search Section -->
-                <div class="search-section">
+                <div class="search-section no-print">
                     <div class="search-tabs">
                         <label>
                             <input type="radio" name="searchType" value="number" checked>
@@ -862,25 +957,41 @@
 
                 <!-- Orders Table -->
                 <div class="orders-table-container">
-                    <div class="result-summary-bar">
+                    <div class="result-summary-bar no-print">
                         <span class="rs-count" id="totalCount">
                             <span class="lang-content" data-en="Total: 0 incomplete orders" data-bn="মোট: ০ টি অসম্পূর্ণ অর্ডার">মোট: ০ টি অসম্পূর্ণ অর্ডার</span>
                         </span>
                         <div class="legend">
-                            <div class="legend-item">
+                            <label class="legend-item legend-filter" data-filter="today">
+                                <input type="checkbox" id="filterToday" class="legend-filter-cb" value="today">
                                 <div class="legend-box today"></div>
                                 <span class="lang-content" data-en="Today's delivery" data-bn="আজকের ডেলিভারি">আজকের ডেলিভারি</span>
-                            </div>
-                            <div class="legend-item">
+                            </label>
+                            <label class="legend-item legend-filter" data-filter="overdue">
+                                <input type="checkbox" id="filterOverdue" class="legend-filter-cb" value="overdue">
                                 <div class="legend-box overdue"></div>
                                 <span class="lang-content" data-en="Overdue" data-bn="তারিখ অতিক্রান্ত">তারিখ অতিক্রান্ত</span>
-                            </div>
-                            <div class="legend-item">
+                            </label>
+                            <label class="legend-item legend-filter" data-filter="partly">
+                                <input type="checkbox" id="filterPartly" class="legend-filter-cb" value="partly">
                                 <div class="legend-box partly"></div>
                                 <span class="lang-content" data-en="Partly done" data-bn="আংশিক সম্পন্ন">আংশিক সম্পন্ন</span>
-                            </div>
+                            </label>
                         </div>
+                        <button type="button" class="btn-print-list" onclick="printIncompleteList()">
+                            <i class="fas fa-print"></i>
+                            <span class="lang-content" data-en="Print List" data-bn="তালিকা প্রিন্ট">তালিকা প্রিন্ট</span>
+                        </button>
                     </div>
+
+                    <div class="iw-print-header" id="iwPrintHeader">
+                        <div class="ins-name" id="printInsName"></div>
+                        <div class="ins-meta" id="printInsPhone"></div>
+                        <div class="ins-meta" id="printInsAddress"></div>
+                        <div class="rep-title" id="printRepTitle"></div>
+                        <div class="rep-date" id="printRepMeta"></div>
+                    </div>
+                    <div class="iw-print-area" id="iwPrintArea"></div>
 
                     <div class="table-wrapper">
                         <div id="ordersTableContainer">
@@ -889,7 +1000,7 @@
                         <div id="iwCardsContainer" class="iw-cards-list"></div>
                     </div>
 
-                    <button type="button" class="btn-complete" id="btnComplete" onclick="completeWork()" disabled>
+                    <button type="button" class="btn-complete no-print" id="btnComplete" onclick="completeWork()" disabled>
                         <span class="lang-content" data-en="Complete Work" data-bn="কাজ সম্পন্ন করুন">কাজ সম্পন্ন করুন</span>
                     </button>
                 </div>
@@ -914,6 +1025,6 @@
     <script src="/js/app-components.js?v=2.1.9"></script>
     
     <!-- Incomplete Works JS -->
-    <script src="/js/incomplete-works.js?v=2.2.5"></script>
+    <script src="/js/incomplete-works.js?v=2.2.8"></script>
 </body>
 </html>
