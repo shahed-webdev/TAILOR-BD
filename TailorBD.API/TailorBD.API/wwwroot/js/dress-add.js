@@ -143,6 +143,8 @@ function populateTable(dresses) {
                         ${dress.Dress_Name}
                     </a>
                 </td>
+                        <td class="text-center">${Number(dress.CuttingCost||0).toFixed(2)}</td>
+                        <td class="text-center">${Number(dress.SewingCost||0).toFixed(2)}</td>
                 <td>
                     ${imageHtml}
                 </td>
@@ -197,6 +199,8 @@ function addDress() {
     // Prepare data
     const data = {
         Dress_Name: dressName,
+                CuttingCost: parseFloat($('#addCuttingCost').val()) || 0,
+                SewingCost: parseFloat($('#addSewingCost').val()) || 0,
         Cloth_For_ID: parseInt(clothFor),
         RegistrationID: parseInt(registrationId),
         InstitutionID: parseInt(institutionId),
@@ -273,6 +277,8 @@ function editDress(dressId) {
 
     $('#editDressId').val(dressId);
     $('#editDressName').val(dress.Dress_Name);
+                $('#editCuttingCost').val(dress.CuttingCost != null ? dress.CuttingCost : 0);
+                $('#editSewingCost').val(dress.SewingCost != null ? dress.SewingCost : 0);
 
     // Show current image
     if (dress.Image && dress.Image.length > 0) {
@@ -291,6 +297,8 @@ function updateDress() {
 
     const data = {
         Dress_Name: $('#editDressName').val().trim(),
+                CuttingCost: parseFloat($('#editCuttingCost').val()) || 0,
+                SewingCost: parseFloat($('#editSewingCost').val()) || 0,
         InstitutionID: parseInt(institutionId)
     };
 

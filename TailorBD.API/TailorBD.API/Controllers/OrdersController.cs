@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TailorBD.API.Helpers;
@@ -9,6 +10,8 @@ namespace TailorBD.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+    [ShopScoped] // every action: login required; shop (institutionId) and user always taken from the token
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -412,6 +415,9 @@ namespace TailorBD.API.Controllers
                 using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                 await connection.OpenAsync();
 
+                if (!await ShopOwnership.InShopAsync(connection, "[Order]", "OrderID", orderId, institutionId))
+                    return NotFound(new { success = false, message = "Order not found" });
+
                 var query = @"
                     SELECT 
                         OrderList.OrderListID,
@@ -474,6 +480,9 @@ namespace TailorBD.API.Controllers
                 var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
                 using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                 await connection.OpenAsync();
+
+                if (!await ShopOwnership.InShopAsync(connection, "OrderList", "OrderListID", orderListId, institutionId, "AND OrderID = @OrderID", new { OrderID = orderId }))
+                    return NotFound(new { success = false, message = "Order item not found" });
 
                 var query = @"
                     SELECT 
@@ -996,6 +1005,9 @@ namespace TailorBD.API.Controllers
                 using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                 await connection.OpenAsync();
 
+                if (!await ShopOwnership.InShopAsync(connection, "OrderList", "OrderListID", orderListId, institutionId, "AND OrderID = @OrderID", new { OrderID = orderId }))
+                    return NotFound(new { success = false, message = "Order item not found" });
+
                 var query = @"
                     SELECT 
                         OM.MeasurementTypeID,
@@ -1044,6 +1056,9 @@ namespace TailorBD.API.Controllers
                 var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
                 using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                 await connection.OpenAsync();
+
+                if (!await ShopOwnership.InShopAsync(connection, "OrderList", "OrderListID", orderListId, institutionId, "AND OrderID = @OrderID", new { OrderID = orderId }))
+                    return NotFound(new { success = false, message = "Order item not found" });
 
                 var query = @"
                     SELECT 
@@ -1210,6 +1225,16 @@ namespace TailorBD.API.Controllers
             var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
             using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
             await connection.OpenAsync();
+
+            // Customer, dresses and account must belong to the caller's shop; otherwise nothing is written.
+            if (!await ShopOwnership.InShopAsync(connection, "Customer", "CustomerID", model.CustomerId, model.InstitutionId))
+                return NotFound(new { success = false, message = "Customer not found" });
+            if (!await ShopOwnership.AllInShopAsync(connection, "Dress", "DressID",
+                    (model.OrderList ?? new List<QuickOrderItem>()).Select(i => i.DressId), model.InstitutionId))
+                return NotFound(new { success = false, message = "Dress not found" });
+            if (model.AccountId > 0 && !await ShopOwnership.InShopAsync(connection, "Account", "AccountID", model.AccountId, model.InstitutionId))
+                return NotFound(new { success = false, message = "Account not found" });
+
             using var transaction = connection.BeginTransaction();
 
             try

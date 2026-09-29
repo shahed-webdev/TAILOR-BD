@@ -133,6 +133,10 @@
                             </button>
                         </div>
                         <span class="legend-item today lang-content" data-en="Today's Order(s)" data-bn="আজকের অর্ডার">আজকের অর্ডার</span>
+                        <label class="aa-print-toggle no-print" for="olPrintArtisan" data-en-title="Show the assigned artisan on the measurement print" data-bn-title="মাপ প্রিন্টে কারিগরের নাম দেখাবে" title="মাপ প্রিন্টে কারিগরের নাম দেখাবে">
+                            <input type="checkbox" id="olPrintArtisan">
+                            <span class="lang-content" data-en="Print artisan name" data-bn="কারিগরের নাম প্রিন্ট">কারিগরের নাম প্রিন্ট</span>
+                        </label>
                     </div>
                 </div>
 
@@ -194,7 +198,10 @@
                                             </td>
                                             <td x-text="order.phone"></td>
                                             <td x-text="order.address"></td>
-                                            <td x-text="order.details"></td>
+                                            <td :title="order.details">
+                                                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="order.details"></div>
+                                                <div class="aa-line aa-print" x-html="artisanHtml(order.orderId, artisanTick, currentLang)"></div>
+                                            </td>
                                             <td x-text="formatDate(order.orderDate)"></td>
                                             <td x-text="formatDate(order.deliveryDate)"></td>
                                             <td class="no-print text-center">
@@ -263,6 +270,9 @@
                             <template x-if="order.details">
                                 <div class="oc-dress"><span class="lbl">পোশাক: </span><span x-text="order.details"></span></div>
                             </template>
+                            <template x-if="artisanHtml(order.orderId, artisanTick, currentLang)">
+                                <div class="oc-dress aa-print"><span class="lbl" x-text="currentLang === 'en' ? 'Artisan: ' : 'কারিগর: '"></span><span x-html="artisanHtml(order.orderId, artisanTick, currentLang)"></span></div>
+                            </template>
                             <div class="oc-actions">
                                 <a :href="'money-receipt.html?orderId=' + order.orderId + '&tab=measurement'"
                                    class="oc-btn-print" title="প্রিন্ট">
@@ -323,9 +333,12 @@
     <!-- Session restore before access check -->
     <script src="/js/auth.js"></script>
     <!-- Shared Components Loader (Must be loaded first) -->
-    <script src="/js/app-components.js?v=2.2.7"></script>
+    <script src="/js/app-components.js?v=2.3.2"></script>
+    <!-- Adds the login token to fetch() calls (search / autocomplete) and sends 401 to /login -->
+    <script src="/js/auth-guard.js?v=1.2.0"></script>
     
     <!-- Page Specific JS -->
-    <script src="/js/order-list.js?v=2.1.7"></script>
+    <script src="/js/artisan-assign.js?v=1.0.1"></script>
+    <script src="/js/order-list.js?v=2.1.8"></script>
 </body>
 </html>

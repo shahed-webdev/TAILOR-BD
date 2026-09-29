@@ -20,7 +20,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Dashboard CSS (includes sidebar and navbar styles) -->
-    <link rel="stylesheet" href="/css/dashboard.css?v=2.2.0">
+    <link rel="stylesheet" href="/css/dashboard.css?v=2.2.1">
     
     <style>
         /* Navbar + main-content layout: see dashboard.css */
@@ -191,6 +191,10 @@
             background-color: #e6f7ff;
         }
 
+        .legend-box.recent {
+            background-color: #fff3cd;
+        }
+
         /* Table Styles */
         .orders-table-container {
             margin-top: 20px;
@@ -257,6 +261,8 @@
         .iw-table .col-name { width: 15%; min-width: 130px; }
         .iw-table .col-phone { width: 100px; min-width: 100px; }
         .iw-table .col-sms { width: 30px; max-width: 30px; }
+        .iw-table .sms-all-wrap { display: flex; flex-direction: column; align-items: center; gap: 1px; margin: 0; cursor: pointer; font-size: inherit; }
+        .iw-table .sms-all-wrap input { margin: 0; cursor: pointer; }
         .iw-table .col-print { width: 32px; max-width: 32px; }
         .iw-table .col-date { width: 62px; min-width: 62px; }
         .iw-table td.col-order-no-cell,
@@ -295,6 +301,7 @@
         .iw-table tr.today td { background-color: #d4edda !important; }
         .iw-table tr.overdue td { background-color: #ffe6e6 !important; }
         .iw-table tr.partly-completed td { background-color: #e6f7ff !important; }
+        .iw-table tr.recent td { background-color: #fff8e1 !important; }
         .iw-table tr.selected td { background-color: #e3f2fd !important; }
 
         /* Nested Order List Table */
@@ -612,6 +619,7 @@
         .legend-box.today   { background: #d4edda; }
         .legend-box.overdue { background: #ffe6e6; }
         .legend-box.partly  { background: #e6f7ff; }
+        .legend-box.recent  { background: #fff3cd; }
 
         .legend-filter {
             cursor: pointer;
@@ -635,6 +643,7 @@
         .legend-filter.is-active[data-filter="today"] { background: #d4edda; border-color: #28a745; }
         .legend-filter.is-active[data-filter="overdue"] { background: #ffe6e6; border-color: #dc3545; }
         .legend-filter.is-active[data-filter="partly"] { background: #e6f7ff; border-color: #17a2b8; }
+        .legend-filter.is-active[data-filter="recent"] { background: #fff3cd; border-color: #e0a800; }
 
         .btn-print-list {
             display: inline-flex;
@@ -652,6 +661,16 @@
             white-space: nowrap;
         }
         .btn-print-list:hover { background: #eef0ff; border-color: #6c7ae0; }
+        .iw-print-cols { position: relative; display: inline-block; }
+        .iw-print-cols > summary { list-style: none; cursor: pointer; font-size: 12px; font-weight: 600; color: #555; white-space: nowrap; padding: 3px 8px; border: 1px solid #d0d5e8; border-radius: 6px; background: #fff; user-select: none; }
+        .iw-print-cols > summary::-webkit-details-marker { display: none; }
+        .iw-print-cols > summary::after { content: ' \25BE'; font-size: 10px; }
+        .iw-print-cols[open] > summary { background: #eef0ff; border-color: #6c7ae0; }
+        .iw-print-cols-menu { position: fixed; z-index: 1060; min-width: 150px; background: #fff; border: 1px solid #d0d5e8; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 6px 10px; }
+        .iw-print-cols-menu label { display: flex; align-items: center; gap: 6px; margin: 0; padding: 3px 0; font-size: 12px; font-weight: 500; color: #333; cursor: pointer; white-space: nowrap; }
+        .iw-print-cols-menu input { margin: 0; cursor: pointer; }
+        .iw-print-cols-msg { font-size: 11px; color: #c0392b; min-height: 0; }
+        .iw-print-cols-msg:empty { display: none; }
 
         .iw-print-area { display: none; }
         .iw-print-header { display: none; text-align: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #333; }
@@ -706,6 +725,7 @@
         }
         .iw-card.today   { border-left: 4px solid #28a745; background: #f0fff4; }
         .iw-card.overdue { border-left: 4px solid #dc3545; background: #fff5f5; }
+        .iw-card.recent  { border-left: 4px solid #e0a800; background: #fffdf5; }
         .iw-card.partly-completed { border-left: 4px solid #17a2b8; background: #f0faff; }
         .iw-card.selected { background: #e8eeff !important; border-left-color: #6c7ae0 !important; }
 
@@ -847,9 +867,18 @@
             #app-navbar, #app-sidebar, .search-section, .result-summary-bar,
             .btn-complete, .iw-pagination-bar, .iw-cards-list, .iw-mobile-select-bar,
             #ordersTableContainer, .iw-card, .no-print { display: none !important; }
-            .main-content { margin-left: 0 !important; padding: 0 !important; }
+            /* dashboard.css sizes .main-content as calc(100vw - sidebar) !important; Firefox keeps that
+               width when the print dialog switches to Landscape. Let everything follow the paper width. */
+            html, body { background: #fff !important; width: auto !important; min-width: 0 !important; overflow: visible !important; }
+            .main-content, .main-content.full-width {
+                margin: 0 !important; padding: 0 !important;
+                width: auto !important; max-width: none !important; min-width: 0 !important; min-height: 0 !important;
+                transition: none !important;
+            }
             .dashboard-content, .work-complete-container, .content, .container,
             .orders-table-container, .table-wrapper {
+                width: auto !important;
+                max-width: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 box-shadow: none !important;
@@ -857,7 +886,8 @@
                 overflow: visible !important;
             }
             .work-complete-container h2 { display: none !important; }
-            .iw-print-area, .iw-print-header { display: block !important; }
+            .iw-print-area, .iw-print-header { display: block !important; width: 100% !important; max-width: none !important; }
+            .iw-print-table { width: 100% !important; max-width: none !important; }
             .iw-print-table th,
             .iw-print-table td,
             .iw-print-table tr.today td,
@@ -977,7 +1007,29 @@
                                 <div class="legend-box partly"></div>
                                 <span class="lang-content" data-en="Partly done" data-bn="আংশিক সম্পন্ন">আংশিক সম্পন্ন</span>
                             </label>
+                            <label class="legend-item legend-filter" data-filter="recent">
+                                <input type="checkbox" id="filterRecent" class="legend-filter-cb" value="recent">
+                                <div class="legend-box recent"></div>
+                                <span class="lang-content" data-en="Recent orders" data-bn="সাপ্রতিক অর্ডার">সাপ্রতিক অর্ডার</span>
+                            </label>
                         </div>
+                        <label class="aa-print-toggle no-print" for="iwPrintArtisan" data-en-title="Show the assigned artisan on the list print and the order print" data-bn-title="তালিকা ও অর্ডার প্রিন্টে কারিগরের নাম দেখাবে" title="তালিকা ও অর্ডার প্রিন্টে কারিগরের নাম দেখাবে">
+                            <input type="checkbox" id="iwPrintArtisan">
+                            <span class="lang-content" data-en="Print artisan name" data-bn="কারিগরের নাম প্রিন্ট">কারিগরের নাম প্রিন্ট</span>
+                        </label>
+                        <details class="iw-print-cols no-print" id="iwPrintCols">
+                            <summary data-en-title="Columns to print" data-bn-title="প্রিন্টে যে কলাম থাকবে" title="প্রিন্টে যে কলাম থাকবে"><i class="fas fa-columns"></i> <span class="lang-content" data-en="Print columns" data-bn="প্রিন্ট কলাম">প্রিন্ট কলাম</span></summary>
+                            <div class="iw-print-cols-menu">
+                                <label><input type="checkbox" data-iw-col="sl" checked> <span class="lang-content" data-en="SL" data-bn="ক্রম">ক্রম</span></label>
+                                <label><input type="checkbox" data-iw-col="no" checked> <span class="lang-content" data-en="No." data-bn="নং">নং</span></label>
+                                <label><input type="checkbox" data-iw-col="name" checked> <span class="lang-content" data-en="Name" data-bn="নাম">নাম</span></label>
+                                <label><input type="checkbox" data-iw-col="phone" checked> <span class="lang-content" data-en="Phone" data-bn="মোবাইল">মোবাইল</span></label>
+                                <label><input type="checkbox" data-iw-col="items" checked> <span class="lang-content" data-en="Order List" data-bn="অর্ডার লিস্ট">অর্ডার লিস্ট</span></label>
+                                <label><input type="checkbox" data-iw-col="order" checked> <span class="lang-content" data-en="Order" data-bn="অর্ডার">অর্ডার</span></label>
+                                <label><input type="checkbox" data-iw-col="delivery" checked> <span class="lang-content" data-en="Delivery" data-bn="ডেলিভারি">ডেলিভারি</span></label>
+                                <div class="iw-print-cols-msg" id="iwPrintColsMsg"></div>
+                            </div>
+                        </details>
                         <button type="button" class="btn-print-list" onclick="printIncompleteList()">
                             <i class="fas fa-print"></i>
                             <span class="lang-content" data-en="Print List" data-bn="তালিকা প্রিন্ট">তালিকা প্রিন্ট</span>
@@ -1022,9 +1074,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- App Components -->
-    <script src="/js/app-components.js?v=2.1.9"></script>
+    <script src="/js/app-components.js?v=2.3.2"></script>
+<script src="/js/auth-guard.js?v=1.2.0"></script>
     
     <!-- Incomplete Works JS -->
-    <script src="/js/incomplete-works.js?v=2.2.8"></script>
+    <script src="/js/artisan-assign.js?v=1.2.0"></script>
+    <script src="/js/incomplete-works.js?v=2.2.19"></script>
 </body>
 </html>

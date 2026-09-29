@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using TailorBD.API.Helpers;
 
 namespace TailorBD.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = ShopClaims.AuthorityRoles)] // whole controller: owner panel only (Authority / Sub-Authority login)
     public class RoleController : ControllerBase
     {
         private readonly IConfiguration _configuration;

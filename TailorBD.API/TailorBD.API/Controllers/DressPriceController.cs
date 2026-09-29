@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 
 namespace TailorBD.API.Controllers
 {
+    [Authorize]
+    [ShopScoped] // login required; InstitutionID always comes from the token
     [Route("api/[controller]")]
     [ApiController]
     public class DressPriceController : ControllerBase
@@ -96,6 +100,10 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (connection.ExecuteScalar<int>(
+                        "SELECT COUNT(1) FROM Dress WHERE DressID = @D AND InstitutionID = @I",
+                        new { D = model.DressId, I = model.InstitutionId }) == 0)
+                    return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
                 
                 var insertQuery = @"
                     INSERT INTO Dress_Price 
@@ -139,7 +147,8 @@ namespace TailorBD.API.Controllers
                     AND InstitutionID = @InstitutionId";
 
                 model.DressPriceId = id;
-                connection.Execute(updateQuery, model);
+                var n = connection.Execute(updateQuery, model);
+                if (n == 0) return NotFound(new { success = false, message = "চার্জ পাওয়া যায়নি / Not found" });
 
                 return Ok(new
                 {
@@ -170,7 +179,8 @@ namespace TailorBD.API.Controllers
                     WHERE Dress_PriceID = @DressPriceId
                     AND InstitutionID = @InstitutionId";
 
-                connection.Execute(deleteQuery, new { DressPriceId = id, InstitutionId = institutionId });
+                var n = connection.Execute(deleteQuery, new { DressPriceId = id, InstitutionId = institutionId });
+                if (n == 0) return NotFound(new { success = false, message = "চার্জ পাওয়া যায়নি / Not found" });
 
                 return Ok(new
                 {

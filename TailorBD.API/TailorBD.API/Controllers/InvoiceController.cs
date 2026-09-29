@@ -1,13 +1,16 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 using TailorBD.API.Services;
 
 namespace TailorBD.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // every action needs a login; see the per-action rules below
     public class InvoiceController : ControllerBase
     {
         private readonly TailorBdContext _context;
@@ -45,6 +48,16 @@ namespace TailorBD.API.Controllers
             return exists;
         }
 
+        // Shop users may only open their own shop's invoices; Authority / Sub-Authority may open any.
+        private async Task<bool> CanOpenInvoiceAsync(int invoiceId)
+        {
+            if (User.IsAuthority()) return true;
+            var shop = HttpContext.Items[ShopScopedAttribute.InstitutionItemKey] is int i ? i : 0;
+            if (shop <= 0) return false;
+            using var con = _context.CreateConnection();
+            return await ShopOwnership.InShopAsync(con, "Invoice", "InvoiceID", invoiceId, shop);
+        }
+
         // ── Cached SQL expressions for Invoice columns ────────────────────────────
         private async Task<(string totalAmountExpr, string paidAmountExpr, string isAutoGenExpr)> GetInvoiceExprsAsync()
         {
@@ -67,6 +80,7 @@ namespace TailorBD.API.Controllers
 
         // ── GET /api/invoice/institutions ─────────────────────────────────────────
         /// <summary>Returns all institutions with their invoice/expiry summary.</summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("institutions")]
         public async Task<ActionResult> GetInstitutions(
             [FromQuery] string? search = null,
@@ -159,6 +173,7 @@ namespace TailorBD.API.Controllers
 
         // ── GET /api/invoice/list ──────────────────────────────────────────────────
         /// <summary>Returns invoice list, optionally filtered by institution.</summary>
+        [ShopScoped(AllowAuthority = true)] // shop users: own shop only (from the token); Authority / Sub-Authority: any shop
         [HttpGet("list")]
         public async Task<ActionResult> GetInvoices(
             [FromQuery] int? institutionId = null,
@@ -252,11 +267,14 @@ namespace TailorBD.API.Controllers
         }
 
         // ── GET /api/invoice/{id}/lines ────────────────────────────────────────────
+        [ShopScoped(AllowAuthority = true)] // shop users: own shop only (from the token); Authority / Sub-Authority: any shop
         [HttpGet("{id}/lines")]
         public async Task<ActionResult> GetInvoiceLines(int id)
         {
             try
             {
+                if (!await CanOpenInvoiceAsync(id))
+                    return NotFound(new { success = false, message = "Invoice not found" });
                 using var con = _context.CreateConnection();
                 var lines = await con.QueryAsync(
                     "SELECT * FROM Invoice_Line WHERE InvoiceID=@id ORDER BY Invoice_LineID",
@@ -270,11 +288,14 @@ namespace TailorBD.API.Controllers
         }
 
         // ── GET /api/invoice/{id}/payments ─────────────────────────────────────────
+        [ShopScoped(AllowAuthority = true)] // shop users: own shop only (from the token); Authority / Sub-Authority: any shop
         [HttpGet("{id}/payments")]
         public async Task<ActionResult> GetInvoicePayments(int id)
         {
             try
             {
+                if (!await CanOpenInvoiceAsync(id))
+                    return NotFound(new { success = false, message = "Invoice not found" });
                 using var con = _context.CreateConnection();
                 var payments = await con.QueryAsync(
                     @"SELECT InvoicePaymentRecordID, InvoiceID, Amount, PaidDate,
@@ -305,11 +326,14 @@ namespace TailorBD.API.Controllers
 
         // ── GET /api/invoice/{id}/detail ───────────────────────────────────────────
         /// <summary>Returns both invoice lines and payment records for a single invoice.</summary>
+        [ShopScoped(AllowAuthority = true)] // shop users: own shop only (from the token); Authority / Sub-Authority: any shop
         [HttpGet("{id}/detail")]
         public async Task<ActionResult> GetInvoiceDetail(int id)
         {
             try
             {
+                if (!await CanOpenInvoiceAsync(id))
+                    return NotFound(new { success = false, message = "Invoice not found" });
                 using var con = _context.CreateConnection();
 
                 var lineData = new List<object>();
@@ -365,6 +389,7 @@ namespace TailorBD.API.Controllers
 
         // ── POST /api/invoice/create ───────────────────────────────────────────────
         /// <summary>Manually create invoices for selected institutions.</summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("create")]
         public async Task<ActionResult> CreateInvoices([FromBody] CreateInvoiceRequest req)
         {
@@ -415,6 +440,7 @@ namespace TailorBD.API.Controllers
 
         // ── POST /api/invoice/auto-generate ───────────────────────────────────────
         /// <summary>Manually trigger auto-bill generation for all due institutions.</summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("auto-generate")]
         public async Task<ActionResult> TriggerAutoGenerate()
         {
@@ -437,6 +463,7 @@ namespace TailorBD.API.Controllers
 
         // ── POST /api/invoice/renew/{institutionId} ────────────────────────────────
         /// <summary>One-click renew for a single institution (uses Renew_Amount from Institution).</summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("renew/{institutionId}")]
         public async Task<ActionResult> RenewInstitution(int institutionId)
         {
@@ -453,6 +480,7 @@ namespace TailorBD.API.Controllers
 
         // ── PUT /api/invoice/{id}/payment ──────────────────────────────────────────
         /// <summary> Update payment status / paid amount.</summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPut("{id}/payment")]
         public async Task<ActionResult> UpdatePayment(int id, [FromBody] UpdatePaymentRequest req)
         {
@@ -544,6 +572,7 @@ namespace TailorBD.API.Controllers
 
         // ── POST /api/invoice/bulk-payment ────────────────────────────────────────
         /// <summary>Pay multiple invoices in a single transaction — avoids deadlock.</summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("bulk-payment")]
         public async Task<ActionResult> BulkPayment([FromBody] BulkPaymentRequest req)
         {
@@ -647,6 +676,7 @@ namespace TailorBD.API.Controllers
 
         // ── GET /api/invoice/payment-summary ──────────────────────────────────────
         /// <summary>Returns paid payment records grouped by date+method+collector for an institution.</summary>
+        [ShopScoped(AllowAuthority = true)] // shop users: own shop only (from the token); Authority / Sub-Authority: any shop
         [HttpGet("payment-summary")]
         public async Task<ActionResult> GetPaymentSummary([FromQuery] int? institutionId = null)
         {
@@ -752,6 +782,7 @@ namespace TailorBD.API.Controllers
         }
 
         // ── GET /api/invoice/due-status/{institutionId} ───────────────────────────
+        [ShopScoped(AllowAuthority = true)] // shop users: own shop only (from the token); Authority / Sub-Authority: any shop
         [HttpGet("due-status/{institutionId}")]
         public async Task<ActionResult> GetDueStatus(int institutionId)
         {
@@ -839,6 +870,7 @@ namespace TailorBD.API.Controllers
         }
 
         // ── GET /api/invoice/authority/collected-payments ─────────────────────────
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("authority/collected-payments")]
         public async Task<ActionResult> GetAuthorityCollectedPayments(
             [FromQuery] string? fromDate = null,
@@ -963,6 +995,7 @@ namespace TailorBD.API.Controllers
 
         // ── POST /api/invoice/sms-recharge ────────────────────────────────────────
         /// <summary>Adds SMS balance and creates a due invoice for the institution.</summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("sms-recharge")]
         public async Task<ActionResult> SmsRecharge([FromBody] SmsRechargeRequest req)
         {

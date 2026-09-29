@@ -851,6 +851,59 @@
         });
     }
 
+    // ─── Shop Page Access ─────────────────────────────────────────────────
+    // The Authority can switch pages off for a whole shop (Authority panel → Shop Page Access).
+    // Pages switched off are hidden from the menu (for the admin and every sub-admin of the shop)
+    // and opening one goes to /access-denied.html. No rows for the shop = every page is open.
+    function shopPageKey(path) {
+        var p = String(path || '').split('#')[0].split('?')[0];
+        if (/^https?:\/\//i.test(p)) {
+            try { p = new URL(p).pathname; } catch (e) { /* keep as is */ }
+        }
+        p = ('/' + p.replace(/^\/+/, '')).toLowerCase().replace(/\/+$/, '');
+        if (p && p !== '/' && !/\.[a-z0-9]+$/.test(p)) p += '.html';
+        return p;
+    }
+
+    function applyShopPageBlocks() {
+        var blocked = window._shopBlockedPages;
+        if (!blocked || !blocked.size) return;
+
+        $('.sidebar-menu a[href]').each(function() {
+            var href = $(this).attr('href');
+            if (!href || href === '#' || href.indexOf('javascript:') === 0) return;
+            if (blocked.has(shopPageKey(href))) $(this).closest('li').hide();
+        });
+        // hide a menu group when nothing inside it is left
+        $('.sidebar-menu .submenu').get().reverse().forEach(function(submenu) {
+            var $submenu = $(submenu);
+            if (!getPermittedSidebarItems($submenu).length) $submenu.closest('li').hide();
+        });
+
+        if (blocked.has(shopPageKey(window.location.pathname))) {
+            console.warn('Page switched off for this shop:', window.location.pathname, '→ /access-denied.html');
+            window.location.replace('/access-denied.html');
+        }
+    }
+
+    function loadShopPageBlocks() {
+        var category = sessionStorage.getItem('category');
+        if (category === 'Authority' || category === 'Sub-Authority') return;
+        if (!sessionStorage.getItem('institutionId') || !TokenHelper.get()) return;
+
+        $.ajax({
+            url: '/api/shop-page-access/my',
+            method: 'GET',
+            cache: false,
+            success: function(res) {
+                var list = (res && res.blocked) || [];
+                window._shopBlockedPages = new Set(list.map(shopPageKey));
+                applyShopPageBlocks();
+            },
+            error: function() { /* not logged in / older server: nothing switched off */ }
+        });
+    }
+
     // Apply Access Control - Hide menu items based on permissions
     function applyAccessControl() {
         const category = sessionStorage.getItem('category');
@@ -859,6 +912,7 @@
             console.log('Admin/Authority user - full access granted');
             $('#userRoleBadge').hide();
             $('#dashboardLink').attr('href', '/dashboard.html');
+            loadShopPageBlocks();
             return;
         }
 
@@ -867,10 +921,12 @@
             $('#userRoleBadge').show();
             $('#dashboardLink').attr('href', '/sub-admin-dashboard.html');
             checkSubAdminAccess();
+            loadShopPageBlocks();
         } else {
             console.log('Unknown category:', category);
             $('#userRoleBadge').hide();
             $('#dashboardLink').attr('href', '/dashboard.html');
+            loadShopPageBlocks();
         }
     }
 
@@ -1078,6 +1134,9 @@
                         window.location.replace('/access-denied.html');
                     }
                 }
+
+                // the sidebar was re-shown above: hide the pages switched off for the shop again
+                applyShopPageBlocks();
             },
             error: function(xhr) {
                 console.error('Error loading permissions:', xhr);
@@ -1405,7 +1464,13 @@
         };
         return aliases[norm] || norm;
     };
+    window.TailorBD.isShopPageBlocked = function(pagePath) {
+        var blocked = window._shopBlockedPages;
+        if (!blocked || !blocked.size) return false;
+        return blocked.has(shopPageKey(pagePath)) || blocked.has(shopPageKey(window.TailorBD.resolvePageUrl(pagePath)));
+    };
     window.TailorBD.hasPageAccess = function(pagePath) {
+        if (window.TailorBD.isShopPageBlocked(pagePath)) return false;
         var category = sessionStorage.getItem('category');
         if (category !== 'Sub-Admin') return true;
         if (!window._subAdminAllowedPages) return false;

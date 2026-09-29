@@ -1,11 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using TailorBD.API.Helpers;
 using TailorBD.API.Services;
 
 namespace TailorBD.API.Controllers
 {
+    // Login required; InstitutionID / RegistrationID always come from the caller's token
+    // (ShopScoped overwrites any value sent in the query string or body), and actions that
+    // take an order id check that the order belongs to the caller's shop.
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+    [ShopScoped]
     public class DeliveryController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -34,6 +41,7 @@ namespace TailorBD.API.Controllers
             [FromQuery] string? address = null,
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null,
+            [FromQuery] bool upcomingOnly = false,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 25)
         {
@@ -42,11 +50,19 @@ namespace TailorBD.API.Controllers
                 if (institutionId <= 0)
                     return BadRequest(new { success = false, message = "Invalid institution ID" });
 
+                if (endDate.HasValue && endDate.Value.TimeOfDay == TimeSpan.Zero)
+                    endDate = endDate.Value.Date.AddDays(1).AddTicks(-1);
+
+                var serialNumbers = ParseOrderSerialNumbers(orderSerialNumbers);
+                var serialFilter = serialNumbers.Count > 0
+                    ? $" AND [Order].OrderSerialNumber IN ({string.Join(",", serialNumbers)})"
+                    : "";
+
                 var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
                 using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
 
-                var query = @"
+                var query = $@"
                     SELECT 
                         [Order].OrderID, 
                         [Order].OrderSerialNumber,
@@ -85,17 +101,24 @@ namespace TailorBD.API.Controllers
                     AND ([Order].DeliveryStatus IN (N'Pending', N'PartlyDelivered'))
                     AND ([Order].WorkStatus IN (N'incomplete', N'PartlyCompleted'))
                     AND (@Phone = '' OR Customer.Phone LIKE '%' + @Phone + '%')
-                    AND (@OrderSerialNumber = '0' OR CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)))
-                    AND ([Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
+                    {serialFilter}
+                    AND (
+                        (@StartDate IS NULL AND @EndDate IS NULL)
+                        OR (
+                            [Order].DeliveryDate IS NOT NULL
+                            AND [Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1760-01-01') AND ISNULL(@EndDate, '3760-01-01')
+                        )
+                    )
                     AND (@CustomerName = '' OR ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
                     AND (@Address = '' OR ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')
+                    AND (@UpcomingOnly = 0 OR [Order].DeliveryDate IS NULL OR CAST([Order].DeliveryDate AS DATE) > CAST(GETDATE() AS DATE))
                     ORDER BY 
                         (CASE WHEN [Order].DeliveryDate = CAST(GETDATE() AS DATE) THEN 0 ELSE 1 END),
                         ISNULL([Order].DeliveryDate, '1-1-3000')
                     OFFSET @Offset ROWS
                     FETCH NEXT @PageSize ROWs ONLY";
 
-                var countQuery = @"
+                var countQuery = $@"
                     SELECT COUNT(*)
                     FROM [Order]
                     INNER JOIN Customer ON [Order].CustomerID = Customer.CustomerID
@@ -103,10 +126,17 @@ namespace TailorBD.API.Controllers
                     AND ([Order].DeliveryStatus IN (N'Pending', N'PartlyDelivered'))
                     AND ([Order].WorkStatus IN (N'incomplete', N'PartlyCompleted'))
                     AND (@Phone = '' OR Customer.Phone LIKE '%' + @Phone + '%')
-                    AND (@OrderSerialNumber = '0' OR CAST([OrderSerialNumber] AS NVARCHAR(50)) IN (SELECT id FROM dbo.In_Function_Parameter(@OrderSerialNumber)))
-                    AND ([Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1-1-1760') AND ISNULL(@EndDate, '1-1-3760'))
+                    {serialFilter}
+                    AND (
+                        (@StartDate IS NULL AND @EndDate IS NULL)
+                        OR (
+                            [Order].DeliveryDate IS NOT NULL
+                            AND [Order].DeliveryDate BETWEEN ISNULL(@StartDate, '1760-01-01') AND ISNULL(@EndDate, '3760-01-01')
+                        )
+                    )
                     AND (@CustomerName = '' OR ISNULL(Customer.CustomerName, '') LIKE '%' + @CustomerName + '%')
-                    AND (@Address = '' OR ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')";
+                    AND (@Address = '' OR ISNULL(Customer.Address, '') LIKE '%' + @Address + '%')
+                    AND (@UpcomingOnly = 0 OR [Order].DeliveryDate IS NULL OR CAST([Order].DeliveryDate AS DATE) > CAST(GETDATE() AS DATE))";
 
                 // Get total count
                 int totalCount = 0;
@@ -114,11 +144,11 @@ namespace TailorBD.API.Controllers
                 {
                     countCmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                     countCmd.Parameters.AddWithValue("@Phone", phone ?? "");
-                    countCmd.Parameters.AddWithValue("@OrderSerialNumber", orderSerialNumbers ?? "0");
                     countCmd.Parameters.AddWithValue("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value);
                     countCmd.Parameters.AddWithValue("@EndDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value);
                     countCmd.Parameters.AddWithValue("@CustomerName", customerName ?? "");
                     countCmd.Parameters.AddWithValue("@Address", address ?? "");
+                    countCmd.Parameters.AddWithValue("@UpcomingOnly", upcomingOnly ? 1 : 0);
 
                     totalCount = (int)await countCmd.ExecuteScalarAsync();
                 }
@@ -129,11 +159,11 @@ namespace TailorBD.API.Controllers
                 {
                     cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
                     cmd.Parameters.AddWithValue("@Phone", phone ?? "");
-                    cmd.Parameters.AddWithValue("@OrderSerialNumber", orderSerialNumbers ?? "0");
                     cmd.Parameters.AddWithValue("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value);
                     cmd.Parameters.AddWithValue("@EndDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value);
                     cmd.Parameters.AddWithValue("@CustomerName", customerName ?? "");
                     cmd.Parameters.AddWithValue("@Address", address ?? "");
+                    cmd.Parameters.AddWithValue("@UpcomingOnly", upcomingOnly ? 1 : 0);
                     cmd.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
                     cmd.Parameters.AddWithValue("@PageSize", pageSize);
 
@@ -149,6 +179,7 @@ namespace TailorBD.API.Controllers
                         var isToday = deliveryDate.HasValue && deliveryDate.Value.Date == DateTime.Today;
                         var isOverdue = deliveryDate.HasValue && deliveryDate.Value.Date < DateTime.Today;
                         var isPartlyCompleted = reader.GetString(reader.GetOrdinal("WorkStatus")) == "PartlyCompleted";
+                        var isRecent = !isToday && !isOverdue;
 
                         orders.Add(new
                         {
@@ -171,6 +202,7 @@ namespace TailorBD.API.Controllers
                             isToday = isToday,
                             isOverdue = isOverdue,
                             isPartlyCompleted = isPartlyCompleted,
+                            isRecent = isRecent,
                             dressItems = ParseDressItems(reader.IsDBNull(reader.GetOrdinal("DressItems")) ? "" : reader.GetString(reader.GetOrdinal("DressItems")))
                         });
                     }
@@ -204,6 +236,9 @@ namespace TailorBD.API.Controllers
                 var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
                 using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
+
+                if (!await OrderBelongsToShopAsync(connection, null, orderId, institutionId))
+                    return NotFound(new { success = false, message = "Order not found" });
 
                 var query = @"
                     SELECT 
@@ -275,6 +310,13 @@ namespace TailorBD.API.Controllers
                     {
                         if (order.OrderListItems == null || order.OrderListItems.Count == 0)
                             continue;
+
+                        // Only orders of the logged-in shop may be changed.
+                        if (!await OrderBelongsToShopAsync(connection, transaction, order.OrderId, model.InstitutionId))
+                        {
+                            validationErrors.Add($"অর্ডার {order.OrderId}: পাওয়া যায়নি");
+                            continue;
+                        }
 
                         // Update order details
                         using (var cmd = new SqlCommand(
@@ -468,9 +510,10 @@ namespace TailorBD.API.Controllers
                 {
                     if (item.CompletedQuantity <= 0) continue;
                     using var cmd = new SqlCommand(
-                        "SELECT Dress.Dress_Name FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID WHERE OrderList.OrderListID = @ID",
+                        "SELECT Dress.Dress_Name FROM OrderList INNER JOIN Dress ON OrderList.DressID = Dress.DressID WHERE OrderList.OrderListID = @ID AND OrderList.OrderID = @OrderID",
                         connection);
                     cmd.Parameters.AddWithValue("@ID", item.OrderListId);
+                    cmd.Parameters.AddWithValue("@OrderID", order.OrderId);
                     var dressName = await cmd.ExecuteScalarAsync() as string ?? "";
                     if (!string.IsNullOrEmpty(dressName))
                         dressParts.Add($"{item.CompletedQuantity} টি {dressName}");
@@ -902,6 +945,26 @@ namespace TailorBD.API.Controllers
 
                 try
                 {
+                    // Only orders of the logged-in shop, and only items of that order.
+                    if (!await OrderBelongsToShopAsync(connection, transaction, model.OrderId, model.InstitutionId))
+                    {
+                        transaction.Rollback();
+                        return NotFound(new { success = false, message = "Order not found" });
+                    }
+                    foreach (var item in model.Items.Where(i => i.DeliverQty > 0))
+                    {
+                        using var itemCmd = new SqlCommand(
+                            "SELECT COUNT(1) FROM OrderList WHERE OrderListID = @OrderListID AND OrderID = @OrderID",
+                            connection, transaction);
+                        itemCmd.Parameters.AddWithValue("@OrderListID", item.OrderListId);
+                        itemCmd.Parameters.AddWithValue("@OrderID", model.OrderId);
+                        if (Convert.ToInt32(await itemCmd.ExecuteScalarAsync()) == 0)
+                        {
+                            transaction.Rollback();
+                            return BadRequest(new { success = false, message = "Invalid order item" });
+                        }
+                    }
+
                     // Update delivery date and discount
                     using (var cmd = new SqlCommand(
                         @"UPDATE [Order] SET DeliveryDate=@DeliveryDate, Update_DeliveryDate=GETDATE(), Discount=Discount+@Discount
@@ -1004,7 +1067,14 @@ namespace TailorBD.API.Controllers
                 var smsErrors = new List<string>();
                 int sentCount = 0;
 
-                foreach (var order in model.Orders)
+                // One SMS per order per request, even if the page sends the same order twice.
+                var uniqueOrders = model.Orders
+                    .Where(o => o != null)
+                    .GroupBy(o => o.OrderId)
+                    .Select(g => g.First())
+                    .ToList();
+
+                foreach (var order in uniqueOrders)
                 {
                     try
                     {
@@ -1380,6 +1450,27 @@ namespace TailorBD.API.Controllers
                 _logger.LogError(ex, "Error deleting orders");
                 return StatusCode(500, new { success = false, message = "Error deleting orders: " + ex.Message });
             }
+        }
+
+        /// <summary>
+        /// Parse comma/space separated order numbers into unique positive integers.
+        /// </summary>
+        private static List<int> ParseOrderSerialNumbers(string? orderSerialNumbers)
+        {
+            if (string.IsNullOrWhiteSpace(orderSerialNumbers))
+                return new List<int>();
+
+            var trimmed = orderSerialNumbers.Trim();
+            if (trimmed == "0")
+                return new List<int>();
+
+            var result = new List<int>();
+            foreach (var part in trimmed.Split(new[] { ',', '،', ';', ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (int.TryParse(part.Trim(), out var n) && n > 0 && !result.Contains(n))
+                    result.Add(n);
+            }
+            return result;
         }
 
         /// <summary>
@@ -2165,6 +2256,19 @@ namespace TailorBD.API.Controllers
                     await cmd.ExecuteNonQueryAsync();
                 }
             }
+        }
+
+        /// <summary>
+        /// True if the order belongs to the given shop (InstitutionID comes from the login token).
+        /// </summary>
+        private static async Task<bool> OrderBelongsToShopAsync(SqlConnection connection, SqlTransaction? transaction, int orderId, int institutionId)
+        {
+            using var cmd = new SqlCommand(
+                "SELECT COUNT(1) FROM [Order] WHERE OrderID = @OrderID AND InstitutionID = @InstitutionID",
+                connection, transaction);
+            cmd.Parameters.AddWithValue("@OrderID", orderId);
+            cmd.Parameters.AddWithValue("@InstitutionID", institutionId);
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync()) > 0;
         }
 
         // ── Model classes ────────────────────────────────────────────────────────

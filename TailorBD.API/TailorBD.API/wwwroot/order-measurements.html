@@ -39,6 +39,7 @@
 
         .tabs {
             display: flex;
+            align-items: center;
             gap: 10px;
             margin-bottom: 20px;
             border-bottom: 2px solid #dee2e6;
@@ -227,6 +228,9 @@
         <div class="tabs">
             <button class="tab active" onclick="switchTab('withoutName')">নাম ছাড়া মাপ</button>
             <button class="tab" onclick="switchTab('withName')">নাম সহ মাপ</button>
+            <label class="aa-print-toggle" for="omPrintArtisan" style="margin-left:auto;padding:0 8px;">
+                <input type="checkbox" id="omPrintArtisan"> কারিগরের নাম প্রিন্ট
+            </label>
         </div>
 
         <div id="withoutName" class="tab-content active">
@@ -238,8 +242,11 @@
         </div>
     </div>
 
+    <script src="/js/auth-guard.js?v=1.2.0"></script>
+    <script src="/js/artisan-assign.js?v=1.0.1"></script>
     <script>
         let orderData = null;
+        let currentOrderId = 0;
 
         document.addEventListener('DOMContentLoaded', async function () {
             restoreSessionFromLocalStorage();
@@ -259,8 +266,29 @@
                 return;
             }
 
-            await loadOrderMeasurements(parseInt(orderId, 10), institutionId);
+            currentOrderId = parseInt(orderId, 10);
+            if (window.ArtisanAssign) {
+                ArtisanAssign.bindToggle('#omPrintArtisan', function () { refreshArtisans(true); });
+            }
+            await loadOrderMeasurements(currentOrderId, institutionId);
         });
+
+        // "কারিগরের নাম প্রিন্ট" (artisan-assign.js): default off, remembered per shop, same setting as the list pages
+        function refreshArtisans(rerenderWhenOff) {
+            if (!orderData) return;
+            const rerender = function () { renderMeasurementsWithoutName(); renderMeasurementsWithName(); };
+            if (window.ArtisanAssign && ArtisanAssign.printOn()) {
+                ArtisanAssign.load([currentOrderId]).then(function (loaded) { if (loaded || rerenderWhenOff) rerender(); });
+            } else if (rerenderWhenOff) {
+                rerender();
+            }
+        }
+
+        function artisanLine(item) {
+            if (!window.ArtisanAssign || !ArtisanAssign.printOn() || !item) return '';
+            const name = ArtisanAssign.lineText(item.orderListId);
+            return name ? '<div class="print-artisan-line" style="margin:4px 0 0;">কারিগর: ' + escapeHtml(name) + '</div>' : '';
+        }
 
         function restoreSessionFromLocalStorage() {
             if (!sessionStorage.getItem('institutionId') && localStorage.getItem('session_isLoggedIn') === 'true') {
@@ -356,6 +384,7 @@
 
                 renderMeasurementsWithoutName();
                 renderMeasurementsWithName();
+                refreshArtisans(false);
             } catch (error) {
                 console.error('Error loading measurements:', error);
                 showLoadError(error.message || 'Unknown error');
@@ -390,6 +419,7 @@
                                 <span class="value">${orderData.customer.deliveryDate ? formatDate(orderData.customer.deliveryDate) : '-'}</span>
                             </div>
                         </div>
+                        ${artisanLine(item)}
 
                         <div class="measurements-section">
                             <div class="measurement-group">
@@ -434,6 +464,7 @@
                                 <span class="value">${orderData.customer.deliveryDate ? formatDate(orderData.customer.deliveryDate) : '-'}</span>
                             </div>
                         </div>
+                        ${artisanLine(item)}
 
                         <div class="measurements-section">
                             ${renderMeasurementsWithNames(item.measurements)}

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 using Dapper;
 
 namespace TailorBD.API.Controllers
@@ -21,6 +23,7 @@ namespace TailorBD.API.Controllers
             new("invoice",              "Create Invoice",        "fa-file-invoice",      "Basic"),
             new("collect-payment",      "Collect Payment",       "fa-hand-holding-usd",  "Basic"),
             new("institution-details",  "Institution Details",   "fa-list-alt",          "Institution Details"),
+            new("shop-page-access",     "Shop Page Access",      "fa-user-lock",         "Institution Details"),
             new("users",                "Approve/Unlock User",   "fa-user-check",        "User Management"),
             new("roles",                "Role Management",       "fa-shield-alt",        "User Management"),
             new("sub-authority",        "Create Sub Authority",  "fa-user-plus",         "Sub Authority"),
@@ -59,6 +62,7 @@ namespace TailorBD.API.Controllers
         // ════════════════════════════════════════════════
         // GET: api/subadmin/by-authority/{authorityRegId}
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("by-authority/{authorityRegId}")]
         public IActionResult GetSubAdminsByAuthority(int authorityRegId)
         {
@@ -92,6 +96,7 @@ namespace TailorBD.API.Controllers
         // ═══════════════════════════════════════════════=
         // POST: api/subadmin/authority  — Create Sub Authority
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("authority")]
         public IActionResult CreateSubAdminByAuthority([FromBody] SubAdminAuthorityCreateModel model)
         {
@@ -150,6 +155,7 @@ namespace TailorBD.API.Controllers
         // ════════════════════════════════════════════════
         // PUT: api/subadmin/{id}/approval
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required (only changes Sub-Authority accounts)
         [HttpPut("{id}/approval")]
         public IActionResult ToggleApproval(int id, [FromBody] ApprovalStatusModel model)
         {
@@ -167,6 +173,7 @@ namespace TailorBD.API.Controllers
         // ════════════════════════════════════════════════
         // PUT: api/subadmin/{id}/lock
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required (only changes Sub-Authority accounts)
         [HttpPut("{id}/lock")]
         public IActionResult ToggleLock(int id, [FromBody] LockStatusModel model)
         {
@@ -187,6 +194,7 @@ namespace TailorBD.API.Controllers
         // ════════════════════════════════════════════════
         // DELETE: api/subadmin/{id}?authorityRegId=X
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpDelete("{id}")]
         public IActionResult DeleteSubAdmin(int id, [FromQuery] int authorityRegId)
         {
@@ -213,6 +221,7 @@ namespace TailorBD.API.Controllers
         // GET: api/subadmin/pages
         // Returns all available HTML pages
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("pages")]
         public IActionResult GetAllPages()
         {
@@ -229,6 +238,7 @@ namespace TailorBD.API.Controllers
         // GET: api/subadmin/page-access/{subRegId}
         // Returns page keys that are enabled for this sub-authority
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("page-access/{subRegId}")]
         public IActionResult GetPageAccess(int subRegId)
         {
@@ -248,6 +258,7 @@ namespace TailorBD.API.Controllers
         // POST: api/subadmin/page-access/{subRegId}
         // Save page access (replace all)
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("page-access/{subRegId}")]
         public IActionResult SavePageAccess(int subRegId, [FromBody] PageAccessSaveModel model)
         {
@@ -286,6 +297,7 @@ namespace TailorBD.API.Controllers
         // ════════════════════════════════════════════════
         // PUT: api/subadmin/migrate-add-islockedcolumn
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityOnly)] // maintenance/debug: Authority login required
         [HttpPut("migrate-add-islockedcolumn")]
         public IActionResult MigrateAddIsLockedColumn()
         {
@@ -330,6 +342,7 @@ namespace TailorBD.API.Controllers
         // PUT: api/subadmin/migrate-fix-category
         // Fix existing Sub-Authority records that were saved as 'Sub-Admin'
         // ════════════════════════════════════════════════
+        [Authorize(Roles = ShopClaims.AuthorityOnly)] // maintenance/debug: Authority login required
         [HttpPut("migrate-fix-category")]
         public IActionResult MigrateFixCategory()
         {
@@ -366,6 +379,8 @@ namespace TailorBD.API.Controllers
         // ════════════════════════════════════════════════
         // GET: api/subadmin/{institutionId}  — Get Sub-Admins by InstitutionID
         // ════════════════════════════════════════════════
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpGet("{institutionId:int}")]
         public IActionResult GetSubAdminsByInstitution(int institutionId, [FromQuery] int registrationId = 0)
         {
@@ -406,6 +421,8 @@ namespace TailorBD.API.Controllers
         // ════════════════════════════════════════════════
         // POST: api/subadmin  — Create Sub-Admin (for Admin users)
         // ════════════════════════════════════════════════
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpPost]
         public IActionResult CreateSubAdmin([FromBody] SubAdminCreateModel model)
         {

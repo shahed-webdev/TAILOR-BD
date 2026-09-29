@@ -132,43 +132,89 @@
         }
     }
 
+    function filterOrdersBySerials(list, orderNo) {
+        const nums = String(orderNo || '').split(/[,،\s]+/).map(function(n) { return n.trim(); }).filter(Boolean);
+        if (!nums.length) return list || [];
+        return (list || []).filter(function(o) {
+            const serial = String(parseInt(o.orderSerialNumber, 10));
+            return nums.some(function(n) {
+                const parsed = parseInt(n, 10);
+                return !isNaN(parsed) && serial === String(parsed);
+            });
+        });
+    }
+
     function filterCachedOrders(phone, orderNo) {
         let list = cachedReadyOrders.slice();
         if (phone) {
             const p = phone.toLowerCase();
             list = list.filter(function(o) { return String(o.phone || '').toLowerCase().indexOf(p) !== -1; });
         }
-        if (orderNo) {
-            const nums = orderNo.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
-            list = list.filter(function(o) {
-                const serial = String(o.orderSerialNumber);
-                return nums.some(function(n) { return serial === n; });
-            });
-        }
+        if (orderNo) list = filterOrdersBySerials(list, orderNo);
         return list;
     }
 
-    function reloadReadyOrders() {
-        cachedReadyOrders = [];
-        loadReadyOrders();
+    function mergeReadyOrdersIntoCache(orders) {
+        (orders || []).forEach(function(order) {
+            const idx = cachedReadyOrders.findIndex(function(o) { return o.orderId === order.orderId; });
+            if (idx === -1) cachedReadyOrders.push(order);
+            else cachedReadyOrders[idx] = order;
+        });
+    }
+
+    function removeOrderFromReadyCache(orderId) {
+        cachedReadyOrders = cachedReadyOrders.filter(function(o) { return o.orderId !== orderId; });
+        allOrders = (allOrders || []).filter(function(o) { return o.orderId !== orderId; });
+        $('#orderNo').val('');
+        $('#mobileNo').val('');
+        if (cachedReadyOrders.length) {
+            showOrdersList(cachedReadyOrders.slice());
+        } else {
+            showOrdersList([]);
+        }
+    }
+
+    function reloadReadyOrders(orderId) {
+        removeOrderFromReadyCache(orderId || pdCurrentOrderId);
     }
 
     function loadReadyOrders(phone = '', orderNo = '', startDate = null, endDate = null) {
         const hasDateFilter = !!(startDate || endDate);
+        const hasLookup = !!(phone || orderNo);
         const seq = ++loadSeq;
+        const container = $('#ordersTableContainer');
 
-        if (!hasDateFilter && cachedReadyOrders.length) {
-            showOrdersList(filterCachedOrders(phone, orderNo));
+        try {
+            $('#orderNo').autocomplete('close');
+            $('#mobileNo').autocomplete('close');
+        } catch (e) { /* autocomplete may not be ready */ }
+
+        // Full list from cache (no search)
+        if (!hasDateFilter && !hasLookup && cachedReadyOrders.length) {
+            showOrdersList(cachedReadyOrders.slice());
             return;
         }
 
-        const container = $('#ordersTableContainer');
-        container.html('<div class="loading"><span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span></div>');
-        $('#smsSendPanel').hide();
+        // Instant local preview for number/phone search
+        if (!hasDateFilter && hasLookup && cachedReadyOrders.length) {
+            const local = filterCachedOrders(phone, orderNo);
+            if (local.length) {
+                showOrdersList(local);
+            } else {
+                container.html('<div class="loading"><span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span></div>');
+            }
+        } else if (!cachedReadyOrders.length || hasDateFilter) {
+            container.html('<div class="loading"><span class="lang-content" data-en="Loading..." data-bn="লোড হচ্ছে...">লোড হচ্ছে...</span></div>');
+            $('#smsSendPanel').hide();
+        }
 
+        // Always fetch from API for a specific number/phone/date so 2nd, 3rd search works
         let url = `/api/delivery/ready-orders?institutionId=${institutionId}`;
         if (phone)     url += `&phone=${encodeURIComponent(phone)}`;
-        if (orderNo)   url += `&orderSerialNumbers=${encodeURIComponent(orderNo)}`;
+        if (orderNo) {
+            const serials = String(orderNo).split(/[,،\s]+/).map(function(n) { return parseInt(n, 10); }).filter(function(n) { return !isNaN(n) && n > 0; });
+            if (serials.length) url += `&orderSerialNumbers=${encodeURIComponent(serials.join(','))}`;
+        }
         if (startDate) url += `&startDate=${startDate}`;
         if (endDate)   url += `&endDate=${endDate}`;
 
@@ -177,9 +223,12 @@
             method: 'GET',
             timeout: 60000,
             success: function(response) {
-                const orders = (response.success && response.data && response.data.orders) ? response.data.orders : [];
-                if (!hasDateFilter && !phone && !orderNo) {
+                let orders = (response.success && response.data && response.data.orders) ? response.data.orders : [];
+                if (orderNo) orders = filterOrdersBySerials(orders, orderNo);
+                if (!hasDateFilter && !hasLookup) {
                     cachedReadyOrders = orders.slice();
+                } else if (!hasDateFilter) {
+                    mergeReadyOrdersIntoCache(orders);
                 }
                 if (seq !== loadSeq) return;
                 showOrdersList(orders);
@@ -536,6 +585,7 @@
         // Order checkbox — auto-check SMS for same row
         $(document).off('change.readyOrders', '.order-checkbox').on('change.readyOrders', '.order-checkbox', function() {
             const orderId = $(this).data('order-id');
+            $(`.order-checkbox[data-order-id="${orderId}"]`).prop('checked', $(this).is(':checked'));   // keep the row / card twin in step
             $(`.sms-checkbox[data-order-id="${orderId}"]`).prop('checked', $(this).is(':checked'));
             const total   = $('.order-checkbox').length;
             const checked = $('.order-checkbox:checked').length;
@@ -548,6 +598,8 @@
 
         // SMS checkbox change — update panel
         $(document).off('change.smsCheck', '.sms-checkbox').on('change.smsCheck', '.sms-checkbox', function() {
+            // keep the row / card twin in step, so unticking SMS really stops it for this order
+            $(`.sms-checkbox[data-order-id="${$(this).data('order-id')}"]`).prop('checked', $(this).is(':checked'));
             updateSmsSendPanel();
         });
 
@@ -560,8 +612,20 @@
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // Every order is rendered twice (desktop table row + mobile card, the hidden one is only CSS-hidden),
+    // so each order has two .sms-checkbox inputs that are checked together. Count / send each order once.
+    function checkedSmsBoxesUnique() {
+        const seen = {};
+        return $('.sms-checkbox:checked').filter(function() {
+            const id = String($(this).data('order-id'));
+            if (seen[id]) return false;
+            seen[id] = true;
+            return true;
+        });
+    }
+
     function updateSmsSendPanel() {
-        const smsChecked = $('.sms-checkbox:checked').length;
+        const smsChecked = checkedSmsBoxesUnique().length;
         if (smsChecked > 0) {
             $('#smsSendPanel').show();
             $('#smsSendCount').text(smsChecked);
@@ -571,9 +635,11 @@
     }
 
     // Send SMS for checked SMS checkboxes
+    let smsSending = false;
     window.sendReadySms = function() {
+        if (smsSending) return;   // double click while the request is running
         const orders = [];
-        $('.sms-checkbox:checked').each(function() {
+        checkedSmsBoxesUnique().each(function() {
             orders.push({
                 orderId:         parseInt($(this).data('order-id')),
                 orderSerialNumber: parseInt($(this).data('order-serial')),
@@ -590,6 +656,7 @@
 
         const btnEl = document.getElementById('smsSendBtn');
         if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> পাঠানো হচ্ছে...'; }
+        smsSending = true;
 
         $.ajax({
             url: '/api/delivery/send-ready-sms',
@@ -597,6 +664,7 @@
             contentType: 'application/json',
             data: JSON.stringify({ institutionId, registrationId, orders }),
             success: function(response) {
+                smsSending = false;
                 if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = '<i class="fas fa-sms me-1"></i> SMS পাঠান (<span id="smsSendCount">' + orders.length + '</span>)'; }
                 if (response.success) {
                     showSmsMsg('success', response.message || 'SMS সফলভাবে পাঠানো হয়েছে!');
@@ -608,6 +676,7 @@
                 }
             },
             error: function() {
+                smsSending = false;
                 if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = '<i class="fas fa-sms me-1"></i> SMS পাঠান (<span id="smsSendCount">' + orders.length + '</span>)'; }
                 showSmsMsg('error', 'SMS পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
             }
@@ -632,7 +701,7 @@
                 success: function(response) {
                     if (response.success) {
                         alert(window.currentLang === 'en' ? 'Order delivered successfully!' : 'অর্ডার সফলভাবে ডেলিভার করা হয়েছে!');
-                        reloadReadyOrders();
+                        reloadReadyOrders(orderId);
                     } else {
                         alert(response.message || 'Failed to deliver order');
                     }
@@ -943,7 +1012,7 @@
                         if (canOpenReceipt) {
                             window.location.href = '/money-receipt.html?orderId=' + pdCurrentOrderId;
                         } else {
-                            reloadReadyOrders();
+                            reloadReadyOrders(pdCurrentOrderId);
                         }
                     }, 1000);
                 } else {

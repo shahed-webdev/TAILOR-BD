@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 using Dapper;
 
 namespace TailorBD.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = ShopClaims.AuthorityOnly)] // whole controller: maintenance tools, Authority login only
     public class MigrationController : ControllerBase
     {
         private readonly TailorBdContext _context;

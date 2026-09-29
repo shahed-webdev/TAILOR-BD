@@ -99,6 +99,11 @@
             applyMeasurementBorderState($(this).is(':checked'));
         });
 
+        // "কারিগরের নাম প্রিন্ট" (artisan-assign.js; default off, remembered per shop)
+        if (window.ArtisanAssign) {
+            ArtisanAssign.bindToggle('#printArtisanCheckbox', function () { refreshMeasurementArtisans(true); });
+        }
+
         // Restore user's saved print size (default 4 inch)
         const savedPrintSize = window.TailorBD && window.TailorBD.printSizePref
             ? window.TailorBD.printSizePref.applyToSelect($('#printSizeSelect'))
@@ -967,6 +972,7 @@
                     
                     displayMoneyReceipt();
                     displayMeasurements();
+                    refreshMeasurementArtisans(false);
                 } else {
                     const errorMsg = response.message || 'Failed to load money receipt details';
                     showAlert('error', errorMsg);
@@ -1241,6 +1247,24 @@
         $container.append(`<div class="measurement-served-by-section">${html}</div>`);
     }
 
+    // Assigned কারিগর on the measurement copies, only when the print toggle is on
+    function refreshMeasurementArtisans(rerenderWhenOff) {
+        if (!orderData || !orderData.measurements) return;
+        if (window.ArtisanAssign && ArtisanAssign.printOn()) {
+            ArtisanAssign.load([orderId]).then(function (loaded) { if (loaded || rerenderWhenOff) displayMeasurements(); });
+        } else if (rerenderWhenOff) {
+            displayMeasurements();
+        }
+    }
+
+    function measurementArtisanLine(item) {
+        if (!window.ArtisanAssign || !ArtisanAssign.printOn() || !item) return '';
+        const name = ArtisanAssign.lineText(item.orderListId || item.orderListID);
+        if (!name) return '';
+        const lbl = (window.currentLang || 'bn') === 'en' ? 'Artisan:' : 'কারিগর:';
+        return `<div class="print-artisan-line measurement-artisan-line">${lbl} ${escapeHtml(name)}</div>`;
+    }
+
     function displayMeasurements() {
         if (!printSettings || !printSettings.measurement) {
             console.warn('No print settings found, using defaults');
@@ -1360,6 +1384,9 @@
                         </tr>
                     </table>
                 `);
+                // artisan name only on the shop copy (by copy role, not title text); each dress gets its own
+                const artisanLine = copy.class === 'shop-copy' ? measurementArtisanLine(item) : '';
+                if (artisanLine) $copy.append(artisanLine);
 
                 // Add barcode if setting is enabled AND this is a shop copy
                 if (mSettings.printBarcode && header.orderSerialNumber && copy.class === 'shop-copy') {

@@ -146,6 +146,8 @@ builder.Services.AddScoped<IDressService, DressService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IInstitutionService, InstitutionService>();
 builder.Services.AddScoped<IInvoiceBillingService, InvoiceBillingService>();
+// Shop Page Access: per-shop page deny list (Authority panel), cached per shop
+builder.Services.AddSingleton<ShopPageAccessService>();
 
 // ── ShurjoPay Online Payment ──────────────────────────────────────────────
 var spOpt = builder.Configuration.GetSection("ShurjoPay").Get<ShurjoPayOptions>()
@@ -221,6 +223,13 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// ── Session (before static files: the shop page block below reads the login session) ──
+app.UseSession();
+
+// ── Shop Page Access: a page the Authority switched off for this shop → /access-denied.html
+// (HTML pages are static files, so this must run before UseStaticFiles)
+app.UseMiddleware<ShopPageBlockMiddleware>();
+
 // ── Static files ──────────────────────────────────────────────────────────
 var defaultFilesOptions = new DefaultFilesOptions();
 defaultFilesOptions.DefaultFileNames.Clear();
@@ -261,8 +270,7 @@ else
     });
 }
 
-// ── Session → Authentication → Authorization ──────────────────────────────
-app.UseSession();
+// ── Authentication → Authorization (session is set up above) ──────────────
 app.UseAuthentication();
 app.UseAuthorization();
 

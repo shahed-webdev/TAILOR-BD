@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using TailorBD.API.Helpers;
 using TailorBD.API.Models;
 using TailorBD.API.Services;
 using System.Drawing;
@@ -31,6 +33,8 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get institution by ID
         /// </summary>
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpGet("{institutionId}")]
         public async Task<ActionResult<ApiResponse<InstitutionDto>>> GetInstitution(int institutionId)
         {
@@ -91,6 +95,8 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Update institution information
         /// </summary>
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpPut("{institutionId}")]
         public async Task<ActionResult<ApiResponse<bool>>> UpdateInstitution(int institutionId, [FromBody] UpdateInstitutionRequest request)
         {
@@ -137,6 +143,8 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Update institution logo
         /// </summary>
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpPost("{institutionId}/logo")]
         public async Task<ActionResult<ApiResponse<bool>>> UpdateInstitutionLogo(int institutionId, IFormFile logo)
         {
@@ -231,6 +239,8 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get print settings for institution
         /// </summary>
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpGet("{institutionId}/print-settings")]
         public async Task<ActionResult> GetPrintSettings(int institutionId)
         {
@@ -376,6 +386,8 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Update measurement print settings
         /// </summary>
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpPut("{institutionId}/measurement-print-settings")]
         public async Task<ActionResult> UpdateMeasurementPrintSettings(
             int institutionId, 
@@ -445,6 +457,8 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Update money receipt print settings
         /// </summary>
+        [Authorize]
+        [ShopScoped] // login required; institutionId always taken from the token
         [HttpPut("{institutionId}/money-receipt-print-settings")]
         public async Task<ActionResult> UpdateMoneyReceiptPrintSettings(
             int institutionId, 
@@ -500,6 +514,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get dashboard summary stats for Authority
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("authority/dashboard")]
         public async Task<ActionResult> GetDashboard()
         {
@@ -604,6 +619,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get all institutions list for Authority panel with filters
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("authority/list")]
         public async Task<ActionResult> GetAllInstitutions(
             [FromQuery] string? paymentStatus    = null,
@@ -731,6 +747,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Toggle institution validation (Active/Inactive)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPut("authority/{institutionId}/toggle-status")]
         public async Task<ActionResult> ToggleInstitutionStatus(int institutionId)
         {
@@ -757,6 +774,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Sign up a new institution (Authority only)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("authority/signup")]
         public async Task<ActionResult> SignUpInstitution([FromBody] SignUpInstitutionRequest req)
         {
@@ -932,6 +950,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Change institution package
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPut("authority/{institutionId}/change-package")]
         public async Task<ActionResult> ChangePackage(int institutionId, [FromBody] ChangePackageRequest req)
         {
@@ -988,6 +1007,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get all packages
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("authority/packages")]
         public async Task<ActionResult> GetPackages()
         {
@@ -1025,6 +1045,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get all institutions with their Admin + Sub-Admin user list, lock/approve status
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("authority/users")]
         public async Task<ActionResult> GetUsersForAuthority(
             [FromQuery] string? search = null,
@@ -1126,6 +1147,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Unlock a user account (clear lockout from aspnet_Membership)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("authority/users/{userName}/unlock")]
         public async Task<ActionResult> UnlockUser(string userName)
         {
@@ -1160,6 +1182,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Toggle IsApproved status
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("authority/users/{userName}/toggle-approve")]
         public async Task<ActionResult> ToggleApprove(string userName)
         {
@@ -1194,6 +1217,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Reset/change password for a LIU user (updates both LIU table and aspnet_Membership)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost("authority/users/{userName}/reset-password")]
         public async Task<ActionResult> ResetPassword(string userName, [FromBody] ResetPasswordRequest req)
         {
@@ -1296,6 +1320,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Search Order Payment Records by OrderSerialNumber (Authority only)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("authority/{institutionId}/order-payments")]
         public async Task<ActionResult> GetOrderPayments(int institutionId, [FromQuery] int orderSerialNumber)
         {
@@ -1359,6 +1384,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Delete a single Order Payment Record (Authority only)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpDelete("authority/{institutionId}/order-payment/{paymentRecordId}")]
         public async Task<ActionResult> DeleteOrderPayment(int institutionId, int paymentRecordId)
         {
@@ -1396,6 +1422,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Search Item Sell Payment Records by Selling SN (Authority only)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpGet("authority/{institutionId}/item-sell-payments")]
         public async Task<ActionResult> GetItemSellPayments(int institutionId, [FromQuery] string sellingSN)
         {
@@ -1457,6 +1484,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Delete a single Item Sell Payment Record (Authority only)
         /// </summary>
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpDelete("authority/{institutionId}/item-sell-payment/{paymentRecordId}")]
         public async Task<ActionResult> DeleteItemSellPayment(int institutionId, int paymentRecordId)
         {

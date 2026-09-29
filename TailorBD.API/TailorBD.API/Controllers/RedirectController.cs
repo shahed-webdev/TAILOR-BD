@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 using Dapper;
 
 namespace TailorBD.API.Controllers
@@ -163,6 +165,7 @@ namespace TailorBD.API.Controllers
         }
 
         // GET: api/Redirect/migrate-page-urls
+        [Authorize(Roles = ShopClaims.AuthorityOnly)] // maintenance/debug: Authority login required
         [HttpGet("migrate-page-urls")]
         public IActionResult MigratePageUrls()
         {

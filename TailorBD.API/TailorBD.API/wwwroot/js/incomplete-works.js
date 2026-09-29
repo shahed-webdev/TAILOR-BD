@@ -207,12 +207,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Setup search tabs
         setupSearchTabs();
         setupLegendFilters();
+        setupSearchEnterKey();
 
         // Load initial data
         await searchOrders();
 
         // Setup select all checkbox
         setupSelectAllCheckbox();
+        setupSmsHeaderCheckbox();
         
         // Initialize language
         if (typeof window.updateLanguage === 'function') {
@@ -260,6 +262,19 @@ function setupSearchTabs() {
     });
 }
 
+function setupSearchEnterKey() {
+    ['mobileNo', 'orderNo', 'customerName', 'address', 'startDate', 'endDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchOrders();
+            }
+        });
+    });
+}
+
 function getSearchCriteria() {
     const searchType = document.querySelector('input[name="searchType"]:checked')?.value || 'number';
     if (searchType === 'date') {
@@ -282,9 +297,48 @@ function getSearchCriteria() {
     };
 }
 
+function localTodayStr() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dayNum = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${m}-${dayNum}`;
+}
+
 function orderDeliveryDateKey(order) {
     if (!order.deliveryDate) return '';
-    return String(order.deliveryDate).split('T')[0];
+    const raw = String(order.deliveryDate);
+    const parsed = new Date(raw);
+    if (!isNaN(parsed.getTime())) {
+        const m = String(parsed.getMonth() + 1).padStart(2, '0');
+        const dayNum = String(parsed.getDate()).padStart(2, '0');
+        return `${parsed.getFullYear()}-${m}-${dayNum}`;
+    }
+    return raw.split('T')[0].split(' ')[0];
+}
+
+function normalizeOrderFlags(order) {
+    const day = orderDeliveryDateKey(order);
+    const today = localTodayStr();
+    order.isToday = !!(day && day === today);
+    order.isOverdue = !!(day && day < today);
+    order.isRecent = !order.isToday && !order.isOverdue;
+    return order;
+}
+
+function getOrderRowClass(order) {
+    if (order.isToday) return 'today';
+    if (order.isOverdue) return 'overdue';
+    if (order.isPartlyCompleted) return 'partly-completed';
+    return 'recent';
+}
+
+function parseOrderNumbers(orderNo) {
+    return String(orderNo || '')
+        .split(/[,،\s]+/)
+        .map(n => n.trim())
+        .filter(Boolean)
+        .map(n => String(parseInt(n, 10)))
+        .filter(n => n !== 'NaN');
 }
 
 function orderMatchesSearch(order, criteria) {
@@ -292,8 +346,9 @@ function orderMatchesSearch(order, criteria) {
     if (criteria.customerName && String(order.customerName || '').toLowerCase().indexOf(criteria.customerName.toLowerCase()) === -1) return false;
     if (criteria.address && String(order.address || '').toLowerCase().indexOf(criteria.address.toLowerCase()) === -1) return false;
     if (criteria.orderNo) {
-        const nums = criteria.orderNo.split(',').map(n => n.trim()).filter(Boolean);
-        if (!nums.some(n => String(order.orderSerialNumber) === n)) return false;
+        const nums = parseOrderNumbers(criteria.orderNo);
+        const serial = String(parseInt(order.orderSerialNumber, 10));
+        if (!nums.length || nums.indexOf(serial) === -1) return false;
     }
     const day = orderDeliveryDateKey(order);
     if (criteria.startDate && (!day || day < criteria.startDate)) return false;
@@ -306,7 +361,7 @@ function rememberSearchTerms(criteria) {
     if (criteria.customerName) addToSearchHistory('customerName', criteria.customerName);
     if (criteria.address) addToSearchHistory('address', criteria.address);
     if (criteria.orderNo) {
-        criteria.orderNo.split(',').map(n => n.trim()).filter(Boolean).forEach(num => addToSearchHistory('orderNo', num));
+        parseOrderNumbers(criteria.orderNo).forEach(num => addToSearchHistory('orderNo', num));
     }
 }
 
@@ -336,17 +391,139 @@ async function ensureOrderListCache(orders) {
     }));
 }
 
+function getVisibleCachedOrders() {
+    const criteria = getSearchCriteria();
+    const skipLegend = !!(criteria.orderNo || criteria.phone);
+    const filters = skipLegend ? [] : getActiveLegendFilters();
+    return cachedIncompleteOrders
+        .filter(order => orderMatchesSearch(order, criteria))
+        .filter(order => orderMatchesLegendFilter(order, filters));
+}
+
 async function renderFromCache() {
     const criteria = getSearchCriteria();
-    const searched = cachedIncompleteOrders.filter(order => orderMatchesSearch(order, criteria));
-    allLoadedOrders = searched;
-    totalCount = searched.length;
+    const skipLegend = !!(criteria.orderNo || criteria.phone);
+    const filters = skipLegend ? [] : getActiveLegendFilters();
+
+    document.querySelectorAll('.legend-filter').forEach(item => {
+        const cb = item.querySelector('.legend-filter-cb');
+        item.classList.toggle('is-active', !!(cb && cb.checked));
+    });
+
+    const searchMatched = cachedIncompleteOrders.filter(order => orderMatchesSearch(order, criteria));
+    const visible = skipLegend ? searchMatched : searchMatched.filter(order => orderMatchesLegendFilter(order, filters));
+
+    allLoadedOrders = visible;
+    totalCount = visible.length;
     totalPages = totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : 0;
     if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
     const start = (currentPage - 1) * PAGE_SIZE;
-    const pageOrders = searched.slice(start, start + PAGE_SIZE);
+    const pageOrders = visible.slice(start, start + PAGE_SIZE);
     await renderOrdersTable(pageOrders);
-    applyLegendFilters();
+    updateTotalCountText(visible.length, searchMatched.length);
+
+    const emptyEl = document.getElementById('iwFilterEmpty');
+    if (emptyEl) emptyEl.style.display = 'none';
+}
+
+function mergeOrdersIntoCache(orders) {
+    (orders || []).map(normalizeOrderFlags).forEach(order => {
+        const index = cachedIncompleteOrders.findIndex(existing => existing.orderId === order.orderId);
+        if (index === -1) cachedIncompleteOrders.push(order);
+        else cachedIncompleteOrders[index] = order;
+    });
+    if (cachedIncompleteOrders.length && cachedIncompleteOrders[0].institutionName && !institutionInfoCache) {
+        institutionInfoCache = { institutionName: cachedIncompleteOrders[0].institutionName };
+    }
+}
+
+async function fetchIncompleteFromApi(extraParams) {
+    let queryParams = `institutionId=${currentInstitutionId}&page=1&pageSize=5000`;
+    Object.keys(extraParams || {}).forEach(key => {
+        const value = extraParams[key];
+        if (value !== undefined && value !== null && value !== '' && value !== false) {
+            queryParams += `&${key}=${encodeURIComponent(value)}`;
+        }
+    });
+    const response = await fetch(`/api/Delivery/incomplete-works?${queryParams}`);
+    const result = await response.json();
+    if (!result.success) throw new Error(result.message || 'Failed to load orders');
+    return result.data.orders || [];
+}
+
+async function refreshIncompleteCacheSilent() {
+    try {
+        const today = localTodayStr();
+        const [mainOrders, upcomingOrders] = await Promise.all([
+            fetchIncompleteFromApi({}),
+            fetchIncompleteFromApi({ startDate: today, endDate: '3760-01-01', upcomingOnly: true })
+        ]);
+        const next = [];
+        (mainOrders || []).concat(upcomingOrders || []).map(normalizeOrderFlags).forEach(order => {
+            if (!next.some(o => o.orderId === order.orderId)) next.push(order);
+        });
+        cachedIncompleteOrders = next;
+        const criteria = getSearchCriteria();
+        if (!criteria.orderNo && !criteria.phone && !criteria.customerName) {
+            await renderFromCache();
+        }
+    } catch (error) {
+        console.warn('Background refresh failed', error);
+    }
+}
+
+async function loadIncompleteCache() {
+    const today = localTodayStr();
+    const [mainOrders, upcomingOrders] = await Promise.all([
+        fetchIncompleteFromApi({}),
+        fetchIncompleteFromApi({ startDate: today, endDate: '3760-01-01', upcomingOnly: true })
+    ]);
+    cachedIncompleteOrders = [];
+    mergeOrdersIntoCache(mainOrders);
+    mergeOrdersIntoCache(upcomingOrders);
+}
+
+async function fetchAndMergeSearch(criteria) {
+    const ordersTableContainer = document.getElementById('ordersTableContainer');
+    const serials = parseOrderNumbers(criteria.orderNo);
+    const extra = {
+        phone: criteria.phone || '',
+        customerName: criteria.customerName || '',
+        orderSerialNumbers: serials.join(','),
+        address: criteria.address || '',
+        startDate: criteria.startDate || '',
+        endDate: criteria.endDate || '',
+        upcomingOnly: !!criteria.upcomingOnly
+    };
+
+    const localHits = cachedIncompleteOrders.filter(order => orderMatchesSearch(order, criteria));
+    if (localHits.length) {
+        await renderFromCache();
+    } else {
+        ordersTableContainer.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
+    }
+
+    try {
+        const orders = await fetchIncompleteFromApi(extra);
+        mergeOrdersIntoCache(orders);
+        await renderFromCache();
+    } catch (error) {
+        console.error('Error searching orders:', error);
+        await renderFromCache();
+    }
+}
+
+async function ensureUpcomingOrdersLoaded() {
+    const ordersTableContainer = document.getElementById('ordersTableContainer');
+    if (ordersTableContainer) {
+        ordersTableContainer.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
+    }
+    const upcoming = await fetchIncompleteFromApi({
+        startDate: localTodayStr(),
+        endDate: '3760-01-01',
+        upcomingOnly: true
+    });
+    mergeOrdersIntoCache(upcoming);
 }
 
 // Search orders
@@ -357,40 +534,33 @@ async function searchOrders(page, forceReload) {
         currentPage = 1;
     }
 
-    rememberSearchTerms(getSearchCriteria());
+    const criteria = getSearchCriteria();
+    rememberSearchTerms(criteria);
+    const ordersTableContainer = document.getElementById('ordersTableContainer');
+    const hasDateSearch = !!(criteria.startDate || criteria.endDate);
+    const hasLookup = !!(criteria.orderNo || criteria.phone || criteria.customerName || criteria.address);
 
-    if (cachedIncompleteOrders.length && !forceReload) {
-        await renderFromCache();
+    if (hasDateSearch || hasLookup) {
+        await fetchAndMergeSearch(criteria);
         return;
     }
 
-    const ordersTableContainer = document.getElementById('ordersTableContainer');
-    ordersTableContainer.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
-
-    try {
-        const queryParams = `institutionId=${currentInstitutionId}&page=1&pageSize=2000`;
-        const response = await fetch(`/api/Delivery/incomplete-works?${queryParams}`);
-        const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(result.message || 'Failed to load orders');
+    if (!cachedIncompleteOrders.length || forceReload) {
+        ordersTableContainer.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
+        try {
+            await loadIncompleteCache();
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            ordersTableContainer.innerHTML = `
+                <div class="error-message">
+                    অর্ডার লোড করতে সমস্যা হয়েছে: ${error.message}
+                </div>
+            `;
+            return;
         }
-
-        cachedIncompleteOrders = result.data.orders || [];
-        if (cachedIncompleteOrders.length && cachedIncompleteOrders[0].institutionName && !institutionInfoCache) {
-            institutionInfoCache = { institutionName: cachedIncompleteOrders[0].institutionName };
-        }
-
-        await renderFromCache();
-
-    } catch (error) {
-        console.error('Error loading orders:', error);
-        ordersTableContainer.innerHTML = `
-            <div class="error-message">
-                অর্ডার লোড করতে সমস্যা হয়েছে: ${error.message}
-            </div>
-        `;
     }
+
+    await renderFromCache();
 }
 
 function renderPaginationHtml() {
@@ -474,7 +644,7 @@ async function renderOrdersTable(orders) {
                     <th>${lang === 'en' ? 'Total' : 'মোট'}</th>
                     <th>${lang === 'en' ? 'Store' : 'রাখা'}</th>
                     <th>${lang === 'en' ? 'Note' : 'নোট'}</th>
-                    <th>SMS</th>
+                    <th class="col-sms-head"><label class="sms-all-wrap" title="${lang === 'en' ? 'SMS for all selected orders' : 'সিলেক্ট করা সব অর্ডারে SMS'}"><span>SMS</span><input type="checkbox" id="smsAll"></label></th>
                     <th>${lang === 'en' ? 'Pr.' : 'প্রি.'}</th>
                 </tr>
             </thead>
@@ -486,18 +656,15 @@ async function renderOrdersTable(orders) {
         const orderListItems = orderListItemsCache[order.orderId] || [];
 
         // Determine row class
-        let rowClass = '';
-        if (order.isToday) rowClass = 'today';
-        else if (order.isOverdue) rowClass = 'overdue';
-        else if (order.isPartlyCompleted) rowClass = 'partly-completed';
-
+        const rowClass = getOrderRowClass(order);
         const customerLabel = `(${order.customerNumber}) ${order.customerName}`;
 
         tableHTML += `
             <tr class="${rowClass}" data-order-id="${order.orderId}"
                 data-is-today="${order.isToday ? '1' : '0'}"
                 data-is-overdue="${order.isOverdue ? '1' : '0'}"
-                data-is-partly="${order.isPartlyCompleted ? '1' : '0'}">
+                data-is-partly="${order.isPartlyCompleted ? '1' : '0'}"
+                data-is-recent="${order.isRecent ? '1' : '0'}">
                 <td><input type="checkbox" class="order-checkbox" data-order-id="${order.orderId}"></td>
                 <td class="col-order-no-cell">
                     <a href="order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}" class="view-measurement-link" target="_blank" title="${lang === 'en' ? 'View measurement' : 'মাপ দেখুন'}">
@@ -506,7 +673,7 @@ async function renderOrdersTable(orders) {
                 </td>
                 <td class="col-name-cell"><span class="cell-name" title="${escapeHtml(customerLabel)}">${escapeHtml(customerLabel)}</span></td>
                 <td class="col-phone-cell">${escapeHtml(order.phone || '-')}</td>
-                <td>${renderOrderListTable(orderListItems, order.orderId)}</td>
+                <td>${renderOrderListTable(orderListItems, order.orderId)}<div class="aa-progress" data-aa-progress="${order.orderId}"></div></td>
                 <td class="col-date-cell">${formatDate(order.orderDate)}</td>
                 <td class="col-date-cell">${order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</td>
                 <td><strong>${Math.round(order.orderAmount)}</strong></td>
@@ -541,6 +708,18 @@ async function renderOrdersTable(orders) {
     // Setup event listeners
     setupOrderCheckboxes();
     setupOrderListCheckboxes();
+    updateSmsHeaderState();
+
+    fillAssignedArtisans(orders);
+}
+
+// Assigned কারিগর per dress line (one batched call for the page; artisan-assign.js)
+function fillAssignedArtisans(orders) {
+    if (!window.ArtisanAssign) return;
+    ArtisanAssign.fill(document);   // cached values right away
+    ArtisanAssign.load((orders || []).map(order => order.orderId)).then(loaded => {
+        if (loaded) ArtisanAssign.fill(document);
+    });
 }
 
 // Render mobile card layout
@@ -560,11 +739,7 @@ function renderMobileCards(orders) {
     </div>`;
 
     orders.forEach(order => {
-        let rowClass = '';
-        if (order.isToday) rowClass = 'today';
-        else if (order.isOverdue) rowClass = 'overdue';
-        else if (order.isPartlyCompleted) rowClass = 'partly-completed';
-
+        const rowClass = getOrderRowClass(order);
         const customerLabel = `(${order.customerNumber}) ${order.customerName}`;
         const orderDate    = order.orderDate    ? formatDate(order.orderDate)    : '-';
         const deliveryDate = order.deliveryDate ? formatDate(order.deliveryDate) : '-';
@@ -579,7 +754,7 @@ function renderMobileCards(orders) {
                 <input type="checkbox" class="order-list-item-checkbox"
                     data-order-id="${order.orderId}"
                     data-order-list-id="${item.orderListId}">
-                <span class="ic-dress">${escapeHtml(item.dressName)}</span>
+                <span class="ic-dress">${escapeHtml(item.dressName)}<span class="aa-line" data-aa-mode="attr" data-aa-ol="${item.orderListId}"></span></span>
                 <span class="ic-qty">${lang === 'en' ? 'Tot:' : 'মো:'} ${item.dressQuantity}</span>
                 <input type="number" class="pending-input"
                     data-order-id="${order.orderId}"
@@ -593,7 +768,8 @@ function renderMobileCards(orders) {
         <div class="iw-card ${rowClass}" data-order-id="${order.orderId}"
             data-is-today="${order.isToday ? '1' : '0'}"
             data-is-overdue="${order.isOverdue ? '1' : '0'}"
-            data-is-partly="${order.isPartlyCompleted ? '1' : '0'}">
+            data-is-partly="${order.isPartlyCompleted ? '1' : '0'}"
+            data-is-recent="${order.isRecent ? '1' : '0'}">
             <div class="ic-top">
                 <input type="checkbox" class="order-checkbox ic-chk" data-order-id="${order.orderId}">
                 <a href="order-measurements.html?orderId=${order.orderId}&institutionId=${currentInstitutionId}"
@@ -609,6 +785,7 @@ function renderMobileCards(orders) {
             <div class="ic-items">
                 <div class="ic-items-title"><i class="fas fa-tshirt me-1"></i>${lang === 'en' ? 'Order Items' : 'পোশাকের তালিকা'}</div>
                 ${itemsHtml}
+                <div class="aa-progress" data-aa-progress="${order.orderId}"></div>
             </div>` : ''}
             <div class="ic-inputs">
                 <input type="text" class="store-input" data-order-id="${order.orderId}"
@@ -648,18 +825,69 @@ function renderMobileCards(orders) {
         });
     }
 
-    // Sync card checkboxes with table checkboxes
+    // Card = phone copy of the table row. completeWork() reads the table row, so every card change is
+    // passed to the table row (whose handlers tick dress lines + SMS) and the result copied back.
     container.querySelectorAll('.order-checkbox').forEach(cb => {
         cb.addEventListener('change', function() {
             const orderId = this.dataset.orderId;
             const tableCheckbox = document.querySelector(`#ordersTableContainer .order-checkbox[data-order-id="${orderId}"]`);
-            if (tableCheckbox) tableCheckbox.checked = this.checked;
-            // update card selected style
-            const card = this.closest('.iw-card');
-            if (card) card.classList.toggle('selected', this.checked);
+            if (tableCheckbox) {
+                if (tableCheckbox.checked !== this.checked) {
+                    tableCheckbox.checked = this.checked;
+                    tableCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                } else {
+                    syncCardFromTable(orderId);
+                }
+            } else {
+                // no table row (should not happen): handle the card on its own
+                const card = this.closest('.iw-card');
+                if (card) {
+                    card.querySelectorAll('.order-list-item-checkbox').forEach(x => { x.checked = this.checked; });
+                    card.classList.toggle('selected', this.checked);
+                }
+                setOrderSms(orderId, this.checked);
+                updateSmsHeaderState();
+            }
             updateCompleteButton();
         });
     });
+    container.querySelectorAll('.order-list-item-checkbox').forEach(cb => {
+        cb.addEventListener('change', function() {
+            const orderId = this.dataset.orderId;
+            const tableItem = document.querySelector(`#ordersTableContainer .order-list-item-checkbox[data-order-id="${orderId}"][data-order-list-id="${this.dataset.orderListId}"]`);
+            if (!tableItem) return;
+            tableItem.checked = this.checked;
+            tableItem.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    });
+    // quantity / store / note typed on the card go to the table row too
+    container.addEventListener('input', function(e) {
+        const el = e.target;
+        if (!el || !el.matches || !el.matches('.pending-input, .store-input, .details-input')) return;
+        const cls = el.classList.contains('pending-input') ? 'pending-input' : (el.classList.contains('store-input') ? 'store-input' : 'details-input');
+        let sel = `#ordersTableContainer .${cls}[data-order-id="${el.dataset.orderId}"]`;
+        if (cls === 'pending-input') sel += `[data-order-list-id="${el.dataset.orderListId}"]`;
+        const target = document.querySelector(sel);
+        if (target) target.value = el.value;
+    });
+}
+
+// copy the table row's selection (order, dress lines, SMS) onto its phone card
+function syncCardFromTable(orderId) {
+    const row = document.querySelector(`#ordersTableContainer tr[data-order-id="${orderId}"]`);
+    const card = document.querySelector(`#iwCardsContainer .iw-card[data-order-id="${orderId}"]`);
+    if (!row || !card) return;
+    const on = !!row.querySelector('.order-checkbox')?.checked;
+    const cardChk = card.querySelector('.order-checkbox');
+    if (cardChk) cardChk.checked = on;
+    card.classList.toggle('selected', on);
+    card.querySelectorAll('.order-list-item-checkbox').forEach(x => {
+        const t = row.querySelector(`.order-list-item-checkbox[data-order-list-id="${x.dataset.orderListId}"]`);
+        if (t) x.checked = t.checked;
+    });
+    const sms = row.querySelector('.sms-checkbox');
+    const cardSms = card.querySelector('.sms-checkbox');
+    if (sms && cardSms) cardSms.checked = sms.checked;
 }
 
 // Render order list table
@@ -699,7 +927,7 @@ function renderOrderListTable(orderListItems, orderId) {
                            data-order-list-id="${item.orderListId}">
                     ${item.orderListSN}
                 </td>
-                <td><span class="cell-clip" title="${escapeHtml(item.dressName)}">${escapeHtml(clipCell(item.dressName, 10))}</span></td>
+                <td><span class="cell-clip" title="${escapeHtml(item.dressName)}">${escapeHtml(clipCell(item.dressName, 10))}</span><span class="aa-line" data-aa-mode="attr" data-aa-ol="${item.orderListId}"></span></td>
                 <td>${item.dressQuantity}</td>
                 <td>
                     <input type="number" class="pending-input" 
@@ -738,11 +966,53 @@ async function getIncompleteOrderList(orderId) {
     }
 }
 
+// ── SMS header checkbox (desktop table) ──────────────────────────────────
+// tick  = SMS on for every selected (ticked) order of the current page
+// untick = SMS off for every order row of the current page
+// state: checked = all selected rows have SMS, indeterminate = some, unchecked = none / nothing selected
+function setOrderSms(orderId, on) {
+    // table row checkbox is what completeWork() reads; the mobile card copy is kept in step
+    document.querySelectorAll(`.sms-checkbox[data-order-id="${orderId}"]`).forEach(cb => { cb.checked = on; });
+}
+function updateSmsHeaderState() {
+    const head = document.getElementById('smsAll');
+    if (!head) return;
+    const rows = Array.from(document.querySelectorAll('#ordersTableContainer tr[data-order-id]'))
+        .filter(tr => tr.querySelector('.order-checkbox')?.checked);
+    const withSms = rows.filter(tr => tr.querySelector('.sms-checkbox')?.checked).length;
+    head.checked = rows.length > 0 && withSms === rows.length;
+    head.indeterminate = withSms > 0 && withSms < rows.length;
+}
+function setupSmsHeaderCheckbox() {
+    // bound once on document: the table (and its header) is re-rendered on every page / search
+    document.addEventListener('change', function (e) {
+        const t = e.target;
+        if (!t || !t.matches) return;
+        if (t.id === 'smsAll') {
+            const rows = Array.from(document.querySelectorAll('#ordersTableContainer tr[data-order-id]'));
+            if (t.checked) {
+                rows.forEach(tr => { if (tr.querySelector('.order-checkbox')?.checked) setOrderSms(tr.dataset.orderId, true); });
+            } else {
+                rows.forEach(tr => setOrderSms(tr.dataset.orderId, false));
+            }
+            updateSmsHeaderState();
+            return;
+        }
+        if (t.matches('.sms-checkbox')) {
+            setOrderSms(t.dataset.orderId, t.checked);   // keep table/card copies equal
+            updateSmsHeaderState();
+            return;
+        }
+        if (t.matches('.order-checkbox, .order-list-item-checkbox')) updateSmsHeaderState();
+    });
+}
+
 // Setup select all checkbox
 function setupSelectAllCheckbox() {
     document.addEventListener('change', function(e) {
         if (e.target.id === 'selectAll') {
-            const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+            // table rows only — their handlers copy the result onto the phone cards
+            const orderCheckboxes = document.querySelectorAll('#ordersTableContainer .order-checkbox');
             orderCheckboxes.forEach(checkbox => {
                 checkbox.checked = e.target.checked;
                 checkbox.dispatchEvent(new Event('change', { bubbles: true }));
@@ -753,7 +1023,7 @@ function setupSelectAllCheckbox() {
 
 // Setup order checkboxes
 function setupOrderCheckboxes() {
-    const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+    const orderCheckboxes = document.querySelectorAll('#ordersTableContainer .order-checkbox');
     orderCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const orderId = parseInt(this.dataset.orderId);
@@ -781,6 +1051,7 @@ function setupOrderCheckboxes() {
                 if (smsCheckbox) smsCheckbox.checked = false;
             }
 
+            syncCardFromTable(orderId);
             updateCompleteButton();
         });
     });
@@ -788,11 +1059,12 @@ function setupOrderCheckboxes() {
 
 // Setup order list checkboxes
 function setupOrderListCheckboxes() {
-    const orderListCheckboxes = document.querySelectorAll('.order-list-item-checkbox');
+    const orderListCheckboxes = document.querySelectorAll('#ordersTableContainer .order-list-item-checkbox');
     orderListCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const orderId = parseInt(this.dataset.orderId);
-            const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+            const orderRow = document.querySelector(`#ordersTableContainer tr[data-order-id="${orderId}"]`);
+            if (!orderRow) return;
             const orderCheckbox = orderRow.querySelector('.order-checkbox');
 
             // Check if any order list item is checked
@@ -812,6 +1084,7 @@ function setupOrderListCheckboxes() {
                 if (smsCheckbox) smsCheckbox.checked = false;
             }
 
+            syncCardFromTable(orderId);
             updateCompleteButton();
         });
     });
@@ -833,13 +1106,14 @@ function setupOrderListCheckboxes() {
 
 // Update complete button state
 function updateCompleteButton() {
-    const anyChecked = document.querySelectorAll('.order-checkbox:checked').length > 0;
+    const anyChecked = document.querySelectorAll('#ordersTableContainer .order-checkbox:checked').length > 0;
     document.getElementById('btnComplete').disabled = !anyChecked;
 }
 
 // Complete work
 async function completeWork() {
-    const checkedOrders = document.querySelectorAll('.order-checkbox:checked');
+    // table rows only (the phone card is a copy of the same order — counting it would send the order twice)
+    const checkedOrders = document.querySelectorAll('#ordersTableContainer .order-checkbox:checked');
 
     if (checkedOrders.length === 0) {
         alert('আপনি কোন অর্ডার সিলেক্ট করেন নি।');
@@ -941,9 +1215,20 @@ async function completeWork() {
 
         if (result.success) {
             alert(result.message || 'অর্ডারের কাজ সফলভাবে সম্পূর্ণ হয়েছে');
-            cachedIncompleteOrders = [];
-            orderListItemsCache = {};
-            await searchOrders(1, true);
+            const doneIds = orders.map(o => o.orderId);
+            cachedIncompleteOrders = cachedIncompleteOrders.filter(o => doneIds.indexOf(o.orderId) === -1);
+            doneIds.forEach(id => { delete orderListItemsCache[id]; });
+            const orderNoEl = document.getElementById('orderNo');
+            const mobileEl = document.getElementById('mobileNo');
+            if (orderNoEl) orderNoEl.value = '';
+            if (mobileEl) mobileEl.value = '';
+            const nameEl = document.getElementById('customerName');
+            const addrEl = document.getElementById('address');
+            if (nameEl) nameEl.value = '';
+            if (addrEl) addrEl.value = '';
+            currentPage = 1;
+            await renderFromCache();
+            refreshIncompleteCacheSilent();
         } else {
             throw new Error(result.message || 'Failed to complete work');
         }
@@ -966,71 +1251,56 @@ function orderMatchesLegendFilter(orderOrEl, filters) {
     const isToday = orderOrEl.isToday === true || orderOrEl.dataset?.isToday === '1';
     const isOverdue = orderOrEl.isOverdue === true || orderOrEl.dataset?.isOverdue === '1';
     const isPartly = orderOrEl.isPartlyCompleted === true || orderOrEl.dataset?.isPartly === '1';
+    const isRecent = orderOrEl.isRecent === true || orderOrEl.dataset?.isRecent === '1' || (!isToday && !isOverdue);
     return filters.some(f =>
         (f === 'today' && isToday) ||
         (f === 'overdue' && isOverdue) ||
-        (f === 'partly' && isPartly)
+        (f === 'partly' && isPartly) ||
+        (f === 'recent' && isRecent)
     );
 }
 
-function updateTotalCountText(visibleCount) {
+function updateTotalCountText(visibleCount, searchTotal) {
     const totalCountEl = document.getElementById('totalCount');
     if (!totalCountEl) return;
     const lang = window.currentLang || 'bn';
     const filters = getActiveLegendFilters();
+    const allTotal = typeof searchTotal === 'number' ? searchTotal : cachedIncompleteOrders.length;
     if (filters.length === 0) {
         totalCountEl.innerHTML = lang === 'en'
-            ? `Total: <strong>${totalCount}</strong> incomplete orders`
-            : `সর্বমোট: <strong>${totalCount}</strong> টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে`;
+            ? `Total: <strong>${visibleCount}</strong> incomplete orders`
+            : `সর্বমোট: <strong>${visibleCount}</strong> টি অর্ডারের কাজ অসম্পূর্ণ অবস্থায় আছে`;
         return;
     }
     totalCountEl.innerHTML = lang === 'en'
-        ? `Showing: <strong>${visibleCount}</strong> of ${totalCount} incomplete orders`
-        : `দেখানো হচ্ছে: <strong>${visibleCount}</strong> টি (মোট ${totalCount} টি অসম্পূর্ণ অর্ডার)`;
+        ? `Showing: <strong>${visibleCount}</strong> of ${allTotal} incomplete orders`
+        : `দেখানো হচ্ছে: <strong>${visibleCount}</strong> টি (মোট ${allTotal} টি অসম্পূর্ণ অর্ডার)`;
 }
 
 function applyLegendFilters() {
-    const filters = getActiveLegendFilters();
-    document.querySelectorAll('.legend-filter').forEach(item => {
-        const cb = item.querySelector('.legend-filter-cb');
-        item.classList.toggle('is-active', !!(cb && cb.checked));
-    });
-
-    const visibleCount = allLoadedOrders.filter(order => orderMatchesLegendFilter(order, filters)).length;
-    document.querySelectorAll('#ordersTableContainer tbody tr[data-order-id]').forEach(row => {
-        row.style.display = orderMatchesLegendFilter(row, filters) ? '' : 'none';
-    });
-    document.querySelectorAll('#iwCardsContainer .iw-card[data-order-id]').forEach(card => {
-        card.style.display = orderMatchesLegendFilter(card, filters) ? '' : 'none';
-    });
-
-    updateTotalCountText(visibleCount);
-
-    const lang = window.currentLang || 'bn';
-    let emptyEl = document.getElementById('iwFilterEmpty');
-    if (!emptyEl) {
-        emptyEl = document.createElement('div');
-        emptyEl.id = 'iwFilterEmpty';
-        emptyEl.className = 'empty-message no-print';
-        const tableWrap = document.querySelector('.table-wrapper');
-        if (tableWrap) tableWrap.appendChild(emptyEl);
-    }
-    const noMatch = filters.length > 0 && visibleCount === 0 && allLoadedOrders.length > 0;
-    emptyEl.style.display = noMatch ? '' : 'none';
-    emptyEl.textContent = lang === 'en'
-        ? 'No orders match the selected filters'
-        : 'নির্বাচিত ফিল্টারে কোন অর্ডার পাওয়া যায়নি';
+    renderFromCache();
 }
 
 function setupLegendFilters() {
     document.querySelectorAll('.legend-filter-cb').forEach(cb => {
-        cb.addEventListener('change', applyLegendFilters);
+        cb.addEventListener('change', async function() {
+            currentPage = 1;
+            if (this.value === 'recent' && this.checked) {
+                try {
+                    await ensureUpcomingOrdersLoaded();
+                } catch (error) {
+                    console.error('Error loading recent orders:', error);
+                }
+            }
+            await renderFromCache();
+        });
     });
 }
 
 function getFilteredOrders(sourceOrders) {
-    const filters = getActiveLegendFilters();
     const criteria = getSearchCriteria();
+    const skipLegend = !!(criteria.orderNo || criteria.phone);
+    const filters = skipLegend ? [] : getActiveLegendFilters();
     const list = sourceOrders || cachedIncompleteOrders || allLoadedOrders || [];
     return list
         .filter(order => orderMatchesSearch(order, criteria))
@@ -1040,12 +1310,14 @@ function getFilteredOrders(sourceOrders) {
 function getOrderDressItems(order) {
     if (orderListItemsCache[order.orderId] && orderListItemsCache[order.orderId].length) {
         return orderListItemsCache[order.orderId].map(item => ({
+            orderListId: item.orderListId || 0,
             dressName: item.dressName,
             total: item.dressQuantity,
             pendingWork: item.remainingWork ?? item.pendingWork ?? 0
         }));
     }
     return (order.dressItems || []).map(item => ({
+        orderListId: item.orderListId || 0,
         dressName: item.dressName,
         total: item.total ?? item.dressQuantity ?? 0,
         pendingWork: item.pendingWork ?? item.remainingWork ?? 0
@@ -1063,7 +1335,7 @@ function buildIncompletePrintQuery() {
         const address = document.getElementById('address').value.trim();
         if (phone) queryParams += `&phone=${encodeURIComponent(phone)}`;
         if (customerName) queryParams += `&customerName=${encodeURIComponent(customerName)}`;
-        if (orderNo) queryParams += `&orderSerialNumbers=${encodeURIComponent(orderNo)}`;
+        if (orderNo) queryParams += `&orderSerialNumbers=${encodeURIComponent(parseOrderNumbers(orderNo).join(','))}`;
         if (address) queryParams += `&address=${encodeURIComponent(address)}`;
     } else if (searchType === 'date') {
         const startDate = document.getElementById('startDate').value;
@@ -1088,7 +1360,72 @@ function getLegendFilterLabels(lang) {
     if (document.getElementById('filterToday')?.checked) labels.push(lang === 'en' ? "Today's delivery" : 'আজকের ডেলিভারি');
     if (document.getElementById('filterOverdue')?.checked) labels.push(lang === 'en' ? 'Overdue' : 'তারিখ অতিক্রান্ত');
     if (document.getElementById('filterPartly')?.checked) labels.push(lang === 'en' ? 'Partly done' : 'আংশিক সম্পন্ন');
+    if (document.getElementById('filterRecent')?.checked) labels.push(lang === 'en' ? 'Recent orders' : 'সাপ্রতিক অর্ডার');
     return labels;
+}
+
+// Artisan name for one dress line of the list print — same source as the on-screen grid
+// (ArtisanAssign / order-artisans = the currently assigned artisan). Falls back to the
+// order's assigned names when the line id is unknown.
+function printArtisanFor(order, item) {
+    if (!window.ArtisanAssign) return '';
+    if (item.orderListId) return ArtisanAssign.lineText(item.orderListId) || '';
+    return ArtisanAssign.orderText(order.orderId) || '';
+}
+
+// ── print column visibility (remembered per shop, all shown by default) ──
+const IW_PRINT_COLS = ['sl', 'no', 'name', 'phone', 'items', 'order', 'delivery'];
+function iwPrintColsKey() {
+    const inst = currentInstitutionId || sessionStorage.getItem('institutionId') || localStorage.getItem('session_institutionId') || '0';
+    return 'tailorbd_iwPrintCols_' + inst;
+}
+// stored as the list of HIDDEN columns, so a column added later shows by default
+function iwHiddenPrintCols() {
+    try {
+        const v = JSON.parse(localStorage.getItem(iwPrintColsKey()) || '[]');
+        const hidden = Array.isArray(v) ? v.filter(k => IW_PRINT_COLS.includes(k)) : [];
+        return hidden.length >= IW_PRINT_COLS.length ? [] : hidden;   // never all hidden
+    } catch (e) { return []; }
+}
+function iwSyncPrintColBoxes() {
+    const hidden = iwHiddenPrintCols();
+    document.querySelectorAll('#iwPrintCols input[data-iw-col]').forEach(cb => { cb.checked = !hidden.includes(cb.dataset.iwCol); });
+}
+function iwBindPrintCols() {
+    const wrap = document.getElementById('iwPrintCols');
+    if (!wrap) return;
+    iwSyncPrintColBoxes();
+    const msg = document.getElementById('iwPrintColsMsg');
+    wrap.addEventListener('change', e => {
+        const cb = e.target.closest('input[data-iw-col]');
+        if (!cb) return;
+        const boxes = Array.from(wrap.querySelectorAll('input[data-iw-col]'));
+        if (!boxes.some(b => b.checked)) {
+            cb.checked = true;   // at least one column must stay
+            if (msg) {
+                msg.textContent = (window.currentLang || 'bn') === 'en' ? 'At least one column must stay' : 'অন্তত একটি কলাম রাখতে হবে';
+                clearTimeout(iwBindPrintCols._t);
+                iwBindPrintCols._t = setTimeout(() => { msg.textContent = ''; }, 2500);
+            }
+            return;
+        }
+        const hidden = boxes.filter(b => !b.checked).map(b => b.dataset.iwCol);
+        try { localStorage.setItem(iwPrintColsKey(), JSON.stringify(hidden)); } catch (x) { }
+    });
+    // menu is position:fixed (the table container scrolls/clips), placed under the summary
+    const menu = wrap.querySelector('.iw-print-cols-menu');
+    const place = () => {
+        if (!menu || !wrap.open) return;
+        const r = wrap.querySelector('summary').getBoundingClientRect();
+        const w = menu.offsetWidth || 160;
+        menu.style.top = (r.bottom + 4) + 'px';
+        menu.style.left = Math.max(4, Math.min(r.right - w, window.innerWidth - w - 4)) + 'px';
+    };
+    wrap.addEventListener('toggle', place);
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    // close the menu when clicking elsewhere
+    document.addEventListener('click', e => { if (wrap.open && !wrap.contains(e.target)) wrap.open = false; });
 }
 
 function renderPrintList(orders) {
@@ -1113,29 +1450,32 @@ function renderPrintList(orders) {
             : `${filterText} | মোট: ${orders.length} টি | প্রিন্ট: ${printedOn}`;
     }
 
+    const printArtisan = !!(window.ArtisanAssign && ArtisanAssign.printOn());
+    const hiddenCols = iwHiddenPrintCols();
+    const showCol = key => !hiddenCols.includes(key);
+    const cell = (key, html) => showCol(key) ? html : '';
+    const artisanLabel = lang === 'en' ? 'Artisan' : 'কারিগর';
     let rows = '';
     orders.forEach((order, index) => {
-        let rowClass = '';
-        if (order.isToday) rowClass = 'today';
-        else if (order.isOverdue) rowClass = 'overdue';
-        else if (order.isPartlyCompleted) rowClass = 'partly-completed';
-
+        const rowClass = getOrderRowClass(order);
         const items = getOrderDressItems(order);
         const itemsHtml = items.length
-            ? `<ul class="iw-print-items">${items.map(item =>
-                `<li>${escapeHtml(item.dressName)} — ${lang === 'en' ? 'Tot' : 'মো'}: ${item.total}, ${lang === 'en' ? 'Inc' : 'অসম্পূ'}: ${item.pendingWork}</li>`
-              ).join('')}</ul>`
+            ? `<ul class="iw-print-items">${items.map(item => {
+                const artisan = printArtisan ? printArtisanFor(order, item) : '';
+                return `<li>${escapeHtml(item.dressName)} — ${lang === 'en' ? 'Tot' : 'মো'}: ${item.total}, ${lang === 'en' ? 'Inc' : 'অসম্পূ'}: ${item.pendingWork}` +
+                    (artisan ? `, <strong>${artisanLabel}: ${escapeHtml(artisan)}</strong>` : '') + `</li>`;
+              }).join('')}</ul>`
             : '-';
 
         rows += `
             <tr class="${rowClass}">
-                <td class="num">${index + 1}</td>
-                <td class="num">${order.orderSerialNumber}</td>
-                <td>${escapeHtml(`(${order.customerNumber}) ${order.customerName}`)}</td>
-                <td>${escapeHtml(order.phone || '-')}</td>
-                <td>${itemsHtml}</td>
-                <td class="num">${formatDate(order.orderDate)}</td>
-                <td class="num">${order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</td>
+                ${cell('sl', `<td class="num">${index + 1}</td>`)}
+                ${cell('no', `<td class="num">${order.orderSerialNumber}</td>`)}
+                ${cell('name', `<td>${escapeHtml(`(${order.customerNumber}) ${order.customerName}`)}</td>`)}
+                ${cell('phone', `<td>${escapeHtml(order.phone || '-')}</td>`)}
+                ${cell('items', `<td>${itemsHtml}</td>`)}
+                ${cell('order', `<td class="num">${formatDate(order.orderDate)}</td>`)}
+                ${cell('delivery', `<td class="num">${order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</td>`)}
             </tr>`;
     });
 
@@ -1143,13 +1483,13 @@ function renderPrintList(orders) {
         <table class="iw-print-table">
             <thead>
                 <tr>
-                    <th>${lang === 'en' ? 'SL' : 'ক্রম'}</th>
-                    <th>${lang === 'en' ? 'No.' : 'নং'}</th>
-                    <th>${lang === 'en' ? 'Name' : 'নাম'}</th>
-                    <th>${lang === 'en' ? 'Phone' : 'মোবাইল'}</th>
-                    <th>${lang === 'en' ? 'Order List' : 'অর্ডার লিস্ট'}</th>
-                    <th>${lang === 'en' ? 'Order' : 'অর্ডার'}</th>
-                    <th>${lang === 'en' ? 'Delivery' : 'ডেলিভারি'}</th>
+                    ${cell('sl', `<th>${lang === 'en' ? 'SL' : 'ক্রম'}</th>`)}
+                    ${cell('no', `<th>${lang === 'en' ? 'No.' : 'নং'}</th>`)}
+                    ${cell('name', `<th>${lang === 'en' ? 'Name' : 'নাম'}</th>`)}
+                    ${cell('phone', `<th>${lang === 'en' ? 'Phone' : 'মোবাইল'}</th>`)}
+                    ${cell('items', `<th>${lang === 'en' ? 'Order List' : 'অর্ডার লিস্ট'}</th>`)}
+                    ${cell('order', `<th>${lang === 'en' ? 'Order' : 'অর্ডার'}</th>`)}
+                    ${cell('delivery', `<th>${lang === 'en' ? 'Delivery' : 'ডেলিভারি'}</th>`)}
                 </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -1189,12 +1529,24 @@ async function printIncompleteList() {
             btn.disabled = true;
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${lang === 'en' ? 'Preparing...' : 'প্রস্তুত হচ্ছে...'}</span>`;
         }
+        iwSyncPrintColBoxes();
         await loadInstitutionInfoForPrint();
         fillPrintHeader();
         const orders = getFilteredOrders(await fetchAllOrdersForPrint());
         if (!orders.length) {
             alert(lang === 'en' ? 'No orders to print' : 'প্রিন্ট করার মতো কোন অর্ডার নেই');
             return;
+        }
+        if (window.ArtisanAssign) {
+            const cb = document.getElementById('iwPrintArtisan');
+            if (cb) cb.checked = ArtisanAssign.printOn();   // keep the tick box in sync with the saved choice
+        }
+        if (window.ArtisanAssign && ArtisanAssign.printOn()) {
+            // make sure every dress line has its OrderListID (orders not yet shown on screen)
+            try { await ensureOrderListCache(orders); } catch (e) { console.warn('order-list load for print failed', e); }
+            // fresh (not 60s-cached) assignment so the print shows the currently assigned artisan
+            const ok = await ArtisanAssign.load(orders.map(order => order.orderId), { force: true });
+            if (!ok) console.warn('Artisan names could not be loaded for print');
         }
         renderPrintList(orders);
         window.print();
@@ -1210,6 +1562,11 @@ async function printIncompleteList() {
 }
 
 window.printIncompleteList = printIncompleteList;
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.ArtisanAssign) ArtisanAssign.bindToggle('#iwPrintArtisan');
+    iwBindPrintCols();
+});
 
 // Format date helper - Compact version
 function formatDate(dateString) {

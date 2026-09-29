@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Payments - TailorBD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/tom-select/tom-select.min.css?v=2.6.2">
+    <style>
+        .page-container { padding:16px 24px; }
+        .card-box { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:16px; }
+        .card-head { padding:12px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; flex-wrap:wrap; gap:8px; }
+        .card-title { font-weight:700; font-size:14px; color:#6c7ae0; }
+        .card-body-p { padding:16px 18px; }
+        .data-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .data-table thead th { background:#f8f9ff; padding:9px 12px; font-size:11px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; text-align:center; }
+        .data-table tbody td { padding:9px 12px; border-bottom:1px solid #f5f5f5; text-align:center; vertical-align:middle; }
+        .f-input { width:100%; padding:8px 12px; border:1px solid #ddd; border-radius:7px; font-size:13px; }
+        .btn-pri { padding:8px 18px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .btn-suc { padding:8px 18px; background:#28a745; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+        .filter-bar { display:flex; flex-wrap:wrap; gap:10px; align-items:end; margin-bottom:12px; }
+        .filter-bar label { font-size:11px; font-weight:700; color:#666; display:block; margin-bottom:4px; }
+        .no-data { text-align:center; color:#999; padding:24px; }
+        .print-header { display:none; }
+        /* tabs + work ledger (worker-ledger.js) */
+        .wp-tabs { display:flex; gap:4px; margin-bottom:14px; border-bottom:2px solid #e0e3f7; flex-wrap:wrap; }
+        .wp-tab-btn { background:none; border:none; padding:9px 16px; font-size:13px; font-weight:700; color:#777; border-bottom:3px solid transparent; margin-bottom:-2px; cursor:pointer; }
+        .wp-tab-btn.active { color:#6c7ae0; border-bottom-color:#6c7ae0; }
+        .seg { display:inline-flex; border:1px solid #6c7ae0; border-radius:7px; overflow:hidden; }
+        .seg button { border:none; background:#fff; color:#6c7ae0; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+        .seg button.active { background:#6c7ae0; color:#fff; }
+        .sum-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:14px; }
+        .sum-card { background:#fff; border:1px solid #eef0fa; border-top:3px solid #6c7ae0; border-radius:10px; padding:10px 16px; }
+        .sum-card .lbl { font-size:11px; color:#777; font-weight:700; }
+        .sum-card .val { font-size:20px; font-weight:800; color:#333; }
+        .st-badge { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; }
+        .st-paid { background:#e6f6ea; color:#1e7e34; }
+        .st-partial { background:#fff4e0; color:#b26a00; }
+        .st-unpaid { background:#fde8e8; color:#c0392b; }
+        .st-none { background:#eee; color:#777; }
+        .btn-edit { padding:4px 10px; background:#eef0fd; color:#6c7ae0; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; }
+        .btn-tok { padding:4px 10px; background:#fd7e14; color:#fff; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; }
+        .lg-note { font-size:12px; color:#8a6d3b; background:#fff8e6; border:1px solid #f5e1a4; border-radius:7px; padding:8px 12px; margin-bottom:12px; }
+        .ms-dd { position:relative; }
+        .ms-btn { display:flex; align-items:center; justify-content:space-between; gap:8px; background:#fff; text-align:left; cursor:pointer; line-height:1.5; }
+        .ms-btn .ms-sum { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .ms-caret { font-size:10px; color:#888; flex:0 0 auto; }
+        .ms-dd.open .ms-btn { border-color:#6c7ae0; box-shadow:0 0 0 2px rgba(108,122,224,.15); }
+        .ms-menu { display:none; position:absolute; z-index:1050; top:calc(100% + 4px); left:0; min-width:100%; background:#fff; border:1px solid #dfe2f5; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.12); padding:6px; }
+        .ms-dd.open .ms-menu { display:block; }
+        .ms-opt { display:flex !important; align-items:center; gap:8px; margin:0 !important; padding:7px 8px; border-radius:6px; cursor:pointer; font-size:13px !important; color:#333 !important; white-space:nowrap; }
+        .ms-opt:hover { background:#f5f6ff; }
+        .ms-opt input { width:16px; height:16px; margin:0; cursor:pointer; accent-color:#6c7ae0; }
+        .ms-foot { border-top:1px solid #f0f0f0; margin-top:4px; padding-top:4px; text-align:right; }
+        .ms-link { background:none; border:none; color:#6c7ae0; font-size:12px; font-weight:700; padding:4px 6px; cursor:pointer; }
+        .lg-actions { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:12px; font-size:13px; }
+        /* payment token (screen: hidden; print: only the token) */
+        #tokenPrintArea { display:none; }
+        /* token width = paper width set by worker-ledger.js (measurement print size / 58mm / 80mm / A5 / A4); font sizes in em scale with it */
+        #tokenPrintArea.tk-measure { display:block !important; position:absolute; left:-10000px; top:0; visibility:hidden; }
+        .tk { font-family:'Noto Sans Bengali','Hind Siliguri','SolaimanLipi','Nirmala UI',Arial,sans-serif; color:#000; background:#fff; width:100%; margin:0 auto; font-size:10.5pt; line-height:1.35; box-sizing:border-box; break-inside:avoid; }
+        .tk-shop { text-align:center; font-weight:800; font-size:1.24em; }
+        .tk-sub { text-align:center; font-size:.81em; }
+        .tk-title { text-align:center; font-weight:800; font-size:1.14em; border:1.5px solid #000; padding:1px 0; margin:5px 0; letter-spacing:.5px; }
+        .tk-row { display:flex; justify-content:space-between; gap:6px; flex-wrap:wrap; font-size:.9em; }
+        .tk-row.tk-fit { flex-wrap:nowrap; white-space:nowrap; }
+        .tk-row.tk-fit > span { flex:0 0 auto; }
+        .tk-row.tk-fit > span:last-child { text-align:right; }
+        .tk-fit.tk-wrap { flex-wrap:wrap; white-space:normal; }
+        .tk-fit.tk-wrap > span:last-child { margin-left:auto; }
+        .tk-name { font-weight:800; font-size:1.14em; }
+        .tk-who { align-items:baseline; }
+        .tk-row.tk-who > span.tk-name { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; font-size:1.18em; }
+        .tk-row.tk-who.tk-fitting > span.tk-name { flex-shrink:0; }
+        .tk-hr { border-top:1px dashed #000; margin:5px 0; }
+        .tk-work { font-size:.95em; word-break:break-word; }
+        .tk-amt { width:100%; border-collapse:collapse; }
+        .tk-amt td { padding:1px 0; }
+        .tk-amt td:last-child { text-align:right; white-space:nowrap; font-weight:700; }
+        .tk-amt .tk-payable td { font-size:1.43em; font-weight:900; border-top:1.5px solid #000; padding-top:3px; }
+        .tk-blanks { display:flex; gap:1.2em; margin-top:14px; white-space:nowrap; align-items:flex-end; }
+        .tk-blank { display:flex; align-items:flex-end; flex:1 1 auto; }
+        .tk-blank:first-child { flex-grow:1.4; }
+        .tk-blank > span:first-child { flex:0 0 auto; }
+        .tk-blank .tk-line { flex:1 1 auto; min-width:9mm; border-bottom:1px solid #000; margin-left:3px; height:1.1em; }
+        .tk-fit.tk-wrap .tk-blank { flex-basis:100%; }
+        .tk-sign { display:flex; justify-content:space-between; gap:14px; margin-top:28px; }
+        .tk-sign div { flex:1; border-top:1px solid #000; text-align:center; font-size:.81em; padding-top:2px; }
+        .tk-note { font-size:.76em; text-align:center; margin-top:8px; }
+        .tk-items table { width:100%; border-collapse:collapse; font-size:.81em; }
+        .tk-items th, .tk-items td { border:1px solid #000; padding:2px 4px; text-align:center; }
+        @media print {
+            #app-sidebar, #app-navbar, .no-print, .filter-bar, .btn-pri, .btn-suc { display:none !important; }
+            .main-content { margin:0 !important; width:100% !important; padding:8px !important; }
+            .print-header { display:block !important; text-align:center; margin-bottom:10px; }
+            .print-header .ins-name { font-size:20px; font-weight:800; }
+            .data-table thead th, .data-table tbody td { border:1px solid #888; font-size:12px; }
+            * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+            body.printing-token { background:#fff !important; margin:0 !important; padding:0 !important; }
+            body.printing-token > *:not(#tokenPrintArea) { display:none !important; }
+            body.printing-token #tokenPrintArea { display:block !important; margin:0 auto !important; position:static !important; }
+        }
+    </style>
+</head>
+<body>
+<div id="app-sidebar"></div>
+<div class="main-content">
+    <div id="app-navbar"></div>
+    <div class="page-container">
+        <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+            <h5 class="mb-0 lang-content" data-en="Worker Payments" data-bn="কর্মী পেমেন্ট">কর্মী পেমেন্ট</h5>
+            <button class="btn-suc" id="btnPrintHistory" onclick="printReport()"><i class="fas fa-print me-1"></i><span class="lang-content" data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span></button>
+        </div>
+
+        <div class="wp-tabs no-print">
+            <button type="button" class="wp-tab-btn" data-tab="pay" onclick="switchWpTab('pay')"><i class="fas fa-money-bill-wave me-1"></i><span class="lang-content" data-en="Worker Payment" data-bn="কারিগর পেমেন্ট">কারিগর পেমেন্ট</span></button>
+            <button type="button" class="wp-tab-btn active" data-tab="history" onclick="switchWpTab('history')"><i class="fas fa-history me-1"></i><span class="lang-content" data-en="Payment History" data-bn="পেমেন্ট ইতিহাস">পেমেন্ট ইতিহাস</span></button>
+            <button type="button" class="wp-tab-btn" data-tab="ledger" onclick="switchWpTab('ledger')"><i class="fas fa-receipt me-1"></i><span class="lang-content" data-en="Work Ledger &amp; Token" data-bn="কাজের হিসাব ও টোকেন">কাজের হিসাব ও টোকেন</span></button>
+        </div>
+
+        <!-- "কারিগর পেমেন্ট": pay (OTP, advance allowed) + other payments + token (worker-pay.js); moved here from factory-issue / cutting-issue -->
+        <div id="tab-pay" class="wp-pane" style="display:none;">
+            <div class="card-box">
+                <div class="card-head">
+                    <span class="card-title lang-content" data-en="Worker payment, other payments &amp; token" data-bn="কারিগর পেমেন্ট, অন্যান্য পাওনা ও টোকেন">কারিগর পেমেন্ট, অন্যান্য পাওনা ও টোকেন</span>
+                </div>
+                <div class="card-body-p">
+                    <div class="filter-bar no-print">
+                        <div>
+                            <label class="lang-content" data-en="Type" data-bn="ধরন">ধরন</label>
+                            <div class="seg" id="wpTypeSeg">
+                                <button type="button" data-type="Artisan" class="active"><span class="lang-content" data-en="Artisan" data-bn="কারিগর">কারিগর</span></button>
+                                <button type="button" data-type="CuttingMaster"><span class="lang-content" data-en="Cutting master" data-bn="কাটিং মাস্টার">কাটিং মাস্টার</span></button>
+                            </div>
+                        </div>
+                        <div style="min-width:260px;flex:1;">
+                            <label class="lang-content" data-en="Search worker" data-bn="কর্মী খুঁজুন">কর্মী খুঁজুন</label>
+                            <select id="wpWorker" class="f-input"><option value="">— কর্মী বাছাই করুন —</option></select>
+                        </div>
+                    </div>
+
+                    <div id="wpList">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="lang-content" data-en="Name" data-bn="নাম">নাম</th>
+                                        <th class="lang-content" data-en="Phone" data-bn="ফোন">ফোন</th>
+                                        <th class="lang-content" data-en="Total earned" data-bn="মোট আয়">মোট আয়</th>
+                                        <th class="lang-content" data-en="Total paid" data-bn="মোট পরিশোধ">মোট পরিশোধ</th>
+                                        <th class="lang-content" data-en="Payable / advance" data-bn="পাওনা / অগ্রিম">পাওনা / অগ্রিম</th>
+                                        <th class="lang-content no-print" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wpListBody"><tr><td colspan="6" class="no-data">...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="wpDetail" style="display:none;">
+                        <div id="wpCards" class="sum-cards"></div>
+                        <div id="wpNote" class="lg-note" style="display:none;"></div>
+                        <div class="lg-actions no-print">
+                            <button type="button" class="btn-suc" id="wpBtnPay"><i class="fas fa-money-bill-wave me-1"></i><span class="lang-content" data-en="Pay" data-bn="পেমেন্ট করুন">পেমেন্ট করুন</span></button>
+                            <button type="button" class="btn-pri" id="wpBtnExtra"><i class="fas fa-plus me-1"></i><span class="lang-content" data-en="Add other payment" data-bn="অন্যান্য পাওনা যোগ করুন">অন্যান্য পাওনা যোগ করুন</span></button>
+                            <button type="button" class="btn-tok" id="wpBtnToken" style="padding:8px 16px;font-size:13px;"><i class="fas fa-receipt me-1"></i><span class="lang-content" data-en="Print payment token" data-bn="পেমেন্ট টোকেন প্রিন্ট">পেমেন্ট টোকেন প্রিন্ট</span></button>
+                            <button type="button" class="btn-edit" id="wpBtnLedger" style="padding:8px 14px;font-size:13px;"><i class="fas fa-list me-1"></i><span class="lang-content" data-en="Work ledger" data-bn="কাজের হিসাব">কাজের হিসাব</span></button>
+                            <button type="button" class="btn-edit" id="wpBtnHistory" style="padding:8px 14px;font-size:13px;"><i class="fas fa-history me-1"></i><span class="lang-content" data-en="Payment history" data-bn="পেমেন্ট ইতিহাস">পেমেন্ট ইতিহাস</span></button>
+                            <button type="button" class="btn-edit" id="wpBackList" style="padding:8px 14px;font-size:13px;"><i class="fas fa-arrow-left me-1"></i><span class="lang-content" data-en="All workers" data-bn="সব কর্মী">সব কর্মী</span></button>
+                        </div>
+                        <div class="card-title mb-2 lang-content" data-en="Other payments (extra design / alteration / other)" data-bn="অন্যান্য পাওনা (এক্সট্রা ডিজাইন / অলটার / অন্যান্য)">অন্যান্য পাওনা (এক্সট্রা ডিজাইন / অলটার / অন্যান্য)</div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="lang-content" data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                        <th class="lang-content" data-en="Type" data-bn="ধরন">ধরন</th>
+                                        <th class="lang-content" data-en="Order" data-bn="অর্ডার">অর্ডার</th>
+                                        <th class="lang-content" data-en="Dress / reference" data-bn="ড্রেস / রেফারেন্স">ড্রেস / রেফারেন্স</th>
+                                        <th class="lang-content" data-en="Note" data-bn="নোট">নোট</th>
+                                        <th class="lang-content" data-en="Amount" data-bn="পরিমাণ">পরিমাণ</th>
+                                        <th class="lang-content" data-en="Paid" data-bn="পরিশোধ">পরিশোধ</th>
+                                        <th class="lang-content" data-en="Status" data-bn="স্ট্যাটাস">স্ট্যাটাস</th>
+                                        <th class="lang-content no-print" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wpExtraBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-history" class="wp-pane">
+        <div class="print-header" id="printHeader">
+            <div class="ins-name" id="printInsName"></div>
+            <div id="printInsAddress" style="font-size:12px;"></div>
+            <div id="printInsPhone" style="font-size:12px;"></div>
+            <hr>
+            <div style="font-weight:700;" id="printHeadline">Worker Payment History</div>
+            <div id="printDateLine" style="font-size:12px;"></div>
+        </div>
+
+        <div class="card-box">
+            <div class="card-head">
+                <span class="card-title lang-content" data-en="Filters" data-bn="ফিল্টার">ফিল্টার</span>
+            </div>
+            <div class="card-body-p">
+                <div class="filter-bar no-print">
+                    <div style="min-width:140px;">
+                        <label class="lang-content" data-en="Type" data-bn="ধরন">ধরন</label>
+                        <select id="fType" class="f-input" onchange="onTypeChange()">
+                            <option value="">All / সব</option>
+                            <option value="Artisan" selected>Artisan / কারিগর</option>
+                            <option value="CuttingMaster">Master / মাস্টার</option>
+                        </select>
+                    </div>
+                    <div style="min-width:180px;">
+                        <label class="lang-content" data-en="Person" data-bn="ব্যক্তি">ব্যক্তি</label>
+                        <select id="fWorker" class="f-input"><option value="">All / সব</option></select>
+                    </div>
+                    <div style="min-width:140px;">
+                        <label class="lang-content" data-en="From" data-bn="হতে">হতে</label>
+                        <input type="date" id="fFrom" class="f-input">
+                    </div>
+                    <div style="min-width:140px;">
+                        <label class="lang-content" data-en="To" data-bn="পর্যন্ত">পর্যন্ত</label>
+                        <input type="date" id="fTo" class="f-input">
+                    </div>
+                    <div style="min-width:180px;flex:1;">
+                        <label class="lang-content" data-en="Search" data-bn="সার্চ">সার্চ</label>
+                        <input type="text" id="fSearch" class="f-input" placeholder="Name / note / OTP">
+                    </div>
+                    <div>
+                        <label>&nbsp;</label>
+                        <button class="btn-pri" onclick="loadPayments(1)"><i class="fas fa-search me-1"></i><span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></button>
+                    </div>
+                </div>
+                <div class="mb-2" style="font-size:13px;">
+                    <strong class="lang-content" data-en="Total" data-bn="মোট">মোট</strong>:
+                    <span id="totalAmt">0.00</span>
+                    (<span class="text-muted ms-2" id="totalRows"></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="payTable">
+                        <thead>
+                            <tr>
+                                <th class="lang-content" data-en="Date" data-bn="তারিখ">তারিখ</th>
+                                <th class="lang-content" data-en="Type" data-bn="ধরন">ধরন</th>
+                                <th class="lang-content" data-en="Name" data-bn="নাম">নাম</th>
+                                <th class="lang-content" data-en="Phone" data-bn="ফোন">ফোন</th>
+                                <th class="lang-content" data-en="Amount" data-bn="পরিমাণ">পরিমাণ</th>
+                                <th class="lang-content" data-en="Notes" data-bn="নোট">নোট</th>
+                                <th class="lang-content" data-en="OTP" data-bn="ওটিপি">ওটিপি</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payBody"><tr><td colspan="7" class="no-data">...</td></tr></tbody>
+                    </table>
+                </div>
+                <div id="pager" class="no-print mt-2"></div>
+            </div>
+        </div>
+        </div>
+
+        <div id="tab-ledger" class="wp-pane" style="display:none;">
+            <div class="card-box">
+                <div class="card-head">
+                    <span class="card-title lang-content" data-en="Work ledger &amp; payment token" data-bn="কাজের হিসাব ও পেমেন্ট টোকেন">কাজের হিসাব ও পেমেন্ট টোকেন</span>
+                </div>
+                <div class="card-body-p">
+                    <div class="filter-bar no-print">
+                        <div>
+                            <label class="lang-content" data-en="Type" data-bn="ধরন">ধরন</label>
+                            <div class="seg" id="lgTypeSeg">
+                                <button type="button" data-type="Artisan" class="active"><span class="lang-content" data-en="Artisan" data-bn="কারিগর">কারিগর</span></button>
+                                <button type="button" data-type="CuttingMaster"><span class="lang-content" data-en="Cutting master" data-bn="কাটিং মাস্টার">কাটিং মাস্টার</span></button>
+                            </div>
+                        </div>
+                        <div style="min-width:240px;">
+                            <label class="lang-content" data-en="Worker" data-bn="কর্মী">কর্মী</label>
+                            <select id="lgWorker" class="f-input"><option value="">সব কর্মী / All workers</option></select>
+                        </div>
+                        <div class="lg-date" style="min-width:140px;display:none;">
+                            <label class="lang-content" data-en="From (completed)" data-bn="হতে (সম্পন্ন)">হতে (সম্পন্ন)</label>
+                            <input type="date" id="lgFrom" class="f-input">
+                        </div>
+                        <div class="lg-date" style="min-width:140px;display:none;">
+                            <label class="lang-content" data-en="To" data-bn="পর্যন্ত">পর্যন্ত</label>
+                            <input type="date" id="lgTo" class="f-input">
+                        </div>
+                        <div style="min-width:170px;">
+                            <label class="lang-content" data-en="Status" data-bn="স্ট্যাটাস">স্ট্যাটাস</label>
+                            <!-- multi-select status filter (worker-ledger.js); none ticked = all -->
+                            <div class="ms-dd" id="lgStatusDd">
+                                <button type="button" class="f-input ms-btn" id="lgStatusBtn" aria-haspopup="true" aria-expanded="false"><span class="ms-sum" id="lgStatusSum">সব</span><i class="fas fa-chevron-down ms-caret"></i></button>
+                                <div class="ms-menu" id="lgStatusMenu">
+                                    <label class="ms-opt"><input type="checkbox" value="paid"><span class="st-badge st-paid lang-content" data-en="Paid" data-bn="পরিশোধিত">পরিশোধিত</span></label>
+                                    <label class="ms-opt"><input type="checkbox" value="partial"><span class="st-badge st-partial lang-content" data-en="Partial" data-bn="আংশিক">আংশিক</span></label>
+                                    <label class="ms-opt"><input type="checkbox" value="unpaid"><span class="st-badge st-unpaid lang-content" data-en="Unpaid" data-bn="বাকি">বাকি</span></label>
+                                    <div class="ms-foot"><button type="button" class="ms-link" id="lgStatusAll"><span class="lang-content" data-en="Show all" data-bn="সব দেখান">সব দেখান</span></button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label>&nbsp;</label>
+                            <button class="btn-pri" onclick="WorkerLedger.load(1)"><i class="fas fa-search me-1"></i><span class="lang-content" data-en="Search" data-bn="খুঁজুন">খুঁজুন</span></button>
+                        </div>
+                    </div>
+                    <div id="lgNote" class="lg-note" style="display:none;"></div>
+                    <div id="lgCards" class="sum-cards"></div>
+                    <div class="lg-actions no-print">
+                        <button type="button" id="lgActions" class="btn-tok" style="display:none;padding:8px 16px;font-size:13px;" onclick="WorkerLedger.printToken(null, $('#lgWorker').val())"><i class="fas fa-receipt me-1"></i><span class="lang-content" data-en="Print payment token" data-bn="পেমেন্ট টোকেন প্রিন্ট">পেমেন্ট টোকেন প্রিন্ট</span></button>
+                        <label style="margin:0;display:inline-flex;align-items:center;gap:6px;"><span class="lang-content" data-en="Token size" data-bn="টোকেন সাইজ">টোকেন সাইজ</span>
+                            <select id="lgTokenSize" class="form-select form-select-sm" style="width:auto;display:inline-block;font-size:13px;">
+                                <option value="auto">মাপ প্রিন্টের সাইজ</option>
+                                <option value="58mm">58 mm</option>
+                                <option value="80mm">80 mm</option>
+                                <option value="A5">A5</option>
+                                <option value="A4">A4</option>
+                            </select>
+                        </label>
+                        <label style="margin:0;cursor:pointer;"><input type="checkbox" id="lgTokenDetail"> <span class="lang-content" data-en="Include item list on token (A4)" data-bn="টোকেনে কাজের বিস্তারিত তালিকা (A4)">টোকেনে কাজের বিস্তারিত তালিকা (A4)</span></label>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="lgTable">
+                            <thead id="lgHead"></thead>
+                            <tbody id="lgBody"><tr><td colspan="10" class="no-data">...</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div id="lgPager" class="no-print mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- pay modal (worker-pay.js): OTP required; amount may exceed the balance = advance -->
+<div class="modal fade no-print" id="wpPayModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h6 class="modal-title"><span class="lang-content" data-en="Pay" data-bn="পেমেন্ট">পেমেন্ট</span> — <span id="wpPayName"></span></h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p class="mb-3 text-muted" style="font-size:13px;"><span class="lang-content" data-en="Current balance" data-bn="বর্তমান ব্যালেন্স">বর্তমান ব্যালেন্স</span>: <strong id="wpPayBal">0</strong></p>
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Amount" data-bn="পরিমাণ">পরিমাণ</span> *</label>
+                <input type="number" id="wpPayAmount" class="f-input" min="0.01" step="0.01">
+                <small id="wpPayHint" style="font-size:12px;color:#1565c0;display:block;margin-top:4px;"></small>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Notes" data-bn="নোট">নোট</span></label>
+                <input type="text" id="wpPayNotes" class="f-input" maxlength="500">
+            </div>
+            <div class="mb-1">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="OTP" data-bn="ওটিপি">ওটিপি</span> *</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="text" id="wpPayOtp" class="f-input" maxlength="6" placeholder="6-digit" style="flex:1;" autocomplete="one-time-code">
+                    <button type="button" class="btn-pri" id="wpPayOtpBtn" style="white-space:nowrap;"><span class="lang-content" data-en="Send OTP" data-bn="OTP পাঠান">OTP পাঠান</span></button>
+                </div>
+                <small id="wpPayOtpHint" class="text-muted" style="font-size:11px;"></small>
+            </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn-suc w-100" id="wpPaySubmit"><span class="lang-content" data-en="Pay" data-bn="পেমেন্ট করুন">পেমেন্ট করুন</span></button></div>
+    </div></div>
+</div>
+
+<!-- other payment modal (worker-pay.js) -->
+<div class="modal fade no-print" id="wpExtraModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h6 class="modal-title"><span id="wpExtraTitle">অন্যান্য পাওনা যোগ করুন</span> — <span id="wpExtraWho"></span></h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="wpExtraId" value="">
+            <div class="row g-2">
+                <div class="col-sm-6">
+                    <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Type" data-bn="ধরন">ধরন</span> *</label>
+                    <select id="wpExtraType" class="f-input">
+                        <option value="">—</option>
+                        <option value="ExtraDesign">এক্সট্রা ডিজাইন / Extra design</option>
+                        <option value="Alter">অলটার / Alteration</option>
+                        <option value="Other">অন্যান্য / Other</option>
+                    </select>
+                </div>
+                <div class="col-sm-6">
+                    <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Amount" data-bn="পরিমাণ">পরিমাণ</span> *</label>
+                    <input type="number" id="wpExtraAmount" class="f-input" min="0.01" step="0.01">
+                </div>
+                <div class="col-sm-6">
+                    <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Date" data-bn="তারিখ">তারিখ</span></label>
+                    <input type="date" id="wpExtraDate" class="f-input">
+                </div>
+                <div class="col-sm-6">
+                    <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Order no. (optional)" data-bn="অর্ডার নং (ঐচ্ছিক)">অর্ডার নং (ঐচ্ছিক)</span></label>
+                    <input type="number" id="wpExtraOrder" class="f-input" min="1" step="1">
+                </div>
+                <div class="col-12">
+                    <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Dress / reference (optional)" data-bn="ড্রেস / রেফারেন্স (ঐচ্ছিক)">ড্রেস / রেফারেন্স (ঐচ্ছিক)</span></label>
+                    <input type="text" id="wpExtraDress" class="f-input" maxlength="200">
+                </div>
+                <div class="col-12">
+                    <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Note" data-bn="নোট">নোট</span></label>
+                    <input type="text" id="wpExtraNotes" class="f-input" maxlength="500">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn-suc w-100" id="wpExtraSave"><span class="lang-content" data-en="Save" data-bn="সেভ করুন">সেভ করুন</span></button></div>
+    </div></div>
+</div>
+<div id="tokenPrintArea"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js?v=2.3.2"></script>
+<script src="/js/auth-guard.js?v=1.2.0"></script>
+<script src="/lib/tom-select/tom-select.base.min.js?v=2.6.2"></script>
+<script src="/js/worker-select.js?v=1.0.0"></script>
+<script src="/js/worker-payments.js?v=1.1.0"></script>
+<script src="/js/worker-ledger.js?v=1.4.0"></script>
+<script src="/js/worker-pay.js?v=1.0.0"></script>
+</body>
+</html>

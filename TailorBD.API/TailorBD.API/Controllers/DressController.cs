@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 using TailorBD.API.Models;
 using Dapper;
 
 namespace TailorBD.API.Controllers
 {
+    [Authorize]
+    [ShopScoped] // login required; InstitutionID always comes from the token
     [Route("api/[controller]")]
     [ApiController]
     public class DressController : ControllerBase
@@ -18,7 +22,7 @@ namespace TailorBD.API.Controllers
             _context = context;
         }
 
-        // GET: api/Dress/list
+        // GET: api/Dress/list  (login required like the rest of this controller; order-edit now sends the token)
         [HttpGet("list")]
         public IActionResult GetDressesByClothFor([FromQuery] int institutionId, [FromQuery] int clothForId)
         {
@@ -26,6 +30,8 @@ namespace TailorBD.API.Controllers
             {
                 using var connection = _context.CreateConnection();
                 var query = @"SELECT DressID, Dress_Name, Cloth_For_ID, 
+                            ISNULL(CuttingCost,0) AS CuttingCost,
+                            ISNULL(SewingCost,0) AS SewingCost,
                             CASE WHEN EXISTS (
                                 SELECT 1 FROM Measurement_Type 
                                 WHERE Measurement_Type.DressID = Dress.DressID
@@ -53,7 +59,9 @@ namespace TailorBD.API.Controllers
             {
                 using var connection = _context.CreateConnection();
                 var query = @"SELECT DressID, Dress_Name, Cloth_For_ID, RegistrationID, InstitutionID, 
-                            Description, Date, Image, DressSerial 
+                            Description, Date, Image, DressSerial,
+                            ISNULL(CuttingCost,0) AS CuttingCost,
+                            ISNULL(SewingCost,0) AS SewingCost
                             FROM Dress 
                             WHERE InstitutionID = @InstitutionID 
                             ORDER BY ISNULL(DressSerial, 99999)";
@@ -70,17 +78,19 @@ namespace TailorBD.API.Controllers
 
         // GET: api/Dress/single/{dressId}
         [HttpGet("single/{dressId}")]
-        public IActionResult GetDress(int dressId)
+        public IActionResult GetDress(int dressId, [FromQuery] int institutionId = 0)
         {
             try
             {
                 using var connection = _context.CreateConnection();
                 var query = @"SELECT DressID, Dress_Name, Cloth_For_ID, RegistrationID, InstitutionID, 
-                            Description, Date, Image, DressSerial 
+                            Description, Date, Image, DressSerial,
+                            ISNULL(CuttingCost,0) AS CuttingCost,
+                            ISNULL(SewingCost,0) AS SewingCost
                             FROM Dress 
-                            WHERE DressID = @DressID";
+                            WHERE DressID = @DressID AND InstitutionID = @InstitutionID";
 
-                var dress = connection.QueryFirstOrDefault(query, new { DressID = dressId });
+                var dress = connection.QueryFirstOrDefault(query, new { DressID = dressId, InstitutionID = institutionId });
 
                 if (dress == null)
                 {
@@ -102,8 +112,8 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
-                var query = @"INSERT INTO Dress(Dress_Name, Cloth_For_ID, RegistrationID, InstitutionID, Date, DressSerial) 
-                            VALUES (@Dress_Name, @Cloth_For_ID, @RegistrationID, @InstitutionID, GETDATE(), @DressSerial);
+                var query = @"INSERT INTO Dress(Dress_Name, Cloth_For_ID, RegistrationID, InstitutionID, Date, DressSerial, CuttingCost, SewingCost) 
+                            VALUES (@Dress_Name, @Cloth_For_ID, @RegistrationID, @InstitutionID, GETDATE(), @DressSerial, ISNULL(@CuttingCost,0), ISNULL(@SewingCost,0));
                             SELECT CAST(SCOPE_IDENTITY() as int)";
 
                 var dressId = connection.ExecuteScalar<int>(query, model);
@@ -124,12 +134,55 @@ namespace TailorBD.API.Controllers
             {
                 using var connection = _context.CreateConnection();
                 var query = @"UPDATE Dress 
-                            SET Dress_Name = @Dress_Name 
+                            SET Dress_Name = @Dress_Name,
+                                CuttingCost = ISNULL(@CuttingCost, CuttingCost),
+                                SewingCost = ISNULL(@SewingCost, SewingCost)
                             WHERE DressID = @DressID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new { Dress_Name = model.Dress_Name, DressID = id, InstitutionID = model.InstitutionID });
+                var n = connection.Execute(query, new {
+                    Dress_Name = model.Dress_Name,
+                    DressID = id,
+                    InstitutionID = model.InstitutionID,
+                    CuttingCost = model.CuttingCost,
+                    SewingCost = model.SewingCost
+                });
+                if (n == 0) return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "????? ??????? ????? ??????" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        // PUT: api/Dress/{id}/costs
+        [HttpPut("{id}/costs")]
+        public IActionResult UpdateDressCosts(int id, [FromBody] DressCostsModel model)
+        {
+            try
+            {
+                if (model.InstitutionID <= 0)
+                    return BadRequest(new { success = false, message = "Institution required" });
+                if (model.CuttingCost < 0 || model.SewingCost < 0)
+                    return BadRequest(new { success = false, message = "Cost cannot be negative" });
+
+                using var connection = _context.CreateConnection();
+                var n = connection.Execute(@"
+                    UPDATE Dress
+                    SET CuttingCost = @CuttingCost, SewingCost = @SewingCost
+                    WHERE DressID = @DressID AND InstitutionID = @InstitutionID",
+                    new {
+                        DressID = id,
+                        InstitutionID = model.InstitutionID,
+                        CuttingCost = model.CuttingCost,
+                        SewingCost = model.SewingCost
+                    });
+                if (n == 0)
+                    return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
+
+                return Ok(new { success = true, message = "খরচ আপডেট হয়েছে / Costs updated" });
             }
             catch (Exception ex)
             {
@@ -146,7 +199,8 @@ namespace TailorBD.API.Controllers
                 using var connection = _context.CreateConnection();
                 var query = @"DELETE FROM Dress WHERE DressID = @DressID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new { DressID = id, InstitutionID = institutionId });
+                var n = connection.Execute(query, new { DressID = id, InstitutionID = institutionId });
+                if (n == 0) return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "????? ??????? ????? ??????" });
             }
@@ -162,7 +216,7 @@ namespace TailorBD.API.Controllers
 
         // POST: api/Dress/{id}/image
         [HttpPost("{id}/image")]
-        public async Task<IActionResult> UploadDressImage(int id, IFormFile image)
+        public async Task<IActionResult> UploadDressImage(int id, IFormFile image, [FromQuery] int institutionId = 0)
         {
             try
             {
@@ -185,9 +239,10 @@ namespace TailorBD.API.Controllers
 
                 // Update database
                 using var connection = _context.CreateConnection();
-                var query = @"UPDATE Dress SET Image = @Image WHERE DressID = @DressID";
+                var query = @"UPDATE Dress SET Image = @Image WHERE DressID = @DressID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new { Image = imageBytes, DressID = id });
+                var n = connection.Execute(query, new { Image = imageBytes, DressID = id, InstitutionID = institutionId });
+                if (n == 0) return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "??? ??????? ????? ??????" });
             }
@@ -198,6 +253,7 @@ namespace TailorBD.API.Controllers
         }
 
         // GET: api/Dress/{id}/image
+        [AllowAnonymous] // no token needed (called without one / used in <img>); scoped when a token is sent
         [HttpGet("{id}/image")]
         public IActionResult GetDressImage(int id)
         {
@@ -290,6 +346,7 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (!DressBelongsToShop(connection, model.DressID, model.InstitutionID)) return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
                 var query = @"INSERT INTO Dress_Style_Category(RegistrationID, InstitutionID, DressID, 
                             Dress_Style_Category_Name, CategorySerial, Date) 
                             VALUES (@RegistrationID, @InstitutionID, @DressID, @DressStyleCategoryName, @CategorySerial, GETDATE());
@@ -323,12 +380,13 @@ namespace TailorBD.API.Controllers
                             SET Dress_Style_Category_Name = @DressStyleCategoryName 
                             WHERE Dress_Style_CategoryID = @CategoryID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new
+                var n = connection.Execute(query, new
                 {
                     DressStyleCategoryName = model.DressStyleCategoryName,
                     CategoryID = id,
                     InstitutionID = model.InstitutionID
                 });
+                if (n == 0) return NotFound(new { success = false, message = "ক্যাটাগরি পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "ক্যাটাগরি সফলভাবে আপডেট হয়েছে" });
             }
@@ -348,7 +406,8 @@ namespace TailorBD.API.Controllers
                 var query = @"DELETE FROM Dress_Style_Category 
                             WHERE Dress_Style_CategoryID = @CategoryID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new { CategoryID = id, InstitutionID = institutionId });
+                var n = connection.Execute(query, new { CategoryID = id, InstitutionID = institutionId });
+                if (n == 0) return NotFound(new { success = false, message = "ক্যাটাগরি পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "ক্যাটাগরি সফলভাবে ডিলিট হয়েছে" });
             }
@@ -419,6 +478,10 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (connection.ExecuteScalar<int>(
+                        "SELECT COUNT(1) FROM Dress_Style_Category WHERE Dress_Style_CategoryID = @C AND InstitutionID = @I",
+                        new { C = model.DressStyleCategoryID, I = model.InstitutionID }) == 0) return NotFound(new { success = false, message = "ক্যাটাগরি পাওয়া যায়নি" });
+                if (!DressBelongsToShop(connection, model.DressID, model.InstitutionID)) return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
                 var query = @"INSERT INTO Dress_Style(Dress_Style_CategoryID, RegistrationID, InstitutionID, 
                             DressID, Dress_Style_Name, StyleSerial) 
                             VALUES (@DressStyleCategoryID, @RegistrationID, @InstitutionID, @DressID, 
@@ -454,12 +517,13 @@ namespace TailorBD.API.Controllers
                             SET Dress_Style_Name = @DressStyleName 
                             WHERE Dress_StyleID = @DesignID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new
+                var n = connection.Execute(query, new
                 {
                     DressStyleName = model.DressStyleName,
                     DesignID = id,
                     InstitutionID = model.InstitutionID
                 });
+                if (n == 0) return NotFound(new { success = false, message = "ডিজাইন পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "ডিজাইন সফলভাবে আপডেট হয়েছে" });
             }
@@ -479,7 +543,8 @@ namespace TailorBD.API.Controllers
                 var query = @"DELETE FROM Dress_Style 
                             WHERE Dress_StyleID = @DesignID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new { DesignID = id, InstitutionID = institutionId });
+                var n = connection.Execute(query, new { DesignID = id, InstitutionID = institutionId });
+                if (n == 0) return NotFound(new { success = false, message = "ডিজাইন পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "ডিজাইন সফলভাবে ডিলিট হয়েছে" });
             }
@@ -495,7 +560,7 @@ namespace TailorBD.API.Controllers
 
         // POST: api/Dress/style-design/{id}/image
         [HttpPost("style-design/{id}/image")]
-        public async Task<IActionResult> UploadStyleDesignImage(int id, IFormFile image)
+        public async Task<IActionResult> UploadStyleDesignImage(int id, IFormFile image, [FromQuery] int institutionId = 0)
         {
             try
             {
@@ -518,9 +583,10 @@ namespace TailorBD.API.Controllers
 
                 // Update database
                 using var connection = _context.CreateConnection();
-                var query = @"UPDATE Dress_Style SET Dress_Style_Image = @Image WHERE Dress_StyleID = @DesignID";
+                var query = @"UPDATE Dress_Style SET Dress_Style_Image = @Image WHERE Dress_StyleID = @DesignID AND InstitutionID = @InstitutionID";
 
-                connection.Execute(query, new { Image = imageBytes, DesignID = id });
+                var n = connection.Execute(query, new { Image = imageBytes, DesignID = id, InstitutionID = institutionId });
+                if (n == 0) return NotFound(new { success = false, message = "ডিজাইন পাওয়া যায়নি" });
 
                 return Ok(new { success = true, message = "ছবি সফলভাবে যুক্ত হয়েছে" });
             }
@@ -531,6 +597,7 @@ namespace TailorBD.API.Controllers
         }
 
         // GET: api/Dress/style-design/{id}/image
+        [AllowAnonymous] // no token needed (called without one / used in <img>); scoped when a token is sent
         [HttpGet("style-design/{id}/image")]
         public IActionResult GetStyleDesignImage(int id)
         {
@@ -608,6 +675,11 @@ namespace TailorBD.API.Controllers
             }
         }
 
+        private static bool DressBelongsToShop(IDbConnection connection, int dressId, int institutionId)
+            => connection.ExecuteScalar<int>(
+                "SELECT COUNT(1) FROM Dress WHERE DressID = @D AND InstitutionID = @I",
+                new { D = dressId, I = institutionId }) > 0;
+
         // Helper method to resize image
         private byte[] ResizeImage(byte[] imageBytes, int maxWidth, int maxHeight)
         {
@@ -641,12 +713,23 @@ namespace TailorBD.API.Controllers
         public int RegistrationID { get; set; }
         public int InstitutionID { get; set; }
         public int? DressSerial { get; set; }
+        public decimal CuttingCost { get; set; }
+        public decimal SewingCost { get; set; }
     }
 
     public class DressUpdateModel
     {
         public string Dress_Name { get; set; }
         public int InstitutionID { get; set; }
+        public decimal? CuttingCost { get; set; }
+        public decimal? SewingCost { get; set; }
+    }
+
+    public class DressCostsModel
+    {
+        public int InstitutionID { get; set; }
+        public decimal CuttingCost { get; set; }
+        public decimal SewingCost { get; set; }
     }
 
     public class DressSerialUpdateModel
@@ -717,6 +800,8 @@ namespace TailorBD.API.Controllers
         public int DressID { get; set; }
         public string Dress_Name { get; set; }
         public int Cloth_For_ID { get; set; }
+        public decimal CuttingCost { get; set; }
+        public decimal SewingCost { get; set; }
         public bool IsMeasurementAvailable { get; set; }
     }
 }

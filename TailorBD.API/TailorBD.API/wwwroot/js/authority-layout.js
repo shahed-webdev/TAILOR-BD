@@ -30,7 +30,8 @@
         {
             title: 'Institution Details',
             items: [
-                { key: 'institution-details', href: '/authority-institution-details.html', icon: 'fa-list-alt', label: 'Institution Details' }
+                { key: 'institution-details', href: '/authority-institution-details.html', icon: 'fa-list-alt', label: 'Institution Details' },
+                { key: 'shop-page-access',    href: '/authority-shop-access.html',         icon: 'fa-user-lock', label: 'Shop Page Access' }
             ]
         },
         {
@@ -66,6 +67,7 @@
         'profile':              { icon: 'fa-tachometer-alt',  label: 'Authority Dashboard' },
         'sub-dashboard':        { icon: 'fa-tachometer-alt',  label: 'Sub Authority Dashboard' },
         'institution-details':  { icon: 'fa-list-alt',        label: 'Institution Details' },
+        'shop-page-access':     { icon: 'fa-user-lock',       label: 'Shop Page Access' },
         'package':              { icon: 'fa-box-open',         label: 'প্যাকেজ ম্যানেজমেন্ট' },
         'signup':               { icon: 'fa-building',         label: 'নতুন ইনস্টিটিউশন নিবন্ধন' },
         'invoice':              { icon: 'fa-file-invoice',     label: 'Invoice Management' },
@@ -166,6 +168,7 @@
             'SignUp Institution': 'প্রতিষ্ঠান নিবন্ধন', 'Create Invoice': 'ইনভয়েস তৈরি',
             'Collect Payment': 'পেমেন্ট গ্রহণ', 'Payment Report': 'পেমেন্ট রিপোর্ট',
             'Institution Details': 'প্রতিষ্ঠান বিস্তারিত',
+            'Shop Page Access': 'শপ পেজ অ্যাক্সেস',
             'Approve/Unlock User': 'ইউজার অনুমোদন', 'Role Management': 'রোল ব্যবস্থাপনা',
             'Create Sub Authority': 'সাব অথোরিটি তৈরি',
             'Marketing Reports': 'মার্কেটিং রিপোর্ট',
@@ -199,6 +202,7 @@
             'প্রতিষ্ঠান নিবন্ধন': 'SignUp Institution', 'ইনভয়েস তৈরি': 'Create Invoice',
             'পেমেন্ট গ্রহণ': 'Collect Payment', 'পেমেন্ট রিপোর্ট': 'Payment Report',
             'প্রতিষ্ঠান বিস্তারিত': 'Institution Details',
+            'শপ পেজ অ্যাক্সেস': 'Shop Page Access',
             'ইউজার অনুমোদন': 'Approve/Unlock User', 'রোল ব্যবস্থাপনা': 'Role Management',
             'সাব অথোরিটি তৈরি': 'Create Sub Authority',
             'মার্কেটিং রিপোর্ট': 'Marketing Reports',

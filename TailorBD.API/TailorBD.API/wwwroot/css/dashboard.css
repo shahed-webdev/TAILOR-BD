@@ -619,3 +619,25 @@ body:not(.modal-open) .modal-backdrop { display: none !important; }
 #dressSelect option.dress-has-measurement { color: #16a34a; font-weight: 600; }
 
 .recent-orders-mobile { display: none; }
+
+/* PRINT — the screen layout above fixes the content width to calc(100vw - sidebar) !important.
+   Firefox keeps that width when Landscape is picked in the print dialog (table ends up at portrait
+   width with an empty/grey strip on the right). In print, drop the sidebar offset and let the
+   content follow the paper width. No @page size here: Portrait/Landscape stays the user's choice.
+   Pages with small slips (token/measurement) keep their own inner widths. */
+@media print {
+    html, body { background: #fff !important; min-width: 0 !important; overflow: visible !important; }
+    .sidebar, .sidebar-overlay { display: none !important; }
+    body > #app-navbar,
+    .main-content,
+    .main-content.full-width,
+    .sidebar.collapsed ~ #app-navbar,
+    .sidebar.collapsed ~ .main-content {
+        margin-left: 0 !important;
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        transition: none !important;
+    }
+}

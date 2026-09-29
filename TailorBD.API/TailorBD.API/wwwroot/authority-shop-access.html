@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Page Access - TailorBD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css">
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/authority-profile.css">
+    <script src="/js/auth.js?v=2.1.6"></script>
+    <!-- Shared sidebar + navbar component -->
+    <script src="/js/authority-layout.js?v=2.1.7" data-page="shop-page-access"></script>
+    <style>
+        .page-header {
+            background: linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
+            border-radius: 14px; padding: 22px 28px; color:#fff;
+            display:flex; align-items:center; gap:18px;
+            box-shadow: 0 8px 32px rgba(99,102,241,.3);
+            margin-bottom:22px; position:relative; overflow:hidden;
+        }
+        .ph-icon { width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0; }
+        .ph-text h2 { font-size:1.25rem;font-weight:700;margin:0 0 3px; }
+        .ph-text p  { font-size:.84rem;opacity:.85;margin:0; }
+
+        .section-card { background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.07);padding:18px 20px;margin-bottom:16px; }
+        .sa-grid { display:grid; grid-template-columns: 340px 1fr; gap:16px; align-items:start; }
+        @media(max-width:900px) { .sa-grid { grid-template-columns: 1fr; } }
+
+        .shop-list { max-height: 62vh; overflow-y:auto; margin-top:10px; }
+        .shop-item { padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px; }
+        .shop-item:hover { border-color:#a5b4fc;background:#f8faff; }
+        .shop-item.active { border-color:#6366f1;background:#eef2ff; }
+        .shop-item .si-name { font-weight:600;font-size:.88rem;color:#1e293b; }
+        .shop-item .si-sub  { font-size:.74rem;color:#94a3b8; }
+        .badge-blocked { background:#fee2e2;color:#b91c1c;font-size:.7rem;border-radius:20px;padding:2px 8px;font-weight:700;margin-left:auto;white-space:nowrap; }
+        .badge-full    { background:#dcfce7;color:#15803d;font-size:.7rem;border-radius:20px;padding:2px 8px;font-weight:700;margin-left:auto;white-space:nowrap; }
+
+        .pa-head { display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px; }
+        .pa-head h5 { margin:0;font-weight:700;font-size:1rem;color:#1e293b; }
+        .pa-summary { font-size:.8rem;color:#64748b; }
+        .pa-section { border:1.5px solid #e2e8f0;border-radius:12px;margin-bottom:12px;overflow:hidden; }
+        .pa-section-head { background:#f8fafc;padding:9px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e2e8f0; }
+        .pa-section-head label { font-weight:700;font-size:.86rem;color:#334155;margin:0;cursor:pointer; }
+        .pa-section-head .pa-count { margin-left:auto;font-size:.74rem;color:#94a3b8; }
+        .pa-pages { display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 14px;padding:10px 14px; }
+        .pa-page { display:flex;align-items:center;gap:8px;font-size:.84rem;color:#334155;margin:0;cursor:pointer; }
+        .pa-page.off { color:#b91c1c;text-decoration:line-through; }
+        .pa-page input, .pa-section-head input { width:17px;height:17px;cursor:pointer;accent-color:#6366f1; }
+        .pa-note { font-size:.78rem;color:#64748b;background:#f1f5f9;border-radius:10px;padding:9px 12px;margin-bottom:12px; }
+        .pa-warn { font-size:.84rem;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:10px 14px;margin-bottom:12px; }
+        .pa-empty { text-align:center;color:#94a3b8;padding:60px 10px; }
+        .pa-actions { position:sticky;bottom:0;background:#fff;padding-top:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end; }
+
+        #toastWrap { position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
+        .toast-item { padding:12px 18px;border-radius:10px;font-size:.85rem;color:#fff;min-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.15);animation:slideIn .3s ease; }
+        .toast-item.success { background:#10b981; }
+        .toast-item.error   { background:#ef4444; }
+        .toast-item.info    { background:#3b82f6; }
+        @keyframes slideIn { from{transform:translateX(60px);opacity:0} to{transform:translateX(0);opacity:1} }
+    </style>
+</head>
+<body>
+
+<!-- -- MAIN -- -->
+<div class="auth-main">
+    <div class="auth-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="ph-icon"><i class="fas fa-user-lock"></i></div>
+            <div class="ph-text">
+                <h2>শপ পেজ অ্যাক্সেস</h2>
+                <p>প্রতিষ্ঠান বেছে নিন, তারপর যে পেজগুলো ওই প্রতিষ্ঠানের এডমিন ও সাব-এডমিন ব্যবহার করতে পারবে সেগুলোতে টিক দিন</p>
+            </div>
+        </div>
+
+        <div id="tableWarn" class="pa-warn" style="display:none;">
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            ডাটাবেজে <b>ShopPageBlock</b> টেবিল এখনো তৈরি হয়নি। সব প্রতিষ্ঠান এখন সব পেজ পাচ্ছে।
+            পরিবর্তন সেভ করতে আগে <code>Database\ShopPageAccess\02_create.sql</code> চালান।
+        </div>
+
+        <div class="sa-grid">
+            <!-- Shop picker -->
+            <div class="section-card">
+                <div class="fw-bold mb-2" style="font-size:.92rem;color:#1e293b;"><i class="fas fa-store me-1 text-primary"></i> প্রতিষ্ঠান</div>
+                <div class="input-group input-group-sm">
+                    <input type="text" id="shopSearch" class="form-control" placeholder="নাম, মোবাইল, ইউজারনেম বা আইডি...">
+                    <button class="btn btn-primary" id="btnShopSearch" type="button"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="form-check form-switch mt-2" style="font-size:.8rem;">
+                    <input class="form-check-input" type="checkbox" id="restrictedOnly">
+                    <label class="form-check-label" for="restrictedOnly">শুধু যেসব প্রতিষ্ঠানে পেজ বন্ধ আছে</label>
+                </div>
+                <div id="shopList" class="shop-list">
+                    <div class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm me-1"></div> লোড হচ্ছে...</div>
+                </div>
+            </div>
+
+            <!-- Page checklist -->
+            <div class="section-card" id="pagePanel">
+                <div class="pa-empty" id="pageEmpty">
+                    <i class="fas fa-hand-pointer fa-2x mb-2 d-block"></i>
+                    বাম পাশ থেকে একটি প্রতিষ্ঠান বেছে নিন
+                </div>
+                <div id="pageEditor" style="display:none;">
+                    <div class="pa-head">
+                        <h5 id="shopTitle"></h5>
+                        <span class="pa-summary" id="pageSummary"></span>
+                        <div class="ms-auto d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-success rounded-pill" id="btnAllOn" type="button"><i class="fas fa-check-double me-1"></i>সব চালু</button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill" id="btnAllOff" type="button"><i class="fas fa-ban me-1"></i>সব বন্ধ</button>
+                        </div>
+                    </div>
+                    <div class="pa-note">
+                        <i class="fas fa-info-circle me-1"></i>
+                        টিক দেওয়া = চালু, টিক তুলে দিলে পেজটি ওই প্রতিষ্ঠানের এডমিন ও সব সাব-এডমিনের মেনু থেকে লুকানো হবে এবং সরাসরি খুললেও বন্ধ থাকবে।
+                        নতুন প্রতিষ্ঠান ও ভবিষ্যতে যোগ হওয়া নতুন পেজ নিজে থেকেই চালু থাকে। ড্যাশবোর্ড, লগইন ও প্রোফাইল সবসময় চালু।
+                    </div>
+                    <div id="sections"></div>
+                    <div class="pa-actions">
+                        <button class="btn btn-light border rounded-pill px-3" id="btnReset" type="button"><i class="fas fa-undo me-1"></i>আগের অবস্থা</button>
+                        <button class="btn btn-primary rounded-pill px-4 fw-bold" id="btnSave" type="button"><i class="fas fa-save me-1"></i>সেভ করুন</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /auth-content -->
+</div><!-- /auth-main -->
+
+<div id="toastWrap"></div>
+
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/js/auth-guard.js?v=1.2.0"></script>
+<script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/authority-shop-access.js?v=1.0.0"></script>
+</body>
+</html>

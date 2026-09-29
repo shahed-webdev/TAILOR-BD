@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Cutting Issue - TailorBD" data-bn="কাটিং ইস্যু - TailorBD">কাটিং ইস্যু - TailorBD</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/lib/tom-select/tom-select.min.css?v=2.6.2">
+    <style>
+        #app-navbar { margin-left:260px; transition:margin-left .3s ease; }
+        .page-container { padding:16px 24px; }
+        @media(max-width:992px){ #app-navbar{margin-left:0;} .main-content{margin-left:0;} .page-container{padding:10px;} }
+        .btn-pri { padding:8px 18px; background:#6c7ae0; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+        .btn-suc { padding:8px 18px; background:#28a745; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+        .btn-dng { padding:6px 12px; background:#fff5f5; color:#dc3545; border:1.5px solid #ffc5c5; border-radius:6px; font-size:12px; cursor:pointer; font-family:inherit; }
+        .btn-edit { padding:6px 12px; background:#f0f1fc; color:#6c7ae0; border:1.5px solid #c5caef; border-radius:6px; font-size:12px; cursor:pointer; font-family:inherit; }
+        .card-box { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.07); overflow:hidden; margin-bottom:18px; }
+        .card-head { padding:12px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; flex-wrap:wrap; gap:8px; }
+        .card-title { font-weight:700; font-size:14px; color:#6c7ae0; }
+        .card-body-p { padding:16px 18px; }
+        .tab-nav { display:flex; gap:0; border-bottom:2px solid #e0e3f7; margin-bottom:16px; flex-wrap:wrap; }
+        .tab-btn { padding:10px 18px; background:none; border:none; font-size:13px; font-weight:600; color:#888; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; font-family:inherit; }
+        .tab-btn.active { color:#6c7ae0; border-bottom-color:#6c7ae0; }
+        .data-table { width:100%; border-collapse:collapse; font-size:14px; }
+        .data-table thead th { background:#f8f9ff; padding:9px 12px; font-size:11px; font-weight:700; color:#555; border-bottom:2px solid #e0e3f7; white-space:nowrap;  text-align:center;}
+        .data-table tbody td { padding:9px 12px; border-bottom:1px solid #f5f5f5; vertical-align:middle;  text-align:center;}
+        .data-table tbody tr:hover { background:#fafbff; }
+        .f-input { width:100%; padding:8px 12px; border:1px solid #ddd; border-radius:7px; font-size:13px; font-family:inherit; }
+        .f-input:focus { outline:none; border-color:#6c7ae0; }
+        .badge-asg { background:#fff3cd; color:#856404; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:700; }
+        .badge-done { background:#d4edda; color:#155724; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:700; }
+        .hint { background:#f0f7ff; border:1px solid #c5daf5; border-radius:8px; padding:10px 14px; font-size:12px; color:#355; margin-bottom:14px; }
+        .sum-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+        @media(max-width:600px){ .sum-row{ grid-template-columns:1fr; } }
+        .s-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 2px 10px rgba(0,0,0,.07); text-align:center; border-top:4px solid #6c7ae0; }
+        .s-lbl { font-size:11px; font-weight:700; color:#888; margin-bottom:4px; }
+        .s-val { font-size:20px; font-weight:800; color:#333; }
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:2000; align-items:center; justify-content:center; }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:#fff; border-radius:12px; width:min(440px,92vw); overflow:hidden; }
+        .modal-hdr { background:#6c7ae0; color:#fff; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; }
+        .modal-hdr button { background:none; border:none; color:#fff; font-size:22px; cursor:pointer; }
+        .modal-body-p { padding:16px; }
+        .no-data { text-align:center; color:#999; padding:24px; }
+        .filter-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+
+        .print-header { display: none; }
+        @media print {
+            .main-content { margin-left: 0 !important; width: 100% !important; max-width: 100% !important; }
+            #app-sidebar { display: none !important; width: 0 !important; }
+
+            #app-sidebar, #app-navbar, .tab-nav, .hint, .no-print,
+            .btn-pri, .btn-suc, .btn-edit, .btn-dng, .btn-info, .btn-warn,
+            .filter-bar, select, input[type="date"], input[type="text"].f-input,
+            .page-container > .d-flex.justify-content-between,
+            a.btn-edit { display: none !important; }
+            .main-content, .page-container, #app-navbar { margin: 0 !important; padding: 10px 3mm 2mm 3mm !important; }
+            .card-box { box-shadow: none; border: 1px solid #ccc; }
+            .card-head .filter-bar, .card-head select, .card-head input { display: none !important; }
+            body { background: #fff; }
+            .tab-pane { display: none !important; }
+            .tab-pane.print-active-tab { display: block !important; }
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin: 0 0 10px 0;
+                padding: 0;
+            }
+            .print-header-row {
+                display: flex !important;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 14px;
+                text-align: left;
+            }
+            .print-header .print-logo,
+            .print-header #printInsLogo {
+                display: block !important;
+                max-height: 56px;
+                max-width: 90px;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+                flex-shrink: 0;
+                margin: 0;
+            }
+            .print-header-text { flex: 0 1 auto; min-width: 0; }
+            .print-header .ins-name { font-size: 18px; font-weight: 800; color: #111; line-height: 1.2; }
+            .print-header .ins-meta { font-size: 11px; color: #444; margin: 1px 0; line-height: 1.3; }
+            .print-header .print-hr {
+                border: none; border-top: 2px solid #222;
+                margin: 8px 0 6px 0;
+            }
+            .print-header .rep-title { font-size: 14px; font-weight: 700; margin: 2px 0; text-align: center; }
+            .print-header .rep-date { font-size: 11px; color: #555; text-align: center; }
+
+            html, body { width: 100% !important; }
+            .main-content, .page-container, .dashboard-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 10px 3mm 2mm 3mm !important;
+            }
+            .print-header { width: 100% !important; }
+            .print-header-row { justify-content: center !important; width: auto !important; margin: 0 auto !important; }
+            .card-box, .card-body-p, .table-responsive {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: visible !important;
+            }
+            .data-table, table.data-table {
+                width: 100% !important;
+                max-width: 100% !important;
+                table-layout: auto !important;
+            }
+            .data-table th, .data-table td {
+                white-space: normal !important;
+                font-size: 11px !important;
+                padding: 4px 6px !important;
+            }
+            /* PRINT_READABLE_V1 */
+
+            /* readable print: larger type, colors, tight sides */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            html, body {
+                width: 100% !important;
+                font-size: 14px !important;
+            }
+            .main-content, .page-container, .dashboard-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 10px 3mm 2mm 3mm !important;
+            }
+            .card-box {
+                box-shadow: none !important;
+                border: 1px solid #999 !important;
+                margin: 0 !important;
+            }
+            .card-head {
+                padding: 6px 4px !important;
+            }
+            .card-title {
+                font-size: 15px !important;
+                color: #111 !important;
+            }
+            .card-body-p, .table-responsive {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 2px 0 !important;
+                overflow: visible !important;
+            }
+            .print-header {
+                width: 100% !important;
+                margin: 0 0 8px 0 !important;
+                padding: 0 !important;
+            }
+            .print-header-row {
+                justify-content: flex-start !important;
+                width: 100% !important;
+                gap: 10px !important;
+            }
+            .print-header .print-logo,
+            .print-header #printInsLogo {
+                max-height: 64px !important;
+                max-width: 100px !important;
+            }
+            .print-header .ins-name { font-size: 20px !important; font-weight: 800 !important; color: #000 !important; }
+            .print-header .ins-meta { font-size: 12px !important; color: #333 !important; }
+            .print-header .rep-title { font-size: 16px !important; font-weight: 700 !important; color: #000 !important; }
+            .print-header .rep-date { font-size: 13px !important; color: #333 !important; }
+            .data-table, table.data-table {
+                width: 100% !important;
+                max-width: 100% !important;
+                table-layout: fixed !important;
+                border-collapse: collapse !important;
+                font-size: 13px !important;
+            }
+            .data-table thead th {
+                background: #dce3ff !important;
+                color: #111 !important;
+                font-size: 12px !important;
+                font-weight: 800 !important;
+                padding: 7px 5px !important;
+                border: 1px solid #888 !important;
+                white-space: normal !important;
+            }
+            .data-table tbody td {
+                font-size: 13px !important;
+                font-weight: 500 !important;
+                color: #111 !important;
+                padding: 6px 5px !important;
+                border: 1px solid #aaa !important;
+                white-space: normal !important;
+                vertical-align: middle !important;
+            }
+            .data-table tbody tr td {
+                background: #fff !important;
+            }
+            .data-table th,
+            .data-table td,
+            .data-table thead th,
+            .data-table tbody td {
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            .print-header .rep-title,
+            .print-header .rep-date {
+                text-align: center !important;
+            }
+            .card-title {
+                text-align: center !important;
+            }
+
+            .badge-asg {
+                background: #ffe08a !important;
+                color: #5c4500 !important;
+                padding: 3px 8px !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                border: 1px solid #c9a227 !important;
+            }
+            .badge-done {
+                background: #b8e6c4 !important;
+                color: #0d3d1a !important;
+                padding: 3px 8px !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                border: 1px solid #2d8a4e !important;
+            }
+            .s-card { border: 1px solid #888 !important; }
+            .s-lbl { font-size: 12px !important; }
+            .s-val { font-size: 18px !important; }
+            .data-table th:last-child,
+            .data-table td:last-child { display: none !important; }
+            @page { size: auto; margin: 6mm 5mm; }
+
+            /* /PRINT_READABLE_V1 */
+
+            /* PRINT_HEADER_ALIGN_V1 */
+            .print-header {
+                width: 100% !important;
+                text-align: center !important;
+            }
+            .print-header-row {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: auto !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                gap: 12px !important;
+                text-align: left !important;
+            }
+            .print-header-text {
+                flex: 0 1 auto !important;
+                text-align: left !important;
+                min-width: 0 !important;
+            }
+            .print-header .ins-name,
+            .print-header .ins-meta {
+                text-align: left !important;
+            }
+            .print-header .rep-title,
+            .print-header .rep-date {
+                text-align: center !important;
+                width: 100% !important;
+            }
+            .print-header .print-hr {
+                width: 100% !important;
+            }
+            .card-head,
+            .card-title {
+                text-align: center !important;
+                justify-content: center !important;
+            }
+            .data-table thead th {
+                text-align: center !important;
+            }
+            .data-table tbody td {
+                text-align: center !important;
+            }
+            /* /PRINT_HEADER_ALIGN_V1 */
+
+            /* PRINT_THIN_ROWS_V1 */
+            .data-table thead th {
+                padding: 4px 3px !important;
+                font-size: 11px !important;
+                line-height: 1.2 !important;
+            }
+            .data-table tbody td {
+                padding: 3px 3px !important;
+                font-size: 12px !important;
+                line-height: 1.25 !important;
+            }
+            .data-table .ord-cust {
+                white-space: nowrap !important;
+                font-size: 12px !important;
+            }
+            .badge-asg, .badge-done {
+                padding: 1px 6px !important;
+                font-size: 11px !important;
+                line-height: 1.2 !important;
+            }
+            .print-header .print-logo,
+            .print-header #printInsLogo {
+                max-height: 48px !important;
+                max-width: 80px !important;
+            }
+            .print-header .ins-name { font-size: 16px !important; }
+            .print-header .ins-meta { font-size: 11px !important; margin: 0 !important; }
+            .print-header .rep-title { font-size: 13px !important; margin: 2px 0 0 0 !important; }
+            .print-header .rep-date { font-size: 11px !important; margin: 0 !important; }
+            .print-header { margin: 0 0 4px 0 !important; }
+            .print-header .print-hr { margin: 4px 0 3px 0 !important; }
+            .card-head { padding: 3px 2px !important; }
+            .card-title { font-size: 12px !important; margin: 0 !important; }
+            .card-body-p { padding: 0 !important; }
+            /* /PRINT_THIN_ROWS_V1 */
+
+            /* PRINT_COL_SPLIT_V1 */
+            .data-table, table.data-table {
+                font-size: 13px !important;
+                table-layout: fixed !important;
+                width: 100% !important;
+            }
+            .data-table thead th {
+                font-size: 12px !important;
+                padding: 5px 3px !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+            }
+            .data-table tbody td {
+                font-size: 13px !important;
+                padding: 4px 3px !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+                word-break: break-word !important;
+            }
+            /* col widths: Order, Customer, Dress, Master/Artisan, Qty, Date, Note, Status [,Action hidden] */
+            .data-table th:nth-child(1),
+            .data-table td:nth-child(1) { width: 9% !important; }
+            .data-table th:nth-child(2),
+            .data-table td:nth-child(2) { width: 16% !important; white-space: normal !important; }
+            .data-table th:nth-child(3),
+            .data-table td:nth-child(3) { width: 12% !important; white-space: normal !important; }
+            .data-table th:nth-child(4),
+            .data-table td:nth-child(4) { width: 14% !important; white-space: normal !important; }
+            .data-table th:nth-child(5),
+            .data-table td:nth-child(5) { width: 6% !important; } /* Qty narrow */
+            .data-table th:nth-child(6),
+            .data-table td:nth-child(6) { width: 10% !important; }
+            .data-table th:nth-child(7),
+            .data-table td:nth-child(7) { width: 14% !important; white-space: normal !important; }
+            .data-table th:nth-child(8),
+            .data-table td:nth-child(8) { width: 12% !important; }
+            .data-table td.col-qty,
+            .data-table th.col-qty { width: 6% !important; max-width: 48px !important; }
+            .data-table td.col-order,
+            .data-table th.col-order { width: 9% !important; }
+            /* /PRINT_COL_SPLIT_V1 */
+
+            /* PRINT_TOP_PAD_V1 */
+            @page { size: auto; margin: 10px 5mm 6mm 5mm !important; }
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .main-content, .page-container, .dashboard-content, #app-navbar {
+                margin: 0 !important;
+                padding: 10px 3mm 2mm 3mm !important;
+                padding-top: 10px !important;
+            }
+            .print-header {
+                margin: 0 0 4px 0 !important;
+                padding: 0 !important;
+            }
+            .print-header .print-hr {
+                margin: 4px 0 3px 0 !important;
+            }
+            .card-box {
+                margin-top: 0 !important;
+            }
+            .card-head {
+                padding-top: 2px !important;
+                padding-bottom: 2px !important;
+            }
+            /* /PRINT_TOP_PAD_V1 */
+
+            /* PRINT_HEADER_BIG_V1 */
+            .print-header .ins-name {
+                font-size: 24px !important;
+                font-weight: 800 !important;
+                line-height: 1.15 !important;
+            }
+            .print-header .ins-meta {
+                font-size: 14px !important;
+                line-height: 1.35 !important;
+                color: #222 !important;
+            }
+            .print-header .print-logo,
+            .print-header #printInsLogo {
+                max-height: 72px !important;
+                max-width: 110px !important;
+            }
+            .print-header .rep-title {
+                font-size: 18px !important;
+                font-weight: 800 !important;
+                margin: 6px 0 2px 0 !important;
+            }
+            .print-header .rep-date {
+                font-size: 14px !important;
+                font-weight: 600 !important;
+                color: #222 !important;
+            }
+            /* /PRINT_HEADER_BIG_V1 */
+
+            /* PRINT_CARDS_TH_V1 */
+            .s-card {
+                border: 1.5px solid #555 !important;
+                padding: 10px 12px !important;
+                box-shadow: none !important;
+            }
+            .s-lbl {
+                font-size: 14px !important;
+                font-weight: 800 !important;
+                color: #111 !important;
+                letter-spacing: 0.02em;
+            }
+            .s-val {
+                font-size: 26px !important;
+                font-weight: 900 !important;
+                color: #000 !important;
+                line-height: 1.2 !important;
+            }
+            .card-title {
+                font-size: 16px !important;
+                font-weight: 800 !important;
+                color: #111 !important;
+            }
+            .data-table thead th {
+                font-size: 14px !important;
+                font-weight: 900 !important;
+                color: #000 !important;
+                padding: 7px 4px !important;
+                background: #c8d0f5 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .data-table tbody td {
+                font-size: 13px !important;
+                color: #111 !important;
+            }
+            /* /PRINT_CARDS_TH_V1 */
+
+
+
+
+
+
+
+            /* hide action column on print — empty/useless */
+            .data-table th:last-child,
+            .data-table td:last-child { display: none !important; }
+            @page { size: auto; margin: 8mm; }
+
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+<div id="app-sidebar"></div>
+<div id="app-navbar"></div>
+<main class="main-content">
+<div class="page-container">
+
+    <!-- Print-only institution header -->
+    <div class="print-header" id="printHeader">
+        <div class="print-header-row">
+            <img id="printInsLogo" class="print-logo" alt="" style="display:none;">
+            <div class="print-header-text">
+                <div class="ins-name" id="printInsName"></div>
+                <div class="ins-meta" id="printInsAddress"></div>
+                <div class="ins-meta" id="printInsPhone"></div>
+            </div>
+        </div>
+        <hr class="print-hr">
+        <div class="rep-title" id="printHeadline"></div>
+        <div class="rep-date" id="printDateLine"></div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h4 class="mb-1" style="font-weight:800;color:#333;">
+                <i class="fas fa-cut me-2" style="color:#6c7ae0;"></i>
+                <span class="lang-content" data-en="Cutting Issue" data-bn="কাটিং ইস্যু">কাটিং ইস্যু</span>
+            </h4>
+            <div class="hint mb-0">
+                <span class="lang-content" data-en="Optional step. You can skip this and complete order work the usual way." data-bn="ঐচ্ছিক ধাপ। চাইলে স্কিপ করে আগের মতো সরাসরি অর্ডারের কাজ সম্পূর্ণ করতে পারবেন।">ঐচ্ছিক ধাপ। চাইলে স্কিপ করে আগের মতো সরাসরি অর্ডারের কাজ সম্পূর্ণ করতে পারবেন।</span>
+            </div>
+        </div>
+        <button type="button" id="btnPrintPage" class="btn-edit no-print" onclick="printPage()">
+            <i class="fas fa-print me-1"></i>
+            <span class="lang-content" data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span>
+        </button>
+        <a href="/incomplete-works.html" class="btn-edit text-decoration-none">
+            <i class="fas fa-tasks me-1"></i>
+            <span class="lang-content" data-en="Complete Order Work" data-bn="কাজ সম্পূর্ণ করুন">কাজ সম্পূর্ণ করুন</span>
+        </a>
+    </div>
+
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="issue" onclick="switchTab('issue')">
+            <i class="fas fa-share me-1"></i><span class="lang-content" data-en="Issue Cutting" data-bn="কাটিং ইস্যু">কাটিং ইস্যু</span>
+        </button>
+        <button class="tab-btn" data-tab="assigned" onclick="switchTab('assigned')">
+            <i class="fas fa-list me-1"></i><span class="lang-content" data-en="Assigned List" data-bn="এসাইন তালিকা">এসাইন তালিকা</span>
+        </button>
+        <button class="tab-btn" data-tab="masters" onclick="switchTab('masters')">
+            <i class="fas fa-user-tie me-1"></i><span class="lang-content" data-en="Cutting Masters" data-bn="কাটিং মাস্টার">কাটিং মাস্টার</span>
+        </button>
+        <button class="tab-btn" data-tab="report" onclick="switchTab('report')">
+            <i class="fas fa-chart-bar me-1"></i><span class="lang-content" data-en="Report" data-bn="রিপোর্ট">রিপোর্ট</span>
+        </button>
+    </div>
+
+    <!-- Issue tab -->
+    <div id="tab-issue" class="tab-pane">
+        <div class="card-box">
+            <div class="card-head">
+                <span class="card-title lang-content" data-en="Eligible dresses (not yet cutting-issued)" data-bn="কাটিং ইস্যু হয়নি এমন ড্রেস">কাটিং ইস্যু হয়নি এমন ড্রেস</span>
+                <div class="filter-bar mb-0">
+                    <input type="text" id="eligibleSearch" class="f-input" style="width:200px;" oninput="queueEligibleSearch()" onkeydown="onEligibleKey(event)" autocomplete="off"
+                           data-en-placeholder="Order no" data-bn-placeholder="অর্ডার নং" placeholder="অর্ডার নং"
+                           data-en-title="Exact order number (customer / dress name also works)" data-bn-title="সঠিক অর্ডার নম্বর (কাস্টমার / পোশাকের নামও লেখা যায়)" title="সঠিক অর্ডার নম্বর (কাস্টমার / পোশাকের নামও লেখা যায়)">
+                    <button class="btn-pri" onclick="searchEligible()"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div class="card-body-p table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="lang-content col-order" data-en="Order #" data-bn="অর্ডার">অর্ডার</th>
+                            <th class="lang-content" data-en="Customer" data-bn="কাস্টমার">কাস্টমার</th>
+                            <th class="lang-content" data-en="Dress" data-bn="ড্রেস">ড্রেস</th>
+                            <th class="lang-content col-qty" data-en="Qty" data-bn="পরিমাণ">পরিমাণ</th>
+                            <th class="lang-content" data-en="Delivery" data-bn="ডেলিভারি">ডেলিভারি</th>
+                            <th class="lang-content" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eligibleBody"><tr><td colspan="6" class="no-data">...</td></tr></tbody>
+                </table>
+
+            <div id="eligiblePager" class="d-flex justify-content-between align-items-center mt-2 no-print" style="gap:8px;flex-wrap:wrap;">
+                <small class="text-muted" id="eligiblePagerInfo"></small>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn-edit" id="eligiblePagerPrev" onclick="eligiblePrevPage()">&laquo; Prev</button>
+                    <button type="button" class="btn-edit" id="eligiblePagerNext" onclick="eligibleNextPage()">Next &raquo;</button>
+                </div>
+            </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned tab -->
+    <div id="tab-assigned" class="tab-pane" style="display:none;">
+        <div class="card-box">
+            <div class="card-head">
+                <span class="card-title lang-content" data-en="Cutting assignments" data-bn="কাটিং এসাইনমেন্ট">কাটিং এসাইনমেন্ট</span>
+                <div class="filter-bar mb-0 no-print">
+                    <input type="search" id="issueOrderSearch" class="f-input" style="width:130px;" autocomplete="off"
+                           onkeydown="onIssueOrderKey(event)" oninput="onIssueOrderInput()"
+                           data-en-placeholder="Order #" data-bn-placeholder="অর্ডার নং" placeholder="অর্ডার নং"
+                           data-en-title="Order # (press Enter)" data-bn-title="অর্ডার নং (Enter চাপুন)" title="অর্ডার নং (Enter চাপুন)">
+                    <select id="issueMasterFilter" class="f-input" style="width:160px;" onchange="loadIssuesReset()">
+                        <option value="">সব মাস্টার / All</option>
+                    </select>
+                    <select id="issueStatusFilter" class="f-input" style="width:140px;" onchange="loadIssuesReset()">
+                        <option value="">All / সব</option>
+                        <option value="Assigned">Assigned / এসাইন</option>
+                        <option value="Completed">Completed / সম্পন্ন</option>
+                    </select>
+                    <input type="date" id="issueDateFrom" class="f-input" style="width:145px;" title="From" onchange="loadIssuesReset()">
+                    <input type="date" id="issueDateTo" class="f-input" style="width:145px;" title="To" onchange="loadIssuesReset()">
+                    <button type="button" class="btn-pri" onclick="loadIssuesReset()"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div class="card-body-p table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="lang-content col-order" data-en="Order #" data-bn="অর্ডার">অর্ডার</th>
+                            <th class="lang-content" data-en="Customer" data-bn="কাস্টমার">কাস্টমার</th>
+                                    <th class="lang-content" data-en="Dress" data-bn="ড্রেস">ড্রেস</th>
+                            <th class="lang-content" data-en="Master" data-bn="মাস্টার">মাস্টার</th>
+                            <th class="lang-content col-qty" data-en="Qty" data-bn="পরিমাণ">পরিমাণ</th>
+                            <th class="lang-content" data-en="Assign Date" data-bn="এসাইন ডেট">এসাইন ডেট</th>
+                            <th class="lang-content" data-en="Notes" data-bn="নোট">নোট</th>
+                            <th class="lang-content" data-en="Status" data-bn="স্ট্যাটাস">স্ট্যাটাস</th>
+                            <th class="lang-content" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="issuesBody"><tr><td colspan="9" class="no-data">...</td></tr></tbody>
+                </table>
+
+            <div id="issuesPager" class="d-flex justify-content-between align-items-center mt-2 no-print" style="gap:8px;flex-wrap:wrap;">
+                <small class="text-muted" id="issuesPagerInfo"></small>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn-edit" id="issuesPagerPrev" onclick="issuesPrevPage()">&laquo; Prev</button>
+                    <button type="button" class="btn-edit" id="issuesPagerNext" onclick="issuesNextPage()">Next &raquo;</button>
+                </div>
+            </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Masters tab -->
+    <div id="tab-masters" class="tab-pane" style="display:none;">
+        <div class="card-box">
+            <div class="card-head">
+                <span class="card-title lang-content" data-en="Cutting Masters" data-bn="কাটিং মাস্টার">কাটিং মাস্টার</span>
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <div class="ls-wrap">
+                        <i class="fas fa-search ls-icon"></i>
+                        <input type="text" id="masterSearch" class="f-input ls-input" autocomplete="off" placeholder="নাম / ফোন খুঁজুন" data-bn-placeholder="নাম / ফোন খুঁজুন" data-en-placeholder="Search name / phone">
+                        <button type="button" class="ls-clear" id="masterSearchClear" style="display:none;" title="Clear" aria-label="Clear">&times;</button>
+                    </div>
+                    <button class="btn-edit" onclick="openMasterBulkModal()"><i class="fas fa-file-excel me-1"></i>
+                        <span class="lang-content" data-en="Add from Excel" data-bn="এক্সেল দিয়ে যুক্ত করুন">এক্সেল দিয়ে যুক্ত করুন</span>
+                    </button>
+                    <button class="btn-pri" onclick="openMasterModal()"><i class="fas fa-plus me-1"></i>
+                        <span class="lang-content" data-en="Add Master" data-bn="মাস্টার যুক্ত করুন">মাস্টার যুক্ত করুন</span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body-p table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="lang-content" data-en="Name" data-bn="নাম">নাম</th>
+                            <th class="lang-content" data-en="Phone" data-bn="ফোন">ফোন</th>
+                            <th class="lang-content" data-en="Balance" data-bn="ব্যালেন্স">ব্যালেন্স</th>
+                            <th class="lang-content" data-en="Status" data-bn="স্ট্যাটাস">স্ট্যাটাস</th>
+                            <th class="lang-content" data-en="Action" data-bn="অ্যাকশন">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mastersBody"><tr><td colspan="5" class="no-data">...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report tab -->
+    <div id="tab-report" class="tab-pane" style="display:none;">
+        <div class="filter-bar mb-3">
+            <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Filter by master" data-bn="মাস্টার ফিল্টার">মাস্টার ফিল্টার</span></label>
+            <select id="reportPersonFilter" class="f-input" style="width:220px;" onchange="loadReport()"></select>
+            <input type="date" id="reportDateFrom" class="f-input" style="width:145px;" title="From" onchange="loadReport()">
+            <input type="date" id="reportDateTo" class="f-input" style="width:145px;" title="To" onchange="loadReport()">
+            <button class="btn-edit" onclick="loadReport()"><i class="fas fa-sync"></i></button>
+            <button type="button" class="btn-edit no-print" onclick="printPage()"><i class="fas fa-print me-1"></i><span class="lang-content" data-en="Print" data-bn="প্রিন্ট">প্রিন্ট</span></button>
+        </div>
+        <div id="reportSummary" class="sum-row"></div>
+        <div class="card-box">
+            <div class="card-head">
+                <span class="card-title lang-content" data-en="Per-master cutting report" data-bn="মাস্টার অনুযায়ী কাটিং রিপোর্ট">মাস্টার অনুযায়ী কাটিং রিপোর্ট</span>
+                <button class="btn-edit" onclick="loadReport()"><i class="fas fa-sync"></i></button>
+            </div>
+            <div class="card-body-p table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="lang-content" data-en="Master" data-bn="মাস্টার">মাস্টার</th>
+                            <th class="lang-content" data-en="Assigned" data-bn="এসাইন">এসাইন</th>
+                            <th class="lang-content" data-en="Completed" data-bn="সম্পন্ন">সম্পন্ন</th>
+                            <th class="lang-content" data-en="Remaining" data-bn="বাকি">বাকি</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportBody"><tr><td colspan="4" class="no-data">...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-box">
+            <div class="card-head">
+                <span class="card-title lang-content" data-en="Dress-wise count" data-bn="ড্রেস অনুযায়ী সংখ্যা">ড্রেস অনুযায়ী সংখ্যা</span>
+            </div>
+            <div class="card-body-p table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="lang-content" data-en="Dress" data-bn="ড্রেস">ড্রেস</th>
+                            <th class="lang-content" data-en="Assigned" data-bn="এসাইন">এসাইন</th>
+                            <th class="lang-content" data-en="Completed" data-bn="সম্পন্ন">সম্পন্ন</th>
+                            <th class="lang-content" data-en="Remaining" data-bn="বাকি">বাকি</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dressReportBody"><tr><td colspan="4" class="no-data">...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</main>
+
+<!-- Issue modal -->
+<div class="modal-overlay" id="issueModal">
+    <div class="modal-box">
+        <div class="modal-hdr">
+            <h6 class="mb-0"><span class="lang-content" data-en="Assign to Cutting Master" data-bn="কাটিং মাস্টারকে এসাইন">কাটিং মাস্টারকে এসাইন</span></h6>
+            <button onclick="closeModal('issueModal')">&times;</button>
+        </div>
+        <div class="modal-body-p">
+            <input type="hidden" id="issueOrderListId">
+            <p id="issueDressInfo" class="mb-3 text-muted" style="font-size:13px;"></p>
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Cutting Master" data-bn="কাটিং মাস্টার">কাটিং মাস্টার</span></label>
+                <select id="issueMasterId" class="f-input"></select>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Notes" data-bn="নোট">নোট</span></label>
+                <input type="text" id="issueNotes" class="f-input">
+            </div>
+            <button class="btn-suc w-100" onclick="submitIssue()"><span class="lang-content" data-en="Assign" data-bn="এসাইন করুন">এসাইন করুন</span></button>
+        </div>
+    </div>
+</div>
+
+<!-- Master modal -->
+<div class="modal-overlay" id="masterModal">
+    <div class="modal-box">
+        <div class="modal-hdr">
+            <h6 class="mb-0" id="masterModalTitle"><span class="lang-content" data-en="Add Cutting Master" data-bn="কাটিং মাস্টার যুক্ত করুন">কাটিং মাস্টার যুক্ত করুন</span></h6>
+            <button onclick="closeModal('masterModal')">&times;</button>
+        </div>
+        <div class="modal-body-p">
+            <input type="hidden" id="masterId" value="0">
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Name" data-bn="নাম">নাম</span> *</label>
+                <input type="text" id="masterName" class="f-input">
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Phone" data-bn="ফোন">ফোন</span></label>
+                <input type="text" id="masterPhone" class="f-input">
+            </div>
+            <div class="mb-3" id="masterActiveWrap" style="display:none;">
+                <label><input type="checkbox" id="masterActive" checked> <span class="lang-content" data-en="Active" data-bn="সক্রিয়">সক্রিয়</span></label>
+            </div>
+            <button class="btn-suc w-100" onclick="submitMaster()"><span class="lang-content" data-en="Save" data-bn="সংরক্ষণ">সংরক্ষণ</span></button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Reassign modal -->
+<div class="modal-overlay" id="reassignModal">
+    <div class="modal-box">
+        <div class="modal-hdr">
+            <h6 class="mb-0"><span class="lang-content" data-en="Reassign Cutting Master" data-bn="অন্য মাস্টারকে এসাইন">অন্য মাস্টারকে এসাইন</span></h6>
+            <button onclick="closeModal('reassignModal')">&times;</button>
+        </div>
+        <div class="modal-body-p">
+            <input type="hidden" id="reassignIssueId">
+            <p id="reassignInfo" class="mb-3 text-muted" style="font-size:13px;"></p>
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="New Cutting Master" data-bn="নতুন কাটিং মাস্টার">নতুন কাটিং মাস্টার</span></label>
+                <select id="reassignMasterId" class="f-input"></select>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold" style="font-size:12px;"><span class="lang-content" data-en="Notes" data-bn="নোট">নোট</span></label>
+                <input type="text" id="reassignNotes" class="f-input">
+            </div>
+            <button class="btn-suc w-100" onclick="submitReassign()"><span class="lang-content" data-en="Reassign" data-bn="রিঅ্যাসাইন করুন">রিঅ্যাসাইন করুন</span></button>
+        </div>
+    </div>
+</div>
+
+
+<div id="app-modals"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app-components.js?v=2.3.2"></script>
+<script src="/js/auth-guard.js?v=1.2.0"></script>
+<script src="/lib/tom-select/tom-select.base.min.js?v=2.6.2"></script>
+<script src="/js/worker-select.js?v=1.0.0"></script>
+<script src="/js/worker-bulk-import.js?v=1.0.0"></script>
+<script src="/js/list-search.js?v=1.0.0"></script>
+<script src="/js/cutting-issue.js?v=1.10.0"></script>
+</body>
+</html>

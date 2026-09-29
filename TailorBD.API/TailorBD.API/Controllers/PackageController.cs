@@ -1,6 +1,8 @@
 using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 using TailorBD.API.Models;
 
 namespace TailorBD.API.Controllers
@@ -37,6 +39,7 @@ namespace TailorBD.API.Controllers
         }
 
         // POST: api/package
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPost]
         public async Task<ActionResult<ApiResponse<int>>> Create([FromBody] PackageCreateRequest request)
         {
@@ -62,6 +65,7 @@ namespace TailorBD.API.Controllers
         }
 
         // PUT: api/package/{id}
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpPut("{id}")]
         public async Task<ActionResult<ApiResponse<bool>>> Update(int id, [FromBody] PackageCreateRequest request)
         {
@@ -89,6 +93,7 @@ namespace TailorBD.API.Controllers
         }
 
         // DELETE: api/package/{id}
+        [Authorize(Roles = ShopClaims.AuthorityRoles)] // owner panel only: Authority / Sub-Authority login required
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<bool>>> Delete(int id)
         {

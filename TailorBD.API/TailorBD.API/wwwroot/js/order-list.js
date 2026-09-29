@@ -9,6 +9,7 @@ function orderListData() {
         pageSize: 25,
         totalPages: 0,
         currentLang: window.currentLang || 'bn',
+        artisanTick: 0,
         filters: {
             phone: '',
             orderSerialNumber: '',
@@ -47,6 +48,8 @@ function orderListData() {
                 self.currentLang = lang;
             });
             
+            if (window.ArtisanAssign) ArtisanAssign.bindToggle('#olPrintArtisan');
+
             // Load initial orders (pending orders)
             await this.searchOrders();
             
@@ -269,6 +272,7 @@ function orderListData() {
                     });
                     this.totalCount = result.data.totalCount;
                     this.totalPages = result.data.totalPages;
+                    this.loadArtisans();
                     console.log(`Loaded ${this.orders.length} orders (Total: ${this.totalCount}, Pages: ${this.totalPages})`);
                     console.log('Current Page:', this.currentPage, 'Total Pages:', this.totalPages);
                     
@@ -288,6 +292,18 @@ function orderListData() {
             } finally {
                 this.isLoading = false;
             }
+        },
+
+        // Assigned কারিগর for the orders on this page: one batched call (artisan-assign.js)
+        loadArtisans() {
+            if (!window.ArtisanAssign || !this.orders.length) return;
+            ArtisanAssign.load(this.orders.map(o => o.orderId)).then(loaded => {
+                if (loaded) this.artisanTick++;
+            });
+        },
+
+        artisanHtml(orderId) {
+            return window.ArtisanAssign ? ArtisanAssign.orderHtml(orderId) : '';
         },
 
         async changePage(newPage) {

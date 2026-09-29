@@ -124,6 +124,12 @@
                             বর্ডার লুকান
                         </label>
                     </div>
+                    <div class="form-check measurement-border-check mb-0">
+                        <input class="form-check-input" type="checkbox" id="printArtisanCheckbox">
+                        <label class="form-check-label lang-content" for="printArtisanCheckbox" data-en="Print artisan name" data-bn="কারিগরের নাম প্রিন্ট">
+                            কারিগরের নাম প্রিন্ট
+                        </label>
+                    </div>
                     <div class="measurement-controls" id="measurementControls" style="display: none;">
                         <div class="d-flex flex-wrap align-items-center gap-2 gap-md-3">
                             <div class="d-flex align-items-center gap-2">
@@ -284,11 +290,13 @@
     <script src="/js/auth.js"></script>
 
     <!-- App Components -->
-    <script src="/js/app-components.js?v=2.2.9"></script>
+    <script src="/js/app-components.js?v=2.3.2"></script>
+    <script src="/js/auth-guard.js?v=1.2.0"></script>
 
     <script src="/js/measurement-fraction-bar.js?v=1.9.0"></script>
 
     <!-- Money Receipt JS -->
-    <script src="/js/money-receipt.js?v=2.2.47"></script>
+    <script src="/js/artisan-assign.js?v=1.0.1"></script>
+    <script src="/js/money-receipt.js?v=2.2.49"></script>
 </body>
 </html>

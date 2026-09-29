@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
+using TailorBD.API.Services;
 using Dapper;
 
 namespace TailorBD.API.Controllers
@@ -24,6 +27,9 @@ namespace TailorBD.API.Controllers
             ["~/AccessAdmin/Order/Order_List.aspx"]             = "/order-list.html",
             ["~/AccessAdmin/Order/OrdrList.aspx"]               = "/order-list.html",
             ["~/AccessAdmin/Order/Order.aspx"]                  = "/new-order.html",
+            ["~/AccessAdmin/Order/Cutting_Issue.aspx"]          = "/cutting-issue.html",
+            ["~/AccessAdmin/Order/Factory_Issue.aspx"]          = "/factory-issue.html",
+            ["~/AccessAdmin/Order/Worker_Payments.aspx"]       = "/worker-payments.html",
             ["~/AccessAdmin/Order/Incomplete_Works.aspx"]       = "/incomplete-works.html",
             ["~/AccessAdmin/Order/Change_Delivery_Date.aspx"]   = "/change-delivery-date.html",
             ["~/AccessAdmin/Order/Delete_Order.aspx"]           = "/delete-order.html",
@@ -195,6 +201,9 @@ namespace TailorBD.API.Controllers
             ["/new-order.html"]              = ("New Order",               "Order"),
             ["/order-list.html"]             = ("Order List",              "Order"),
             ["/money-receipt.html"]          = ("Money Receipt",           "Order"),
+            ["/cutting-issue.html"]          = ("Cutting Issue",           "Order"),
+            ["/factory-issue.html"]          = ("Factory Issue",           "Order"),
+            ["/worker-payments.html"]        = ("Worker Payments",         "Order"),
             ["/incomplete-works.html"]       = ("Complete Order Works",    "Order"),
             ["/change-delivery-date.html"]   = ("Change Delivery Date",   "Order"),
             ["/delete-order.html"]           = ("Permanently Delete Order","Order"),
@@ -294,6 +303,9 @@ namespace TailorBD.API.Controllers
 
                 var pages = connection.Query(query).ToList();
 
+                // Shop Page Access: pages the Authority switched off for this shop cannot be given to sub-admins
+                var shopBlocked = HttpContext.RequestServices.GetRequiredService<ShopPageAccessService>().GetEffectiveBlocked(institutionId);
+
                 // Normalize URLs and deduplicate by normalized HTML URL
                 // Multiple ASPX entries can map to the same HTML page (e.g. CustomerList.aspx and Customer_List.aspx both → /customer-list.html)
                 var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -301,7 +313,7 @@ namespace TailorBD.API.Controllers
                 foreach (var p in pages)
                 {
                     string normalizedUrl = NormalizeUrl((string)p.PageURL);
-                    if (string.IsNullOrEmpty(normalizedUrl) || seenUrls.Contains(normalizedUrl))
+                    if (string.IsNullOrEmpty(normalizedUrl) || seenUrls.Contains(normalizedUrl) || shopBlocked.Contains(normalizedUrl))
                         continue;
                     seenUrls.Add(normalizedUrl);
                     uniquePages.Add(p);
@@ -363,13 +375,16 @@ namespace TailorBD.API.Controllers
                     UserName = username
                 }).ToList();
 
+                // Shop Page Access: a sub-admin never gets more than the shop (pages switched off by the Authority are dropped)
+                var shopBlocked = HttpContext.RequestServices.GetRequiredService<ShopPageAccessService>().GetEffectiveBlocked(institutionId);
+
                 // Map legacy .aspx URLs → modern .html URLs and deduplicate
                 var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var permissions = new List<object>();
                 foreach (var p in raw)
                 {
                     string normalizedUrl = NormalizeUrl((string)p.PageURL);
-                    if (string.IsNullOrEmpty(normalizedUrl) || seenUrls.Contains(normalizedUrl))
+                    if (string.IsNullOrEmpty(normalizedUrl) || seenUrls.Contains(normalizedUrl) || shopBlocked.Contains(normalizedUrl))
                         continue;
                     seenUrls.Add(normalizedUrl);
                     permissions.Add(new {
@@ -529,6 +544,7 @@ namespace TailorBD.API.Controllers
         }
 
         // GET: api/Access/debug/{institutionId}/{registrationId}
+        [Authorize(Roles = ShopClaims.AuthorityOnly)] // maintenance/debug: Authority login required
         [HttpGet("debug/{institutionId}/{registrationId}")]
         public IActionResult DebugPermissions(int institutionId, int registrationId)
         {
@@ -623,6 +639,7 @@ namespace TailorBD.API.Controllers
 
         // GET: api/access/debug-registrations
         // DEBUG ONLY: list all registrations to find valid institutionId/registrationId pairs
+        [Authorize(Roles = ShopClaims.AuthorityOnly)] // maintenance/debug: Authority login required
         [HttpGet("debug-registrations")]
         public IActionResult DebugRegistrations()
         {

@@ -59,6 +59,8 @@
                             <tr>
                                 <th class="lang-content" data-en="Edit" data-bn="সম্পাদনা">সম্পাদনা</th>
                                 <th class="lang-content" data-en="Dress Name" data-bn="ড্রেসের নাম">ড্রেসের নাম</th>
+                                <th class="lang-content" data-en="Cutting Cost" data-bn="কাটিং খরচ">কাটিং খরচ</th>
+                                <th class="lang-content" data-en="Sewing Cost" data-bn="সেলাই খরচ">সেলাই খরচ</th>
                                 <th class="lang-content" data-en="Image" data-bn="ছবি">ছবি</th>
                                 <th class="lang-content" data-en="Add Style" data-bn="স্টাইল যোগ করুন ">স্টাইল যোগ করুন</th>
                                 <th class="lang-content" data-en="Add Measurement" data-bn="মাপজোখ যোগ করুন">মাপজোখ যোগ করুন</th>
@@ -109,7 +111,16 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
+                
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Cutting Cost (per piece)" data-bn="কাটিং খরচ (প্রতি পিস)">কাটিং খরচ (প্রতি পিস)</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="addCuttingCost" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Sewing Cost (per piece)" data-bn="সেলাই খরচ (প্রতি পিস)">সেলাই খরচ (প্রতি পিস)</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="addSewingCost" value="0">
+                        </div>
+                        <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <span class="lang-content" data-en="Close" data-bn="বন্ধ করুন">বন্ধ করুন</span>
                     </button>
@@ -136,6 +147,16 @@
                         <div class="mb-3">
                             <label class="form-label lang-content" data-en="Dress Name" data-bn="ড্রেসের নাম">ড্রেসের নাম</label>
                             <input type="text" class="form-control" id="editDressName" required>
+
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Cutting Cost (per piece)" data-bn="কাটিং খরচ (প্রতি পিস)">কাটিং খরচ (প্রতি পিস)</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="editCuttingCost" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label lang-content" data-en="Sewing Cost (per piece)" data-bn="সেলাই খরচ (প্রতি পিস)">সেলাই খরচ (প্রতি পিস)</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="editSewingCost" value="0">
+                        </div>
+
                         </div>
                         <div class="mb-3">
                             <label class="form-label lang-content" data-en="Update Image" data-bn="ছবি আপডেট করুন">ছবি আপডেট করুন</label>
@@ -358,9 +379,9 @@
     
     <!-- App Components -->
     <script src="/js/auth.js"></script>
-    <script src="/js/app-components.js?v=2.2.9"></script>
+    <script src="/js/app-components.js?v=2.3.2"></script>
     
     <!-- Dress Add JS -->
-    <script src="/js/dress-add.js?v=3.0.2"></script>
+    <script src="/js/dress-add.js?v=1.7.0"></script>
 </body>
 </html>

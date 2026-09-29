@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.Text.Json.Serialization;
 using TailorBD.API.Helpers;
 using TailorBD.API.Models;
@@ -7,6 +8,8 @@ namespace TailorBD.API.Controllers
 {
     [Route("api/orders")]
     [ApiController]
+    [Authorize]
+    [ShopScoped] // every action: login required; shop (InstitutionID) and user always taken from the token
     public class OrdersWriteController : ControllerBase
     {
         private readonly ILogger<OrdersWriteController> _logger;
@@ -39,6 +42,21 @@ namespace TailorBD.API.Controllers
                 var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
                 using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                 await connection.OpenAsync();
+
+                // Everything this edit touches must belong to this order in the caller's shop;
+                // otherwise refuse before changing anything.
+                var touchedOrderListIds = model.OrderList
+                    .Where(i => i.OrderListId.HasValue).Select(i => i.OrderListId!.Value)
+                    .Concat(model.DeletedOrderListIds ?? new List<int>());
+                if (!await ShopOwnership.InShopAsync(connection, "[Order]", "OrderID", orderId, model.InstitutionId)
+                    || !await ShopOwnership.AllInShopAsync(connection, "OrderList", "OrderListID", touchedOrderListIds, model.InstitutionId, "AND OrderID = @OrderID", new { OrderID = orderId })
+                    || !await ShopOwnership.AllInShopAsync(connection, "Order_Payment", "OrderPaymentID", model.DeletedOrderPaymentIds, model.InstitutionId, "AND OrderID = @OrderID", new { OrderID = orderId }))
+                    return NotFound(new { success = false, message = "Order not found" });
+                if (!await ShopOwnership.InShopAsync(connection, "Customer", "CustomerID", model.CustomerId, model.InstitutionId)
+                    || !await ShopOwnership.AllInShopAsync(connection, "Dress", "DressID",
+                        model.OrderList.Select(i => i.DressId).Where(id => id > 0), model.InstitutionId))
+                    return NotFound(new { success = false, message = "Customer or dress not found" });
+
                 using var transaction = connection.BeginTransaction();
 
                 try
@@ -291,6 +309,13 @@ namespace TailorBD.API.Controllers
 
                 int orderId = model.OrderID ?? 0;
 
+                // Order (when given), customer and dress must belong to the caller's shop; otherwise nothing is written.
+                if (orderId != 0 && !await ShopOwnership.InShopAsync(connection, "[Order]", "OrderID", orderId, model.InstitutionID))
+                    return NotFound(new { success = false, message = "Order not found" });
+                if (!await ShopOwnership.InShopAsync(connection, "Customer", "CustomerID", model.CustomerID, model.InstitutionID)
+                    || !await ShopOwnership.InShopAsync(connection, "Dress", "DressID", model.DressID, model.InstitutionID))
+                    return NotFound(new { success = false, message = "Customer or dress not found" });
+
                 if (orderId == 0)
                 {
                     var createOrderQuery = @"
@@ -474,6 +499,14 @@ namespace TailorBD.API.Controllers
                 var connectionString = _configuration.GetConnectionString("TailorBDConnectionString");
                 using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
                 await connection.OpenAsync();
+
+                // The order (and the account, if given) must belong to the caller's shop; otherwise nothing is written.
+                if (!await ShopOwnership.InShopAsync(connection, "[Order]", "OrderID", model.OrderId, model.InstitutionId))
+                    return NotFound(new { success = false, message = "Order not found" });
+                if (model.AccountId.HasValue && model.AccountId.Value > 0
+                    && !await ShopOwnership.InShopAsync(connection, "Account", "AccountID", model.AccountId.Value, model.InstitutionId))
+                    return NotFound(new { success = false, message = "Account not found" });
+
                 using var transaction = connection.BeginTransaction();
 
                 try
@@ -596,7 +629,9 @@ namespace TailorBD.API.Controllers
                     connection);
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 cmd.Parameters.AddWithValue("@InstitutionID", institutionId > 0 ? institutionId : (object)DBNull.Value);
-                await cmd.ExecuteNonQueryAsync();
+                var rows = await cmd.ExecuteNonQueryAsync();
+                if (rows == 0)
+                    return NotFound(new { success = false, message = "Order not found" });
 
                 return Ok(new { success = true, message = "Print count updated" });
             }

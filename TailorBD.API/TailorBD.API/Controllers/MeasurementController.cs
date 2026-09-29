@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using TailorBD.API.Data;
+using TailorBD.API.Helpers;
 using System.Data.SqlClient;
 
 namespace TailorBD.API.Controllers
 {
+    [Authorize]
+    [ShopScoped] // login required; InstitutionID always comes from the token
     [Route("api/[controller]")]
     [ApiController]
     public class MeasurementController : ControllerBase
@@ -37,6 +41,16 @@ namespace TailorBD.API.Controllers
         {
             _context = context;
         }
+
+        private static bool DressBelongsToShop(System.Data.IDbConnection connection, int dressId, int institutionId)
+            => connection.ExecuteScalar<int>(
+                "SELECT COUNT(1) FROM Dress WHERE DressID = @D AND InstitutionID = @I",
+                new { D = dressId, I = institutionId }) > 0;
+
+        private static bool TypeBelongsToShop(System.Data.IDbConnection connection, int measurementTypeId, int institutionId)
+            => connection.ExecuteScalar<int>(
+                "SELECT COUNT(1) FROM Measurement_Type WHERE MeasurementTypeID = @T AND InstitutionID = @I",
+                new { T = measurementTypeId, I = institutionId }) > 0;
 
         // GET: api/Measurement/dress/{dressId}
         [HttpGet("dress/{dressId}")]
@@ -87,7 +101,7 @@ namespace TailorBD.API.Controllers
 
         // GET: api/Measurement/group/{groupId}/types
         [HttpGet("group/{groupId}/types")]
-        public IActionResult GetMeasurementTypes(int groupId)
+        public IActionResult GetMeasurementTypes(int groupId, [FromQuery] int institutionId = 0)
         {
             try
             {
@@ -101,9 +115,10 @@ namespace TailorBD.API.Controllers
                     FROM Measurement_Type
                     WHERE Measurement_GroupID = @GroupId
                       AND MeasurementTypeID <> @GroupId
+                      AND InstitutionID = @InstitutionId
                     ORDER BY ISNULL(Measurement_Group_SerialNo, 99999)";
 
-                var types = connection.Query<dynamic>(query, new { GroupId = groupId });
+                var types = connection.Query<dynamic>(query, new { GroupId = groupId, InstitutionId = institutionId });
 
                 return Ok(new
                 {
@@ -128,6 +143,8 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (!DressBelongsToShop(connection, model.DressId, model.InstitutionId))
+                    return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
                 
                 var insertQuery = @"
                     INSERT INTO Measurement_Type
@@ -165,6 +182,9 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (!DressBelongsToShop(connection, model.DressId, model.InstitutionId))
+                    return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
+                if (!TypeBelongsToShop(connection, model.MeasurementGroupId, model.InstitutionId)) return NotFound(new { success = false, message = "মাপ পাওয়া যায়নি / Not found" });
                 
                 var insertQuery = @"
                     INSERT INTO Measurement_Type
@@ -208,7 +228,8 @@ namespace TailorBD.API.Controllers
                     AND InstitutionID = @InstitutionId";
 
                 model.Id = id;
-                connection.Execute(updateQuery, model);
+                var n = connection.Execute(updateQuery, model);
+                if (n == 0) return NotFound(new { success = false, message = "মাপ পাওয়া যায়নি / Not found" });
 
                 return Ok(new
                 {
@@ -242,7 +263,8 @@ namespace TailorBD.API.Controllers
                     AND InstitutionID = @InstitutionId";
 
                 model.Id = id;
-                connection.Execute(updateQuery, model);
+                var n = connection.Execute(updateQuery, model);
+                if (n == 0) return NotFound(new { success = false, message = "মাপ পাওয়া যায়নি / Not found" });
 
                 return Ok(new
                 {
@@ -267,6 +289,7 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (!TypeBelongsToShop(connection, id, institutionId)) return NotFound(new { success = false, message = "মাপ পাওয়া যায়নি / Not found" });
                 connection.Open();
                 using var transaction = connection.BeginTransaction();
 
@@ -507,6 +530,8 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (!TypeBelongsToShop(connection, id, model.InstitutionId)
+                    || !TypeBelongsToShop(connection, model.GroupId, model.InstitutionId)) return NotFound(new { success = false, message = "মাপ পাওয়া যায়নি / Not found" });
 
                 var updateQuery = @"
                     UPDATE Measurement_Type
@@ -577,6 +602,8 @@ namespace TailorBD.API.Controllers
             try
             {
                 using var connection = _context.CreateConnection();
+                if (!DressBelongsToShop(connection, dressId, institutionId))
+                    return NotFound(new { success = false, message = "পোষাক পাওয়া যায়নি" });
                 
                 // Get order details
                 var detailsQuery = @"
@@ -733,6 +760,7 @@ namespace TailorBD.API.Controllers
         /// <summary>
         /// Get list of dress IDs that have measurements for a specific customer
         /// </summary>
+        // login required like the rest of this controller (order-edit now sends the token)
         [HttpGet("customer-dresses-with-measurements")]
         public IActionResult GetCustomerDressesWithMeasurements(int customerId, int institutionId)
         {
